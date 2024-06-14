@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'Lexend', sans-serif;
+  /* background-color: bisque */
+}
+.container {
+  @apply max-w-6xl mx-auto px-2;
+}
+.custom-btn {
+  @apply h-[40px] leading-[40px] bg-white rounded-full text-black inline-block text-sm px-8 transition ease-in-out duration-300;
+}
+.custom-btn:hover {
+  @apply bg-[#FFD700]  shadow-md;
+}
+.custom-heading {
+  @apply text-[32px]/[120%] lg:mb-5 lg:text-[64px]/[110%] -tracking-[1.5px] lg:-tracking-[4px] font-semibold;
+}
