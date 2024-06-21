@@ -3,18 +3,58 @@
 @tailwind utilities;
 
 body {
-  font-family: 'Lexend', sans-serif;
-  /* background-color: bisque */
+  font-family: 'Poppins';
 }
-.container {
-  @apply max-w-6xl mx-auto px-2;
+.container {  
+  @apply max-w-7xl mx-[auto] px-4;
 }
-.custom-btn {
-  @apply h-[40px] leading-[40px] bg-white rounded-full text-black inline-block text-sm px-8 transition ease-in-out duration-300;
-}
-.custom-btn:hover {
-  @apply bg-[#FFD700]  shadow-md;
+.text-hover:hover{
+  color: #00BADB;
 }
 .custom-heading {
-  @apply text-[32px]/[120%] lg:mb-5 lg:text-[64px]/[110%] -tracking-[1.5px] lg:-tracking-[4px] font-semibold;
+  @apply text-[32px]/[120%]  lg:text-[28px]/[110%] font-semibold text-center;
 }
+.custom-heading-sub {
+  font-family: 'LibreBaskerville-Italic.ttf';
+  font-size: 18px;
+  color: #878787
+}
+.custom-btn {
+  @apply bg-[#00BADB] text-[#fff] w-[150px] h-[48px] font-bold text-lg relative z-10 transition ease-in-out duration-300;
+}
+.custom-btn::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #000;
+  z-index: -1;
+  transition: height 0.2s ease-in;
+}
+.custom-btn:hover::before {
+  height: 0;
+}
+.btn-load:hover::before {
+  width: 0;
+  border-radius: 180px;
+}
+.btn-load {
+  @apply bg-[#00BADB] text-[#fff] w-[150px] h-[48px] font-bold text-lg relative z-10 transition ease-in-out duration-300
+ rounded-[180px] 
+  ;
+}
+.btn-load::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #000;
+  z-index: -1;
+  transition: width 0.2s ease-in;
+  border-radius: 180px;
+}
+
