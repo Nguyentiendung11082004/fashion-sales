@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 body {
-  font-family: 'Poppins';
+  /* font-family: 'Poppins'; */
 }
 .container {  
   @apply max-w-7xl mx-[auto] px-4;
