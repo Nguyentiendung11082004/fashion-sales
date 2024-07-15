@@ -3,23 +3,21 @@
 @tailwind utilities;
 
 body {
-  /* font-family: "Poppins"; */
+  font-family: 'Poppins';
 }
-
-
-.container {
+.container {  
   @apply max-w-7xl mx-[auto] px-4;
 }
-.text-hover:hover {
-  color: #00badb;
+.text-hover:hover{
+  color: #00BADB;
 }
 .custom-heading {
   @apply text-[32px]/[120%]  lg:text-[28px]/[110%] font-semibold text-center;
 }
 .custom-heading-sub {
-  font-family: "LibreBaskerville-Italic.ttf";
+  font-family: 'LibreBaskerville-Italic.ttf';
   font-size: 18px;
-  color: #878787;
+  color: #878787
 }
 .custom-btn {
   @apply bg-[#00BADB] text-[#fff] w-[150px] h-[48px] font-bold text-lg relative z-10 transition ease-in-out duration-300;
@@ -38,17 +36,15 @@ body {
 .custom-btn:hover::before {
   height: 0;
 }
-
 .btn-load:hover::before {
   width: 0;
   border-radius: 180px;
 }
-
 .btn-load {
-  @apply bg-[#00BADB] text-[#fff] w-[150px] h-[48px] font-bold text-lg relative z-10 transition ease-in-out duration-500
- rounded-[180px];
+  @apply bg-[#00BADB] text-[#fff] w-[150px] h-[48px] font-bold text-lg relative z-10 transition ease-in-out duration-300
+ rounded-[180px] 
+  ;
 }
-
 .btn-load::before {
   content: "";
   position: absolute;
@@ -58,31 +54,7 @@ body {
   height: 100%;
   background-color: #000;
   z-index: -1;
-  transition: width 0.5s ease-in;
+  transition: width 0.2s ease-in;
   border-radius: 180px;
 }
-
-/* css notFound */
-.emoji-404 {
-  position: relative;
-  animation: mymove 2.5s infinite;
-}
-
-@keyframes mymove {
-  33%   {top: 0px;}
-  66%  {top: 20px;}
-  100%  {top: 0px}
-
-
-
-}
-
-.overlay {
-  
-  
-    background-color: black; /* Màu của lớp phủ */
-    opacity: 0.8; /* Độ mờ của lớp phủ, giá trị từ 0 đến 1 */
-}
-
-
 
