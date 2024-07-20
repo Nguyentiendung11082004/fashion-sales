@@ -1,0 +1,1712 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap"
+    />
+    <title>Vite + React + TS</title>
+  </head>
+
+  <body class="">
+    <!-- info -->
+
+    <section class="bg-[#F6F6F8] text-xs">
+      <div
+        class="text-[#878787] flex lg:justify-between lg:items-center flex-wrap sm:justify-center md:justify-center py-4 lg:mx-4 h-[auto] lg:h-[48px] md:h-[48px]"
+      >
+        <div class="hidden lg:flex">
+          <div class="flex mr-4">
+            <svg
+              class="w-4 h-4 mr-1"
+              fill="none"
+              stroke="currentColor"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z"
+              />
+            </svg>
+            <!-- test -->
+            <span class=""> +0123456789 </span>
+          </div>
+          <div class="flex">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="size-6 w-4 h-4 mr-1"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"
+              />
+            </svg>
+
+            <span class="text-[#878787]"> Kalle@domain.com </span>
+          </div>
+        </div>
+        <div class="mx-auto lg:mx-0">
+          <span class="">
+            Summer sale discount off <span class="text-[red]">50%</span>!
+            <span class="text-black">Shop Now</span>
+          </span>
+        </div>
+        <div class="flex mx-auto lg:mx-0">
+          <div class="flex items-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="size-6 w-5 h-5 mr-1"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+              />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"
+              />
+            </svg>
+            <span class="">Location</span>
+          </div>
+          <div class="mx-5">
+            <select name="" id="" class="bg-[#F6F6F8]">
+              <option value="">English</option>
+              <option value="">Viet nam</option>
+            </select>
+          </div>
+          <div class="flex items-center">
+            <img
+              src="./src/assets/icons/icon-vn.svg?v=2"
+              class="w-4 h-3 object-cover"
+              alt=""
+            />
+            <select class="bg-[#F6F6F8] mt-[-2px]">
+              <option value="">VND</option>
+              <option value="">Canada</option>
+              <option value="">France</option>
+            </select>
+          </div>
+          <!-- <div></div> -->
+        </div>
+      </div>
+    </section>
+
+    <!-- header -->
+    <div class="w-full border">
+      <header
+        class="container bg-[#fff] z-10 h-[70px] grid grid-cols-12 gap-4 text-sm"
+      >
+        <div
+          class="lg:col-span-2 col-span-4 flex justify-center items-center md:items-center md:justify-start order-2 lg:order-1"
+        >
+          <img src="./src/assets/images/logo.png" class="h-10" alt="Logo" />
+        </div>
+        <div
+          class="col-span-4 flex items-center justify-start md:items-center md:justify-start lg:hidden order-1"
+        >
+          <svg
+            class=" "
+            xmlns="http://www.w3.org/2000/svg"
+            width="30"
+            height="16"
+            viewBox="0 0 30 16"
+            fill="currentColor"
+          >
+            <rect width="30" height="1.5"></rect>
+            <rect y="7" width="20" height="1.5"></rect>
+            <rect y="14" width="30" height="1.5"></rect>
+          </svg>
+        </div>
+        <div
+          class="lg:col-span-8 lg:flex lg:items-center lg:justify-center md:hidden sm:hidden hidden lg:order-2"
+        >
+          <ul class="flex space-x-16 ml-10">
+            <li><a href="" class="font-normal text-hover">Home</a></li>
+            <li class="relative">
+              <a href="" class="font-normal text-hover"
+                >Shop
+                <span
+                  class="absolute text-[9px] rounded-full px-2 text-white bg-primary top-[-15px] left-6"
+                  >New</span
+                ></a
+              >
+            </li>
+            <li>
+              <a href="/product.html" class="font-normal text-hover">Product</a>
+            </li>
+            <li>
+              <a href="" class="font-normal text-hover">Accessory</a>
+            </li>
+            <li><a href="" class="font-normal text-hover">Shoe</a></li>
+            <li><a href="" class="font-normal text-hover">Blog</a></li>
+            <li>
+              <a href="" class="font-normal text-hover">Contact</a>
+            </li>
+          </ul>
+        </div>
+        <div
+          class="lg:col-span-2 col-span-4 flex items-center justify-end order-3"
+        >
+          <div class="flex items-center space-x-4">
+            <a href="" class="">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="size-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+                />
+              </svg>
+            </a>
+            <a href="" class="hidden lg:block">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="h-6 w-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
+                />
+              </svg>
+            </a>
+            <a href="" class="hidden lg:block" class="relative">
+              <span
+                class="absolute text-xs right-[-5px] top-[-5px] bg-[#000] text-white px-1 rounded-full"
+                >0</span
+              >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="h-6 w-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
+                />
+              </svg>
+            </a>
+            <a href="" class="relative">
+              <span
+                class="absolute text-xs right-[-5px] top-[-5px] bg-[#000] text-white px-1 rounded-full"
+                >3</span
+              >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="h-6 w-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
+                />
+              </svg>
+            </a>
+          </div>
+        </div>
+      </header>
+    </div>
+    <!-- main -->
+
+    <div class="w-full bg-[#f6f6f6]">
+      <div class="container h-[55px] flex items-center">
+        <span class="text-[13px]">Home</span>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="size-6 w-4 h-[10px]"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="m8.25 4.5 7.5 7.5-7.5 7.5"
+          />
+        </svg>
+        <span class="text-[13px] text-[#222]">Tên sản phẩm</span>
+      </div>
+
+      <div
+        class="container lg:flex justify-between pt-[20px] lg:mb-[20px] bg-white"
+      >
+      <!-- left -->
+        <div class="lg:w-[50%] w-full mr-[10px] lg:flex relative">
+        
+          <div
+            class="lg:w-[75%] lg:flex justify-between items-center relative border bg-[white] lg:order-1 "
+          >
+            <button class="lg:block hidden">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="size-6 w-10 h-10 absolute left-4 rounded-full border-2 border-black bg-white top-[50%] -translate-x-1/2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M15.75 19.5 8.25 12l7.5-7.5"
+                />
+              </svg>
+            </button>
+
+            <img
+              class="lg:w-[90%] w-[100%] m-auto object-cover h-[300px] lg:h-[500px] lg:flex items-center"
+              src="data:image/jpeg;base64,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"
+              alt=""
+            />
+            <button class="hidden lg:block">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="size-6 w-10 h-10 absolute -right-6 rounded-full border-2 border-black bg-white top-[50%] -translate-x-1/2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="m8.25 4.5 7.5 7.5-7.5 7.5"
+                />
+              </svg>
+            </button>
+          </div>
+          <div class="lg:w-[20%] lg:block  w-[100%] flex ">
+            <img
+              class="h-[90px] w-[90px]"
+              src="data:image/jpeg;base64,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"
+              alt=""
+            />
+            <img
+              class="h-[90px] w-[90px]"
+              src="data:image/jpeg;base64,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"
+              alt=""
+            />
+            <img
+              class="h-[90px] w-[90px]"
+              src="data:image/jpeg;base64,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"
+              alt=""
+            />
+          </div>
+          
+        </div>
+
+        <!-- right -->
+        <div class="lg:w-[50%]">
+          <h2 class="lgtext-base text-sm font-bold my-2">Ten san pham</h2>
+          <p class="lg:text-xl text-sm text-[#878787] my-2">$700.000</p>
+          <p class="lg:text-sm text-xs text-[#878787] mb-[30px]">
+            Go kalles this summer with this vintage navy and white striped
+            v-neck t-shirt from the Nike. Perfect for pairing with denim and
+            white kicks for a stylish kalles vibe.
+          </p>
+          <p class="lg:text-base mb-[20px] text-xs">CHOOSE STYLE</p>
+          <div class="w-full grid grid-cols-4 gap-4 mb-[20px]">
+            <div class="border px-1 rounded-xl">
+              <img
+                class="w-full object-cover h-[130px]"
+                src="https://demo-kalles-4-1.myshopify.com/cdn/shop/products/700_b6fb2d40-f262-49b9-a656-db8394dc622e.jpg?v=1652079363&width=102"
+                alt=""
+              />
+              <p class="lg:text-base text-xs py-1">Ten san pham</p>
+            </div>
+            <div class="border px-1 rounded-xl">
+              <img
+                class="w-full object-cover h-[130px]"
+                src="https://demo-kalles-4-1.myshopify.com/cdn/shop/products/700_b6fb2d40-f262-49b9-a656-db8394dc622e.jpg?v=1652079363&width=102"
+                alt=""
+              />
+              <p class="lg:text-base text-xs py-1">Ten san pham</p>
+            </div>
+            <div class="border px-1 rounded-xl">
+              <img
+                class="w-full object-cover h-[130px]"
+                src="https://demo-kalles-4-1.myshopify.com/cdn/shop/products/700_b6fb2d40-f262-49b9-a656-db8394dc622e.jpg?v=1652079363&width=102"
+                alt=""
+              />
+              <p class="lg:text-base text-xs py-1">Ten san pham</p>
+            </div>
+            <div class="border px-1 rounded-xl">
+              <img
+                class="w-full object-cover h-[130px]"
+                src="https://demo-kalles-4-1.myshopify.com/cdn/shop/products/700_b6fb2d40-f262-49b9-a656-db8394dc622e.jpg?v=1652079363&width=102"
+                alt=""
+              />
+              <p class="text-sm py-1">Ten san pham</p>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-center lg:text-base text-xs">
+            <div
+              class="border-2 border-black w-[120px] h-[40px] rounded-full flex justify-between px-2 font-bold"
+            >
+              <button class="lg:text-base text-xs text-hover">-</button>
+              <button class="lg:text-base text-xs">1</button>
+              <button class="lg:text-base text-xs text-hover">+</button>
+            </div>
+
+
+            <button
+              class=" animate-bounce focus:animate-none hover:animate-none inline-flex text-md  mt-3 lg:py-2 py-3 tracking-wide  h-[40px] px-8 border bg-[#56cfe1] text-white rounded-full font-bold mx-[10px]"
+            >
+              Thêm vào giỏ hàng
+            </button>
+            <div
+              class="h-[40px] w-[40px] rounded-full flex items-center justify-center border-2 border-black text-hover"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="size-6 w-[20px] h-[20px]"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
+                />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="w-full bg-[#f6f6f8] mb-[40px]">
+        <div class="container py-[40px] lg:block hidden">
+          <div class="flex m-auto justify-between w-[40%]">
+            <a href="" class="w-[132px]">
+              <button class="px-4 border py-2 rounded-full">Desciption</button>
+            </a>
+            <a href="" class="w-[132px]">
+              <button class="px-4 border py-2 rounded-full">Custom tab</button>
+            </a>
+            <a href="" class="w-[132px]">
+              <button class="px-4 border py-2 rounded-full">Reviews</button>
+            </a>
+          </div>
+
+          <div class="">
+            <p class="text-base font-bold my-[20px]">Tieu de mo ta</p>
+            <p class="text-sm">
+              Hỗ trợ ý chính: For example, a study conducted by researchers at
+              the University of Nature found that exposure to natural
+              environments, such as mountains, can reduce stress levels.
+              Additionally, hikers often report a feeling of accomplishment and
+              improved mood after conquering a challenging mountain trail. Câu
+              kết luận: In conclusion, hiking in the mountains is not just a
+              physical activity; it is a therapeutic experience that offers both
+              mental and emotional benefits.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="container m-auto mb-[50px]">
+      <p
+        class="lg:text-2xl text-base mb-[30px] font-semibold m-auto text-center"
+      >
+        You may also like
+      </p>
+      <div class="">
+        <div
+          class="grid lg:grid-cols-4 grid-cols-2 gap-8 border-b border-gray-200 relative"
+        >
+          <!-- item 1 -->
+
+          <div class="lg:mb-[25px] mb-[20px]">
+            <div
+              class="lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] overflow-hidden"
+            >
+              <img
+                class="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover/image:opacity-0"
+                src="./src/assets/images/product.webp"
+                alt=""
+              />
+              <img
+                class="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover/image:opacity-100"
+                src="./src/assets/images/product-next.webp"
+                alt=""
+              />
+              <div class="">
+                <a href="" class="absolute left-5 top-5">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="hidden h-6 w-6 text-white group-hover:block"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
+                    />
+                  </svg>
+                </a>
+              </div>
+              <div
+                class="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100"
+              >
+                <a href="" class="group/btn relative m-auto">
+                  <button
+                    class="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]"
+                  >
+                    <p
+                      class="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0"
+                    >
+                      Xem thêm
+                    </p>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="mx-auto size-6 lg:translate-y-5 lg:transform lg:text-white lg:opacity-0 lg:transition-all lg:duration-300 lg:ease-in-out lg:group-hover/btn:-translate-y-3 lg:group-hover/btn:opacity-100"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
+                      />
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                      />
+                    </svg>
+                  </button>
+                </a>
+                <a href="" class="group/btn relative">
+                  <button
+                    class="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]"
+                  >
+                    <p
+                      class="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0"
+                    >
+                      Thêm vào giỏ hàng
+                    </p>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="mx-auto size-6 translate-y-1 transform text-white opacity-0 transition-all duration-300 ease-in-out group-hover/btn:-translate-y-3 group-hover/btn:opacity-100"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
+                      />
+                    </svg>
+                  </button>
+                </a>
+              </div>
+              <div class="absolute bottom-2 left-[35%] text-white
+         -translate-y-7 transform 
+          transition-all duration-500 ease-in-out 
+          group-hover:translate-y-0
+          opacity-0
+          group-hover:opacity-100
+        ">
+          <ul class="flex">
+            <li><a href="">XS,</a></li>
+            <li><a href="">S,</a></li>
+            <li><a href="">M,</a></li>
+            <li><a href="">L,</a></li>
+            <li><a href="">XL</a></li>
+          </ul>
+        </div>
+
+              <div
+                class="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400"
+              >
+                -15%
+              </div>
+            </div>
+            <div class="">
+              <p class="text-sm text-black mb-1">Analogue Resin Strap</p>
+              <del class="mr-1">12.000.000đ</del>
+              <span class="text-[red]">776.000₫</span>
+            </div>
+          </div>
+          <div class="lg:mb-[25px] mb-[20px]">
+            <div
+              class="lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] overflow-hidden"
+            >
+              <img
+                class="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover/image:opacity-0"
+                src="./src/assets/images/product.webp"
+                alt=""
+              />
+              <img
+                class="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover/image:opacity-100"
+                src="./src/assets/images/product-next.webp"
+                alt=""
+              />
+              <div class="">
+                <a href="" class="absolute left-5 top-5">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="hidden h-6 w-6 text-white group-hover:block"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
+                    />
+                  </svg>
+                </a>
+              </div>
+              <div
+                class="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100"
+              >
+                <a href="" class="group/btn relative m-auto">
+                  <button
+                    class="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]"
+                  >
+                    <p
+                      class="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0"
+                    >
+                      Xem thêm
+                    </p>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="mx-auto size-6 lg:translate-y-5 lg:transform lg:text-white lg:opacity-0 lg:transition-all lg:duration-300 lg:ease-in-out lg:group-hover/btn:-translate-y-3 lg:group-hover/btn:opacity-100"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
+                      />
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                      />
+                    </svg>
+                  </button>
+                </a>
+                <a href="" class="group/btn relative">
+                  <button
+                    class="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]"
+                  >
+                    <p
+                      class="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0"
+                    >
+                      Thêm vào giỏ hàng
+                    </p>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="mx-auto size-6 translate-y-1 transform text-white opacity-0 transition-all duration-300 ease-in-out group-hover/btn:-translate-y-3 group-hover/btn:opacity-100"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
+                      />
+                    </svg>
+                  </button>
+                </a>
+              </div>
+              <div class="absolute bottom-2 left-[35%] text-white
+         -translate-y-7 transform 
+          transition-all duration-500 ease-in-out 
+          group-hover:translate-y-0
+          opacity-0
+          group-hover:opacity-100
+        ">
+          <ul class="flex">
+            <li><a href="">XS,</a></li>
+            <li><a href="">S,</a></li>
+            <li><a href="">M,</a></li>
+            <li><a href="">L,</a></li>
+            <li><a href="">XL</a></li>
+          </ul>
+        </div>
+
+              <div
+                class="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400"
+              >
+                -15%
+              </div>
+            </div>
+            <div class="">
+              <p class="text-sm text-black mb-1">Analogue Resin Strap</p>
+              <del class="mr-1">12.000.000đ</del>
+              <span class="text-[red]">776.000₫</span>
+            </div>
+          </div>
+          <div class="lg:mb-[25px] mb-[20px]">
+            <div
+              class="lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] overflow-hidden"
+            >
+              <img
+                class="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover/image:opacity-0"
+                src="./src/assets/images/product.webp"
+                alt=""
+              />
+              <img
+                class="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover/image:opacity-100"
+                src="./src/assets/images/product-next.webp"
+                alt=""
+              />
+              <div class="">
+                <a href="" class="absolute left-5 top-5">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="hidden h-6 w-6 text-white group-hover:block"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
+                    />
+                  </svg>
+                </a>
+              </div>
+              <div
+                class="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100"
+              >
+                <a href="" class="group/btn relative m-auto">
+                  <button
+                    class="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]"
+                  >
+                    <p
+                      class="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0"
+                    >
+                      Xem thêm
+                    </p>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="mx-auto size-6 lg:translate-y-5 lg:transform lg:text-white lg:opacity-0 lg:transition-all lg:duration-300 lg:ease-in-out lg:group-hover/btn:-translate-y-3 lg:group-hover/btn:opacity-100"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
+                      />
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                      />
+                    </svg>
+                  </button>
+                </a>
+                <a href="" class="group/btn relative">
+                  <button
+                    class="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]"
+                  >
+                    <p
+                      class="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0"
+                    >
+                      Thêm vào giỏ hàng
+                    </p>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="mx-auto size-6 translate-y-1 transform text-white opacity-0 transition-all duration-300 ease-in-out group-hover/btn:-translate-y-3 group-hover/btn:opacity-100"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
+                      />
+                    </svg>
+                  </button>
+                </a>
+              </div>
+              <div class="absolute bottom-2 left-[35%] text-white
+         -translate-y-7 transform 
+          transition-all duration-500 ease-in-out 
+          group-hover:translate-y-0
+          opacity-0
+          group-hover:opacity-100
+        ">
+          <ul class="flex">
+            <li><a href="">XS,</a></li>
+            <li><a href="">S,</a></li>
+            <li><a href="">M,</a></li>
+            <li><a href="">L,</a></li>
+            <li><a href="">XL</a></li>
+          </ul>
+        </div>
+
+              <div
+                class="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400"
+              >
+                -15%
+              </div>
+            </div>
+            <div class="">
+              <p class="text-sm text-black mb-1">Analogue Resin Strap</p>
+              <del class="mr-1">12.000.000đ</del>
+              <span class="text-[red]">776.000₫</span>
+            </div>
+          </div>
+          <div class="lg:mb-[25px] mb-[20px]">
+            <div
+              class="lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] overflow-hidden"
+            >
+              <img
+                class="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover/image:opacity-0"
+                src="./src/assets/images/product.webp"
+                alt=""
+              />
+              <img
+                class="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover/image:opacity-100"
+                src="./src/assets/images/product-next.webp"
+                alt=""
+              />
+              <div class="">
+                <a href="" class="absolute left-5 top-5">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="hidden h-6 w-6 text-white group-hover:block"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
+                    />
+                  </svg>
+                </a>
+              </div>
+              <div
+                class="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100"
+              >
+                <a href="" class="group/btn relative m-auto">
+                  <button
+                    class="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]"
+                  >
+                    <p
+                      class="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0"
+                    >
+                      Xem thêm
+                    </p>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="mx-auto size-6 lg:translate-y-5 lg:transform lg:text-white lg:opacity-0 lg:transition-all lg:duration-300 lg:ease-in-out lg:group-hover/btn:-translate-y-3 lg:group-hover/btn:opacity-100"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
+                      />
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                      />
+                    </svg>
+                  </button>
+                </a>
+                <a href="" class="group/btn relative">
+                  <button
+                    class="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]"
+                  >
+                    <p
+                      class="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0"
+                    >
+                      Thêm vào giỏ hàng
+                    </p>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="mx-auto size-6 translate-y-1 transform text-white opacity-0 transition-all duration-300 ease-in-out group-hover/btn:-translate-y-3 group-hover/btn:opacity-100"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
+                      />
+                    </svg>
+                  </button>
+                </a>
+              </div>
+              <div class="absolute bottom-2 left-[35%] text-white
+         -translate-y-7 transform 
+          transition-all duration-500 ease-in-out 
+          group-hover:translate-y-0
+          opacity-0
+          group-hover:opacity-100
+        ">
+          <ul class="flex">
+            <li><a href="">XS,</a></li>
+            <li><a href="">S,</a></li>
+            <li><a href="">M,</a></li>
+            <li><a href="">L,</a></li>
+            <li><a href="">XL</a></li>
+          </ul>
+        </div>
+
+              <div
+                class="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400"
+              >
+                -15%
+              </div>
+            </div>
+            <div class="">
+              <p class="text-sm text-black mb-1">Analogue Resin Strap</p>
+              <del class="mr-1">12.000.000đ</del>
+              <span class="text-[red]">776.000₫</span>
+            </div>
+          </div>
+       
+        </div>
+      </div>
+    </div>
+    <div class="container m-auto mb-[50px]">
+      <p
+        class="lg:text-2xl text-base mb-[30px] font-semibold m-auto text-center"
+      >
+        Recently viewed products
+      </p>
+      <div class="">
+        <div
+          class="grid lg:grid-cols-4 grid-cols-2 gap-8 border-b border-gray-200 relative"
+        >
+          <!-- item 1 -->
+
+          <div class="lg:mb-[25px] mb-[20px]">
+            <div
+              class="lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] overflow-hidden"
+            >
+              <img
+                class="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover/image:opacity-0"
+                src="./src/assets/images/product.webp"
+                alt=""
+              />
+              <img
+                class="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover/image:opacity-100"
+                src="./src/assets/images/product-next.webp"
+                alt=""
+              />
+              <div class="">
+                <a href="" class="absolute left-5 top-5">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="hidden h-6 w-6 text-white group-hover:block"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
+                    />
+                  </svg>
+                </a>
+              </div>
+              <div
+                class="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100"
+              >
+                <a href="" class="group/btn relative m-auto">
+                  <button
+                    class="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]"
+                  >
+                    <p
+                      class="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0"
+                    >
+                      Xem thêm
+                    </p>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="mx-auto size-6 lg:translate-y-5 lg:transform lg:text-white lg:opacity-0 lg:transition-all lg:duration-300 lg:ease-in-out lg:group-hover/btn:-translate-y-3 lg:group-hover/btn:opacity-100"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
+                      />
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                      />
+                    </svg>
+                  </button>
+                </a>
+                <a href="" class="group/btn relative">
+                  <button
+                    class="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]"
+                  >
+                    <p
+                      class="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0"
+                    >
+                      Thêm vào giỏ hàng
+                    </p>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="mx-auto size-6 translate-y-1 transform text-white opacity-0 transition-all duration-300 ease-in-out group-hover/btn:-translate-y-3 group-hover/btn:opacity-100"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
+                      />
+                    </svg>
+                  </button>
+                </a>
+              </div>
+              <div class="absolute bottom-2 left-[35%] text-white
+         -translate-y-7 transform 
+          transition-all duration-500 ease-in-out 
+          group-hover:translate-y-0
+          opacity-0
+          group-hover:opacity-100
+        ">
+          <ul class="flex">
+            <li><a href="">XS,</a></li>
+            <li><a href="">S,</a></li>
+            <li><a href="">M,</a></li>
+            <li><a href="">L,</a></li>
+            <li><a href="">XL</a></li>
+          </ul>
+        </div>
+
+              <div
+                class="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400"
+              >
+                -15%
+              </div>
+            </div>
+            <div class="">
+              <p class="text-sm text-black mb-1">Analogue Resin Strap</p>
+              <del class="mr-1">12.000.000đ</del>
+              <span class="text-[red]">776.000₫</span>
+            </div>
+          </div>
+          <div class="lg:mb-[25px] mb-[20px]">
+            <div
+              class="lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] overflow-hidden"
+            >
+              <img
+                class="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover/image:opacity-0"
+                src="./src/assets/images/product.webp"
+                alt=""
+              />
+              <img
+                class="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover/image:opacity-100"
+                src="./src/assets/images/product-next.webp"
+                alt=""
+              />
+              <div class="">
+                <a href="" class="absolute left-5 top-5">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="hidden h-6 w-6 text-white group-hover:block"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
+                    />
+                  </svg>
+                </a>
+              </div>
+              <div
+                class="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100"
+              >
+                <a href="" class="group/btn relative m-auto">
+                  <button
+                    class="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]"
+                  >
+                    <p
+                      class="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0"
+                    >
+                      Xem thêm
+                    </p>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="mx-auto size-6 lg:translate-y-5 lg:transform lg:text-white lg:opacity-0 lg:transition-all lg:duration-300 lg:ease-in-out lg:group-hover/btn:-translate-y-3 lg:group-hover/btn:opacity-100"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
+                      />
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                      />
+                    </svg>
+                  </button>
+                </a>
+                <a href="" class="group/btn relative">
+                  <button
+                    class="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]"
+                  >
+                    <p
+                      class="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0"
+                    >
+                      Thêm vào giỏ hàng
+                    </p>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="mx-auto size-6 translate-y-1 transform text-white opacity-0 transition-all duration-300 ease-in-out group-hover/btn:-translate-y-3 group-hover/btn:opacity-100"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
+                      />
+                    </svg>
+                  </button>
+                </a>
+              </div>
+              <div class="absolute bottom-2 left-[35%] text-white
+         -translate-y-7 transform 
+          transition-all duration-500 ease-in-out 
+          group-hover:translate-y-0
+          opacity-0
+          group-hover:opacity-100
+        ">
+          <ul class="flex">
+            <li><a href="">XS,</a></li>
+            <li><a href="">S,</a></li>
+            <li><a href="">M,</a></li>
+            <li><a href="">L,</a></li>
+            <li><a href="">XL</a></li>
+          </ul>
+        </div>
+
+              <div
+                class="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400"
+              >
+                -15%
+              </div>
+            </div>
+            <div class="">
+              <p class="text-sm text-black mb-1">Analogue Resin Strap</p>
+              <del class="mr-1">12.000.000đ</del>
+              <span class="text-[red]">776.000₫</span>
+            </div>
+          </div>
+          <div class="lg:mb-[25px] mb-[20px]">
+            <div
+              class="lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] overflow-hidden"
+            >
+              <img
+                class="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover/image:opacity-0"
+                src="./src/assets/images/product.webp"
+                alt=""
+              />
+              <img
+                class="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover/image:opacity-100"
+                src="./src/assets/images/product-next.webp"
+                alt=""
+              />
+              <div class="">
+                <a href="" class="absolute left-5 top-5">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="hidden h-6 w-6 text-white group-hover:block"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
+                    />
+                  </svg>
+                </a>
+              </div>
+              <div
+                class="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100"
+              >
+                <a href="" class="group/btn relative m-auto">
+                  <button
+                    class="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]"
+                  >
+                    <p
+                      class="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0"
+                    >
+                      Xem thêm
+                    </p>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="mx-auto size-6 lg:translate-y-5 lg:transform lg:text-white lg:opacity-0 lg:transition-all lg:duration-300 lg:ease-in-out lg:group-hover/btn:-translate-y-3 lg:group-hover/btn:opacity-100"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
+                      />
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                      />
+                    </svg>
+                  </button>
+                </a>
+                <a href="" class="group/btn relative">
+                  <button
+                    class="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]"
+                  >
+                    <p
+                      class="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0"
+                    >
+                      Thêm vào giỏ hàng
+                    </p>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="mx-auto size-6 translate-y-1 transform text-white opacity-0 transition-all duration-300 ease-in-out group-hover/btn:-translate-y-3 group-hover/btn:opacity-100"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
+                      />
+                    </svg>
+                  </button>
+                </a>
+              </div>
+              <div class="absolute bottom-2 left-[35%] text-white
+         -translate-y-7 transform 
+          transition-all duration-500 ease-in-out 
+          group-hover:translate-y-0
+          opacity-0
+          group-hover:opacity-100
+        ">
+          <ul class="flex">
+            <li><a href="">XS,</a></li>
+            <li><a href="">S,</a></li>
+            <li><a href="">M,</a></li>
+            <li><a href="">L,</a></li>
+            <li><a href="">XL</a></li>
+          </ul>
+        </div>
+
+              <div
+                class="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400"
+              >
+                -15%
+              </div>
+            </div>
+            <div class="">
+              <p class="text-sm text-black mb-1">Analogue Resin Strap</p>
+              <del class="mr-1">12.000.000đ</del>
+              <span class="text-[red]">776.000₫</span>
+            </div>
+          </div>
+          <div class="lg:mb-[25px] mb-[20px]">
+            <div
+              class="lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] overflow-hidden"
+            >
+              <img
+                class="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover/image:opacity-0"
+                src="./src/assets/images/product.webp"
+                alt=""
+              />
+              <img
+                class="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover/image:opacity-100"
+                src="./src/assets/images/product-next.webp"
+                alt=""
+              />
+              <div class="">
+                <a href="" class="absolute left-5 top-5">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="hidden h-6 w-6 text-white group-hover:block"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
+                    />
+                  </svg>
+                </a>
+              </div>
+              <div
+                class="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100"
+              >
+                <a href="" class="group/btn relative m-auto">
+                  <button
+                    class="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]"
+                  >
+                    <p
+                      class="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0"
+                    >
+                      Xem thêm
+                    </p>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="mx-auto size-6 lg:translate-y-5 lg:transform lg:text-white lg:opacity-0 lg:transition-all lg:duration-300 lg:ease-in-out lg:group-hover/btn:-translate-y-3 lg:group-hover/btn:opacity-100"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
+                      />
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                      />
+                    </svg>
+                  </button>
+                </a>
+                <a href="" class="group/btn relative">
+                  <button
+                    class="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]"
+                  >
+                    <p
+                      class="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0"
+                    >
+                      Thêm vào giỏ hàng
+                    </p>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      class="mx-auto size-6 translate-y-1 transform text-white opacity-0 transition-all duration-300 ease-in-out group-hover/btn:-translate-y-3 group-hover/btn:opacity-100"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
+                      />
+                    </svg>
+                  </button>
+                </a>
+              </div>
+              <div class="absolute bottom-2 left-[35%] text-white
+         -translate-y-7 transform 
+          transition-all duration-500 ease-in-out 
+          group-hover:translate-y-0
+          opacity-0
+          group-hover:opacity-100
+        ">
+          <ul class="flex">
+            <li><a href="">XS,</a></li>
+            <li><a href="">S,</a></li>
+            <li><a href="">M,</a></li>
+            <li><a href="">L,</a></li>
+            <li><a href="">XL</a></li>
+          </ul>
+        </div>
+
+              <div
+                class="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400"
+              >
+                -15%
+              </div>
+            </div>
+            <div class="">
+              <p class="text-sm text-black mb-1">Analogue Resin Strap</p>
+              <del class="mr-1">12.000.000đ</del>
+              <span class="text-[red]">776.000₫</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="container text-center mt-[20px] text-gray-500 lg:text-sm text-xs"
+    >
+      <a class="hover:text-[red] px-4">Pre</a>
+      <a class="hover:text-[red] px-4">1</a>
+      <a class="hover:text-[red] px-4">2</a>
+      <a class="hover:text-[red] px-4">3</a>
+      <a class="hover:text-[red] px-4">...</a>
+      <a class="hover:text-[red] px-4">100</a>
+      <a class="hover:text-[red] px-4">Next</a>
+    </div>
+
+    <!-- footer -->
+    <footer class="bg-[#f6f6f8] mt-5 py-16 text-[#878787]">
+      <div
+        class="container grid lg:grid-cols-12 md:grid-cols-2 sm:grid-cols-1 gap-4"
+      >
+        <div class="mt-5 lg:col-span-3 md:col-span-6 md:order-1 lg:order-1">
+          <img
+            src="./src/assets/images/logo.png"
+            class="h-10 mb-10"
+            alt="Logo"
+          />
+
+          <div class="flex mb-5">
+            <div class="mr-2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="size-7 text-[#878787]"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"
+                />
+              </svg>
+            </div>
+            <p>184 Main Rd E, St Albans VIC 3021, Australia</p>
+          </div>
+          <div class="flex mb-5">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="size-6 w-7 h-7 mr-2 text-[#878787]"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"
+              />
+            </svg>
+            <p>contact@company.com</p>
+          </div>
+          <div class="flex mb-5">
+            <div class="mr-2">
+              <svg
+                class="w-7 h-7 text-[#878787]"
+                fill="none"
+                stroke="currentColor"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z"
+                />
+              </svg>
+            </div>
+            <p>+001 2233 456</p>
+          </div>
+          <ul class="flex">
+            <li class="mr-6">
+              <a href="">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="w-5 h-5"
+                  viewBox="0 0 320 512"
+                >
+                  <path
+                    d="M80 299.3V512H196V299.3h86.5l18-97.8H196V166.9c0-51.7 20.3-71.5 72.7-71.5c16.3 0 29.4 .4 37 1.2V7.9C291.4 4 256.4 0 236.2 0C129.3 0 80 50.5 80 159.4v42.1H14v97.8H80z"
+                  />
+                </svg>
+              </a>
+            </li>
+            <li class="mr-6">
+              <a href="">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="w-5 h-5"
+                  viewBox="0 0 512 512"
+                >
+                  <path
+                    d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z"
+                  />
+                </svg>
+              </a>
+            </li>
+            <li class="mr-6">
+              <a href="">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="w-5 h-5"
+                  viewBox="0 0 448 512"
+                >
+                  <path
+                    d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1s2.7 102.7-9 132.1z"
+                  />
+                </svg>
+              </a>
+            </li>
+            <li class="mr-6">
+              <a href="">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="w-5 h-5"
+                  viewBox="0 0 448 512"
+                >
+                  <path
+                    d="M100.3 448H7.4V148.9h92.9zM53.8 108.1C24.1 108.1 0 83.5 0 53.8a53.8 53.8 0 0 1 107.6 0c0 29.7-24.1 54.3-53.8 54.3zM447.9 448h-92.7V302.4c0-34.7-.7-79.2-48.3-79.2-48.3 0-55.7 37.7-55.7 76.7V448h-92.8V148.9h89.1v40.8h1.3c12.4-23.5 42.7-48.3 87.9-48.3 94 0 111.3 61.9 111.3 142.3V448z"
+                  />
+                </svg>
+              </a>
+            </li>
+            <li class="mr-6">
+              <a href="">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="w-5 h-5"
+                  viewBox="0 0 384 512"
+                >
+                  <path
+                    d="M204 6.5C101.4 6.5 0 74.9 0 185.6 0 256 39.6 296 63.6 296c9.9 0 15.6-27.6 15.6-35.4 0-9.3-23.7-29.1-23.7-67.8 0-80.4 61.2-137.4 140.4-137.4 68.1 0 118.5 38.7 118.5 109.8 0 53.1-21.3 152.7-90.3 152.7-24.9 0-46.2-18-46.2-43.8 0-37.8 26.4-74.4 26.4-113.4 0-66.2-93.9-54.2-93.9 25.8 0 16.8 2.1 35.4 9.6 50.7-13.8 59.4-42 147.9-42 209.1 0 18.9 2.7 37.5 4.5 56.4 3.4 3.8 1.7 3.4 6.9 1.5 50.4-69 48.6-82.5 71.4-172.8 12.3 23.4 44.1 36 69.3 36 106.2 0 153.9-103.5 153.9-196.8C384 71.3 298.2 6.5 204 6.5z"
+                  />
+                </svg>
+              </a>
+            </li>
+          </ul>
+
+          <!-- Nội dung của cột này -->
+        </div>
+        <div
+          class="mt-5 lg:col-span-6 md:col-span-12 md:order-3 lg:order-2 flex lg:justify-around md:justify-between"
+        >
+          <div class="">
+            <h1 class="font-weight mb-10 mt-2 text-base text-[#222222]">
+              Categories
+            </h1>
+            <ul>
+              <li class="mb-1">
+                <a href="" class="text-sm text-[#878787] text-hover">Men</a>
+              </li>
+              <li class="mb-1">
+                <a href="" class="text-sm text-[#878787] text-hover">Woman</a>
+              </li>
+              <li class="mb-1">
+                <a href="" class="text-sm text-[#878787] text-hover"
+                  >Accessories</a
+                >
+              </li>
+              <li class="mb-1">
+                <a href="" class="text-sm text-[#878787] text-hover">Shoes</a>
+              </li>
+              <li class="mb-1">
+                <a href="" class="text-sm text-[#878787] text-hover">Watch</a>
+              </li>
+              <li class="mb-1">
+                <a href="" class="text-sm text-[#878787] text-hover">Dress</a>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h1 class="font-weight mb-10 mt-2 text-base text-[#222222]">
+              Infomation
+            </h1>
+            <ul>
+              <li class="mb-1">
+                <a href="" class="text-sm text-[#878787] text-hover"
+                  >About us</a
+                >
+              </li>
+              <li class="mb-1">
+                <a href="" class="text-sm text-[#878787] text-hover"
+                  >Concact us</a
+                >
+              </li>
+              <li class="mb-1">
+                <a href="" class="text-sm text-[#878787] text-hover"
+                  >Terms & Conditions
+                </a>
+              </li>
+              <li class="mb-1">
+                <a href="" class="text-sm text-[#878787] text-hover"
+                  >Returns & Exchanges</a
+                >
+              </li>
+              <li class="mb-1">
+                <a href="" class="text-sm text-[#878787] text-hover"
+                  >Shipping & Delivery</a
+                >
+              </li>
+              <li class="mb-1">
+                <a href="" class="text-sm text-[#878787] text-hover"
+                  >Privacy Policy</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h1 class="font-weight mb-10 mt-2 text-base text-[#222222]">
+              Useful links
+            </h1>
+            <ul>
+              <li class="mb-1">
+                <a href="" class="text-sm text-[#878787] text-hover"
+                  >Latest News</a
+                >
+              </li>
+              <li class="mb-1">
+                <a href="" class="text-sm text-[#878787] text-hover"
+                  >My Account</a
+                >
+              </li>
+              <li class="mb-1">
+                <a href="" class="text-sm text-[#878787] text-hover"
+                  >Size Guide</a
+                >
+              </li>
+              <li class="mb-1">
+                <a href="" class="text-sm text-[#878787] text-hover">FAQs</a>
+              </li>
+              <li class="mb-1">
+                <a href="" class="text-sm text-[#878787] text-hover">FAQs 2</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="mt-5 lg:col-span-3 md:col-span-6 md:order-2 lg:order-3">
+          <div>
+            <h4 class="font-weight mb-10 mt-2 text-base text-[#222222]">
+              Newsletter Signup
+            </h4>
+            <span class="text-sm text-[#878787]"
+              >Subscribe to our newsletter and get 10% off your first
+              purchase</span
+            >
+
+            <form class="max-w-md w-full my-5 rounded-lg flex">
+              <div class="relative flex-1">
+                <input
+                  type="email"
+                  class="w-full border-gray-300 border rounded-full py-3 px-3 focus:outline-none focus:ring-2 focus:border-transparent placeholder:text-[13px]"
+                  placeholder="Your email address"
+                  required
+                />
+                <button
+                  type="submit"
+                  class="absolute rounded-full right-[5px] text-sm top-[5px] bottom-[5px] bg-black text-white px-6"
+                >
+                  Subscribe
+                </button>
+              </div>
+            </form>
+
+            <img src="./src/assets/images/footer-method.png" alt="" />
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!--  -->
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
