@@ -1,6 +1,17 @@
-@tailwind base;
+@layer tailwind-base, antd;
+
+@layer tailwind-base {
+    @tailwind base;
+}
+
+@layer antd {
+    /* Import các CSS của antd tại đây */
+    @import "antd/dist/reset.css";
+}
+
 @tailwind components;
 @tailwind utilities;
+
 
 body {
   /* font-family: 'Poppins'; */
