@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React from "react";
 import { Link } from "react-router-dom";
-import { Icon7 } from "../icons";
+import { Icon7, Logo } from "../icons";
 
 type Props = {};
 
@@ -99,7 +99,7 @@ const Header = (props: Props) => {
           <header className="container bg-[#fff] h-[70px] grid grid-cols-12 gap-4 ">
             <div className="lg:col-span-2 col-span-4 flex justify-center items-center md:items-center md:justify-center lg:justify-start  order-2 lg:order-1">
               <img
-                src="./src/assets/images/logo.png"
+                src={Logo}
                 className="h-10 "
                 alt="Logo"
               />

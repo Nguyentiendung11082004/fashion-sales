@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React from "react";
 import { Link } from "react-router-dom";
+import { Logo } from "../icons";
 
 type Props = {};
 
@@ -11,7 +12,7 @@ const Footer = (props: Props) => {
       <div className="container grid lg:grid-cols-12 md:grid-cols-2 sm:grid-cols-1 gap-4 ">
         <div className=" mt-5 lg:col-span-3 md:col-span-6 md:order-1 lg:order-1">
           <img
-            src="./src/assets/images/logo.png"
+            src={Logo}
             className="h-10  mb-10"
             alt="Logo"
           />
@@ -56,7 +57,7 @@ const Footer = (props: Props) => {
           </div>
           <div className="flex mb-5">
             <div className="mr-2">
-              {" "}
+            
               <svg
                 className="w-7 h-7 text-[#878787] "
                 fill="none"

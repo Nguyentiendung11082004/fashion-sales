@@ -1,6 +1,6 @@
+import { Icon10, Icon9 } from "@/components/icons";
 import React from "react";
 import { Link } from "react-router-dom";
-
 const HomePage = () => {
   return (
     <>
@@ -25,7 +25,7 @@ const HomePage = () => {
           <div className="lg:col-span-6 md:col-span-6 col-span-12 overflow-hidden">
             <Link to="" className="relative overflow-hidden">
               <img
-                src="./src/assets/images/category-women.webp"
+                src={Icon9}
                 className="h-[100%] hover:scale-110 transition-all duration-700 ease-in-out "
               />
               <button className="shadow-sm absolute bottom-[4%] left-[50%] -translate-x-[50%] lg:left-[50%] lg:-translate-x-[50%] bg-[#fff] text-[#000] hover:bg-[#000] hover:text-[#fff] transition ease-in duration-300 w-[150px] h-[40px] font-bold text-lg">
@@ -37,7 +37,7 @@ const HomePage = () => {
             <div className="w-[100%] h-[50%] overflow-hidden">
               <Link to="" className="relative  ">
                 <img
-                  src="./src/assets/images/category-accessory.avif"
+                  src={Icon10}
                   className="h-full w-full hover:scale-110 transition-all duration-700 ease-in-out "
                 />
                 <button className="shadow-sm absolute bottom-[4%] left-[50%] -translate-x-[50%] lg:left-[50%] lg:-translate-x-[50%] md:left-[10%] bg-[#fff] text-[#000] hover:bg-[#000] hover:text-[#fff] transition ease-in duration-300 w-[150px] h-[40px] font-bold text-lg">
