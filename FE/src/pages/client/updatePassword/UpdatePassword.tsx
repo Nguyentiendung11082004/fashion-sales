@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const UpdatePassword = () => {
   return (
@@ -28,21 +29,21 @@ const UpdatePassword = () => {
             </div>
             <hr className="mt-[1rem] h-0 border-solid border-b-2" />
             <div className="hd-account-menu overflow-x-auto flex uppercase font-medium">
-              <a href="account.html" className="hd-account-menu-item">
+              <Link to="account.html" className="hd-account-menu-item">
                 Thông tin tài khoản
-              </a>
-              <a href="#" className="hd-account-menu-item">
+              </Link>
+              <Link to="#" className="hd-account-menu-item">
                 Yêu thích
-              </a>
-              <a href="history-order.html" className="hd-account-menu-item">
+              </Link>
+              <Link to="history-order.html" className="hd-account-menu-item">
                 Lịch sử mua hàng
-              </a>
-              <a
-                href="updatepass-account.html"
+              </Link>
+              <Link
+                to="updatepass-account.html"
                 className="hd-account-menu-item"
               >
                 Đổi mật khẩu
-              </a>
+              </Link>
             </div>
             <hr className="h-0 border-solid border-b-2" />
           </div>

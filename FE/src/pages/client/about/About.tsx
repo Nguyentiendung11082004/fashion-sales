@@ -1,4 +1,5 @@
-import { Icon1 } from "@/components/icons";
+import { HeroRight, Icon1, Product2 } from "@/components/icons";
+import ButtonSubmit from "@/components/icons/about/ButtonSubmit";
 import React from "react";
 
 const About = () => {
@@ -13,7 +14,6 @@ const About = () => {
             <span className="block bg-[#ef233c] w-72 h-72 rounded-full mix-blend-multiply filter blur-3xl opacity-10 lg:w-96 lg:h-96" />
             <span className="block bg-[#04868b] w-72 h-72 -ml-20 mt-40 rounded-full mix-blend-multiply filter blur-3xl opacity-10 lg:w-96 lg:h-96 nc-animation-delay-2000" />
           </div>
-          {/*end bg*/}
           <div className="hd-page-head">
             <div className="hd-header-banner bg-[url('./src/assets/images/shopping-cart-head.webp')] bg-no-repeat bg-cover bg-center">
               <div className="hd-bg-banner overflow-hidden relative !text-center bg-black bg-opacity-55 lg:py-[50px] mb-0 py-[30px]">
@@ -28,7 +28,6 @@ const About = () => {
               </div>
             </div>
           </div>
-          {/*end hd-page-head*/}
           <div className="hd-page-body-content container py-10 lg:py-28 space-y-16 lg:space-y-28">
             <div className="hd-SectionTop relative " data-nc-id="SectionHero">
               <div className="flex flex-col lg:flex-row space-y-14 lg:space-y-0 lg:space-x-10 items-center relative text-center lg:text-left">
@@ -61,7 +60,7 @@ const About = () => {
                     className="w-full"
                     srcSet="
           "
-                    src="./src/assets/images/hero-right1.webp"
+                    src={HeroRight}
                     style={{ color: "transparent" }}
                   />
                 </div>
@@ -447,20 +446,7 @@ const About = () => {
                       className="ttnc-ButtonCircle flex items-center justify-center rounded-full !leading-none disabled:bg-opacity-70 bg-[#00BADB] hover:bg-[#00b0cf] text-slate-50 absolute transform top-1/2 -translate-y-1/2 right-1 w-9 h-9 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0"
                       type="submit"
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                        aria-hidden="true"
-                        data-slot="icon"
-                        className="w-6 h-6"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M3.75 12a.75.75 0 0 1 .75-.75h13.19l-5.47-5.47a.75.75 0 0 1 1.06-1.06l6.75 6.75a.75.75 0 0 1 0 1.06l-6.75 6.75a.75.75 0 1 1-1.06-1.06l5.47-5.47H4.5a.75.75 0 0 1-.75-.75Z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
+                    <ButtonSubmit/>
                     </button>
                   </form>
                 </div>
@@ -474,7 +460,7 @@ const About = () => {
                     sizes="(max-width: 768px) 100vw, 50vw"
                     srcSet="
           "
-                    src="./src/assets/images/promo3.webp"
+                    src={Product2}
                     style={{ color: "transparent" }}
                   />
                 </div>

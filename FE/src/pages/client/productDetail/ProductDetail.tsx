@@ -1,5 +1,14 @@
+import { Product, ProductNext } from "@/components/icons";
+
 import React from "react";
 import { Link } from "react-router-dom";
+import Less from "@/components/icons/detail/Less";
+import CompareLeft from "@/components/icons/detail/CompareLeft";
+import CompareRight from "@/components/icons/detail/CompareRight";
+import Heart from "@/components/icons/detail/Heart";
+import HeartWhite from "@/components/icons/detail/HeartWhite";
+import Eye from "@/components/icons/detail/Eye";
+import CartDetail from "@/components/icons/detail/CartDetail";
 
 const ProductDetail = () => {
   return (
@@ -8,20 +17,7 @@ const ProductDetail = () => {
         <div className="w-full bg-[#f6f6f6]">
           <div className="container h-[55px] flex items-center">
             <span className="text-[13px]">Home</span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
-              stroke="currentColor"
-              className="size-6 w-4 h-[10px]"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="m8.25 4.5 7.5 7.5-7.5 7.5"
-              />
-            </svg>
+            <Less />
             <span className="text-[13px] text-[#222]">Tên sản phẩm</span>
           </div>
           <div className="container lg:flex justify-between pt-[20px] lg:mb-[20px] bg-white">
@@ -29,40 +25,14 @@ const ProductDetail = () => {
             <div className="lg:w-[50%] w-full mr-[10px] lg:flex relative">
               <div className="lg:w-[75%] lg:flex justify-between items-center relative border bg-[white] lg:order-1 ">
                 <button className="lg:block hidden">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                    stroke="currentColor"
-                    className="size-6 w-10 h-10 absolute left-4 rounded-full border-2 border-black bg-white top-[50%] -translate-x-1/2"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M15.75 19.5 8.25 12l7.5-7.5"
-                    />
-                  </svg>
+                  <CompareLeft />
                 </button>
                 <img
                   className="lg:w-[90%] w-[100%] m-auto object-cover h-[300px] lg:h-[500px] lg:flex items-center"
                   src="data:image/jpeg;base64,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"
                 />
                 <button className="hidden lg:block">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                    stroke="currentColor"
-                    className="size-6 w-10 h-10 absolute -right-6 rounded-full border-2 border-black bg-white top-[50%] -translate-x-1/2"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="m8.25 4.5 7.5 7.5-7.5 7.5"
-                    />
-                  </svg>
+                  <CompareRight />
                 </button>
               </div>
               <div className="lg:w-[20%] lg:block  w-[100%] flex ">
@@ -132,20 +102,7 @@ const ProductDetail = () => {
                   Thêm vào giỏ hàng
                 </button>
                 <div className="h-[40px] w-[40px] rounded-full flex items-center justify-center border-2 border-black text-hover">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                    stroke="currentColor"
-                    className="size-6 w-[20px] h-[20px]"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
-                    />
-                  </svg>
+                  <Heart />
                 </div>
               </div>
             </div>
@@ -196,28 +153,15 @@ const ProductDetail = () => {
                 <div className="lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] overflow-hidden">
                   <img
                     className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover/image:opacity-0"
-                    src="./src/assets/images/product.webp"
+                    src={Product}
                   />
                   <img
                     className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover/image:opacity-100"
-                    src="./src/assets/images/product-next.webp"
+                    src={ProductNext}
                   />
                   <div>
                     <Link to="" className="absolute left-5 top-5">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth="1.5"
-                        stroke="currentColor"
-                        className="hidden h-6 w-6 text-white group-hover:block"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
-                        />
-                      </svg>
+                      <HeartWhite />
                     </Link>
                   </div>
                   <div className="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100">
@@ -226,25 +170,7 @@ const ProductDetail = () => {
                         <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
                           Xem thêm
                         </p>
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth="1.5"
-                          stroke="currentColor"
-                          className="mx-auto size-6 lg:translate-y-5 lg:transform lg:text-white lg:opacity-0 lg:transition-all lg:duration-300 lg:ease-in-out lg:group-hover/btn:-translate-y-3 lg:group-hover/btn:opacity-100"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
-                          />
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                          />
-                        </svg>
+                        <Eye />
                       </button>
                     </Link>
                     <Link to="" className="group/btn relative">
@@ -252,20 +178,7 @@ const ProductDetail = () => {
                         <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
                           Thêm vào giỏ hàng
                         </p>
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth="1.5"
-                          stroke="currentColor"
-                          className="mx-auto size-6 translate-y-1 transform text-white opacity-0 transition-all duration-300 ease-in-out group-hover/btn:-translate-y-3 group-hover/btn:opacity-100"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
-                          />
-                        </svg>
+                        <CartDetail />
                       </button>
                     </Link>
                   </div>
@@ -312,28 +225,15 @@ const ProductDetail = () => {
                 <div className="lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] overflow-hidden">
                   <img
                     className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover/image:opacity-0"
-                    src="./src/assets/images/product.webp"
+                    src={Product}
                   />
                   <img
                     className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover/image:opacity-100"
-                    src="./src/assets/images/product-next.webp"
+                    src={ProductNext}
                   />
                   <div>
                     <Link to="" className="absolute left-5 top-5">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth="1.5"
-                        stroke="currentColor"
-                        className="hidden h-6 w-6 text-white group-hover:block"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
-                        />
-                      </svg>
+                      <HeartWhite />
                     </Link>
                   </div>
                   <div className="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100">
@@ -342,25 +242,7 @@ const ProductDetail = () => {
                         <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
                           Xem thêm
                         </p>
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth="1.5"
-                          stroke="currentColor"
-                          className="mx-auto size-6 lg:translate-y-5 lg:transform lg:text-white lg:opacity-0 lg:transition-all lg:duration-300 lg:ease-in-out lg:group-hover/btn:-translate-y-3 lg:group-hover/btn:opacity-100"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
-                          />
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                          />
-                        </svg>
+                        <Eye />
                       </button>
                     </Link>
                     <Link to="" className="group/btn relative">
@@ -368,20 +250,7 @@ const ProductDetail = () => {
                         <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
                           Thêm vào giỏ hàng
                         </p>
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth="1.5"
-                          stroke="currentColor"
-                          className="mx-auto size-6 translate-y-1 transform text-white opacity-0 transition-all duration-300 ease-in-out group-hover/btn:-translate-y-3 group-hover/btn:opacity-100"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
-                          />
-                        </svg>
+                        <CartDetail />
                       </button>
                     </Link>
                   </div>
@@ -428,28 +297,15 @@ const ProductDetail = () => {
                 <div className="lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] overflow-hidden">
                   <img
                     className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover/image:opacity-0"
-                    src="./src/assets/images/product.webp"
+                    src={Product}
                   />
                   <img
                     className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover/image:opacity-100"
-                    src="./src/assets/images/product-next.webp"
+                    src={ProductNext}
                   />
                   <div>
                     <Link to="" className="absolute left-5 top-5">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth="1.5"
-                        stroke="currentColor"
-                        className="hidden h-6 w-6 text-white group-hover:block"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
-                        />
-                      </svg>
+                      <HeartWhite />
                     </Link>
                   </div>
                   <div className="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100">
@@ -458,25 +314,7 @@ const ProductDetail = () => {
                         <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
                           Xem thêm
                         </p>
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth="1.5"
-                          stroke="currentColor"
-                          className="mx-auto size-6 lg:translate-y-5 lg:transform lg:text-white lg:opacity-0 lg:transition-all lg:duration-300 lg:ease-in-out lg:group-hover/btn:-translate-y-3 lg:group-hover/btn:opacity-100"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
-                          />
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                          />
-                        </svg>
+                        <Eye />
                       </button>
                     </Link>
                     <Link to="" className="group/btn relative">
@@ -484,20 +322,7 @@ const ProductDetail = () => {
                         <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
                           Thêm vào giỏ hàng
                         </p>
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth="1.5"
-                          stroke="currentColor"
-                          className="mx-auto size-6 translate-y-1 transform text-white opacity-0 transition-all duration-300 ease-in-out group-hover/btn:-translate-y-3 group-hover/btn:opacity-100"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
-                          />
-                        </svg>
+                        <CartDetail />
                       </button>
                     </Link>
                   </div>
@@ -544,28 +369,15 @@ const ProductDetail = () => {
                 <div className="lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] overflow-hidden">
                   <img
                     className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover/image:opacity-0"
-                    src="./src/assets/images/product.webp"
+                    src={Product}
                   />
                   <img
                     className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover/image:opacity-100"
-                    src="./src/assets/images/product-next.webp"
+                    src={ProductNext}
                   />
                   <div>
                     <Link to="" className="absolute left-5 top-5">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth="1.5"
-                        stroke="currentColor"
-                        className="hidden h-6 w-6 text-white group-hover:block"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
-                        />
-                      </svg>
+                      <HeartWhite />
                     </Link>
                   </div>
                   <div className="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100">
@@ -574,25 +386,7 @@ const ProductDetail = () => {
                         <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
                           Xem thêm
                         </p>
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth="1.5"
-                          stroke="currentColor"
-                          className="mx-auto size-6 lg:translate-y-5 lg:transform lg:text-white lg:opacity-0 lg:transition-all lg:duration-300 lg:ease-in-out lg:group-hover/btn:-translate-y-3 lg:group-hover/btn:opacity-100"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
-                          />
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                          />
-                        </svg>
+                        <Eye />
                       </button>
                     </Link>
                     <Link to="" className="group/btn relative">
@@ -600,20 +394,7 @@ const ProductDetail = () => {
                         <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
                           Thêm vào giỏ hàng
                         </p>
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth="1.5"
-                          stroke="currentColor"
-                          className="mx-auto size-6 translate-y-1 transform text-white opacity-0 transition-all duration-300 ease-in-out group-hover/btn:-translate-y-3 group-hover/btn:opacity-100"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
-                          />
-                        </svg>
+                        <CartDetail />
                       </button>
                     </Link>
                   </div>
@@ -670,28 +451,15 @@ const ProductDetail = () => {
                 <div className="lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] overflow-hidden">
                   <img
                     className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover/image:opacity-0"
-                    src="./src/assets/images/product.webp"
+                    src={Product}
                   />
                   <img
                     className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover/image:opacity-100"
-                    src="./src/assets/images/product-next.webp"
+                    src={ProductNext}
                   />
                   <div>
                     <Link to="" className="absolute left-5 top-5">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth="1.5"
-                        stroke="currentColor"
-                        className="hidden h-6 w-6 text-white group-hover:block"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
-                        />
-                      </svg>
+                      <HeartWhite />
                     </Link>
                   </div>
                   <div className="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100">
@@ -700,25 +468,7 @@ const ProductDetail = () => {
                         <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
                           Xem thêm
                         </p>
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth="1.5"
-                          stroke="currentColor"
-                          className="mx-auto size-6 lg:translate-y-5 lg:transform lg:text-white lg:opacity-0 lg:transition-all lg:duration-300 lg:ease-in-out lg:group-hover/btn:-translate-y-3 lg:group-hover/btn:opacity-100"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
-                          />
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                          />
-                        </svg>
+                        <Eye />
                       </button>
                     </Link>
                     <Link to="" className="group/btn relative">
@@ -726,20 +476,7 @@ const ProductDetail = () => {
                         <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
                           Thêm vào giỏ hàng
                         </p>
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth="1.5"
-                          stroke="currentColor"
-                          className="mx-auto size-6 translate-y-1 transform text-white opacity-0 transition-all duration-300 ease-in-out group-hover/btn:-translate-y-3 group-hover/btn:opacity-100"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
-                          />
-                        </svg>
+                        <CartDetail />
                       </button>
                     </Link>
                   </div>
@@ -786,28 +523,15 @@ const ProductDetail = () => {
                 <div className="lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] overflow-hidden">
                   <img
                     className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover/image:opacity-0"
-                    src="./src/assets/images/product.webp"
+                    src={Product}
                   />
                   <img
                     className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover/image:opacity-100"
-                    src="./src/assets/images/product-next.webp"
+                    src={ProductNext}
                   />
                   <div>
                     <Link to="" className="absolute left-5 top-5">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth="1.5"
-                        stroke="currentColor"
-                        className="hidden h-6 w-6 text-white group-hover:block"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
-                        />
-                      </svg>
+                      <HeartWhite />
                     </Link>
                   </div>
                   <div className="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100">
@@ -816,25 +540,7 @@ const ProductDetail = () => {
                         <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
                           Xem thêm
                         </p>
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth="1.5"
-                          stroke="currentColor"
-                          className="mx-auto size-6 lg:translate-y-5 lg:transform lg:text-white lg:opacity-0 lg:transition-all lg:duration-300 lg:ease-in-out lg:group-hover/btn:-translate-y-3 lg:group-hover/btn:opacity-100"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
-                          />
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                          />
-                        </svg>
+                        <Eye />
                       </button>
                     </Link>
                     <Link to="" className="group/btn relative">
@@ -842,20 +548,7 @@ const ProductDetail = () => {
                         <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
                           Thêm vào giỏ hàng
                         </p>
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth="1.5"
-                          stroke="currentColor"
-                          className="mx-auto size-6 translate-y-1 transform text-white opacity-0 transition-all duration-300 ease-in-out group-hover/btn:-translate-y-3 group-hover/btn:opacity-100"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
-                          />
-                        </svg>
+                        <CartDetail />
                       </button>
                     </Link>
                   </div>
@@ -902,28 +595,15 @@ const ProductDetail = () => {
                 <div className="lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] overflow-hidden">
                   <img
                     className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover/image:opacity-0"
-                    src="./src/assets/images/product.webp"
+                    src={Product}
                   />
                   <img
                     className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover/image:opacity-100"
-                    src="./src/assets/images/product-next.webp"
+                    src={ProductNext}
                   />
                   <div>
                     <Link to="" className="absolute left-5 top-5">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth="1.5"
-                        stroke="currentColor"
-                        className="hidden h-6 w-6 text-white group-hover:block"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
-                        />
-                      </svg>
+                      <HeartWhite />
                     </Link>
                   </div>
                   <div className="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100">
@@ -932,25 +612,7 @@ const ProductDetail = () => {
                         <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
                           Xem thêm
                         </p>
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth="1.5"
-                          stroke="currentColor"
-                          className="mx-auto size-6 lg:translate-y-5 lg:transform lg:text-white lg:opacity-0 lg:transition-all lg:duration-300 lg:ease-in-out lg:group-hover/btn:-translate-y-3 lg:group-hover/btn:opacity-100"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
-                          />
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                          />
-                        </svg>
+                        <Eye />
                       </button>
                     </Link>
                     <Link to="" className="group/btn relative">
@@ -958,20 +620,7 @@ const ProductDetail = () => {
                         <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
                           Thêm vào giỏ hàng
                         </p>
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth="1.5"
-                          stroke="currentColor"
-                          className="mx-auto size-6 translate-y-1 transform text-white opacity-0 transition-all duration-300 ease-in-out group-hover/btn:-translate-y-3 group-hover/btn:opacity-100"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
-                          />
-                        </svg>
+                        <CartDetail />
                       </button>
                     </Link>
                   </div>
@@ -1018,28 +667,15 @@ const ProductDetail = () => {
                 <div className="lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] overflow-hidden">
                   <img
                     className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover/image:opacity-0"
-                    src="./src/assets/images/product.webp"
+                    src={Product}
                   />
                   <img
                     className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover/image:opacity-100"
-                    src="./src/assets/images/product-next.webp"
+                    src={ProductNext}
                   />
                   <div>
                     <Link to="" className="absolute left-5 top-5">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth="1.5"
-                        stroke="currentColor"
-                        className="hidden h-6 w-6 text-white group-hover:block"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
-                        />
-                      </svg>
+                      <HeartWhite />
                     </Link>
                   </div>
                   <div className="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100">
@@ -1048,25 +684,7 @@ const ProductDetail = () => {
                         <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
                           Xem thêm
                         </p>
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth="1.5"
-                          stroke="currentColor"
-                          className="mx-auto size-6 lg:translate-y-5 lg:transform lg:text-white lg:opacity-0 lg:transition-all lg:duration-300 lg:ease-in-out lg:group-hover/btn:-translate-y-3 lg:group-hover/btn:opacity-100"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
-                          />
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                          />
-                        </svg>
+                        <Eye />
                       </button>
                     </Link>
                     <Link to="" className="group/btn relative">
@@ -1074,20 +692,7 @@ const ProductDetail = () => {
                         <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
                           Thêm vào giỏ hàng
                         </p>
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          strokeWidth="1.5"
-                          stroke="currentColor"
-                          className="mx-auto size-6 translate-y-1 transform text-white opacity-0 transition-all duration-300 ease-in-out group-hover/btn:-translate-y-3 group-hover/btn:opacity-100"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
-                          />
-                        </svg>
+                        <CartDetail />
                       </button>
                     </Link>
                   </div>

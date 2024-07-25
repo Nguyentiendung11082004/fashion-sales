@@ -1,4 +1,6 @@
+import { Product4, Product5, Product6 } from "@/components/icons";
 import React from "react";
+import { Link } from "react-router-dom";
 
 const HistoryOrder = () => {
   return (
@@ -31,21 +33,21 @@ const HistoryOrder = () => {
               </div>
               <hr className="mt-[1rem] h-0 border-solid border-b-2" />
               <div className="hd-account-menu overflow-x-auto flex uppercase font-medium">
-                <a href="account.html" className="hd-account-menu-item">
+                <Link to="account.html" className="hd-account-menu-item">
                   Thông tin tài khoản
-                </a>
-                <a href="#" className="hd-account-menu-item">
+                </Link>
+                <Link to="#" className="hd-account-menu-item">
                   Yêu thích
-                </a>
-                <a href="history-order.html" className="hd-account-menu-item">
+                </Link>
+                <Link to="history-order.html" className="hd-account-menu-item">
                   Lịch sử mua hàng
-                </a>
-                <a
-                  href="updatepass-account.html"
+                </Link>
+                <Link
+                  to="updatepass-account.html"
                   className="hd-account-menu-item"
                 >
                   Đổi mật khẩu
-                </a>
+                </Link>
               </div>
               <hr className="h-0 border-solid border-b-2" />
             </div>
@@ -85,7 +87,7 @@ const HistoryOrder = () => {
                         data-nimg="fill"
                         className="block absolute align-middle  inset-0 h-full w-full object-cover object-center"
                         sizes="100px"
-                        src="./src/assets/images/17.webp"
+                        src={Product4}
                       />
                     </div>
                     <div className="ml-4 flex flex-1 flex-col">
@@ -136,7 +138,7 @@ const HistoryOrder = () => {
                         data-nimg="fill"
                         className="block absolute align-middle  inset-0 h-full w-full object-cover object-center"
                         sizes="100px"
-                        src="./src/assets/images/16.webp"
+                        src={Product5}
                       />
                     </div>
                     <div className="ml-4 flex flex-1 flex-col">
@@ -187,7 +189,7 @@ const HistoryOrder = () => {
                         data-nimg="fill"
                         className="block absolute align-middle  inset-0 h-full w-full object-cover object-center"
                         sizes="100px"
-                        src="./src/assets/images/2.webp"
+                        src={Product6}
                       />
                     </div>
                     <div className="ml-4 flex flex-1 flex-col">
@@ -261,7 +263,7 @@ const HistoryOrder = () => {
                         data-nimg="fill"
                         className="block absolute align-middle  inset-0 h-full w-full object-cover object-center"
                         sizes="100px"
-                        src="./src/assets/images/17.webp"
+                        src={Product4}
                       />
                     </div>
                     <div className="ml-4 flex flex-1 flex-col">
@@ -312,7 +314,7 @@ const HistoryOrder = () => {
                         data-nimg="fill"
                         className="block absolute align-middle  inset-0 h-full w-full object-cover object-center"
                         sizes="100px"
-                        src="./src/assets/images/16.webp"
+                        src={Product5}
                       />
                     </div>
                     <div className="ml-4 flex flex-1 flex-col">
@@ -363,7 +365,7 @@ const HistoryOrder = () => {
                         data-nimg="fill"
                         className="block absolute align-middle  inset-0 h-full w-full object-cover object-center"
                         sizes="100px"
-                        src="./src/assets/images/2.webp"
+                        src={Product6}
                       />
                     </div>
                     <div className="ml-4 flex flex-1 flex-col">

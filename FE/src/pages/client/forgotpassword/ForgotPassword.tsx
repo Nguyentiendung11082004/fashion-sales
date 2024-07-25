@@ -1,11 +1,13 @@
+import { Logo } from "@/components/icons";
 import React from "react";
+import { Link } from "react-router-dom";
 
 const ForgotPassword = () => {
   return (
     <>
       <div>
         <img
-          src="./src/assets/images/logo.png"
+          src={Logo}
           className="h-10 lg:ml-[140px] mt-[30px] mx-auto"
           alt="Logo"
         />
@@ -35,10 +37,10 @@ const ForgotPassword = () => {
               </div>
               <div className="mt-4 flex items-center justify-between">
                 <span className="border-b w-1/5 md:w-1/4" />
-                <a href="#" className="text-xs text-gray-500 uppercase">
+                <Link to="#" className="text-xs text-gray-500 uppercase">
                   {" "}
                   Đăng nhập
-                </a>
+                </Link>
                 <span className="border-b w-1/5 md:w-1/4" />
               </div>
             </div>

@@ -1,4 +1,26 @@
 import React from "react";
+import CheckoutIcon7 from "@/components/icons/checkout/CheckoutIcon7";
+import CheckoutIcon8 from "@/components/icons/checkout/CheckoutIcon8";
+import CheckoutIcon9 from "@/components/icons/checkout/CheckoutIcon9";
+import { Link } from "react-router-dom";
+import { Product1 } from "@/components/icons";
+import CheckoutIcon10 from "@/components/icons/checkout/CheckoutIcon10";
+import CheckoutIcon11 from "@/components/icons/checkout/CheckoutIcon11";
+import CheckoutIcon13 from "@/components/icons/checkout/CheckoutIcon13";
+import CheckoutIcon14 from "@/components/icons/checkout/CheckoutIcon14";
+import CheckoutIcon15 from "@/components/icons/checkout/CheckoutIcon15";
+import CheckoutIcon16 from "@/components/icons/checkout/CheckoutIcon16";
+import CheckoutIcon17 from "@/components/icons/checkout/CheckoutIcon17";
+import CheckoutIcon18 from "@/components/icons/checkout/CheckoutIcon18";
+import CheckoutIcon19 from "@/components/icons/checkout/CheckoutIcon19";
+import CheckoutIcon20 from "@/components/icons/checkout/CheckoutIcon20";
+import CheckoutIcon21 from "@/components/icons/checkout/CheckoutIcon21";
+import CheckoutIcon22 from "@/components/icons/checkout/CheckoutIcon22";
+import User from "@/components/icons/checkout/User";
+import Completed from "@/components/icons/checkout/Completed";
+import AddressCheckout from "@/components/icons/checkout/AddressCheckout";
+import CheckoutIcon12 from "@/components/icons/checkout/CheckoutIcon12";
+import IconPay from "@/components/icons/checkout/IconPay";
 
 const Checkout = () => {
   return (
@@ -28,53 +50,14 @@ const Checkout = () => {
                     <div className="border border-slate-200 rounded-xl overflow-hidden z-0">
                       <div className="flex flex-col sm:flex-row items-start p-6">
                         <span className="hidden sm:block">
-                          <svg
-                            className="w-6 h-6 text-slate-700 mt-0.5"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              d="M12.12 12.78C12.05 12.77 11.96 12.77 11.88 12.78C10.12 12.72 8.71997 11.28 8.71997 9.50998C8.71997 7.69998 10.18 6.22998 12 6.22998C13.81 6.22998 15.28 7.69998 15.28 9.50998C15.27 11.28 13.88 12.72 12.12 12.78Z"
-                              stroke="currentColor"
-                              strokeWidth="1.5"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                            <path
-                              d="M18.74 19.3801C16.96 21.0101 14.6 22.0001 12 22.0001C9.40001 22.0001 7.04001 21.0101 5.26001 19.3801C5.36001 18.4401 5.96001 17.5201 7.03001 16.8001C9.77001 14.9801 14.25 14.9801 16.97 16.8001C18.04 17.5201 18.64 18.4401 18.74 19.3801Z"
-                              stroke="currentColor"
-                              strokeWidth="1.5"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                            <path
-                              d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
-                              stroke="currentColor"
-                              strokeWidth="1.5"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                          </svg>
+                          <User />
                         </span>
                         <div className="sm:ml-8">
                           <h3 className="text-black flex">
                             <span className="uppercase tracking-tight">
                               Thông tin liên lạc
                             </span>
-                            <svg
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              strokeWidth="2.5"
-                              stroke="currentColor"
-                              className="w-5 h-5 ml-3 text-slate-900 "
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M4.5 12.75l6 6 9-13.5"
-                              />
-                            </svg>
+                            <Completed />
                           </h3>
                           <div className="font-semibold mt-1 text-sm">
                             <span>Thu Hằng</span>
@@ -95,12 +78,12 @@ const Checkout = () => {
                           </h3>
                           <span className="block text-sm my-1 md:my-0">
                             Bạn chưa có tài khoản?
-                            <a
-                              href="##"
+                            <Link
+                              to="##"
                               className="text-primary-500 font-medium"
                             >
                               Đăng nhập
-                            </a>
+                            </Link>
                           </span>
                         </div>
                         <div className="max-w-lg">
@@ -145,68 +128,12 @@ const Checkout = () => {
                     <div className="border border-slate-200 rounded-xl">
                       <div className="hd-top-ShippingAddress p-6 flex flex-col sm:flex-row items-start">
                         <span className="hidden sm:block">
-                          <svg
-                            className="w-6 h-6 text-slate-700 mt-0.5"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              d="M12.1401 15.0701V13.11C12.1401 10.59 14.1801 8.54004 16.7101 8.54004H18.6701"
-                              stroke="currentColor"
-                              strokeWidth="1.5"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                            <path
-                              d="M5.62012 8.55005H7.58014C10.1001 8.55005 12.1501 10.59 12.1501 13.12V13.7701V17.25"
-                              stroke="currentColor"
-                              strokeWidth="1.5"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                            <path
-                              d="M7.14008 6.75L5.34009 8.55L7.14008 10.35"
-                              stroke="currentColor"
-                              strokeWidth="1.5"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                            <path
-                              d="M16.8601 6.75L18.6601 8.55L16.8601 10.35"
-                              stroke="currentColor"
-                              strokeWidth="1.5"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                            <path
-                              d="M9 22H15C20 22 22 20 22 15V9C22 4 20 2 15 2H9C4 2 2 4 2 9V15C2 20 4 22 9 22Z"
-                              stroke="currentColor"
-                              strokeWidth="1.5"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                          </svg>
+                          <AddressCheckout />
                         </span>
                         <div className="sm:ml-8">
                           <h3 className="text-black flex">
-                            <span className="uppercase">
-                              {" "}
-                              Địa chỉ giao hàng{" "}
-                            </span>
-                            <svg
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              strokeWidth="2.5"
-                              stroke="currentColor"
-                              className="w-5 h-5 ml-3 text-slate-900"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M4.5 12.75l6 6 9-13.5"
-                              />
-                            </svg>
+                            <span className="uppercase">Địa chỉ giao hàng</span>
+                            <Completed />
                           </h3>
                           <div className="font-semibold mt-1 text-sm">
                             <span>
@@ -381,8 +308,7 @@ const Checkout = () => {
                                   <span className="font-light">
                                     (Giao hàng từ
                                     <span className="font-medium">
-                                      {" "}
-                                      9:00 - 17:00{" "}
+                                      9:00 - 17:00
                                     </span>
                                     )
                                   </span>
@@ -408,70 +334,14 @@ const Checkout = () => {
                     <div className="border border-slate-200 rounded-xl">
                       <div className="p-6 flex flex-col sm:flex-row items-start">
                         <span className="hidden sm:block">
-                          <svg
-                            className="w-6 h-6 text-slate-700 mt-0.5"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              d="M3.92969 15.8792L15.8797 3.9292"
-                              stroke="currentColor"
-                              strokeWidth="1.5"
-                              strokeMiterlimit={10}
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                            <path
-                              d="M11.1013 18.2791L12.3013 17.0791"
-                              stroke="currentColor"
-                              strokeWidth="1.5"
-                              strokeMiterlimit={10}
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                            <path
-                              d="M13.793 15.5887L16.183 13.1987"
-                              stroke="currentColor"
-                              strokeWidth="1.5"
-                              strokeMiterlimit={10}
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                            <path
-                              d="M3.60127 10.239L10.2413 3.599C12.3613 1.479 13.4213 1.469 15.5213 3.569L20.4313 8.479C22.5313 10.579 22.5213 11.639 20.4013 13.759L13.7613 20.399C11.6413 22.519 10.5813 22.529 8.48127 20.429L3.57127 15.519C1.47127 13.419 1.47127 12.369 3.60127 10.239Z"
-                              stroke="currentColor"
-                              strokeWidth="1.5"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                            <path
-                              d="M2 21.9985H22"
-                              stroke="currentColor"
-                              strokeWidth="1.5"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                          </svg>
+                          <IconPay />
                         </span>
                         <div className="sm:ml-8">
                           <h3 className="text-black flex">
                             <span className="uppercase tracking-tight">
                               Phương thức thanh toán
                             </span>
-                            <svg
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              strokeWidth="2.5"
-                              stroke="currentColor"
-                              className="w-5 h-5 ml-3 text-slate-900"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M4.5 12.75l6 6 9-13.5"
-                              />
-                            </svg>
+                            <Completed />
                           </h3>
                           <div className="font-semibold mt-1 text-sm">
                             <span>Ví MOMO / VNPay </span>
@@ -502,50 +372,7 @@ const Checkout = () => {
                                 className="flex items-center space-x-4 sm:space-x-6"
                               >
                                 <div className="p-2.5 rounded-xl border-2 border-slate-600 ">
-                                  <svg
-                                    className="w-6 h-6 sm:w-7 sm:h-7"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                  >
-                                    <path
-                                      d="M2 12.6101H19"
-                                      stroke="currentColor"
-                                      strokeWidth="1.5"
-                                      strokeMiterlimit={10}
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                    />
-                                    <path
-                                      d="M19 10.28V17.43C18.97 20.28 18.19 21 15.22 21H5.78003C2.76003 21 2 20.2501 2 17.2701V10.28C2 7.58005 2.63 6.71005 5 6.57005C5.24 6.56005 5.50003 6.55005 5.78003 6.55005H15.22C18.24 6.55005 19 7.30005 19 10.28Z"
-                                      stroke="currentColor"
-                                      strokeWidth="1.5"
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                    />
-                                    <path
-                                      d="M22 6.73V13.72C22 16.42 21.37 17.29 19 17.43V10.28C19 7.3 18.24 6.55 15.22 6.55H5.78003C5.50003 6.55 5.24 6.56 5 6.57C5.03 3.72 5.81003 3 8.78003 3H18.22C21.24 3 22 3.75 22 6.73Z"
-                                      stroke="currentColor"
-                                      strokeWidth="1.5"
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                    />
-                                    <path
-                                      d="M5.25 17.8101H6.96997"
-                                      stroke="currentColor"
-                                      strokeWidth="1.5"
-                                      strokeMiterlimit={10}
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                    />
-                                    <path
-                                      d="M9.10986 17.8101H12.5499"
-                                      stroke="currentColor"
-                                      strokeWidth="1.5"
-                                      strokeMiterlimit={10}
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                    />
-                                  </svg>
+                                  <CheckoutIcon7 />
                                 </div>
                                 <p className="font-medium">
                                   Debit / Credit Card
@@ -629,48 +456,7 @@ const Checkout = () => {
                                 className="flex items-center space-x-4 sm:space-x-6"
                               >
                                 <div className="p-2.5 rounded-xl border-2 border-gray-200 dark:border-slate-600">
-                                  <svg
-                                    className="w-6 h-6 sm:w-7 sm:h-7"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                  >
-                                    <path
-                                      d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
-                                      stroke="currentColor"
-                                      strokeWidth="1.5"
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                    />
-                                    <path
-                                      d="M7.99998 3H8.99998C7.04998 8.84 7.04998 15.16 8.99998 21H7.99998"
-                                      stroke="currentColor"
-                                      strokeWidth="1.5"
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                    />
-                                    <path
-                                      d="M15 3C16.95 8.84 16.95 15.16 15 21"
-                                      stroke="currentColor"
-                                      strokeWidth="1.5"
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                    />
-                                    <path
-                                      d="M3 16V15C8.84 16.95 15.16 16.95 21 15V16"
-                                      stroke="currentColor"
-                                      strokeWidth="1.5"
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                    />
-                                    <path
-                                      d="M3 9.0001C8.84 7.0501 15.16 7.0501 21 9.0001"
-                                      stroke="currentColor"
-                                      strokeWidth="1.5"
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                    />
-                                  </svg>
+                                  <CheckoutIcon8 />
                                 </div>
                                 <p className="font-medium">Internet banking</p>
                               </label>
@@ -737,40 +523,7 @@ const Checkout = () => {
                                 className="flex items-center space-x-4 sm:space-x-6"
                               >
                                 <div className="p-2.5 rounded-xl border-2 border-gray-200 dark:border-slate-600">
-                                  <svg
-                                    className="w-6 h-6 sm:w-7 sm:h-7"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                  >
-                                    <path
-                                      d="M18.04 13.55C17.62 13.96 17.38 14.55 17.44 15.18C17.53 16.26 18.52 17.05 19.6 17.05H21.5V18.24C21.5 20.31 19.81 22 17.74 22H6.26C4.19 22 2.5 20.31 2.5 18.24V11.51C2.5 9.44001 4.19 7.75 6.26 7.75H17.74C19.81 7.75 21.5 9.44001 21.5 11.51V12.95H19.48C18.92 12.95 18.41 13.17 18.04 13.55Z"
-                                      stroke="currentColor"
-                                      strokeWidth="1.5"
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                    />
-                                    <path
-                                      d="M2.5 12.4101V7.8401C2.5 6.6501 3.23 5.59006 4.34 5.17006L12.28 2.17006C13.52 1.70006 14.85 2.62009 14.85 3.95009V7.75008"
-                                      stroke="currentColor"
-                                      strokeWidth="1.5"
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                    />
-                                    <path
-                                      d="M22.5588 13.9702V16.0302C22.5588 16.5802 22.1188 17.0302 21.5588 17.0502H19.5988C18.5188 17.0502 17.5288 16.2602 17.4388 15.1802C17.3788 14.5502 17.6188 13.9602 18.0388 13.5502C18.4088 13.1702 18.9188 12.9502 19.4788 12.9502H21.5588C22.1188 12.9702 22.5588 13.4202 22.5588 13.9702Z"
-                                      stroke="currentColor"
-                                      strokeWidth="1.5"
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                    />
-                                    <path
-                                      d="M7 12H14"
-                                      stroke="currentColor"
-                                      strokeWidth="1.5"
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                    />
-                                  </svg>
+                                  <CheckoutIcon9 />
                                 </div>
                                 <p className="font-medium">
                                   Google / Apple Wallet
@@ -818,7 +571,7 @@ const Checkout = () => {
                         data-nimg="fill"
                         className="h-full w-full object-contain object-center"
                         sizes="150px"
-                        src="./src/assets/images/product1.webp"
+                        src={Product1}
                         style={{
                           position: "absolute",
                           height: "100%",
@@ -827,100 +580,25 @@ const Checkout = () => {
                           color: "transparent",
                         }}
                       />
-                      <a className="absolute inset-0" href="/product-detail" />
+                      <Link className="absolute inset-0" to="/product-detail" />
                     </div>
                     <div className="ml-3 sm:ml-6 flex flex-1 flex-col">
                       <div>
                         <div className="flex justify-between">
                           <div className="flex-[1.5]">
                             <h3 className="text-base font-semibold">
-                              <a href="/product-detail">Rey Nylon Backpack</a>
+                              <Link to="/product-detail">
+                                Rey Nylon Backpack
+                              </Link>
                             </h3>
                             <div className="mt-1.5 sm:mt-2.5 flex text-sm text-slate-600">
                               <div className="flex items-center space-x-1.5">
-                                <svg
-                                  className="w-4 h-4"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                >
-                                  <path
-                                    d="M7.01 18.0001L3 13.9901C1.66 12.6501 1.66 11.32 3 9.98004L9.68 3.30005L17.03 10.6501C17.4 11.0201 17.4 11.6201 17.03 11.9901L11.01 18.0101C9.69 19.3301 8.35 19.3301 7.01 18.0001Z"
-                                    stroke="currentColor"
-                                    strokeWidth="1.5"
-                                    strokeMiterlimit={10}
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                  <path
-                                    d="M8.35 1.94995L9.69 3.28992"
-                                    stroke="currentColor"
-                                    strokeWidth="1.5"
-                                    strokeMiterlimit={10}
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                  <path
-                                    d="M2.07 11.92L17.19 11.26"
-                                    stroke="currentColor"
-                                    strokeWidth="1.5"
-                                    strokeMiterlimit={10}
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                  <path
-                                    d="M3 22H16"
-                                    stroke="currentColor"
-                                    strokeWidth="1.5"
-                                    strokeMiterlimit={10}
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                  <path
-                                    d="M18.85 15C18.85 15 17 17.01 17 18.24C17 19.26 17.83 20.09 18.85 20.09C19.87 20.09 20.7 19.26 20.7 18.24C20.7 17.01 18.85 15 18.85 15Z"
-                                    stroke="currentColor"
-                                    strokeWidth="1.5"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                </svg>
+                                <CheckoutIcon10 />
                                 <span>Black</span>
                               </div>
                               <span className="mx-4 border-l border-slate-200" />
                               <div className="flex items-center space-x-1.5">
-                                <svg
-                                  className="w-4 h-4"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                >
-                                  <path
-                                    d="M21 9V3H15"
-                                    stroke="currentColor"
-                                    strokeWidth="1.5"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                  <path
-                                    d="M3 15V21H9"
-                                    stroke="currentColor"
-                                    strokeWidth="1.5"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                  <path
-                                    d="M21 3L13.5 10.5"
-                                    stroke="currentColor"
-                                    strokeWidth="1.5"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                  <path
-                                    d="M10.5 13.5L3 21"
-                                    stroke="currentColor"
-                                    strokeWidth="1.5"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                </svg>
+                                <CheckoutIcon11 />
                                 <span>2XL</span>
                               </div>
                             </div>
@@ -968,20 +646,7 @@ const Checkout = () => {
                                 type="button"
                                 disabled
                               >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  viewBox="0 0 24 24"
-                                  fill="currentColor"
-                                  aria-hidden="true"
-                                  data-slot="icon"
-                                  className="w-4 h-4"
-                                >
-                                  <path
-                                    fillRule="evenodd"
-                                    d="M4.25 12a.75.75 0 0 1 .75-.75h14a.75.75 0 0 1 0 1.5H5a.75.75 0 0 1-.75-.75Z"
-                                    clipRule="evenodd"
-                                  />
-                                </svg>
+                                <CheckoutIcon12 />
                               </button>
                               <span className="select-none block flex-1 text-center leading-none">
                                 1
@@ -990,30 +655,17 @@ const Checkout = () => {
                                 className="w-8 h-8 rounded-full flex items-center justify-center border border-neutral-400 dark:border-neutral-500 bg-white focus:outline-none hover:border-neutral-700 dark:hover:border-neutral-400 disabled:hover:border-neutral-400 dark:disabled:hover:border-neutral-500 disabled:opacity-50 disabled:cursor-default"
                                 type="button"
                               >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  viewBox="0 0 24 24"
-                                  fill="currentColor"
-                                  aria-hidden="true"
-                                  data-slot="icon"
-                                  className="w-4 h-4"
-                                >
-                                  <path
-                                    fillRule="evenodd"
-                                    d="M12 3.75a.75.75 0 0 1 .75.75v6.75h6.75a.75.75 0 0 1 0 1.5h-6.75v6.75a.75.75 0 0 1-1.5 0v-6.75H4.5a.75.75 0 0 1 0-1.5h6.75V4.5a.75.75 0 0 1 .75-.75Z"
-                                    clipRule="evenodd"
-                                  />
-                                </svg>
+                                <CheckoutIcon13 />
                               </button>
                             </div>
                           </div>
                         </div>
-                        <a
-                          href="##"
+                        <Link
+                          to="##"
                           className="relative z-10 flex items-center mt-3 font-medium hover:text-[#00BADB] text-sm"
                         >
                           <span>Xóa</span>
-                        </a>
+                        </Link>
                       </div>
                     </div>
                   </div>
@@ -1026,7 +678,7 @@ const Checkout = () => {
                         data-nimg="fill"
                         className="h-full w-full object-contain object-center"
                         sizes="150px"
-                        src="./src/assets/images/product1.webp"
+                        src={Product1}
                         style={{
                           position: "absolute",
                           height: "100%",
@@ -1035,100 +687,25 @@ const Checkout = () => {
                           color: "transparent",
                         }}
                       />
-                      <a className="absolute inset-0" href="/product-detail" />
+                      <Link className="absolute inset-0" to="/product-detail" />
                     </div>
                     <div className="ml-3 sm:ml-6 flex flex-1 flex-col">
                       <div>
                         <div className="flex justify-between">
                           <div className="flex-[1.5]">
                             <h3 className="text-base font-semibold">
-                              <a href="/product-detail">Rey Nylon Backpack</a>
+                              <Link to="/product-detail">
+                                Rey Nylon Backpack
+                              </Link>
                             </h3>
                             <div className="mt-1.5 sm:mt-2.5 flex text-sm text-slate-600">
                               <div className="flex items-center space-x-1.5">
-                                <svg
-                                  className="w-4 h-4"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                >
-                                  <path
-                                    d="M7.01 18.0001L3 13.9901C1.66 12.6501 1.66 11.32 3 9.98004L9.68 3.30005L17.03 10.6501C17.4 11.0201 17.4 11.6201 17.03 11.9901L11.01 18.0101C9.69 19.3301 8.35 19.3301 7.01 18.0001Z"
-                                    stroke="currentColor"
-                                    strokeWidth="1.5"
-                                    strokeMiterlimit={10}
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                  <path
-                                    d="M8.35 1.94995L9.69 3.28992"
-                                    stroke="currentColor"
-                                    strokeWidth="1.5"
-                                    strokeMiterlimit={10}
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                  <path
-                                    d="M2.07 11.92L17.19 11.26"
-                                    stroke="currentColor"
-                                    strokeWidth="1.5"
-                                    strokeMiterlimit={10}
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                  <path
-                                    d="M3 22H16"
-                                    stroke="currentColor"
-                                    strokeWidth="1.5"
-                                    strokeMiterlimit={10}
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                  <path
-                                    d="M18.85 15C18.85 15 17 17.01 17 18.24C17 19.26 17.83 20.09 18.85 20.09C19.87 20.09 20.7 19.26 20.7 18.24C20.7 17.01 18.85 15 18.85 15Z"
-                                    stroke="currentColor"
-                                    strokeWidth="1.5"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                </svg>
+                                <CheckoutIcon14 />
                                 <span>Black</span>
                               </div>
                               <span className="mx-4 border-l border-slate-200" />
                               <div className="flex items-center space-x-1.5">
-                                <svg
-                                  className="w-4 h-4"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                >
-                                  <path
-                                    d="M21 9V3H15"
-                                    stroke="currentColor"
-                                    strokeWidth="1.5"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                  <path
-                                    d="M3 15V21H9"
-                                    stroke="currentColor"
-                                    strokeWidth="1.5"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                  <path
-                                    d="M21 3L13.5 10.5"
-                                    stroke="currentColor"
-                                    strokeWidth="1.5"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                  <path
-                                    d="M10.5 13.5L3 21"
-                                    stroke="currentColor"
-                                    strokeWidth="1.5"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                </svg>
+                                <CheckoutIcon15 />
                                 <span>2XL</span>
                               </div>
                             </div>
@@ -1176,20 +753,7 @@ const Checkout = () => {
                                 type="button"
                                 disabled
                               >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  viewBox="0 0 24 24"
-                                  fill="currentColor"
-                                  aria-hidden="true"
-                                  data-slot="icon"
-                                  className="w-4 h-4"
-                                >
-                                  <path
-                                    fillRule="evenodd"
-                                    d="M4.25 12a.75.75 0 0 1 .75-.75h14a.75.75 0 0 1 0 1.5H5a.75.75 0 0 1-.75-.75Z"
-                                    clipRule="evenodd"
-                                  />
-                                </svg>
+                                <CheckoutIcon16 />
                               </button>
                               <span className="select-none block flex-1 text-center leading-none">
                                 1
@@ -1198,30 +762,17 @@ const Checkout = () => {
                                 className="w-8 h-8 rounded-full flex items-center justify-center border border-neutral-400 dark:border-neutral-500 bg-white focus:outline-none hover:border-neutral-700 dark:hover:border-neutral-400 disabled:hover:border-neutral-400 dark:disabled:hover:border-neutral-500 disabled:opacity-50 disabled:cursor-default"
                                 type="button"
                               >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  viewBox="0 0 24 24"
-                                  fill="currentColor"
-                                  aria-hidden="true"
-                                  data-slot="icon"
-                                  className="w-4 h-4"
-                                >
-                                  <path
-                                    fillRule="evenodd"
-                                    d="M12 3.75a.75.75 0 0 1 .75.75v6.75h6.75a.75.75 0 0 1 0 1.5h-6.75v6.75a.75.75 0 0 1-1.5 0v-6.75H4.5a.75.75 0 0 1 0-1.5h6.75V4.5a.75.75 0 0 1 .75-.75Z"
-                                    clipRule="evenodd"
-                                  />
-                                </svg>
+                                <CheckoutIcon17 />
                               </button>
                             </div>
                           </div>
                         </div>
-                        <a
-                          href="##"
+                        <Link
+                          to="##"
                           className="relative z-10 flex items-center mt-3 font-medium hover:text-[#00BADB] text-sm"
                         >
                           <span>Xóa</span>
-                        </a>
+                        </Link>
                       </div>
                     </div>
                   </div>
@@ -1234,7 +785,7 @@ const Checkout = () => {
                         data-nimg="fill"
                         className="h-full w-full object-contain object-center"
                         sizes="150px"
-                        src="./src/assets/images/product1.webp"
+                        src={Product1}
                         style={{
                           position: "absolute",
                           height: "100%",
@@ -1243,100 +794,25 @@ const Checkout = () => {
                           color: "transparent",
                         }}
                       />
-                      <a className="absolute inset-0" href="/product-detail" />
+                      <Link className="absolute inset-0" to="/product-detail" />
                     </div>
                     <div className="ml-3 sm:ml-6 flex flex-1 flex-col">
                       <div>
                         <div className="flex justify-between">
                           <div className="flex-[1.5]">
                             <h3 className="text-base font-semibold">
-                              <a href="/product-detail">Rey Nylon Backpack</a>
+                              <Link to="/product-detail">
+                                Rey Nylon Backpack
+                              </Link>
                             </h3>
                             <div className="mt-1.5 sm:mt-2.5 flex text-sm text-slate-600">
                               <div className="flex items-center space-x-1.5">
-                                <svg
-                                  className="w-4 h-4"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                >
-                                  <path
-                                    d="M7.01 18.0001L3 13.9901C1.66 12.6501 1.66 11.32 3 9.98004L9.68 3.30005L17.03 10.6501C17.4 11.0201 17.4 11.6201 17.03 11.9901L11.01 18.0101C9.69 19.3301 8.35 19.3301 7.01 18.0001Z"
-                                    stroke="currentColor"
-                                    strokeWidth="1.5"
-                                    strokeMiterlimit={10}
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                  <path
-                                    d="M8.35 1.94995L9.69 3.28992"
-                                    stroke="currentColor"
-                                    strokeWidth="1.5"
-                                    strokeMiterlimit={10}
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                  <path
-                                    d="M2.07 11.92L17.19 11.26"
-                                    stroke="currentColor"
-                                    strokeWidth="1.5"
-                                    strokeMiterlimit={10}
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                  <path
-                                    d="M3 22H16"
-                                    stroke="currentColor"
-                                    strokeWidth="1.5"
-                                    strokeMiterlimit={10}
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                  <path
-                                    d="M18.85 15C18.85 15 17 17.01 17 18.24C17 19.26 17.83 20.09 18.85 20.09C19.87 20.09 20.7 19.26 20.7 18.24C20.7 17.01 18.85 15 18.85 15Z"
-                                    stroke="currentColor"
-                                    strokeWidth="1.5"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                </svg>
+                                <CheckoutIcon18 />
                                 <span>Black</span>
                               </div>
                               <span className="mx-4 border-l border-slate-200" />
                               <div className="flex items-center space-x-1.5">
-                                <svg
-                                  className="w-4 h-4"
-                                  viewBox="0 0 24 24"
-                                  fill="none"
-                                >
-                                  <path
-                                    d="M21 9V3H15"
-                                    stroke="currentColor"
-                                    strokeWidth="1.5"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                  <path
-                                    d="M3 15V21H9"
-                                    stroke="currentColor"
-                                    strokeWidth="1.5"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                  <path
-                                    d="M21 3L13.5 10.5"
-                                    stroke="currentColor"
-                                    strokeWidth="1.5"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                  <path
-                                    d="M10.5 13.5L3 21"
-                                    stroke="currentColor"
-                                    strokeWidth="1.5"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                  />
-                                </svg>
+                                <CheckoutIcon19 />
                                 <span>2XL</span>
                               </div>
                             </div>
@@ -1384,20 +860,7 @@ const Checkout = () => {
                                 type="button"
                                 disabled
                               >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  viewBox="0 0 24 24"
-                                  fill="currentColor"
-                                  aria-hidden="true"
-                                  data-slot="icon"
-                                  className="w-4 h-4"
-                                >
-                                  <path
-                                    fillRule="evenodd"
-                                    d="M4.25 12a.75.75 0 0 1 .75-.75h14a.75.75 0 0 1 0 1.5H5a.75.75 0 0 1-.75-.75Z"
-                                    clipRule="evenodd"
-                                  />
-                                </svg>
+                                <CheckoutIcon20 />
                               </button>
                               <span className="select-none block flex-1 text-center leading-none">
                                 1
@@ -1406,30 +869,17 @@ const Checkout = () => {
                                 className="w-8 h-8 rounded-full flex items-center justify-center border border-neutral-400 dark:border-neutral-500 bg-white focus:outline-none hover:border-neutral-700 dark:hover:border-neutral-400 disabled:hover:border-neutral-400 dark:disabled:hover:border-neutral-500 disabled:opacity-50 disabled:cursor-default"
                                 type="button"
                               >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  viewBox="0 0 24 24"
-                                  fill="currentColor"
-                                  aria-hidden="true"
-                                  data-slot="icon"
-                                  className="w-4 h-4"
-                                >
-                                  <path
-                                    fillRule="evenodd"
-                                    d="M12 3.75a.75.75 0 0 1 .75.75v6.75h6.75a.75.75 0 0 1 0 1.5h-6.75v6.75a.75.75 0 0 1-1.5 0v-6.75H4.5a.75.75 0 0 1 0-1.5h6.75V4.5a.75.75 0 0 1 .75-.75Z"
-                                    clipRule="evenodd"
-                                  />
-                                </svg>
+                                <CheckoutIcon21 />
                               </button>
                             </div>
                           </div>
                         </div>
-                        <a
-                          href="##"
+                        <Link
+                          to="##"
                           className="relative z-10 flex items-center mt-3 font-medium hover:text-[#00BADB] text-sm"
                         >
                           <span>Xóa</span>
-                        </a>
+                        </Link>
                       </div>
                     </div>
                   </div>
@@ -1479,51 +929,25 @@ const Checkout = () => {
                 {/*end hd-checkout-btn*/}
                 <div className="hd-checkout-text-note mt-5 text-sm text-slate-500 flex items-center justify-center">
                   <p className="block relative pl-5">
-                    <svg
-                      className="w-4 h-4 absolute -left-1 top-0.5"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                    >
-                      <path
-                        d="M12 22C17.5 22 22 17.5 22 12C22 6.5 17.5 2 12 2C6.5 2 2 6.5 2 12C2 17.5 6.5 22 12 22Z"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M12 8V13"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M11.9945 16H12.0035"
-                        stroke="currentColor"
-                        strokeWidth={2}
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
+                    <CheckoutIcon22 />
                     Tìm hiểu thêm thông tin về
-                    <a
+                    <Link
                       target="_blank"
                       rel="noopener noreferrer"
-                      href="##"
+                      to="##"
                       className="text-slate-900 underline font-medium"
                     >
                       Thuế
-                    </a>
+                    </Link>
                     <span> và </span>
-                    <a
+                    <Link
                       target="_blank"
                       rel="noopener noreferrer"
-                      href="##"
+                      to="##"
                       className="text-slate-900 underline font-medium"
                     >
                       Vận chuyển
-                    </a>
+                    </Link>
                   </p>
                 </div>
                 {/*end hd-checkout-text-note*/}

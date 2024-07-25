@@ -1,4 +1,6 @@
+import { Logo } from "@/components/icons";
 import React from "react";
+import { Link } from "react-router-dom";
 
 const Register = () => {
   return (
@@ -14,7 +16,7 @@ const Register = () => {
           <main className="flex items-center justify-center px-8 py-8 sm:px-12 lg:col-span-7 lg:px-16 lg:py-12 xl:col-span-6">
             <div className="max-w-xl lg:max-w-3xl">
               <img
-                src="./src/assets/images/logo.png"
+                src={Logo}
                 className="h-10 mb-10"
                 alt="Logo"
               />
@@ -58,7 +60,7 @@ const Register = () => {
                     htmlFor="Email"
                     className="block text-sm font-medium text-gray-700"
                   >
-                    {" "}
+                   
                     Eamil của bạn
                   </label>
                   <input
@@ -113,14 +115,14 @@ const Register = () => {
                 <div className="col-span-6">
                   <p className="text-sm text-gray-500">
                     Bằng cách tạo một tài khoản, bạn đồng ý với chúng tôi
-                    <a href="#" className="text-gray-700 underline">
+                    <Link to="#" className="text-gray-700 underline">
                       {" "}
                       các điều khoản và điều kiện
-                    </a>
+                    </Link>
                     and
-                    <a href="#" className="text-gray-700 underline">
+                    <Link to="#" className="text-gray-700 underline">
                       Chính sách bảo mật
-                    </a>
+                    </Link>
                     .
                   </p>
                 </div>
@@ -130,9 +132,9 @@ const Register = () => {
                   </button>
                   <p className="mt-4 text-sm text-gray-500 sm:mt-0">
                     Bạn đã có tài khoản
-                    <a href="#" className="text-gray-700 underline">
+                    <Link to="#" className="text-gray-700 underline">
                       Đăng nhập
-                    </a>
+                    </Link>
                     .
                   </p>
                 </div>
