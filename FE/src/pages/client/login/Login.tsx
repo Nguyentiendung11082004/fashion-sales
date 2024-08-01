@@ -1,18 +1,21 @@
 import { Logo } from "@/components/icons";
+import BackgroundLogin from "@/components/icons/login/Background";
 import LoginIcon1 from "@/components/icons/login/LoginIcon1";
-import React from "react";
 import { Link } from "react-router-dom";
+
 
 const Login = () => {
   return (
     <>
-      <div>
+      <div >
+        <div>
+          <BackgroundLogin />
+        </div>
         <img
           src={Logo}
-          className="h-10 lg:ml-[140px] mt-[30px] mx-auto"
+          className="absolute h-10 z-10 lg:ml-[140px] mt-[30px] mx-auto"
           alt="Logo"
         />
-        <section className="bg-[url('../src/assets/images/loginpage.svg')] hidden lg:block bg-no-repeat bg-cover bg-center text-white lg:min-h-[620px] md:min-h-[420px] lg:items-center lg:py-0 mt-16" />
         <div className="absolute lg:right-[12%] top-[10%]">
           <div className="w-full m-9 p-[50px] lg:w-[450px] shadow-2xl border">
             <h2 className="text-2xl font-semibold text-gray-700 text-center">
@@ -23,7 +26,7 @@ const Login = () => {
             </p>
             <Link
               to=""
-              className="flex items-center justify-center mt-4 text-white rounded-lg shadow-md hover:bg-gray-100"
+              className="flex items-center justify-center mt-4 bg-white rounded-lg shadow-md hover:bg-gray-100"
             >
               <div className="px-1 py-3">
                 <LoginIcon1 />
@@ -47,7 +50,7 @@ const Login = () => {
                 Email của bạn
               </label>
               <input
-                className="bg-gray-200 text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none"
+                className="bg-white text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none"
                 type="email"
               />
             </div>
@@ -61,7 +64,7 @@ const Login = () => {
                 </Link>
               </div>
               <input
-                className="bg-gray-200 text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none"
+                className="bg-white text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none"
                 type="password"
               />
             </div>
