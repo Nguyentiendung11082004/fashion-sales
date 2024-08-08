@@ -1,0 +1,2043 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap"
+    />
+    <title>Vite + React + TS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+
+  <body class="page-effect">
+    <section class="bg-[#F6F6F8] text-sm">
+      <div
+        class="text-[#878787] flex lg:justify-between lg:items-center flex-wrap sm:justify-center md:justify-center py-4 lg:mx-4 h-[auto] lg:h-[48px] md:h-[48px]"
+      >
+        <div class="hidden lg:flex">
+          <div class="flex mr-4">
+            <svg
+              class="w-4 h-4 mr-1"
+              fill="none"
+              stroke="currentColor"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z"
+              />
+            </svg>
+            <!-- test -->
+            <span class=""> +0123456789 </span>
+          </div>
+          <div class="flex">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="size-6 w-4 h-4 mr-1"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"
+              />
+            </svg>
+
+            <span class="text-[#878787]"> Kalle@domain.com </span>
+          </div>
+        </div>
+        <div class="mx-auto lg:mx-0">
+          <span class="">
+            Summer sale discount off <span class="text-[red]">50%</span>!
+            <span class="text-black">Shop Now</span>
+          </span>
+        </div>
+        <div class="flex mx-auto lg:mx-0">
+          <div class="flex items-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="size-6 w-5 h-5 mr-1"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+              />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"
+              />
+            </svg>
+            <span class="">Location</span>
+          </div>
+          <div class="mx-5">
+            <select name="" id="" class="bg-[#F6F6F8]">
+              <option value="">English</option>
+              <option value="">Viet nam</option>
+            </select>
+          </div>
+          <div class="flex items-center">
+            <img
+              src="./src/assets/icons/icon-vn.svg?v=2"
+              class="w-4 h-3 object-cover"
+              alt=""
+            />
+            <select class="bg-[#F6F6F8] mt-[-2px]">
+              <option value="">VND</option>
+              <option value="">Canada</option>
+              <option value="">France</option>
+            </select>
+          </div>
+          <!-- <div></div> -->
+        </div>
+      </div>
+    </section>
+    <div class="w-[100%] bg-[#fff] sticky top-0 left-0 right-0 z-20">
+      <header class="container bg-[#fff] h-[70px] grid grid-cols-12 gap-4">
+        <div
+          class="lg:col-span-2 col-span-4 flex justify-center items-center md:items-center md:justify-center lg:justify-start order-2 lg:order-1"
+        >
+          <img src="./src/assets/images/logo.png" class="h-10" alt="Logo" />
+        </div>
+        <div
+          class="col-span-4 flex items-center justify-start md:items-center md:justify-start lg:hidden order-1"
+        >
+          <svg
+            class=" "
+            xmlns="http://www.w3.org/2000/svg"
+            width="30"
+            height="16"
+            viewBox="0 0 30 16"
+            fill="currentColor"
+          >
+            <rect width="30" height="1.5"></rect>
+            <rect y="7" width="20" height="1.5"></rect>
+            <rect y="14" width="30" height="1.5"></rect>
+          </svg>
+        </div>
+        <div
+          class="lg:col-span-8 lg:flex lg:items-center lg:justify-center md:hidden hidden lg:order-2"
+        >
+          <ul class="flex space-x-16 ml-10 text-[14px]">
+            <li><a href="" class="font-normal text-hover">Trang Chủ</a></li>
+            <li class="relative">
+              <a href="" class="font-normal text-hover"
+                >Sản Phẩm<span
+                  class="absolute text-xs rounded-full px-2 py-[2px] text-white bg-primary top-[-10px] left-16"
+                  >New</span
+                ></a
+              >
+            </li>
+            <li><a href="" class="font-normal text-hover">Phụ Kiện</a></li>
+            <li><a href="" class="font-normal text-hover">Giày</a></li>
+            <li><a href="" class="font-normal text-hover">Bài Viết</a></li>
+            <li><a href="" class="font-normal text-hover">Liên Hệ</a></li>
+          </ul>
+        </div>
+        <div
+          class="lg:col-span-2 col-span-4 flex items-center justify-end order-3"
+        >
+          <div class="flex items-center space-x-4">
+            <a href="">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="h-6 w-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
+                />
+              </svg>
+            </a>
+            <a href="" class="relative">
+              <span
+                class="absolute text-xs right-[-5px] top-[-5px] bg-[#000] text-white px-1 rounded-full"
+                >0</span
+              >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="h-6 w-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
+                />
+              </svg>
+            </a>
+            <a href="" class="relative">
+              <span
+                class="absolute text-xs right-[-5px] top-[-5px] bg-[#000] text-white px-1 rounded-full"
+                >3</span
+              >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke-width="1.5"
+                stroke="currentColor"
+                class="h-6 w-6"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
+                />
+              </svg>
+            </a>
+          </div>
+        </div>
+      </header>
+    </div>
+
+    <main
+      id="main-content"
+      class="min-h-fit !shadow-none !outline-0 block isolate *:box-border"
+    >
+      <div class="hd-page-head">
+        <div
+          class="hd-header-banner bg-[url('./src/assets/images/shopping-cart-head.webp')] bg-no-repeat bg-cover bg-center "
+        >
+          <div
+            class="hd-bg-banner overflow-hidden relative !text-center bg-black bg-opacity-55 py-[50px] mb-0"
+          >
+            <div class="relative hd-container">
+              <h1 class="text-white text-xl font-medium leading-5">
+                Thanh toán
+              </h1>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!--end hd-page-head-->
+
+      <div class="hd-CheckoutPage">
+        <main class="container py-16 lg:pb-28 lg:pt-20">
+          <div class="flex flex-col lg:flex-row">
+            <div class="flex-1">
+              <div class="space-y-8">
+                <div id="hd-ContactInfo" class="scroll-mt-24">
+                  <div
+                    class="border border-slate-200 rounded-xl overflow-hidden z-0"
+                  >
+                    <div class="flex flex-col sm:flex-row items-start p-6">
+                      <span class="hidden sm:block">
+                        <svg
+                          class="w-6 h-6 text-slate-700 mt-0.5"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M12.12 12.78C12.05 12.77 11.96 12.77 11.88 12.78C10.12 12.72 8.71997 11.28 8.71997 9.50998C8.71997 7.69998 10.18 6.22998 12 6.22998C13.81 6.22998 15.28 7.69998 15.28 9.50998C15.27 11.28 13.88 12.72 12.12 12.78Z"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          ></path>
+                          <path
+                            d="M18.74 19.3801C16.96 21.0101 14.6 22.0001 12 22.0001C9.40001 22.0001 7.04001 21.0101 5.26001 19.3801C5.36001 18.4401 5.96001 17.5201 7.03001 16.8001C9.77001 14.9801 14.25 14.9801 16.97 16.8001C18.04 17.5201 18.64 18.4401 18.74 19.3801Z"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          ></path>
+                          <path
+                            d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          ></path>
+                        </svg>
+                      </span>
+                      <div class="sm:ml-8">
+                        <h3 class="text-black flex">
+                          <span class="uppercase tracking-tight"
+                            >Thông tin liên lạc</span
+                          >
+                          <svg
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke-width="2.5"
+                            stroke="currentColor"
+                            class="w-5 h-5 ml-3 text-slate-900 "
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              d="M4.5 12.75l6 6 9-13.5"
+                            ></path>
+                          </svg>
+                        </h3>
+                        <div class="font-semibold mt-1 text-sm">
+                          <span class="">Thu Hằng</span>
+                          <span class="ml-3 tracking-tighter"
+                            >0921 735 576</span
+                          >
+                        </div>
+                      </div>
+                      <button
+                        class="py-2 px-4 bg-slate-50 hover:bg-slate-100 mt-5 sm:mt-0 sm:ml-auto text-sm font-medium rounded-lg"
+                      >
+                        Thay đổi
+                      </button>
+                    </div>
+                    <!--end-->
+
+                    <div
+                      class="hd-no-account border-t border-slate-200 px-6 py-7 space-y-4 sm:space-y-6 hidden"
+                    >
+                      <div
+                        class="flex justify-between flex-wrap items-baseline"
+                      >
+                        <h3 class="text-lg font-semibold">
+                          Thông tin liên lạc
+                        </h3>
+                        <span class="block text-sm my-1 md:my-0">
+                          Bạn chưa có tài khoản?
+                          <a href="##" class="text-primary-500 font-medium"
+                            >Đăng nhập</a
+                          >
+                        </span>
+                      </div>
+                      <div class="max-w-lg">
+                        <label
+                          class="nc-Label font-medium text-neutral-900 text-sm"
+                          data-nc-id="Label"
+                          >Số điện thoại</label
+                        >
+                        <input class="block w-full outline-0 border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50 focus:border-neutral-200 rounded-2xl font-normal h-11 px-4 py-3 mt-1.5" type="text" value="+84 xxx">
+                      </div>
+                      <div class="max-w-lg">
+                        <label
+                          class="nc-Label font-medium text-neutral-900 text-sm"
+                          data-nc-id="Label"
+                          >Email</label
+                        >
+                        <input class="block w-full outline-0 border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50 focus:border-neutral-200 rounded-2xl font-normal h-11 px-4 py-3 mt-1.5" type="email" value="">
+                      </div>    
+
+                      <div class="flex flex-col sm:flex-row pt-6">
+                        <button
+                          class="hd-Button relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm sm:text-base font-medium py-3 px-4 sm:py-3.5 ttnc-ButtonPrimary disabled:bg-opacity-90 bg-slate-900 dark:bg-slate-100 hover:bg-slate-800 text-slate-50 dark:text-slate-800 sm:!px-7 shadow-none focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0"
+                        >
+                          Lưu & Tiếp tục mua sắm
+                        </button>
+                        <button
+                          class="hd-Button relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm sm:text-base font-medium py-3 px-4 sm:py-3.5 sm:px-6 ttnc-ButtonSecondary bg-white text-slate-700 dark:bg-slate-900 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 mt-3 sm:mt-0 sm:ml-3 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0"
+                        >
+                          Hủy
+                        </button>
+                      </div>
+                    </div>
+                    <!--end hd-form-change-account-none-->
+                  </div>
+                </div>
+                <!--end ContactInfo-->
+
+                <div id="hd-ShippingAddress" class="scroll-mt-24">
+                  <div
+                    class="border border-slate-200 rounded-xl"
+                  >
+                    <div class="hd-top-ShippingAddress p-6 flex flex-col sm:flex-row items-start">
+                      <span class="hidden sm:block">
+                        <svg
+                          class="w-6 h-6 text-slate-700 mt-0.5"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M12.1401 15.0701V13.11C12.1401 10.59 14.1801 8.54004 16.7101 8.54004H18.6701"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          ></path>
+                          <path
+                            d="M5.62012 8.55005H7.58014C10.1001 8.55005 12.1501 10.59 12.1501 13.12V13.7701V17.25"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          ></path>
+                          <path
+                            d="M7.14008 6.75L5.34009 8.55L7.14008 10.35"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          ></path>
+                          <path
+                            d="M16.8601 6.75L18.6601 8.55L16.8601 10.35"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          ></path>
+                          <path
+                            d="M9 22H15C20 22 22 20 22 15V9C22 4 20 2 15 2H9C4 2 2 4 2 9V15C2 20 4 22 9 22Z"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          ></path>
+                        </svg>
+                      </span>
+                      <div class="sm:ml-8">
+                        <h3 class="text-black flex">
+                          <span class="uppercase"> Địa chỉ giao hàng </span>
+                          <svg
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke-width="2.5"
+                            stroke="currentColor"
+                            class="w-5 h-5 ml-3 text-slate-900"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              d="M4.5 12.75l6 6 9-13.5"
+                            ></path>
+                          </svg>
+                        </h3>
+                        <div class="font-semibold mt-1 text-sm">
+                          <span class=""
+                            >80 Xuân Phương, Bắc Từ Liêm, Hà Nội, Việt Nam</span>
+                        </div>
+                      </div>
+                      <button
+                        class="py-2 px-4 bg-slate-50 hover:bg-slate-100 mt-5 sm:mt-0 sm:ml-auto text-sm font-medium rounded-lg"
+                      >
+                        Thay đổi
+                      </button>
+                    </div>
+                    <!--end hd-top-ShippingAddress-->
+
+                    <div
+                      class="hd-body-ShippingAddress border-t border-slate-200 px-6 py-7 space-y-4 sm:space-y-6 block"
+                    >
+                      <div
+                        class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3"
+                      >
+                        <div>
+                          <label
+                            class="hd-Label text-base font-medium text-neutral-900"
+                            data-nc-id="Label"
+                          >
+                            Họ
+                          </label>
+                          <input
+                            class="block w-full outline-0 border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50 focus:border-neutral-200 rounded-2xl font-normal h-11 px-4 py-3 mt-1.5"
+                            type="text"
+                            value="Thu"
+                          />
+                        </div>
+                        <div>
+                          <label
+                            class="hd-Label text-base font-medium text-neutral-900"
+                            data-nc-id="Label"
+                          >
+                            Tên
+                          </label>
+                          <input
+                            class="block w-full outline-0 border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50 focus:border-neutral-200 rounded-2xl font-normal h-11 px-4 py-3 mt-1.5"
+                            type="text"
+                            value="Hằng"
+                          />
+                        </div>
+                      </div>
+                      <div class="sm:flex space-y-4 sm:space-y-0 sm:space-x-3">
+                        <div class="flex-1">
+                          <label
+                            class="hd-Label text-base font-medium text-neutral-900"
+                            data-nc-id="Label"
+                          >
+                            Địa chỉ
+                          </label>
+                          <input
+                            class="block w-full outline-0 border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50 focus:border-neutral-200 rounded-2xl font-normal h-11 px-4 py-3 mt-1.5"
+                            placeholder=""
+                            type="text"
+                            value="80 Xuân Phương, Bắc Từ Liêm"
+                          />
+                        </div>
+                        <div class="sm:w-1/3">
+                          <label
+                            class="hd-Label text-base font-medium text-neutral-900"
+                            data-nc-id="Label"
+                          >
+                            Số nhà/Số căn *
+                          </label>
+                          <input
+                            class="block w-full outline-0 border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50 focus:border-neutral-200 rounded-2xl font-normal h-11 px-4 py-3 mt-1.5"
+                            type="text"
+                            value="sn10 - 5/101/80"
+                          />
+                        </div>
+                      </div>
+                      <div
+                        class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3"
+                      >
+                        <div>
+                          <label
+                            class="hd-Label text-base font-medium text-neutral-900"
+                            data-nc-id="Label"
+                          >
+                            Thành phố
+                          </label>
+                          <input
+                            class="block w-full outline-0 border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50 focus:border-neutral-200 rounded-2xl font-normal h-11 px-4 py-3 mt-1.5"
+                            type="text"
+                            value="Hà Nội"
+                          />
+                        </div>
+                        <div>
+                          <label
+                            class="hd-Label text-base font-medium text-neutral-900"
+                            data-nc-id="Label"
+                          >
+                            Quốc gia
+                          </label>
+                          <select
+                            class="hd-Select pl-[13px] outline-0 h-11 mt-1.5 block w-full text-sm rounded-2xl border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:bg-neutral-50 dark:focus:ring-primary-6000 dark:focus:ring-opacity-25"
+                          >
+                            <option value="Vietnam">Vietnam</option>
+                            <option value="Vietnam">Canada</option>
+                            <option value="Vietnam">Mexico</option>
+                            <option value="Vietnam">Israel</option>
+                            <option value="Vietnam">France</option>
+                            <option value="Vietnam">England</option>
+                            <option value="Vietnam">Laos</option>
+                            <option value="Vietnam">China</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div
+                        class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3"
+                      >
+                        <div>
+                          <label
+                            class="hd-Label text-base font-medium text-neutral-900"
+                            data-nc-id="Label"
+                          >
+                            Tỉnh
+                          </label>
+                          <input
+                            class="block w-full outline-0 border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50 focus:border-neutral-200 rounded-2xl font-normal h-11 px-4 py-3 mt-1.5"
+                            type="text"
+                            value=""
+                          />
+                        </div>
+                        <div>
+                          <label
+                            class="hd-Label text-base font-medium text-neutral-900"
+                            data-nc-id="Label"
+                          >
+                            Mã bưu cục
+                          </label>
+                          <input
+                            class="block w-full outline-0 border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50 focus:border-neutral-200 rounded-2xl font-normal h-11 px-4 py-3 mt-1.5"
+                            type="text"
+                            value=""
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label
+                          class="hd-Label text-base font-medium text-neutral-900"
+                          data-nc-id="Label"
+                        >
+                          Đến:
+                        </label>
+                        <div
+                          class="mt-1.5 grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3"
+                        >
+                          <div class="flex items-center text-sm sm:text-base">
+                            <input
+                              id="Address-type-home"
+                              class="focus:ring-action-primary text-primary-500 rounded-full border-slate-400 hover:border-slate-700 bg-transparent dark:border-slate-600 dark:hover:border-slate-400 dark:checked:bg-primary-500 focus:ring-primary-500 w-5 h-5"
+                              type="radio"
+                              value="Address-type-home"
+                              checked=""
+                              name="Address-type"
+                            />
+                            <label
+                              for="Address-type-home"
+                              class="pl-2.5 sm:pl-3 block text-slate-900 select-none"
+                            >
+                              <span class="text-sm font-medium">
+                                Nhà riêng
+                                <span class="font-light">
+                                  (Giao hàng cả ngày)
+                                </span>
+                              </span>
+                            </label>
+                          </div>
+                          <div class="flex items-center text-sm sm:text-base">
+                            <input
+                              id="Address-type-office"
+                              class="focus:ring-action-primary text-primary-500 rounded-full border-slate-400 hover:border-slate-700 bg-transparent dark:border-slate-600 dark:hover:border-slate-400 dark:checked:bg-primary-500 focus:ring-primary-500 w-5 h-5"
+                              type="radio"
+                              value="Address-type-office"
+                              name="Address-type"
+                            />
+                            <label
+                              for="Address-type-office"
+                              class="pl-2.5 sm:pl-3 block text-slate-900 select-none"
+                            >
+                              <span class="text-sm font-medium">
+                                Văn phòng
+                                <span class="font-light">
+                                  (Giao hàng từ
+                                  <span class="font-medium"> 9:00 - 17:00 </span>
+                                  )
+                                </span>
+                              </span>
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="flex flex-col sm:flex-row pt-6">
+                        <button
+                          class="hd-Button relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm sm:text-base font-medium py-3 px-4 sm:py-3.5 ttnc-ButtonPrimary disabled:bg-opacity-90 bg-[#00BADB] hover:bg-[#23b6cd] text-white sm:!px-7 shadow-none focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0"
+                        >
+                          Lưu & tiếp tục Thanh toán
+                        </button>
+                        <button
+                          class="hd-Button relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm sm:text-base font-medium py-3 px-4 sm:py-3.5 sm:px-6 ttnc-ButtonSecondary bg-slate-50 text-black hover:bg-gray-100 mt-3 sm:mt-0 sm:ml-3 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0"
+                        >
+                          Hủy
+                        </button>
+                      </div>
+                    </div>
+                    <!--end hd-body-ShippingAddress-->
+
+                  </div>
+                </div>
+                <!--end hd-ShippingAddress-->
+
+                <div id="hd-PaymentMethod" class="scroll-mt-24">
+                  <div
+                    class="border border-slate-200 rounded-xl"
+                  >
+                    <div class="p-6 flex flex-col sm:flex-row items-start">
+                      <span class="hidden sm:block">
+                        <svg
+                          class="w-6 h-6 text-slate-700 mt-0.5"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M3.92969 15.8792L15.8797 3.9292"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            stroke-miterlimit="10"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          ></path>
+                          <path
+                            d="M11.1013 18.2791L12.3013 17.0791"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            stroke-miterlimit="10"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          ></path>
+                          <path
+                            d="M13.793 15.5887L16.183 13.1987"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            stroke-miterlimit="10"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          ></path>
+                          <path
+                            d="M3.60127 10.239L10.2413 3.599C12.3613 1.479 13.4213 1.469 15.5213 3.569L20.4313 8.479C22.5313 10.579 22.5213 11.639 20.4013 13.759L13.7613 20.399C11.6413 22.519 10.5813 22.529 8.48127 20.429L3.57127 15.519C1.47127 13.419 1.47127 12.369 3.60127 10.239Z"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          ></path>
+                          <path
+                            d="M2 21.9985H22"
+                            stroke="currentColor"
+                            stroke-width="1.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          ></path>
+                        </svg>
+                      </span>
+                      <div class="sm:ml-8">
+                        <h3 class="text-black flex">
+                          <span class="uppercase tracking-tight">
+                            Phương thức thanh toán
+                          </span>
+                          <svg
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke-width="2.5"
+                            stroke="currentColor"
+                            class="w-5 h-5 ml-3 text-slate-900"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              d="M4.5 12.75l6 6 9-13.5"
+                            ></path>
+                          </svg>
+                        </h3>
+                        <div class="font-semibold mt-1 text-sm">
+                          <span class="">Ví MOMO / VNPay </span>
+                          <span class="ml-3"> xxx-xxx-xx55 </span>
+                        </div>
+                      </div>
+                      <button
+                        class="py-2 px-4 bg-slate-50 hover:bg-slate-100 mt-5 sm:mt-0 sm:ml-auto text-sm font-medium rounded-lg"
+                      >
+                        Thay đổi
+                      </button>
+                    </div>
+                    <!--end-->
+
+                    <div
+                      class="border-t border-slate-200 px-6 py-7 space-y-6 hidden"
+                    >
+                      <div>
+                        <div class="flex items-start space-x-4 sm:space-x-6">
+                          <div
+                            class="flex items-center text-sm sm:text-base pt-3.5"
+                          >
+                            <input
+                              id="Credit-Card"
+                              class="focus:ring-action-primary text-primary-500 rounded-full border-slate-400 hover:border-slate-700 bg-transparent dark:border-slate-700 dark:hover:border-slate-500 dark:checked:bg-primary-500 focus:ring-primary-500 w-6 h-6"
+                              type="radio"
+                              value="Credit-Card"
+                              checked=""
+                              name="payment-method"
+                            />
+                          </div>
+                          <div class="flex-1">
+                            <label
+                              for="Credit-Card"
+                              class="flex items-center space-x-4 sm:space-x-6"
+                            >
+                              <div
+                                class="p-2.5 rounded-xl border-2 border-slate-600 "
+                              >
+                                <svg
+                                  class="w-6 h-6 sm:w-7 sm:h-7"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                >
+                                  <path
+                                    d="M2 12.6101H19"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-miterlimit="10"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                  ></path>
+                                  <path
+                                    d="M19 10.28V17.43C18.97 20.28 18.19 21 15.22 21H5.78003C2.76003 21 2 20.2501 2 17.2701V10.28C2 7.58005 2.63 6.71005 5 6.57005C5.24 6.56005 5.50003 6.55005 5.78003 6.55005H15.22C18.24 6.55005 19 7.30005 19 10.28Z"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                  ></path>
+                                  <path
+                                    d="M22 6.73V13.72C22 16.42 21.37 17.29 19 17.43V10.28C19 7.3 18.24 6.55 15.22 6.55H5.78003C5.50003 6.55 5.24 6.56 5 6.57C5.03 3.72 5.81003 3 8.78003 3H18.22C21.24 3 22 3.75 22 6.73Z"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                  ></path>
+                                  <path
+                                    d="M5.25 17.8101H6.96997"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-miterlimit="10"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                  ></path>
+                                  <path
+                                    d="M9.10986 17.8101H12.5499"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-miterlimit="10"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                  ></path>
+                                </svg>
+                              </div>
+                              <p class="font-medium">Debit / Credit Card</p>
+                            </label>
+                            <div class="mt-6 mb-4 space-y-3 sm:space-y-5 block">
+                              <div class="max-w-lg">
+                                <label
+                                  class="hd-Label text-base font-medium text-neutral-900"
+                                  data-nc-id="Label"
+                                >
+                                  Card number
+                                </label>
+                                <input
+                                  class="block w-full border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:border-neutral-700 dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-900 disabled:bg-neutral-200 dark:disabled:bg-neutral-800 rounded-2xl text-sm font-normal h-11 px-4 py-3 mt-1.5"
+                                  autocomplete="off"
+                                  type="text"
+                                />
+                              </div>
+                              <div class="max-w-lg">
+                                <label
+                                  class="hd-Label text-base font-medium text-neutral-900 "
+                                  data-nc-id="Label"
+                                >
+                                  Name on Card
+                                </label>
+                                <input
+                                  class="block w-full border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:border-neutral-700 dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-900 disabled:bg-neutral-200 dark:disabled:bg-neutral-800 rounded-2xl text-sm font-normal h-11 px-4 py-3 mt-1.5"
+                                  autocomplete="off"
+                                  type="text"
+                                />
+                              </div>
+                              <div
+                                class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-3"
+                              >
+                                <div class="sm:w-2/3">
+                                  <label
+                                    class="nc-Label text-base font-medium text-neutral-900 "
+                                    data-nc-id="Label"
+                                  >
+                                    Expiration date (MM/YY)
+                                  </label>
+                                  <input
+                                    class="block w-full border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:border-neutral-700 dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-900 disabled:bg-neutral-200 dark:disabled:bg-neutral-800 rounded-2xl text-sm font-normal h-11 px-4 py-3 mt-1.5"
+                                    autocomplete="off"
+                                    placeholder="MM/YY"
+                                    type="text"
+                                  />
+                                </div>
+                                <div class="flex-1">
+                                  <label
+                                    class="hd-Label text-base font-medium text-neutral-900 "
+                                    data-nc-id="Label"
+                                  >
+                                    CVC
+                                  </label>
+                                  <input
+                                    class="block w-full border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:border-neutral-700 dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-900 disabled:bg-neutral-200 dark:disabled:bg-neutral-800 rounded-2xl text-sm font-normal h-11 px-4 py-3 mt-1.5"
+                                    autocomplete="off"
+                                    placeholder="CVC"
+                                    type="text"
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div>
+                        <div class="flex items-start space-x-4 sm:space-x-6">
+                          <div
+                            class="flex items-center text-sm sm:text-base pt-3.5"
+                          >
+                            <input
+                              id="Internet-banking"
+                              class="focus:ring-action-primary text-primary-500 rounded-full border-slate-400 hover:border-slate-700 bg-transparent dark:border-slate-700 dark:hover:border-slate-500 dark:checked:bg-primary-500 focus:ring-primary-500 w-6 h-6"
+                              type="radio"
+                              value="Internet-banking"
+                              name="payment-method"
+                            />
+                          </div>
+                          <div class="flex-1">
+                            <label
+                              for="Internet-banking"
+                              class="flex items-center space-x-4 sm:space-x-6"
+                            >
+                              <div
+                                class="p-2.5 rounded-xl border-2 border-gray-200 dark:border-slate-600"
+                              >
+                                <svg
+                                  class="w-6 h-6 sm:w-7 sm:h-7"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path
+                                    d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                  ></path>
+                                  <path
+                                    d="M7.99998 3H8.99998C7.04998 8.84 7.04998 15.16 8.99998 21H7.99998"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                  ></path>
+                                  <path
+                                    d="M15 3C16.95 8.84 16.95 15.16 15 21"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                  ></path>
+                                  <path
+                                    d="M3 16V15C8.84 16.95 15.16 16.95 21 15V16"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                  ></path>
+                                  <path
+                                    d="M3 9.0001C8.84 7.0501 15.16 7.0501 21 9.0001"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                  ></path>
+                                </svg>
+                              </div>
+                              <p class="font-medium">Internet banking</p>
+                            </label>
+                            <div class="mt-6 mb-4 hidden">
+                              <p class="text-sm dark:text-slate-300">
+                                Your order will be delivered to you after you
+                                transfer to:
+                              </p>
+                              <ul
+                                class="mt-3.5 text-sm text-slate-500 dark:text-slate-400 space-y-2"
+                              >
+                                <li>
+                                  <h3
+                                    class="text-base text-slate-800 dark:text-slate-200 font-semibold mb-1"
+                                  >
+                                    ChisNghiax
+                                  </h3>
+                                </li>
+                                <li>
+                                  Bank name:
+                                  <span
+                                    class="text-slate-900 dark:text-slate-200 font-medium"
+                                  >
+                                    Example Bank Name
+                                  </span>
+                                </li>
+                                <li>
+                                  Account number:
+                                  <span
+                                    class="text-slate-900 dark:text-slate-200 font-medium"
+                                  >
+                                    555 888 777
+                                  </span>
+                                </li>
+                                <li>
+                                  Sort code:
+                                  <span
+                                    class="text-slate-900 dark:text-slate-200 font-medium"
+                                  >
+                                    999
+                                  </span>
+                                </li>
+                                <li>
+                                  IBAN:
+                                  <span
+                                    class="text-slate-900 dark:text-slate-200 font-medium"
+                                  >
+                                    IBAN
+                                  </span>
+                                </li>
+                                <li>
+                                  BIC:
+                                  <span
+                                    class="text-slate-900 dark:text-slate-200 font-medium"
+                                  >
+                                    BIC/Swift
+                                  </span>
+                                </li>
+                              </ul>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div>
+                        <div class="flex items-start space-x-4 sm:space-x-6">
+                          <div
+                            class="flex items-center text-sm sm:text-base pt-3.5"
+                          >
+                            <input
+                              id="Wallet"
+                              class="focus:ring-action-primary text-primary-500 rounded-full border-slate-400 hover:border-slate-700 bg-transparent dark:border-slate-700 dark:hover:border-slate-500 dark:checked:bg-primary-500 focus:ring-primary-500 w-6 h-6"
+                              type="radio"
+                              value="Wallet"
+                              name="payment-method"
+                            />
+                          </div>
+                          <div class="flex-1">
+                            <label
+                              for="Wallet"
+                              class="flex items-center space-x-4 sm:space-x-6"
+                            >
+                              <div
+                                class="p-2.5 rounded-xl border-2 border-gray-200 dark:border-slate-600"
+                              >
+                                <svg
+                                  class="w-6 h-6 sm:w-7 sm:h-7"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                >
+                                  <path
+                                    d="M18.04 13.55C17.62 13.96 17.38 14.55 17.44 15.18C17.53 16.26 18.52 17.05 19.6 17.05H21.5V18.24C21.5 20.31 19.81 22 17.74 22H6.26C4.19 22 2.5 20.31 2.5 18.24V11.51C2.5 9.44001 4.19 7.75 6.26 7.75H17.74C19.81 7.75 21.5 9.44001 21.5 11.51V12.95H19.48C18.92 12.95 18.41 13.17 18.04 13.55Z"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                  ></path>
+                                  <path
+                                    d="M2.5 12.4101V7.8401C2.5 6.6501 3.23 5.59006 4.34 5.17006L12.28 2.17006C13.52 1.70006 14.85 2.62009 14.85 3.95009V7.75008"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                  ></path>
+                                  <path
+                                    d="M22.5588 13.9702V16.0302C22.5588 16.5802 22.1188 17.0302 21.5588 17.0502H19.5988C18.5188 17.0502 17.5288 16.2602 17.4388 15.1802C17.3788 14.5502 17.6188 13.9602 18.0388 13.5502C18.4088 13.1702 18.9188 12.9502 19.4788 12.9502H21.5588C22.1188 12.9702 22.5588 13.4202 22.5588 13.9702Z"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                  ></path>
+                                  <path
+                                    d="M7 12H14"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                  ></path>
+                                </svg>
+                              </div>
+                              <p class="font-medium">Google / Apple Wallet</p>
+                            </label>
+                            <div class="mt-6 mb-4 space-y-6 hidden">
+                              <div class="text-sm prose dark:prose-invert">
+                                <p>
+                                  Lorem ipsum dolor sit amet consectetur
+                                  adipisicing elit. Itaque dolore quod quas
+                                  fugit perspiciatis architecto, temporibus quos
+                                  ducimus libero explicabo?
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="flex pt-6">
+                        <button
+                          class="hd-Button relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm sm:text-base font-medium py-3 px-4 sm:py-3.5 sm:px-6 ttnc-ButtonPrimary disabled:bg-opacity-90 bg-slate-900 dark:bg-slate-100 hover:bg-slate-800 text-slate-50 dark:text-slate-800 shadow-xl w-full max-w-[240px] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0"
+                        >
+                          Confirm order
+                        </button>
+                        <button
+                          class="hd-Button relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm sm:text-base font-medium py-3 px-4 sm:py-3.5 sm:px-6 ttnc-ButtonSecondary bg-white text-slate-700 dark:bg-slate-900 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 ml-3 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                    <!--end hd-form-change-PaymentMethod-none-->
+
+                  </div>
+                </div>
+                <!--end hd-PaymentMethod-->
+
+              </div>
+            </div>
+            <!--end-left-->
+
+            <div
+              class="flex-shrink-0 border-t lg:border-t-0 lg:border-l border-slate-200 my-10 lg:my-0 lg:mx-10 xl:lg:mx-14 2xl:mx-16"
+            ></div>
+
+            <div class="w-full lg:w-[36%]">
+              <h3 class="text-lg font-semibold">Đặt hàng</h3>
+
+              <div
+                class="hd-checkout-pro mt-8 divide-y divide-slate-200/70"
+              >
+                <div class="relative flex py-7 first:pt-0 last:pb-0">
+                  <div
+                    class="relative h-36 w-24 sm:w-28 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100"
+                  >
+                    <img
+                      alt="Rey Nylon Backpack"
+                      loading="lazy"
+                      decoding="async"
+                      data-nimg="fill"
+                      class="h-full w-full object-contain object-center"
+                      sizes="150px"
+                      srcset=""
+                      src="./src/assets/images/product1.webp"
+                      style="
+                        position: absolute;
+                        height: 100%;
+                        width: 100%;
+                        inset: 0px;
+                        color: transparent;
+                      "
+                    />
+                    <a class="absolute inset-0" href="/product-detail"></a>
+                  </div>
+                  <div class="ml-3 sm:ml-6 flex flex-1 flex-col">
+                    <div>
+                      <div class="flex justify-between">
+                        <div class="flex-[1.5]">
+                          <h3 class="text-base font-semibold">
+                            <a href="/product-detail">Rey Nylon Backpack</a>
+                          </h3>
+                          <div
+                            class="mt-1.5 sm:mt-2.5 flex text-sm text-slate-600"
+                          >
+                            <div class="flex items-center space-x-1.5">
+                              <svg
+                                class="w-4 h-4"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                              >
+                                <path
+                                  d="M7.01 18.0001L3 13.9901C1.66 12.6501 1.66 11.32 3 9.98004L9.68 3.30005L17.03 10.6501C17.4 11.0201 17.4 11.6201 17.03 11.9901L11.01 18.0101C9.69 19.3301 8.35 19.3301 7.01 18.0001Z"
+                                  stroke="currentColor"
+                                  stroke-width="1.5"
+                                  stroke-miterlimit="10"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                ></path>
+                                <path
+                                  d="M8.35 1.94995L9.69 3.28992"
+                                  stroke="currentColor"
+                                  stroke-width="1.5"
+                                  stroke-miterlimit="10"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                ></path>
+                                <path
+                                  d="M2.07 11.92L17.19 11.26"
+                                  stroke="currentColor"
+                                  stroke-width="1.5"
+                                  stroke-miterlimit="10"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                ></path>
+                                <path
+                                  d="M3 22H16"
+                                  stroke="currentColor"
+                                  stroke-width="1.5"
+                                  stroke-miterlimit="10"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                ></path>
+                                <path
+                                  d="M18.85 15C18.85 15 17 17.01 17 18.24C17 19.26 17.83 20.09 18.85 20.09C19.87 20.09 20.7 19.26 20.7 18.24C20.7 17.01 18.85 15 18.85 15Z"
+                                  stroke="currentColor"
+                                  stroke-width="1.5"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                ></path>
+                              </svg>
+                              <span>Black</span>
+                            </div>
+                            <span
+                              class="mx-4 border-l border-slate-200"
+                            ></span>
+                            <div class="flex items-center space-x-1.5">
+                              <svg
+                                class="w-4 h-4"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                              >
+                                <path
+                                  d="M21 9V3H15"
+                                  stroke="currentColor"
+                                  stroke-width="1.5"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                ></path>
+                                <path
+                                  d="M3 15V21H9"
+                                  stroke="currentColor"
+                                  stroke-width="1.5"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                ></path>
+                                <path
+                                  d="M21 3L13.5 10.5"
+                                  stroke="currentColor"
+                                  stroke-width="1.5"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                ></path>
+                                <path
+                                  d="M10.5 13.5L3 21"
+                                  stroke="currentColor"
+                                  stroke-width="1.5"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                ></path>
+                              </svg>
+                              <span>2XL</span>
+                            </div>
+                          </div>
+                          
+                          <div
+                            class="mt-3 flex justify-between w-full sm:hidden relative"
+                          >
+                            <select
+                              name="qty"
+                              id="qty"
+                              class="form-select text-sm rounded-md py-1 border-slate-200 relative z-10"
+                            >
+                              <option value="1">1</option>
+                              <option value="2">2</option>
+                              <option value="3">3</option>
+                              <option value="4">4</option>
+                              <option value="5">5</option>
+                              <option value="6">6</option>
+                              <option value="7">7</option>
+                            </select>
+                            <div class="">
+                              <div
+                                class="flex items-center border-2 border-green-500 rounded-lg py-1 px-2 md:py-1.5 md:px-2.5 text-sm font-medium h-full"
+                              >
+                                <span class="text-green-500 !leading-none"
+                                  >$74</span
+                                >
+                              </div>
+                            </div>
+                          </div>
+                          <!--end-form-change-qty-->
+
+                        </div>
+                        <div class="hidden flex-1 sm:flex justify-end">
+                          <div class="mt-0.5">
+                            <div
+                              class="flex items-center border-2 border-green-500 rounded-lg py-1 px-2 md:py-1.5 md:px-2.5 text-sm font-medium"
+                            >
+                              <span class="text-green-500 !leading-none"
+                                >$74</span
+                              >
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div
+                      class="flex mt-auto pt-4 items-end justify-between text-sm"
+                    >
+                      <div class="hidden sm:block text-center relative">
+                        <div
+                          class="nc-NcInputNumber flex items-center justify-between space-x-5 relative z-10"
+                        >
+                          <div
+                            class="nc-NcInputNumber__content flex items-center justify-between w-[104px] sm:w-28"
+                          >
+                            <button
+                              class="w-8 h-8 rounded-full flex items-center justify-center border border-neutral-400 dark:border-neutral-500 bg-white focus:outline-none hover:border-neutral-700 dark:hover:border-neutral-400 disabled:hover:border-neutral-400 dark:disabled:hover:border-neutral-500 disabled:opacity-50 disabled:cursor-default"
+                              type="button"
+                              disabled=""
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                fill="currentColor"
+                                aria-hidden="true"
+                                data-slot="icon"
+                                class="w-4 h-4"
+                              >
+                                <path
+                                  fill-rule="evenodd"
+                                  d="M4.25 12a.75.75 0 0 1 .75-.75h14a.75.75 0 0 1 0 1.5H5a.75.75 0 0 1-.75-.75Z"
+                                  clip-rule="evenodd"
+                                ></path>
+                              </svg>
+                            </button>
+                            <span
+                              class="select-none block flex-1 text-center leading-none"
+                              >1</span
+                            >
+                            <button
+                              class="w-8 h-8 rounded-full flex items-center justify-center border border-neutral-400 dark:border-neutral-500 bg-white focus:outline-none hover:border-neutral-700 dark:hover:border-neutral-400 disabled:hover:border-neutral-400 dark:disabled:hover:border-neutral-500 disabled:opacity-50 disabled:cursor-default"
+                              type="button"
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                fill="currentColor"
+                                aria-hidden="true"
+                                data-slot="icon"
+                                class="w-4 h-4"
+                              >
+                                <path
+                                  fill-rule="evenodd"
+                                  d="M12 3.75a.75.75 0 0 1 .75.75v6.75h6.75a.75.75 0 0 1 0 1.5h-6.75v6.75a.75.75 0 0 1-1.5 0v-6.75H4.5a.75.75 0 0 1 0-1.5h6.75V4.5a.75.75 0 0 1 .75-.75Z"
+                                  clip-rule="evenodd"
+                                ></path>
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                      <a
+                        href="##"
+                        class="relative z-10 flex items-center mt-3 font-medium hover:text-[#00BADB] text-sm"
+                      >
+                        <span>Xóa</span>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="relative flex py-7 first:pt-0 last:pb-0">
+                    <div
+                      class="relative h-36 w-24 sm:w-28 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100"
+                    >
+                      <img
+                        alt="Rey Nylon Backpack"
+                        loading="lazy"
+                        decoding="async"
+                        data-nimg="fill"
+                        class="h-full w-full object-contain object-center"
+                        sizes="150px"
+                        srcset=""
+                        src="./src/assets/images/product1.webp"
+                        style="
+                          position: absolute;
+                          height: 100%;
+                          width: 100%;
+                          inset: 0px;
+                          color: transparent;
+                        "
+                      />
+                      <a class="absolute inset-0" href="/product-detail"></a>
+                    </div>
+                    <div class="ml-3 sm:ml-6 flex flex-1 flex-col">
+                      <div>
+                        <div class="flex justify-between">
+                          <div class="flex-[1.5]">
+                            <h3 class="text-base font-semibold">
+                              <a href="/product-detail">Rey Nylon Backpack</a>
+                            </h3>
+                            <div
+                              class="mt-1.5 sm:mt-2.5 flex text-sm text-slate-600"
+                            >
+                              <div class="flex items-center space-x-1.5">
+                                <svg
+                                  class="w-4 h-4"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                >
+                                  <path
+                                    d="M7.01 18.0001L3 13.9901C1.66 12.6501 1.66 11.32 3 9.98004L9.68 3.30005L17.03 10.6501C17.4 11.0201 17.4 11.6201 17.03 11.9901L11.01 18.0101C9.69 19.3301 8.35 19.3301 7.01 18.0001Z"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-miterlimit="10"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                  ></path>
+                                  <path
+                                    d="M8.35 1.94995L9.69 3.28992"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-miterlimit="10"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                  ></path>
+                                  <path
+                                    d="M2.07 11.92L17.19 11.26"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-miterlimit="10"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                  ></path>
+                                  <path
+                                    d="M3 22H16"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-miterlimit="10"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                  ></path>
+                                  <path
+                                    d="M18.85 15C18.85 15 17 17.01 17 18.24C17 19.26 17.83 20.09 18.85 20.09C19.87 20.09 20.7 19.26 20.7 18.24C20.7 17.01 18.85 15 18.85 15Z"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                  ></path>
+                                </svg>
+                                <span>Black</span>
+                              </div>
+                              <span
+                                class="mx-4 border-l border-slate-200"
+                              ></span>
+                              <div class="flex items-center space-x-1.5">
+                                <svg
+                                  class="w-4 h-4"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                >
+                                  <path
+                                    d="M21 9V3H15"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                  ></path>
+                                  <path
+                                    d="M3 15V21H9"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                  ></path>
+                                  <path
+                                    d="M21 3L13.5 10.5"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                  ></path>
+                                  <path
+                                    d="M10.5 13.5L3 21"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                  ></path>
+                                </svg>
+                                <span>2XL</span>
+                              </div>
+                            </div>
+                            
+                            <div
+                              class="mt-3 flex justify-between w-full sm:hidden relative"
+                            >
+                              <select
+                                name="qty"
+                                id="qty"
+                                class="form-select text-sm rounded-md py-1 border-slate-200 relative z-10"
+                              >
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                              </select>
+                              <div class="">
+                                <div
+                                  class="flex items-center border-2 border-green-500 rounded-lg py-1 px-2 md:py-1.5 md:px-2.5 text-sm font-medium h-full"
+                                >
+                                  <span class="text-green-500 !leading-none"
+                                    >$74</span
+                                  >
+                                </div>
+                              </div>
+                            </div>
+                            <!--end-form-change-qty-->
+  
+                          </div>
+                          <div class="hidden flex-1 sm:flex justify-end">
+                            <div class="mt-0.5">
+                              <div
+                                class="flex items-center border-2 border-green-500 rounded-lg py-1 px-2 md:py-1.5 md:px-2.5 text-sm font-medium"
+                              >
+                                <span class="text-green-500 !leading-none"
+                                  >$74</span
+                                >
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+  
+                      <div
+                        class="flex mt-auto pt-4 items-end justify-between text-sm"
+                      >
+                        <div class="hidden sm:block text-center relative">
+                          <div
+                            class="nc-NcInputNumber flex items-center justify-between space-x-5 relative z-10"
+                          >
+                            <div
+                              class="nc-NcInputNumber__content flex items-center justify-between w-[104px] sm:w-28"
+                            >
+                              <button
+                                class="w-8 h-8 rounded-full flex items-center justify-center border border-neutral-400 dark:border-neutral-500 bg-white focus:outline-none hover:border-neutral-700 dark:hover:border-neutral-400 disabled:hover:border-neutral-400 dark:disabled:hover:border-neutral-500 disabled:opacity-50 disabled:cursor-default"
+                                type="button"
+                                disabled=""
+                              >
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  viewBox="0 0 24 24"
+                                  fill="currentColor"
+                                  aria-hidden="true"
+                                  data-slot="icon"
+                                  class="w-4 h-4"
+                                >
+                                  <path
+                                    fill-rule="evenodd"
+                                    d="M4.25 12a.75.75 0 0 1 .75-.75h14a.75.75 0 0 1 0 1.5H5a.75.75 0 0 1-.75-.75Z"
+                                    clip-rule="evenodd"
+                                  ></path>
+                                </svg>
+                              </button>
+                              <span
+                                class="select-none block flex-1 text-center leading-none"
+                                >1</span
+                              >
+                              <button
+                                class="w-8 h-8 rounded-full flex items-center justify-center border border-neutral-400 dark:border-neutral-500 bg-white focus:outline-none hover:border-neutral-700 dark:hover:border-neutral-400 disabled:hover:border-neutral-400 dark:disabled:hover:border-neutral-500 disabled:opacity-50 disabled:cursor-default"
+                                type="button"
+                              >
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  viewBox="0 0 24 24"
+                                  fill="currentColor"
+                                  aria-hidden="true"
+                                  data-slot="icon"
+                                  class="w-4 h-4"
+                                >
+                                  <path
+                                    fill-rule="evenodd"
+                                    d="M12 3.75a.75.75 0 0 1 .75.75v6.75h6.75a.75.75 0 0 1 0 1.5h-6.75v6.75a.75.75 0 0 1-1.5 0v-6.75H4.5a.75.75 0 0 1 0-1.5h6.75V4.5a.75.75 0 0 1 .75-.75Z"
+                                    clip-rule="evenodd"
+                                  ></path>
+                                </svg>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                        <a
+                          href="##"
+                          class="relative z-10 flex items-center mt-3 font-medium hover:text-[#00BADB] text-sm"
+                        >
+                          <span>Xóa</span>
+                        </a>
+                      </div>
+                    </div>
+                </div>
+
+                <div class="relative flex py-7 first:pt-0 last:pb-0">
+                    <div
+                      class="relative h-36 w-24 sm:w-28 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100"
+                    >
+                      <img
+                        alt="Rey Nylon Backpack"
+                        loading="lazy"
+                        decoding="async"
+                        data-nimg="fill"
+                        class="h-full w-full object-contain object-center"
+                        sizes="150px"
+                        srcset=""
+                        src="./src/assets/images/product1.webp"
+                        style="
+                          position: absolute;
+                          height: 100%;
+                          width: 100%;
+                          inset: 0px;
+                          color: transparent;
+                        "
+                      />
+                      <a class="absolute inset-0" href="/product-detail"></a>
+                    </div>
+                    <div class="ml-3 sm:ml-6 flex flex-1 flex-col">
+                      <div>
+                        <div class="flex justify-between">
+                          <div class="flex-[1.5]">
+                            <h3 class="text-base font-semibold">
+                              <a href="/product-detail">Rey Nylon Backpack</a>
+                            </h3>
+                            <div
+                              class="mt-1.5 sm:mt-2.5 flex text-sm text-slate-600"
+                            >
+                              <div class="flex items-center space-x-1.5">
+                                <svg
+                                  class="w-4 h-4"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                >
+                                  <path
+                                    d="M7.01 18.0001L3 13.9901C1.66 12.6501 1.66 11.32 3 9.98004L9.68 3.30005L17.03 10.6501C17.4 11.0201 17.4 11.6201 17.03 11.9901L11.01 18.0101C9.69 19.3301 8.35 19.3301 7.01 18.0001Z"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-miterlimit="10"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                  ></path>
+                                  <path
+                                    d="M8.35 1.94995L9.69 3.28992"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-miterlimit="10"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                  ></path>
+                                  <path
+                                    d="M2.07 11.92L17.19 11.26"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-miterlimit="10"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                  ></path>
+                                  <path
+                                    d="M3 22H16"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-miterlimit="10"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                  ></path>
+                                  <path
+                                    d="M18.85 15C18.85 15 17 17.01 17 18.24C17 19.26 17.83 20.09 18.85 20.09C19.87 20.09 20.7 19.26 20.7 18.24C20.7 17.01 18.85 15 18.85 15Z"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                  ></path>
+                                </svg>
+                                <span>Black</span>
+                              </div>
+                              <span
+                                class="mx-4 border-l border-slate-200"
+                              ></span>
+                              <div class="flex items-center space-x-1.5">
+                                <svg
+                                  class="w-4 h-4"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                >
+                                  <path
+                                    d="M21 9V3H15"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                  ></path>
+                                  <path
+                                    d="M3 15V21H9"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                  ></path>
+                                  <path
+                                    d="M21 3L13.5 10.5"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                  ></path>
+                                  <path
+                                    d="M10.5 13.5L3 21"
+                                    stroke="currentColor"
+                                    stroke-width="1.5"
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                  ></path>
+                                </svg>
+                                <span>2XL</span>
+                              </div>
+                            </div>
+                            
+                            <div
+                              class="mt-3 flex justify-between w-full sm:hidden relative"
+                            >
+                              <select
+                                name="qty"
+                                id="qty"
+                                class="form-select text-sm rounded-md py-1 border-slate-200 relative z-10"
+                              >
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                              </select>
+                              <div class="">
+                                <div
+                                  class="flex items-center border-2 border-green-500 rounded-lg py-1 px-2 md:py-1.5 md:px-2.5 text-sm font-medium h-full"
+                                >
+                                  <span class="text-green-500 !leading-none"
+                                    >$74</span
+                                  >
+                                </div>
+                              </div>
+                            </div>
+                            <!--end-form-change-qty-->
+  
+                          </div>
+                          <div class="hidden flex-1 sm:flex justify-end">
+                            <div class="mt-0.5">
+                              <div
+                                class="flex items-center border-2 border-green-500 rounded-lg py-1 px-2 md:py-1.5 md:px-2.5 text-sm font-medium"
+                              >
+                                <span class="text-green-500 !leading-none"
+                                  >$74</span
+                                >
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+  
+                      <div
+                        class="flex mt-auto pt-4 items-end justify-between text-sm"
+                      >
+                        <div class="hidden sm:block text-center relative">
+                          <div
+                            class="nc-NcInputNumber flex items-center justify-between space-x-5 relative z-10"
+                          >
+                            <div
+                              class="nc-NcInputNumber__content flex items-center justify-between w-[104px] sm:w-28"
+                            >
+                              <button
+                                class="w-8 h-8 rounded-full flex items-center justify-center border border-neutral-400 dark:border-neutral-500 bg-white focus:outline-none hover:border-neutral-700 dark:hover:border-neutral-400 disabled:hover:border-neutral-400 dark:disabled:hover:border-neutral-500 disabled:opacity-50 disabled:cursor-default"
+                                type="button"
+                                disabled=""
+                              >
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  viewBox="0 0 24 24"
+                                  fill="currentColor"
+                                  aria-hidden="true"
+                                  data-slot="icon"
+                                  class="w-4 h-4"
+                                >
+                                  <path
+                                    fill-rule="evenodd"
+                                    d="M4.25 12a.75.75 0 0 1 .75-.75h14a.75.75 0 0 1 0 1.5H5a.75.75 0 0 1-.75-.75Z"
+                                    clip-rule="evenodd"
+                                  ></path>
+                                </svg>
+                              </button>
+                              <span
+                                class="select-none block flex-1 text-center leading-none"
+                                >1</span
+                              >
+                              <button
+                                class="w-8 h-8 rounded-full flex items-center justify-center border border-neutral-400 dark:border-neutral-500 bg-white focus:outline-none hover:border-neutral-700 dark:hover:border-neutral-400 disabled:hover:border-neutral-400 dark:disabled:hover:border-neutral-500 disabled:opacity-50 disabled:cursor-default"
+                                type="button"
+                              >
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  viewBox="0 0 24 24"
+                                  fill="currentColor"
+                                  aria-hidden="true"
+                                  data-slot="icon"
+                                  class="w-4 h-4"
+                                >
+                                  <path
+                                    fill-rule="evenodd"
+                                    d="M12 3.75a.75.75 0 0 1 .75.75v6.75h6.75a.75.75 0 0 1 0 1.5h-6.75v6.75a.75.75 0 0 1-1.5 0v-6.75H4.5a.75.75 0 0 1 0-1.5h6.75V4.5a.75.75 0 0 1 .75-.75Z"
+                                    clip-rule="evenodd"
+                                  ></path>
+                                </svg>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                        <a
+                          href="##"
+                          class="relative z-10 flex items-center mt-3 font-medium hover:text-[#00BADB] text-sm"
+                        >
+                          <span>Xóa</span>
+                        </a>
+                      </div>
+                    </div>
+                </div>
+
+              </div>
+              <!--end hd-checkout-pro-->
+
+              <div
+                class="hd-checkout-text-count mt-10 pt-6 text-sm text-slate-500 border-t border-slate-200/70 dark:border-slate-700"
+              >
+                <div>
+                  <label
+                    class="nc-Label text-base font-medium text-neutral-900"
+                    data-nc-id="Label"
+                  >
+                    Mã giảm giá
+                  </label>
+                  <div class="flex mt-1.5">
+                    <input
+                      class="block w-full outline-0 border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50 rounded-2xl text-sm font-normal h-10 px-4 py-3 flex-1"
+                      type="text"
+                    />
+                    <button
+                      class="text-gray-800 outline-0 border border-neutral-200 hover:bg-neutral-100 rounded-2xl px-4 ml-3 font-medium text-sm bg-neutral-200/70 dark:hover:bg-neutral-100 w-24 flex justify-center items-center transition-colors"
+                    >
+                      Áp dụng
+                    </button>
+                  </div>
+                </div>
+                <div class="mt-4 flex justify-between py-2.5">
+                  <span>Tổng phụ</span>
+                  <span class="font-semibold text-slate-900"
+                    >$249.00</span
+                  >
+                </div>
+                <div class="flex justify-between py-2.5">
+                  <span>Phí vận chuyển</span>
+                  <span class="font-semibold text-slate-900"
+                    >$5.00</span
+                  >
+                </div>
+                <div class="flex justify-between py-2.5">
+                  <span>Thuế</span>
+                  <span class="font-semibold text-slate-900"
+                    >$24.90</span
+                  >
+                </div>
+                <div
+                  class="flex justify-between font-semibold text-slate-900 text-base pt-4"
+                >
+                  <span>Tổng tiền</span>
+                  <span>$276.00</span>
+                </div>
+              </div>
+              <!--end hd-checkout-text-count-->
+
+              <button
+                class="nc-Button relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm sm:text-base font-medium py-3 px-4 sm:py-3.5 sm:px-6 ttnc-ButtonPrimary disabled:bg-opacity-90 bg-[#00BADB] hover:bg-[#23b6cd] text-white shadow-xl mt-8 w-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0"
+              >
+                Xác nhận đơn hàng
+              </button>
+              <!--end hd-checkout-btn-->
+
+              <div
+                class="hd-checkout-text-note mt-5 text-sm text-slate-500 flex items-center justify-center"
+              >
+                <p class="block relative pl-5">
+                  <svg
+                    class="w-4 h-4 absolute -left-1 top-0.5"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                  >
+                    <path
+                      d="M12 22C17.5 22 22 17.5 22 12C22 6.5 17.5 2 12 2C6.5 2 2 6.5 2 12C2 17.5 6.5 22 12 22Z"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    ></path>
+                    <path
+                      d="M12 8V13"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    ></path>
+                    <path
+                      d="M11.9945 16H12.0035"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    ></path>
+                  </svg>
+                  Tìm hiểu thêm thông tin về
+                  <a
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    href="##"
+                    class="text-slate-900 underline font-medium"
+                  >
+                    Thuế
+                  </a>
+                  <span> và </span>
+                  <a
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    href="##"
+                    class="text-slate-900 underline font-medium"
+                  >
+                    Vận chuyển
+                  </a>
+                  
+                </p>
+              </div>
+              <!--end hd-checkout-text-note-->
+            </div>
+            <!--end-right-->
+
+          </div>
+        </main>
+      </div>
+      <!--end hd-CheckoutPage-->
+    </main>
+
+    <footer class="bg-[#f6f6f8] mt-5 py-16 ">
+        <div class="container grid lg:grid-cols-12 md:grid-cols-2 sm:grid-cols-1 gap-4 ">
+          <div class=" mt-5 lg:col-span-3 md:col-span-6 md:order-1 lg:order-1">
+    
+            <img src="./src/assets/images/logo.png" class="h-10  mb-10" alt="Logo">
+    
+            <div class="flex mb-5">
+              <div class="mr-2"> <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke-width="1.5"
+                  stroke="currentColor" class="size-7 text-[#878787]">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                </svg></div>
+              <p>184 Nam Từ Liêm , Hà Nội</p>
+            </div>
+            <div class="flex mb-5">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke-width="1.5" stroke="currentColor"
+                class="size-6 w-7 h-7 mr-2 text-[#878787]">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+              </svg>
+              <p>contact@company.com</p>
+            </div>
+            <div class="flex mb-5">
+              <div class="mr-2"> <svg class="w-7 h-7 text-[#878787] " fill="none" stroke="currentColor"
+                  xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round"
+                    d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z" />
+                </svg></div>
+              <p>+001 2233 456</p>
+            </div>
+            <ul class="flex">
+              <li class="mr-6"><a href="">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 320 512">
+                    <path
+                      d="M80 299.3V512H196V299.3h86.5l18-97.8H196V166.9c0-51.7 20.3-71.5 72.7-71.5c16.3 0 29.4 .4 37 1.2V7.9C291.4 4 256.4 0 236.2 0C129.3 0 80 50.5 80 159.4v42.1H14v97.8H80z" />
+                  </svg></a></li>
+              <li class="mr-6"><a href="">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 512 512">
+                    <path
+                      d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z" />
+                  </svg>
+                </a></li>
+              <li class="mr-6"><a href="">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 448 512">
+                    <path
+                      d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1s2.7 102.7-9 132.1z" />
+                  </svg>
+                </a></li>
+              <li class="mr-6"><a href=""><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 448 512">
+                    <path
+                      d="M100.3 448H7.4V148.9h92.9zM53.8 108.1C24.1 108.1 0 83.5 0 53.8a53.8 53.8 0 0 1 107.6 0c0 29.7-24.1 54.3-53.8 54.3zM447.9 448h-92.7V302.4c0-34.7-.7-79.2-48.3-79.2-48.3 0-55.7 37.7-55.7 76.7V448h-92.8V148.9h89.1v40.8h1.3c12.4-23.5 42.7-48.3 87.9-48.3 94 0 111.3 61.9 111.3 142.3V448z" />
+                  </svg></a></li>
+              <li class="mr-6"><a href="">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 384 512">
+                    <path
+                      d="M204 6.5C101.4 6.5 0 74.9 0 185.6 0 256 39.6 296 63.6 296c9.9 0 15.6-27.6 15.6-35.4 0-9.3-23.7-29.1-23.7-67.8 0-80.4 61.2-137.4 140.4-137.4 68.1 0 118.5 38.7 118.5 109.8 0 53.1-21.3 152.7-90.3 152.7-24.9 0-46.2-18-46.2-43.8 0-37.8 26.4-74.4 26.4-113.4 0-66.2-93.9-54.2-93.9 25.8 0 16.8 2.1 35.4 9.6 50.7-13.8 59.4-42 147.9-42 209.1 0 18.9 2.7 37.5 4.5 56.4 3.4 3.8 1.7 3.4 6.9 1.5 50.4-69 48.6-82.5 71.4-172.8 12.3 23.4 44.1 36 69.3 36 106.2 0 153.9-103.5 153.9-196.8C384 71.3 298.2 6.5 204 6.5z" />
+                  </svg>
+                </a></li>
+            </ul>
+    
+    
+          </div>
+          <div
+            class=" mt-5 lg:col-span-6 md:col-span-12 md:order-3  lg:order-2 flex lg:justify-around md:justify-between justify-center text-center lg:text-start">
+            <div class="">
+              <h1 class="font-semibold mb-10 mt-2 text-xl text-[#222222]">Danh Mục</h1>
+              <ul>
+                <li class="mb-1"><a href="" class="text-lg text-[#878787] text-hover">Đàn Ông</a></li>
+                <li class="mb-1"><a href="" class="text-lg text-[#878787] text-hover">Phụ Nữ</a></li>
+                <li class="mb-1"><a href="" class="text-lg text-[#878787] text-hover">Phụ Kiện</a></li>
+                <li class="mb-1"><a href="" class="text-lg text-[#878787] text-hover">Giày</a></li>
+                <li class="mb-1"><a href="" class="text-lg text-[#878787] text-hover">Đồng Hồ </a></li>
+                <li class="mb-1"><a href="" class="text-lg text-[#878787] text-hover">Đầm</a></li>
+              </ul>
+            </div>
+            <div>
+              <h1 class="font-semibold mb-10 mt-2 text-xl text-[#222222] ">Thông Tin</h1>
+              <ul>
+                <li class="mb-1"><a href="" class="text-lg text-[#878787] text-hover">Về chúng tôi</a></li>
+                <li class="mb-1"><a href="" class="text-lg text-[#878787] text-hover">Liên hệ chúng tôi</a></li>
+                <li class="mb-1"><a href="" class="text-lg text-[#878787] text-hover">Điều khoản và điều kiện</a></li>
+                <li class="mb-1"><a href="" class="text-lg text-[#878787] text-hover">Trả lại và trao đổi</a></li>
+                <li class="mb-1"><a href="" class="text-lg text-[#878787] text-hover">Vận chuyển và giao hàng</a></li>
+                <li class="mb-1"><a href="" class="text-lg text-[#878787] text-hover">Chính sách bảo mật</a></li>
+              </ul>
+            </div>
+            <div>
+              <h1 class="font-semibold mb-10 mt-2 text-xl text-[#222222]">Liên Kết Hữu Ích</h1>
+              <ul>
+                <li class="mb-1"><a href="" class="text-lg text-[#878787] text-hover">Tin mới nhất</a></li>
+                <li class="mb-1"><a href="" class="text-lg text-[#878787] text-hover">Tài khoản của tôi</a></li>
+                <li class="mb-1"><a href="" class="text-lg text-[#878787] text-hover">Hướng dãn chọn kích thước</a></li>
+                <li class="mb-1"><a href="" class="text-lg text-[#878787] text-hover">Câu hỏi thường gặp</a></li>
+                <li class="mb-1"><a href="" class="text-lg text-[#878787] text-hover">Câu hỏi thường gặp 2</a></li>
+              </ul>
+    
+            </div>
+    
+    
+          </div>
+          <div class=" mt-5 lg:col-span-3 md:col-span-6 md:order-2  lg:order-3">
+    
+    
+            <div>
+              <h4 class="font-semibold mb-10 mt-2 text-xl text-[#222222] ">
+                Đăng ký bản tin
+              </h4>
+              <span class="text-lg text-[#878787] ">Đăng ký nhận bản tin của chúng tôi và được giảm giá 10% cho lần đầu tiên
+                của bạn
+                mua</span>
+    
+              <form class="max-w-md w-full my-5 rounded-lg flex">
+                <div class="relative flex-1">
+                  <input type="email"
+                    class="w-full border-gray-300 border rounded-full py-4 px-3 focus:outline-none focus:ring-2 focus:border-transparent"
+                    placeholder="Emai của bạn" required>
+                  <button type="submit"
+                    class="absolute rounded-full right-[5px] top-[5px] bottom-[5px] bg-black text-white px-6">Đặt
+                    mua</button>
+                </div>
+              </form>
+    
+              <img src="./src/assets/images/footer-method.png" alt="">
+            </div>
+    
+          </div>
+        </div>
+      </footer>
+      <script type="module" src="/src/main.tsx"></script>
+    </body>
+    
+    </html>

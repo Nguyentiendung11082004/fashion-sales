@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap">
+  <title>Vite + React + TS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="page-effect">
+  <section class="bg-[#F6F6F8] text-sm">
+    <div
+      class="text-[#878787] flex lg:justify-between lg:items-center flex-wrap sm:justify-center md:justify-center py-4 lg:mx-4 h-[auto] lg:h-[48px] md:h-[48px]">
+      <div class="hidden lg:flex">
+        <div class="flex mr-4">
+          <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round"
+              d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z" />
+          </svg>
+          <!-- test -->
+          <span class=""> +0123456789 </span>
+        </div>
+        <div class="flex">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+            stroke="currentColor" class="size-6 w-4 h-4 mr-1">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+          </svg>
+
+          <span class="text-[#878787]"> Kalle@domain.com </span>
+        </div>
+      </div>
+      <div class="mx-auto lg:mx-0">
+        <span class="">
+          Summer sale discount off <span class="text-[red]">50%</span>!
+          <span class="text-black">Shop Now</span>
+        </span>
+      </div>
+      <div class="flex mx-auto lg:mx-0">
+        <div class="flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+            stroke="currentColor" class="size-6 w-5 h-5 mr-1">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+          </svg>
+          <span class="">Location</span>
+        </div>
+        <div class="mx-5">
+          <select name="" id="" class="bg-[#F6F6F8]">
+            <option value="">English</option>
+            <option value="">Viet nam</option>
+          </select>
+        </div>
+        <div class="flex items-center">
+          <img src="./src/assets/icons/icon-vn.svg?v=2" class="w-4 h-3 object-cover" alt="" />
+          <select class="bg-[#F6F6F8] mt-[-2px]">
+            <option value="">VND</option>
+            <option value="">Canada</option>
+            <option value="">France</option>
+          </select>
+        </div>
+        <!-- <div></div> -->
+      </div>
+    </div>
+  </section>
+  <div class="w-[100%] bg-[#fff] sticky top-0 left-0 right-0  z-20 ">
+    <header class="container bg-[#fff] h-[70px] grid grid-cols-12 gap-4 ">
+      <div
+        class="lg:col-span-2 col-span-4 flex justify-center items-center md:items-center md:justify-center lg:justify-start  order-2 lg:order-1">
+        <img src="./src/assets/images/logo.png" class="h-10 " alt="Logo">
+      </div>
+      <div class="col-span-4 flex items-center justify-start md:items-center md:justify-start lg:hidden  order-1  ">
+        <svg class=" " xmlns="http://www.w3.org/2000/svg" width="30" height="16" viewBox="0 0 30 16"
+          fill="currentColor">
+          <rect width="30" height="1.5"></rect>
+          <rect y="7" width="20" height="1.5"></rect>
+          <rect y="14" width="30" height="1.5"></rect>
+        </svg>
+      </div>
+      <div class="lg:col-span-8  lg:flex lg:items-center lg:justify-center md:hidden  hidden lg:order-2">
+        <ul class="flex space-x-16 ml-10 text-[14px]">
+          <li><a href="" class=" font-normal text-hover">Trang Chủ</a></li>
+          <li class="relative"><a href="" class=" font-normal text-hover">Sản Phẩm<span
+                class="absolute text-xs rounded-full px-2 py-[2px] text-white bg-primary top-[-10px] left-16 ">New</span></a>
+          </li>
+          <li><a href="" class=" font-normal text-hover">Phụ Kiện</a></li>
+          <li><a href="" class=" font-normal text-hover">Giày</a></li>
+          <li><a href="" class=" font-normal text-hover">Bài Viết</a></li>
+          <li><a href="" class=" font-normal text-hover">Liên Hệ</a></li>
+        </ul>
+      </div>
+      <div class="lg:col-span-2 col-span-4 flex items-center justify-end order-3">
+        <div class="flex items-center space-x-4">
+          <a href="">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+              stroke="currentColor" class="h-6 w-6">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+            </svg>
+          </a>
+          <a href="" class="relative">
+            <span class="absolute text-xs right-[-5px] top-[-5px] bg-[#000] text-white px-1 rounded-full">0</span>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+              stroke="currentColor" class="h-6 w-6">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+            </svg>
+          </a>
+          <a href="" class="relative">
+            <span class="absolute text-xs right-[-5px] top-[-5px] bg-[#000] text-white px-1 rounded-full">3</span>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+              stroke="currentColor" class="h-6 w-6">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+            </svg>
+          </a>
+        </div>
+      </div>
+    </header>
+  </div>
+
+
+  <main id="main-content" class="min-h-fit !shadow-none !outline-0 block isolate *:box-border">
+    <div class="hd-page-head">
+      <div class="hd-header-banner bg-[url('./src/assets/images/shopping-cart-head.webp')] bg-no-repeat bg-cover bg-center">
+        <div class="hd-bg-banner overflow-hidden relative !text-center bg-black bg-opacity-55 lg:py-[50px] mb-0 py-[30px]">
+            <div class="z-[100] relative hd-container">
+                <h1 class="text-white text-xl font-medium leading-5">Tài khoản</h1>
+            </div>
+        </div>
+      </div>
+    </div>
+    <!--end hd-page-head-->
+
+    <div class="hd-account-body max-w-5xl w-full mx-auto px-4 text-[14px] lg:my-[80px] my-[50px]">
+        <div class="hd-account-head">
+            <div class="max-w-auto">
+                <div class="max-w-[42rem]">
+                    <span class="hd-all-textgrey block mt-4">
+                        <span class="text-black font-semibold">Thu Hằng,</span>
+                        ha9671889@gmail.com · Hà Nội, Việt Nam
+                    </span>
+                </div>
+
+                <hr class="mt-[1rem] h-0 border-solid border-b-2">
+
+                <div class="hd-account-menu overflow-x-auto flex uppercase font-medium ">
+                    <a href="account.html" class="hd-account-menu-item">Thông tin tài khoản</a>
+                    <a href="#" class="hd-account-menu-item">Yêu thích</a>
+                    <a href="history-order.html" class="hd-account-menu-item">Lịch sử mua hàng</a>
+                    <a href="updatepass-account.html" class="hd-account-menu-item">Đổi mật khẩu</a>
+                </div>
+
+                <hr class="h-0 border-solid border-b-2">
+            </div>
+        </div>
+        <!--end hd-account-head-->
+
+        <div class="hd-account-content pt-[30px] mx-auto">
+            <div class="hd-ct-text">
+                <h2 class="lg:mb-[50px] mb-[30px] lg:mt-[25px] lg:text-2xl text-xl font-semibold uppercase">Thông tin tài khoản</h2>
+                <div class="lg:flex">
+                    <div class="lg:w-1/4 items-start flex-shrink-0 flex mb-[25px] justify-center lg:justify-start">
+                        <div class="rounded-full overflow-hidden flex relative text-white">
+                            <img alt="avatar" loading="lazy" width="128" height="128" decoding="async" data-nimg="1" class="w-32 h-32 rounded-full object-cover z-0" srcset="" src="./src/assets/images/z5513883787421_7d1f10db8a5171d1da722feb02185edd.jpg" style="color: transparent;">
+                            <div class="absolute inset-0 flex cursor-pointer items-center justify-center bg-black bg-opacity-35">
+                                <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17.5 5H7.5C6.83696 5 6.20107 5.26339 5.73223 5.73223C5.26339 6.20107 5 6.83696 5 7.5V20M5 20V22.5C5 23.163 5.26339 23.7989 5.73223 24.2678C6.20107 24.7366 6.83696 25 7.5 25H22.5C23.163 25 23.7989 24.7366 24.2678 24.2678C24.7366 23.7989 25 23.163 25 22.5V17.5M5 20L10.7325 14.2675C11.2013 13.7988 11.8371 13.5355 12.5 13.5355C13.1629 13.5355 13.7987 13.7988 14.2675 14.2675L17.5 17.5M25 12.5V17.5M25 17.5L23.0175 15.5175C22.5487 15.0488 21.9129 14.7855 21.25 14.7855C20.5871 14.7855 19.9513 15.0488 19.4825 15.5175L17.5 17.5M17.5 17.5L20 20M22.5 5H27.5M25 2.5V7.5M17.5 10H17.5125" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                            </div>
+                            <input type="file" name="" id="" class="absolute inset-0 cursor-pointer opacity-0">
+                        </div>
+                    </div>
+                    <!--end item-start-->
+
+                    <div class="lg:w-3/4 max-w-full">
+                        <div>
+                            <label class="nc-Label text-base font-medium" data-nc-id="Label">Họ & tên</label>
+                            <input class="block w-full outline-0 border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50 focus:border-neutral-200 rounded-2xl font-normal h-11 px-4 py-3 mt-1.5" type="text" value="Thu Hằng">
+                        </div>
+                        <div class="mt-5">
+                            <label class="nc-Label text-base font-medium" data-nc-id="Label">Email</label>
+                            <div class="mt-1.5 flex">
+                                <span class="inline-flex items-center px-2.5 rounded-l-2xl border border-r-0 border-neutral-200 dark:bg-neutral-50 text-neutral-500 dark:text-neutral-400">
+                                    <i class="text-2xl las la-envelope">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+                                        </svg>                                          
+                                    </i>
+                                </span>
+                                <input class="block w-full outline-0 border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50 rounded-2xl font-normal h-11 px-4 py-3 !rounded-l-none" placeholder="ha9671889@email.com" type="text">
+                            </div>
+                        </div>
+                        <div class="max-w-lg mt-5">
+                            <label class="nc-Label text-base font-medium" data-nc-id="Label">Ngày sinh</label>
+                            <div class="mt-1.5 flex">
+                                <span class="inline-flex items-center px-2.5 rounded-l-2xl border border-r-0 border-neutral-200 dark:bg-neutral-50 text-neutral-500 dark:text-neutral-400">
+                                    <i class="text-2xl las la-calendar">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z" />
+                                          </svg>                                          
+                                    </i>
+                                </span>
+                                <input class="block w-full outline-0 border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50 rounded-2xl font-normal h-11 px-4 py-3 !rounded-l-none" type="date" value="2004-12-18">
+                            </div>
+                        </div>
+                        <div class="mt-5">
+                            <label class="nc-Label text-base font-medium" data-nc-id="Label">Địa chỉ</label>
+                            <div class="mt-1.5 flex">
+                                <span class="inline-flex items-center px-2.5 rounded-l-2xl border border-r-0 border-neutral-200 dark:bg-neutral-50 text-neutral-500 dark:text-neutral-400">
+                                    <i class="text-2xl las la-envelope">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                                        </svg>                                                                               
+                                    </i>
+                                </span>
+                                <input class="block w-full outline-0 border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50 rounded-2xl font-normal h-11 px-4 py-3 !rounded-l-none" value="Hà Nội, Việt Nam" type="text">
+                            </div>
+                        </div>
+                        <div class="mt-5">
+                            <label class="nc-Label text-base font-medium" data-nc-id="Label">Giới tính</label>
+                            <select class="nc-Select h-11 mt-1.5 px-[10px] block w-full outline-0 rounded-2xl border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-50">
+                                <option value="Nam">Nam</option>
+                                <option value="Nữ">Nữ</option>
+                                <option value="Khác">Khác</option>
+                            </select>
+                        </div>
+                        <div class="mt-5">
+                            <label class="nc-Label text-base font-medium" data-nc-id="Label">Số điện thoại</label>
+                            <div class="mt-1.5 flex">
+                                <span class="inline-flex items-center px-2.5 rounded-l-2xl border border-r-0 border-neutral-200 dark:bg-neutral-50 text-neutral-500 dark:text-neutral-400">
+                                    <i class="text-2xl las la-phone-volume">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M14.25 9.75v-4.5m0 4.5h4.5m-4.5 0 6-6m-3 18c-8.284 0-15-6.716-15-15V4.5A2.25 2.25 0 0 1 4.5 2.25h1.372c.516 0 .966.351 1.091.852l1.106 4.423c.11.44-.054.902-.417 1.173l-1.293.97a1.062 1.062 0 0 0-.38 1.21 12.035 12.035 0 0 0 7.143 7.143c.441.162.928-.004 1.21-.38l.97-1.293a1.125 1.125 0 0 1 1.173-.417l4.423 1.106c.5.125.852.575.852 1.091V19.5a2.25 2.25 0 0 1-2.25 2.25h-2.25Z" />
+                                        </svg>                                          
+                                    </i>
+                                </span>
+                                <input class="block w-full outline-0 border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50 rounded-2xl font-normal h-11 px-4 py-3 !rounded-l-none" value="0921 735 576" type="text">
+                            </div>
+                        </div>
+                        <div class="mt-5">
+                            <label class="nc-Label text-base font-medium" data-nc-id="Label">Về bạn</label>
+                            <textarea class="block w-full outline-0 px-[10px] rounded-2xl border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-50 mt-1.5" rows="4">...</textarea>
+                        </div>
+                        <div class="mt-10">
+                            <button type="submit" class="text-base bg-[#00BADB] h-[50px] w-auto px-[45px] font-semibold rounded-full text-white inline-flex items-center relative overflow-hidden hover:bg-[#23b6cd] transition-all ease-in-out duration-300">Cập nhật</button>
+                        </div>
+                    </div>
+                    <!--end item-end-->
+                </div>
+            </div>
+        </div>
+        <!--end hd-account-content-->
+    </div>
+    <!--end hd-account-body-->
+
+  </main>
+
+
+  <footer class="bg-[#f6f6f8] mt-5 py-16 ">
+    <div class="container grid lg:grid-cols-12 md:grid-cols-2 sm:grid-cols-1 gap-4 ">
+      <div class=" mt-5 lg:col-span-3 md:col-span-6 md:order-1 lg:order-1">
+
+        <img src="./src/assets/images/logo.png" class="h-10  mb-10" alt="Logo">
+
+        <div class="flex mb-5">
+          <div class="mr-2"> <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke-width="1.5"
+              stroke="currentColor" class="size-7 text-[#878787]">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+            </svg></div>
+          <p>184 Nam Từ Liêm , Hà Nội</p>
+        </div>
+        <div class="flex mb-5">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke-width="1.5" stroke="currentColor"
+            class="size-6 w-7 h-7 mr-2 text-[#878787]">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+          </svg>
+          <p>contact@company.com</p>
+        </div>
+        <div class="flex mb-5">
+          <div class="mr-2"> <svg class="w-7 h-7 text-[#878787] " fill="none" stroke="currentColor"
+              xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round"
+                d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 0 1-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z" />
+            </svg></div>
+          <p>+001 2233 456</p>
+        </div>
+        <ul class="flex">
+          <li class="mr-6"><a href="">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 320 512">
+                <path
+                  d="M80 299.3V512H196V299.3h86.5l18-97.8H196V166.9c0-51.7 20.3-71.5 72.7-71.5c16.3 0 29.4 .4 37 1.2V7.9C291.4 4 256.4 0 236.2 0C129.3 0 80 50.5 80 159.4v42.1H14v97.8H80z" />
+              </svg></a></li>
+          <li class="mr-6"><a href="">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 512 512">
+                <path
+                  d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z" />
+              </svg>
+            </a></li>
+          <li class="mr-6"><a href="">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 448 512">
+                <path
+                  d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1s2.7 102.7-9 132.1z" />
+              </svg>
+            </a></li>
+          <li class="mr-6"><a href=""><svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 448 512">
+                <path
+                  d="M100.3 448H7.4V148.9h92.9zM53.8 108.1C24.1 108.1 0 83.5 0 53.8a53.8 53.8 0 0 1 107.6 0c0 29.7-24.1 54.3-53.8 54.3zM447.9 448h-92.7V302.4c0-34.7-.7-79.2-48.3-79.2-48.3 0-55.7 37.7-55.7 76.7V448h-92.8V148.9h89.1v40.8h1.3c12.4-23.5 42.7-48.3 87.9-48.3 94 0 111.3 61.9 111.3 142.3V448z" />
+              </svg></a></li>
+          <li class="mr-6"><a href="">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 384 512">
+                <path
+                  d="M204 6.5C101.4 6.5 0 74.9 0 185.6 0 256 39.6 296 63.6 296c9.9 0 15.6-27.6 15.6-35.4 0-9.3-23.7-29.1-23.7-67.8 0-80.4 61.2-137.4 140.4-137.4 68.1 0 118.5 38.7 118.5 109.8 0 53.1-21.3 152.7-90.3 152.7-24.9 0-46.2-18-46.2-43.8 0-37.8 26.4-74.4 26.4-113.4 0-66.2-93.9-54.2-93.9 25.8 0 16.8 2.1 35.4 9.6 50.7-13.8 59.4-42 147.9-42 209.1 0 18.9 2.7 37.5 4.5 56.4 3.4 3.8 1.7 3.4 6.9 1.5 50.4-69 48.6-82.5 71.4-172.8 12.3 23.4 44.1 36 69.3 36 106.2 0 153.9-103.5 153.9-196.8C384 71.3 298.2 6.5 204 6.5z" />
+              </svg>
+            </a></li>
+        </ul>
+
+
+      </div>
+      <div
+        class=" mt-5 lg:col-span-6 md:col-span-12 md:order-3  lg:order-2 flex lg:justify-around md:justify-between justify-center text-center lg:text-start">
+        <div class="">
+          <h1 class="font-semibold mb-10 mt-2 text-xl text-[#222222]">Danh Mục</h1>
+          <ul>
+            <li class="mb-1"><a href="" class="text-lg text-[#878787] text-hover">Đàn Ông</a></li>
+            <li class="mb-1"><a href="" class="text-lg text-[#878787] text-hover">Phụ Nữ</a></li>
+            <li class="mb-1"><a href="" class="text-lg text-[#878787] text-hover">Phụ Kiện</a></li>
+            <li class="mb-1"><a href="" class="text-lg text-[#878787] text-hover">Giày</a></li>
+            <li class="mb-1"><a href="" class="text-lg text-[#878787] text-hover">Đồng Hồ </a></li>
+            <li class="mb-1"><a href="" class="text-lg text-[#878787] text-hover">Đầm</a></li>
+          </ul>
+        </div>
+        <div>
+          <h1 class="font-semibold mb-10 mt-2 text-xl text-[#222222] ">Thông Tin</h1>
+          <ul>
+            <li class="mb-1"><a href="" class="text-lg text-[#878787] text-hover">Về chúng tôi</a></li>
+            <li class="mb-1"><a href="" class="text-lg text-[#878787] text-hover">Liên hệ chúng tôi</a></li>
+            <li class="mb-1"><a href="" class="text-lg text-[#878787] text-hover">Điều khoản và điều kiện</a></li>
+            <li class="mb-1"><a href="" class="text-lg text-[#878787] text-hover">Trả lại và trao đổi</a></li>
+            <li class="mb-1"><a href="" class="text-lg text-[#878787] text-hover">Vận chuyển và giao hàng</a></li>
+            <li class="mb-1"><a href="" class="text-lg text-[#878787] text-hover">Chính sách bảo mật</a></li>
+          </ul>
+        </div>
+        <div>
+          <h1 class="font-semibold mb-10 mt-2 text-xl text-[#222222]">Liên Kết Hữu Ích</h1>
+          <ul>
+            <li class="mb-1"><a href="" class="text-lg text-[#878787] text-hover">Tin mới nhất</a></li>
+            <li class="mb-1"><a href="" class="text-lg text-[#878787] text-hover">Tài khoản của tôi</a></li>
+            <li class="mb-1"><a href="" class="text-lg text-[#878787] text-hover">Hướng dãn chọn kích thước</a></li>
+            <li class="mb-1"><a href="" class="text-lg text-[#878787] text-hover">Câu hỏi thường gặp</a></li>
+            <li class="mb-1"><a href="" class="text-lg text-[#878787] text-hover">Câu hỏi thường gặp 2</a></li>
+          </ul>
+
+        </div>
+
+
+      </div>
+      <div class=" mt-5 lg:col-span-3 md:col-span-6 md:order-2  lg:order-3">
+
+
+        <div>
+          <h4 class="font-semibold mb-10 mt-2 text-xl text-[#222222] ">
+            Đăng ký bản tin
+          </h4>
+          <span class="text-lg text-[#878787] ">Đăng ký nhận bản tin của chúng tôi và được giảm giá 10% cho lần đầu tiên
+            của bạn
+            mua</span>
+
+          <form class="max-w-md w-full my-5 rounded-lg flex">
+            <div class="relative flex-1">
+              <input type="email"
+                class="w-full border-gray-300 border rounded-full py-4 px-3 focus:outline-none focus:ring-2 focus:border-transparent"
+                placeholder="Emai của bạn" required>
+              <button type="submit"
+                class="absolute rounded-full right-[5px] top-[5px] bottom-[5px] bg-black text-white px-6">Đặt
+                mua</button>
+            </div>
+          </form>
+
+          <img src="./src/assets/images/footer-method.png" alt="">
+        </div>
+
+      </div>
+    </div>
+  </footer>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+
+</html>
