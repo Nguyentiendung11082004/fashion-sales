@@ -6,6 +6,7 @@ import { Logo } from "../icons";
 import MapFooter from "../icons/FooterWebsite/MapFooter";
 import EmailFooter from "../icons/FooterWebsite/EmailFooter";
 import PhoneFooter from "../icons/FooterWebsite/PhoneFooter";
+import imgfooter from "@/assets/images/footer-method.png"
 
 type Props = {};
 
@@ -16,7 +17,7 @@ const Footer = (props: Props) => {
         <div className=" mt-5 lg:col-span-3 md:col-span-6 md:order-1 lg:order-1">
           <img
             src={Logo}
-            className="h-10  mb-10"
+            className="h-9 mb-10"
             alt="Logo"
           />
           <div className="flex mb-5">
@@ -94,108 +95,108 @@ const Footer = (props: Props) => {
             </li>
           </ul>
         </div>
-        <div className=" mt-5 lg:col-span-6 md:col-span-12 md:order-3  lg:order-2 flex lg:justify-around md:justify-between justify-center text-center lg:text-start">
-          <div>
-            <h1 className="font-semibold mb-10 mt-2 text-xl text-[#222222]">
+        <div className=" mt-5 lg:col-span-6 md:col-span-12 md:order-3  lg:order-2 flex lg:justify-around md:justify-between justify-center text-start">
+          <div className="lg:pr-0 pr-5">
+            <h1 className="font-semibold mb-8 mt-2 text-lg text-[#222222]">
               Danh Mục
             </h1>
-            <ul>
+            <ul className="">
               <li className="mb-1">
-                <Link to="" className="text-lg text-[#878787] text-hover">
+                <Link to="" className="text-[#878787] text-hover">
                   Đàn Ông
                 </Link>
               </li>
               <li className="mb-1">
-                <Link to="" className="text-lg text-[#878787] text-hover">
+                <Link to="" className="text-[#878787] text-hover">
                   Phụ Nữ
                 </Link>
               </li>
               <li className="mb-1">
-                <Link to="" className="text-lg text-[#878787] text-hover">
+                <Link to="" className="text-[#878787] text-hover">
                   Phụ Kiện
                 </Link>
               </li>
               <li className="mb-1">
-                <Link to="" className="text-lg text-[#878787] text-hover">
+                <Link to="" className="text-[#878787] text-hover">
                   Giày
                 </Link>
               </li>
               <li className="mb-1">
-                <Link to="" className="text-lg text-[#878787] text-hover">
+                <Link to="" className="text-[#878787] text-hover">
                   Đồng Hồ{" "}
                 </Link>
               </li>
               <li className="mb-1">
-                <Link to="" className="text-lg text-[#878787] text-hover">
+                <Link to="" className="text-[#878787] text-hover">
                   Đầm
                 </Link>
               </li>
             </ul>
           </div>
-          <div>
-            <h1 className="font-semibold mb-10 mt-2 text-xl text-[#222222] ">
+          <div className="lg:pr-0 pr-5">
+            <h1 className="font-semibold mb-8 mt-2 text-lg text-[#222222] ">
               Thông Tin
             </h1>
             <ul>
               <li className="mb-1">
-                <Link to="" className="text-lg text-[#878787] text-hover">
+                <Link to="" className="text-[#878787] text-hover">
                   Về chúng tôi
                 </Link>
               </li>
               <li className="mb-1">
-                <Link to="" className="text-lg text-[#878787] text-hover">
+                <Link to="" className=" text-[#878787] text-hover">
                   Liên hệ chúng tôi
                 </Link>
               </li>
               <li className="mb-1">
-                <Link to="" className="text-lg text-[#878787] text-hover">
+                <Link to="" className="text-[#878787] text-hover">
                   Điều khoản và điều kiện
                 </Link>
               </li>
               <li className="mb-1">
-                <Link to="" className="text-lg text-[#878787] text-hover">
+                <Link to="" className=" text-[#878787] text-hover">
                   Trả lại và trao đổi
                 </Link>
               </li>
               <li className="mb-1">
-                <Link to="" className="text-lg text-[#878787] text-hover">
+                <Link to="" className=" text-[#878787] text-hover">
                   Vận chuyển và giao hàng
                 </Link>
               </li>
               <li className="mb-1">
-                <Link to="" className="text-lg text-[#878787] text-hover">
+                <Link to="" className=" text-[#878787] text-hover">
                   Chính sách bảo mật
                 </Link>
               </li>
             </ul>
           </div>
           <div>
-            <h1 className="font-semibold mb-10 mt-2 text-xl text-[#222222]">
+            <h1 className="font-semibold mb-8 mt-2 text-lg text-[#222222]">
               Liên Kết Hữu Ích
             </h1>
             <ul>
               <li className="mb-1">
-                <Link to="" className="text-lg text-[#878787] text-hover">
+                <Link to="" className=" text-[#878787] text-hover">
                   Tin mới nhất
                 </Link>
               </li>
               <li className="mb-1">
-                <Link to="" className="text-lg text-[#878787] text-hover">
+                <Link to="" className=" text-[#878787] text-hover">
                   Tài khoản của tôi
                 </Link>
               </li>
               <li className="mb-1">
-                <Link to="" className="text-lg text-[#878787] text-hover">
+                <Link to="" className="text-[#878787] text-hover">
                   Hướng dãn chọn kích thước
                 </Link>
               </li>
               <li className="mb-1">
-                <Link to="" className="text-lg text-[#878787] text-hover">
+                <Link to="" className="text-[#878787] text-hover">
                   Câu hỏi thường gặp
                 </Link>
               </li>
               <li className="mb-1">
-                <Link to="" className="text-lg text-[#878787] text-hover">
+                <Link to="" className="text-[#878787] text-hover">
                   Câu hỏi thường gặp 2
                 </Link>
               </li>
@@ -204,10 +205,10 @@ const Footer = (props: Props) => {
         </div>
         <div className=" mt-5 lg:col-span-3 md:col-span-6 md:order-2  lg:order-3">
           <div>
-            <h4 className="font-semibold mb-10 mt-2 text-xl text-[#222222] ">
+            <h4 className="font-semibold mb-8 mt-2 text-lg text-[#222222] ">
               Đăng ký bản tin
             </h4>
-            <span className="text-lg text-[#878787] ">
+            <span className=" text-[#878787] ">
               Đăng ký nhận bản tin của chúng tôi và được giảm giá 10% cho lần
               đầu tiên của bạn mua
             </span>
@@ -221,13 +222,13 @@ const Footer = (props: Props) => {
                 />
                 <button
                   type="submit"
-                  className="absolute rounded-full right-[5px] top-[5px] bottom-[5px] bg-black text-white px-6"
+                  className="absolute hd-all-hoverblue-btn rounded-full right-[5px] top-[5px] bottom-[5px] bg-black text-white px-6"
                 >
-                  Đặt mua
+                  Đăng ký
                 </button>
               </div>
             </form>
-            <img src="./src/assets/images/footer-method.png" />
+            <img src={imgfooter} />
           </div>
         </div>
       </div>

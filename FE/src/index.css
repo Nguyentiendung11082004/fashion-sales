@@ -30,20 +30,6 @@ body {
   font-size: 18px;
   color: #878787
 }
-.custom-btn {
-  @apply bg-[#00BADB] text-[#fff] w-[150px] h-[48px] font-bold text-lg relative z-10 transition ease-in-out duration-300;
-}
-.custom-btn::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: #000;
-  z-index: -1;
-  transition: height 0.2s ease-in;
-}
 .custom-btn:hover::before {
   height: 0;
 }
@@ -120,5 +106,28 @@ body {
 }
 .hd-account-menu-item{
   @apply block w-1/4 lg:text-left text-center flex-shrink-0 py-[1.5rem] leading-4 relative after:absolute after:bottom-0 after:left-0 after:bg-[#00BADB] after:h-0.5 after:w-0 hover:after:w-full after:transition-all after:ease-in-out after:duration-500;
+}
+
+.hd-animation-border:hover{
+  --b: 2px;  /* the border thickness */
+  --d: 45px; /* the distance from the edge */
+  --o: 15px; /* the offset on hover */
+  --s: 1;    /* the direction of the hover effect (+1 or -1)*/
+  
+  --_d: calc(var(--d) + var(--s)*1em);
+  --_g: calc(100% - 2*(var(--_d) + var(--b)));
+  --_m:
+    conic-gradient(from 90deg at var(--_d) var(--_d),#0000 25%,#000 0)
+     0 0/calc(100% - var(--_d)) calc(100% - var(--_d)),
+    linear-gradient(#000 0 0) 50%/var(--_g) var(--_g) no-repeat;
+  -webkit-mask: var(--_m);
+          mask: var(--_m);
+  font-size: 0;
+  cursor: pointer;
+  transition: .35s;
+}
+
+.hd-switch > input[type="checkbox"]{
+  -webkit-appearance: none;
 }
 

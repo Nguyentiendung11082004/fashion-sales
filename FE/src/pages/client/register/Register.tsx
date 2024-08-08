@@ -6,12 +6,19 @@ const Register = () => {
   return (
     <>
       <section className="bg-white">
-        <div className="lg:grid lg:min-h-screen lg:grid-cols-12">
-          <aside className="relative block h-16 lg:order-last lg:col-span-5 lg:h-full xl:col-span-6">
-            <img
-              src="https://images.unsplash.com/photo-1605106702734-205df224ecce?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=870&q=80"
-              className="absolute inset-0 h-full w-full object-cover"
-            />
+        <div className="xl:grid xl:min-h-screen xl:grid-cols-12">
+          <aside className="relative hidden xl:block  h-16 lg:order-last lg:col-span-5 lg:h-full xl:col-span-6 bg-black bg-opacity-55">
+            <div className="hd-page-head">
+              <div className="hd-header-banner bg-[url('https://cdn.mos.cms.futurecdn.net/whowhatwear/posts/311736/gen-z-fashion-trends-2024-311736-1705592248484-main-768-80.jpg.webp')] bg-no-repeat bg-cover bg-center">
+                <div className="hd-bg-banner overflow-hidden relative !text-center bg-black bg-opacity-55">
+                  <div className="z-[100] relative hd-container">
+                    <h1 className="text-white text-6xl font-medium py-[335px]">
+                        KALLES
+                    </h1>
+                  </div>
+                </div>
+              </div>
+            </div>
           </aside>
           <main className="flex items-center justify-center px-8 py-8 sm:px-12 lg:col-span-7 lg:px-16 lg:py-12 xl:col-span-6">
             <div className="max-w-xl lg:max-w-3xl">

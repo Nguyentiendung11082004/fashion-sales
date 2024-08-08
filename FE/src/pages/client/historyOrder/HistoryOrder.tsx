@@ -103,11 +103,10 @@ const HistoryOrder = () => {
                               <span>XL</span>
                             </p>
                           </div>
-                          <div className="mt-0.5 ml-2">
-                            <div className="flex items-center border-2 border-green-500 rounded-lg py-1 px-2 md:py-1.5 md:px-2.5 text-sm font-medium">
-                              <span className="text-green-500 !leading-none">
-                                $33
-                              </span>
+                          <div className="mt-[1.7px]">
+                            <div className="flex items-center text-sm font-medium">
+                              <del className="mr-1">12.000.000đ</del>
+                              <span className="text-[red]">776.000₫</span>
                             </div>
                           </div>
                         </div>
@@ -123,7 +122,7 @@ const HistoryOrder = () => {
                             type="button"
                             className="font-medium hd-all-hover-bluelight"
                           >
-                            Leave review
+                            Đánh giá
                           </button>
                         </div>
                       </div>
@@ -154,11 +153,10 @@ const HistoryOrder = () => {
                               <span>XL</span>
                             </p>
                           </div>
-                          <div className="mt-0.5 ml-2">
-                            <div className="flex items-center border-2 border-green-500 rounded-lg py-1 px-2 md:py-1.5 md:px-2.5 text-sm font-medium">
-                              <span className="text-green-500 !leading-none">
-                                $33
-                              </span>
+                          <div className="mt-[1.7px]">
+                            <div className="flex items-center text-sm font-medium">
+                              <del className="mr-1">12.000.000đ</del>
+                              <span className="text-[red]">776.000₫</span>
                             </div>
                           </div>
                         </div>
@@ -174,7 +172,7 @@ const HistoryOrder = () => {
                             type="button"
                             className="font-medium hd-all-hover-bluelight"
                           >
-                            Leave review
+                            Đánh giá
                           </button>
                         </div>
                       </div>
@@ -205,11 +203,10 @@ const HistoryOrder = () => {
                               <span>XL</span>
                             </p>
                           </div>
-                          <div className="mt-0.5 ml-2">
-                            <div className="flex items-center border-2 border-green-500 rounded-lg py-1 px-2 md:py-1.5 md:px-2.5 text-sm font-medium">
-                              <span className="text-green-500 !leading-none">
-                                $33
-                              </span>
+                          <div className="mt-[1.7px]">
+                            <div className="flex items-center text-sm font-medium">
+                              <del className="mr-1">12.000.000đ</del>
+                              <span className="text-[red]">776.000₫</span>
                             </div>
                           </div>
                         </div>
@@ -225,7 +222,7 @@ const HistoryOrder = () => {
                             type="button"
                             className="font-medium hd-all-hover-bluelight"
                           >
-                            Leave review
+                            Đánh giá
                           </button>
                         </div>
                       </div>
@@ -279,11 +276,10 @@ const HistoryOrder = () => {
                               <span>XL</span>
                             </p>
                           </div>
-                          <div className="mt-0.5 ml-2">
-                            <div className="flex items-center border-2 border-green-500 rounded-lg py-1 px-2 md:py-1.5 md:px-2.5 text-sm font-medium">
-                              <span className="text-green-500 !leading-none">
-                                $33
-                              </span>
+                          <div className="mt-[1.7px]">
+                            <div className="flex items-center text-sm font-medium">
+                              <del className="mr-1">12.000.000đ</del>
+                              <span className="text-[red]">776.000₫</span>
                             </div>
                           </div>
                         </div>
@@ -299,7 +295,7 @@ const HistoryOrder = () => {
                             type="button"
                             className="font-medium hd-all-hover-bluelight"
                           >
-                            Leave review
+                            Đánh giá
                           </button>
                         </div>
                       </div>
@@ -330,11 +326,10 @@ const HistoryOrder = () => {
                               <span>XL</span>
                             </p>
                           </div>
-                          <div className="mt-0.5 ml-2">
-                            <div className="flex items-center border-2 border-green-500 rounded-lg py-1 px-2 md:py-1.5 md:px-2.5 text-sm font-medium">
-                              <span className="text-green-500 !leading-none">
-                                $33
-                              </span>
+                          <div className="mt-[1.7px]">
+                            <div className="flex items-center text-sm font-medium">
+                              <del className="mr-1">12.000.000đ</del>
+                              <span className="text-[red]">776.000₫</span>
                             </div>
                           </div>
                         </div>
@@ -350,7 +345,7 @@ const HistoryOrder = () => {
                             type="button"
                             className="font-medium hd-all-hover-bluelight"
                           >
-                            Leave review
+                            Đánh giá
                           </button>
                         </div>
                       </div>
@@ -381,11 +376,10 @@ const HistoryOrder = () => {
                               <span>XL</span>
                             </p>
                           </div>
-                          <div className="mt-0.5 ml-2">
-                            <div className="flex items-center border-2 border-green-500 rounded-lg py-1 px-2 md:py-1.5 md:px-2.5 text-sm font-medium">
-                              <span className="text-green-500 !leading-none">
-                                $33
-                              </span>
+                          <div className="mt-[1.7px]">
+                            <div className="flex items-center text-sm font-medium">
+                              <del className="mr-1">12.000.000đ</del>
+                              <span className="text-[red]">776.000₫</span>
                             </div>
                           </div>
                         </div>
@@ -401,7 +395,7 @@ const HistoryOrder = () => {
                             type="button"
                             className="font-medium hd-all-hover-bluelight"
                           >
-                            Leave review
+                            Đánh giá
                           </button>
                         </div>
                       </div>

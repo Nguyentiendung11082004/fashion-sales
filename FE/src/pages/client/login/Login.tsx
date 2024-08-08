@@ -2,6 +2,7 @@ import { Logo } from "@/components/icons";
 import LoginIcon1 from "@/components/icons/login/LoginIcon1";
 import React from "react";
 import { Link } from "react-router-dom";
+// import loginpage from "@/assets/images/"
 
 const Login = () => {
   return (
