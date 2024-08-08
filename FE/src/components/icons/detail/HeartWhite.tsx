@@ -9,7 +9,7 @@ const HeartWhite
     viewBox="0 0 24 24"
     strokeWidth="1.5"
     stroke="currentColor"
-    className="hidden h-6 w-6 text-white group-hover:block"
+    className="hidden h-6 w-6 text-white group-hover:block hover:text-black transition-all duration-300 ease-in-out"
   >
     <path
       strokeLinecap="round"

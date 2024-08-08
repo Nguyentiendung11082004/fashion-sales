@@ -627,11 +627,10 @@ const Checkout = () => {
                             {/*end-form-change-qty*/}
                           </div>
                           <div className="hidden flex-1 sm:flex justify-end">
-                            <div className="mt-0.5">
-                              <div className="flex items-center border-2 border-green-500 rounded-lg py-1 px-2 md:py-1.5 md:px-2.5 text-sm font-medium">
-                                <span className="text-green-500 !leading-none">
-                                  $74
-                                </span>
+                            <div className="mt-[1.7px]">
+                              <div className="flex items-center text-sm font-medium">
+                                <del className="mr-1">12.000.000đ</del>
+                                <span className="text-[red]">776.000₫</span>
                               </div>
                             </div>
                           </div>
@@ -734,11 +733,10 @@ const Checkout = () => {
                             {/*end-form-change-qty*/}
                           </div>
                           <div className="hidden flex-1 sm:flex justify-end">
-                            <div className="mt-0.5">
-                              <div className="flex items-center border-2 border-green-500 rounded-lg py-1 px-2 md:py-1.5 md:px-2.5 text-sm font-medium">
-                                <span className="text-green-500 !leading-none">
-                                  $74
-                                </span>
+                          <div className="mt-[1.7px]">
+                              <div className="flex items-center text-sm font-medium">
+                                <del className="mr-1">12.000.000đ</del>
+                                <span className="text-[red]">776.000₫</span>
                               </div>
                             </div>
                           </div>
@@ -841,11 +839,10 @@ const Checkout = () => {
                             {/*end-form-change-qty*/}
                           </div>
                           <div className="hidden flex-1 sm:flex justify-end">
-                            <div className="mt-0.5">
-                              <div className="flex items-center border-2 border-green-500 rounded-lg py-1 px-2 md:py-1.5 md:px-2.5 text-sm font-medium">
-                                <span className="text-green-500 !leading-none">
-                                  $74
-                                </span>
+                            <div className="mt-[1.7px]">
+                              <div className="flex items-center text-sm font-medium">
+                                <del className="mr-1">12.000.000đ</del>
+                                <span className="text-[red]">776.000₫</span>
                               </div>
                             </div>
                           </div>
@@ -906,20 +903,20 @@ const Checkout = () => {
                   <div className="mt-4 flex justify-between py-2.5">
                     <span>Tổng phụ</span>
                     <span className="font-semibold text-slate-900">
-                      $249.00
+                      5.000.000đ
                     </span>
                   </div>
                   <div className="flex justify-between py-2.5">
                     <span>Phí vận chuyển</span>
-                    <span className="font-semibold text-slate-900">$5.00</span>
+                    <span className="font-semibold text-slate-900">5.000.000đ</span>
                   </div>
                   <div className="flex justify-between py-2.5">
                     <span>Thuế</span>
-                    <span className="font-semibold text-slate-900">$24.90</span>
+                    <span className="font-semibold text-slate-900">5.000.000đ</span>
                   </div>
                   <div className="flex justify-between font-semibold text-slate-900 text-base pt-4">
                     <span>Tổng tiền</span>
-                    <span>$276.00</span>
+                    <span>15.000.000đ</span>
                   </div>
                 </div>
                 {/*end hd-checkout-text-count*/}

@@ -82,7 +82,7 @@ const Cart = () => {
                               Màu sắc: <strong>Xanh</strong>
                             </p>
                             <p className="mb-[5px]">
-                              Size: <strong>M</strong>
+                              Kích thước: <strong>M</strong>
                             </p>
                           </div>
                           <div className="hd-infor-text-tools mt-[10px]">
