@@ -1,15 +1,15 @@
 import { Product, ProductNext } from "../../../components/icons";
-import user1 from "@/assets/images/user1.jpg";
 import pro1 from "../../../assets/images/product1.webp";
 import CartDetail from "../../../components/icons/detail/CartDetail";
 import Eye from "../../../components/icons/detail/Eye";
 import HeartWhite from "../../../components/icons/detail/HeartWhite";
 import Less from "../../../components/icons/detail/Less";
 import { Link } from "react-router-dom";
-import { useRef } from "react";
-// import SliderDetail from "./SliderDetail";
+import { useRef, useState } from "react";
+import Star from "@/components/icons/detail/Star";
 
 const ProductDetail = () => {
+  // slideshow
   const imgRef = useRef<HTMLImageElement>(null);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
@@ -30,6 +30,13 @@ const ProductDetail = () => {
       containerRef.current.scrollTop += e.deltaY;
     }
   };
+
+  const [activeButton, setActiveButton] = useState("details");
+
+  const handleButtonClick = (buttonName: string) => {
+    setActiveButton(buttonName);
+  };
+
   return (
     <>
       <div>
@@ -49,7 +56,7 @@ const ProductDetail = () => {
           <div className="w-full lg:w-[55%]">
             <div className="flex gap-3">
               <div
-                className="hd-img-soft w-1/5 max-h-[394px] sm:max-h-[608px] xl:max-h-[688px] lg:max-h-[535px] overflow-y-auto"
+                className=" hd-img-soft w-1/5 max-h-[394px] sm:max-h-[608px] xl:max-h-[688px] lg:max-h-[535px] overflow-y-auto"
                 onWheel={handleWheel}
                 ref={containerRef}
                 style={{ scrollbarWidth: "none", msOverflowStyle: "none" }} // Hide scrollbar for Firefox and IE/Edge
@@ -139,7 +146,6 @@ const ProductDetail = () => {
                   />
                 </div>
               </div>
-
             </div>
           </div>
 
@@ -330,7 +336,9 @@ const ProductDetail = () => {
                       fill="currentColor"
                     ></path>
                   </svg>
-                  <span className="xl:ml-3 ml-1 lg:text-base xl:text-lg">Thêm vào giỏ hàng</span>
+                  <span className="xl:ml-3 ml-1 lg:text-base xl:text-lg">
+                    Thêm vào giỏ hàng
+                  </span>
                 </button>
                 <div className="flex border border-slate-600 rounded-full items-center px-3 h-12 hover:border-red-500 hover:text-red-500">
                   <svg
@@ -369,197 +377,345 @@ const ProductDetail = () => {
         </div>
 
         {/* Desc&Review */}
-        <div className="container sm:mt-10 mt-12 space-y-10 sm:space-y-16">
 
-          <div className="">
-            <h2 className="text-2xl font-semibold">Chi tiết sản phẩm</h2>
-            <div className="relative text-sm lg:block xl:hidden block mt-3">
-                <p className="hd-all-textgrey">
-                  Mã sản phẩm: <span className="text-black">A1</span>
-                </p>
-                <p className="hd-all-textgrey">
-                  Tình trạng: <span className="text-black">Còn hàng</span>
-                </p>
-                <p className="hd-all-textgrey">
-                  Danh mục: <span className="text-black">Mũ</span>
-                </p>
-                <p className="">
-                  Nhà cung cấp <span>H&M</span>
-                </p>
+        {/* chi tiết */}
+
+        <div className="w-full bg-[#f6f6f8]">
+          <div className="container py-[45px]">
+            <div className="w-[50%] text-center m-auto flex justify-between">
+              <button
+                onClick={() => handleButtonClick("details")}
+                className={`${
+                  activeButton === "details"
+                    ? "border-black text-black border-2"
+                    : " text-[#8e8e8e]"
+                } font-medium cursor-pointer py-2 px-6 rounded-full`}
+              >
+                Chi tiết sản phẩm
+              </button>
+              <button
+                onClick={() => handleButtonClick("reviews")}
+                className={`${
+                  activeButton === "reviews"
+                    ? "border-black text-black border-2"
+                    : "border-black text-[#8e8e8e]"
+                } btn_cmt font-medium cursor-pointer py-2 px-6 rounded-full`}
+              >
+                Xem đánh giá sản phẩm
+              </button>
+              <button
+                onClick={() => handleButtonClick("comment")}
+                className={`${
+                  activeButton === "comment"
+                    ? "border-black text-black border-2"
+                    : "border-black text-[#8e8e8e]"
+                } btn_cmt font-medium cursor-pointer py-2 px-6 rounded-full`}
+              >
+                Viết bình luận
+              </button>
+            </div>
+
+            <div className="mt-[20px] w-full">
+              {activeButton === "details" && (
+                <div className="detail_pageDetail flex flex-col">
+                  <p className="py-2 relative">
+                    <span className="text-[#9b9791] mr-[200px]">Danh mục:</span>
+                    <span className="absolute left-[200px] font-medium">
+                      Váy nữ
+                    </span>
+                  </p>
+                  <p className="py-2 relative">
+                    <span className="text-[#9b9791] mr-[200px]">
+                      Thương hiệu :
+                    </span>
+                    <span className="absolute left-[200px] font-medium">
+                      Chanel
+                    </span>
+                  </p>
+                  <p className="py-2 relative">
+                    <span className="text-[#9b9791] mr-[200px]">
+                      Chất liệu :
+                    </span>
+                    <span className="absolute left-[200px] font-medium">
+                      Cotton lạnh
+                    </span>
+                  </p>
+                  <p className="py-2 relative">
+                    <span className="text-[#9b9791] mr-[200px]">
+                      Phong cách :
+                    </span>
+                    <span className="absolute left-[200px] font-medium">
+                      Thể thao
+                    </span>
+                  </p>
+                  <p className="py-2 relative">
+                    <span className="text-[#9b9791] mr-[200px]">Xuất xứ :</span>
+                    <span className="absolute left-[200px] font-medium">
+                      Trung Quốc
+                    </span>
+                  </p>
+                  <div className="w-full mt-4">
+                    <h1 className="font-semibold text-xl pb-2">
+                      Mô tả sản phẩm:
+                    </h1>
+                    <p>
+                      🎈Cuối cùng đang chờ bạn: cửa hàng của chúng tôi có các
+                      sản phẩm chất lượng cao và nhiều loại quần áo, chào mừng
+                      bạn đến cửa hàng để mua <br />
+                      💚Khi bạn đặt hàng, nó sẽ được chuyển trong vòng 10 ngày,
+                      và toàn bộ gói hàng sẽ được giao cho bạn <br />
+                      💚Cửa hàng của chúng tôi là kích thước tiêu chuẩn, nếu bạn
+                      muốn có một sự vừa vặn hơn, vui lòng mua một kích thước
+                      lên.
+                    </p>
+                  </div>
+                </div>
+              )}
+              {activeButton === "reviews" && (
+                <div className="w-full">
+                  <div>
+                    {/* box đánh giá của khách hàng */}
+                    <div className="border py-4">
+                      <div className="flex ">
+                        <img
+                          className="w-[60px] h-[60px] rounded-full mr-4"
+                          src="data:image/jpeg;base64,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"
+                          alt=""
+                        />
+                        <div>
+                          <span className="">Phạm Kim Huệ</span>
+                          <div className="mt-2 flex">
+                            <Star />
+                            <Star />
+                            <Star />
+                            <Star />
+                            <Star />
+                          </div>
+                          <p className="text-xs mt-2">21/8/2024 10:30</p>
+                        </div>
+                      </div>
+                      <div className="mt-4 ml-[75px]">
+                        <p>
+                          Phân loại hàng:
+                          <span>Chân váy Jean ngắn , size: S</span>
+                        </p>
+                        <p>
+                          Màu sắc: <span>Đúng với mô tả</span>
+                        </p>
+                        <p>
+                          Chất liệu: <span>dày dặn</span>
+                        </p>
+                        <p>
+                          Nhận xét chung: Chân váy Jean dày dặn đúng form rất
+                          đẹp nha
+                        </p>
+                        <img
+                          className="my-4"
+                          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTdfKDCkaIX-YZGUaKS_kurggq409OrjxrefA&s"
+                          alt="hình ảnh từ người mua đánh giá"
+                        />
+                      </div>
+                      <div className="bg-gray-200 ml-[75px]">
+                        <p className="text-base font-medium my-4 pt-4">
+                          Phản hồi của người bán
+                        </p>
+                        <p>
+                          cảm ơn bạn đã đánh giá sản phẩm của chúng tôi, nếu có
+                          điểm nào ko hài lòng vui lòng liên hệ với chúng tôi!!!
+                        </p>
+                      </div>
+                    </div>
+                    <div className="border py-4">
+                      <div className="flex ">
+                        <img
+                          className="w-[60px] h-[60px] rounded-full mr-4"
+                          src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxMTEhUSEhMVFRUXFRUVFRUXGBUXFxcVFRUWFxUVFRUYHSggGBolHRUVITEhJSkrLi4uFx8zODMtNygtLisBCgoKDg0OFxAQFy0dHR0tLS0tLS0rLS0tLS0tLSstLS0tLS0tKystLS0tLS0rLSstLS0tLTctLTctKzctNysrK//AABEIAMIBAwMBIgACEQEDEQH/xAAbAAACAwEBAQAAAAAAAAAAAAADBAIFBgABB//EADkQAAIBAgQDBQcCBQQDAAAAAAABAgMRBAUhMRJBUQYiYXGREzKBobHR8MHhFCNCYnIHJILxFVLS/8QAGQEAAwEBAQAAAAAAAAAAAAAAAAECAwQF/8QAJBEBAQACAgIBBQADAAAAAAAAAAECEQMhEjFBBBMiUWEjMoH/2gAMAwEAAhEDEQA/APpUqx57c99tCQOpQ6M8+ZbdGkvbnjrik7oDKsVsaPuuRdcTlVio3lJRvtcFOppdWa6p3Q9jR6VcHOv+fcrZ4gA8R4i2FhWrta8uTAVq91fr8nz+H38GLwxF9FbXeL91/Znqp89eF+91i76eejWvPXqGzD9pdtflw2Dwjk72019eFsNDA3abas9L8vz9h2pio04vra3ovmAGweAirSfTVeOq+uoeVSFNLia3t6oy+KzifKVvIQrY6U3dtsqBsJZ1DZOxXYmjKrUvLEJU9e6nbm7JvnyM3KsSp4h9QvZ49emxp4qjRjaHefyJ0+0P9qMdLFMgsUM737fQqXaJW2+Z5LP9fDT6mEp423ML/HFeVT4T9NjicYquuv8Ait99viKqlLl4/Ft7+Ct+aGZp5g07llhs8tvz3M7LFLapSa038fHr+nxB06mv1A0c0jPd26L7jXBxbWs/ht/2OWp0YWKSTbei1ZlM3zJ1ZXey91eH3HM+xDtGEdvDm+r9djO1ZdSc8t9NuPCTsR1EGpyb5CSm+Q1h4yb96xhW8p6Gxo61ZeqT9UjOq+z1LDE17O3RJeiL42PN8D1a6HsupQkrtozdWvc8wmIkpqzsrl7Ytr7SK00PSrUjjP7v8PxV0jljJR5nk2BmYS6Xo1/5Nf1A6leEtmI1IiVam1toXM7E+KyzCPFBc+H6MqqVSVN3i2uvR+DXMLha8k7PZ6MLiqcTTy32vGfAyxMaiSXdnrp/S9vdfJ6bCc7p2ej6CtQewmK4rQqq62jPmvjzXgPZZYa7gdNXe5b4eUo6SV/20+55SwsY6tprqufmuoCtiVBNRd1b0LjMxVx8Uu678yoxmNb1bEcVidRKriLlgStXuTw+1xKLuXWXYRyV+QwWVNthlhX1V+hYuMI/m/mDnK/QAq6tKS3QK7LRL+77C1eH59hApxne1PXEXqhsxfbnqxDEnVIuuPY0tKeLaLnB50/6n4GQVfpqFpVX+foSemxqYlVNU1zvo9ulyoxlCz0d/Ll8hTDYq3MfVRS0/PUmxWOWidNFjhaaW8QSoJcyXtEtjDJ042U7R1foTxqbnKyb1IZU7zXPVfuXEsTCPIvDqMeb2qKeAnLlYcoZTbVvYJUzPohWpjpPmO5xjpacRwvTd0jjDbTSMogZRL1Uac/daA4jLbK47hYmZRSSiBqQH50gUqZKlf7M6cJNaeWiGalM9w7s7PZl43Qiu/g5Pr6DmEw/DZ636rVDq80vqKYvEKK3NsRndAYzF2Vvz5FJXxonnOcxiZPFdrUtlfyT+tzWTfpn/a1lSuLuujJw7UQfh8GW2TSninanZrnLktOZVxsG5fVabKqPH3n7q3+w5is0a7sLJLYXr0/YwVJO/OT6tiDkTa0xxGqY2b5kP4iXUCc2LbTxgqxUlzY7h8bfcp1iFe1w1OYROWK6lqV+ZXjG6WgfC109GN8I2PpiKuZ6uxXYrPUud30RtcdkFGpvC3lp9Cmr9iab91uK+D+bLlx+RbfhlKnaCb2T+L/RHtHPKl9V6NmvwvYujH3lKf8Ak7fKNi1w+S0qfuU4R/4q/qK5Y/op5M3lmZzlbuzf/F/Y02ErT6SXwaGFQfX0JqDRnao1BtoBJu57CTROvG6uRljtphnro1k9TvSfRP7DMpiWURtGT8bDvA2Y266Vl3UJSBuY3HAyf5chPAS6Mm5Qphas6D7q8j06hTairo9ILxr592Zxdfjj33bzPqeIzGMKa4nyPnGQUb1YI2/aPK+Ki7OzselzySRx8Pe1ZPtHRi7Nh6WY0am0kmYPL8vcq3A9dTTZpkPC48Ghw5adWK1mumpGMUTweGtFK9ws4WQYzdFCrVYrlqVON4ZdfgM1Vdg5QR1M9szjuzdKrv7RfEqMZ2ChLWM5rou79DdsPRprdlS2ehe/b51l3+mrcrzm+Ho42N3leTUMLC1KCirau2srdXzLD2nJbdQOKwznFrYdyt9lJGUzXEXk3coaeYNVEm9HpYu8f2dlr39Cir5PGEk7ttNMnTrws0uJMWzSo1Sk472JVKmhCpO8WvARyMng8w4Xd3Ze0M2vsmTyzJqfON9S9o5fCO0UPoZZwhgqs5STs0jQ05uwGlFLkMJoHPldpxqIlxi8odDoz5MWy0YUjziBqTPGxbMW5Fsgj25JpEqcgdz2LCULfDQgo96SXMK80w1PeaMxnmAq1eF05O1rWT+tjOYjKHB2qSa/Or1MOTH8m+GX4voGI7c4WGzv5FNjv9SlqqdP5GewOWYduzld+ZZVMipR/P1JmJ7a7Lc5nOlCbWsopnAsrcFSglyRwvFGiHZKlfEI+g55USpPyMT2Jp3rNmo7XQvSevQ9D6muHgY7LeFVZTWruN4ntLT4uGelgXZPCXm20VXbHLJOreK08jiydOPpp8NnFGW0hqvWTjoz5nhcLUhJPhfwNllcpSg3ra3z8yuOdllehnLzYGcn+IhN2Bqb6/qdCIZpoM7vQjh1fkgtV2V9h6JydvIhiMTyFJ4jxBOd9Rm9r1NCjzChfUtK07FfXqXBpjdKKs7HtF3J4tKzB4V2QOjfS0wkUiwTK2lV2e4zGtcTCmOInGQKLuSEQ3EdfqAU2TjMALxWOcjlY5xJoc2eJnXItkgREkgakycWEC3yjV2Zlv8AUDDL2qvojQYadit7V4qF4ua5aaXuGXVmQnc8WFyqHDXtuuXqjd5jH3bJszkc6pRd1C7XSKQ7LtPUn7tKXqvsRlyTe2uPHZNLzL4y9nHuvny8WcAwOOquCbjZ66fFnHP9zH9q8Mmi7Cwbk2y27WVeGFloKdiqXcbenlp9Cu7XYlyqKlB+d9fqeh9R708/h9IZNj4UouUm5X6lhiOGpT9o9F6FdTyeUKd5PV26L5F7jsJ/tLR0lw6PxOfPHTbDJn8PjKE1aMrvzLKNNRhZGTyzIq6qRlOpNxvd3lL6Gqry5JF4Se4eSur8XIFDivy+QStRbPMLR1vp8Xc1Sfi1GOthDE1+J2sHrVL8xOpP4jgRVPXUlVkkgTqCs22wCFed2VuIdvIcrzsVtedwaYlq0twWHkTqPQVw81qhNp6WNKpYa9pZaIrYMN7cKzsWtKrp0DwqCFKd1qGpxsFScuRUQDbCQmSBXcnTq9QcaoSLQUC8PQhIlFEZSJsDkTiwcZBESDFGZ7i8DGvHhkk7O6AwHMJLUv3NF6u1VDs5RT2/PQljMNGmu6tC6xE1w6bmUcqrqpNrhv1OHk4perXXhn/BHirdfRHF4qVLm0ccv223k0/ZSP8AJM7mLvjPQ0eQXVHS22+v0/cy2IxEViW5ddWe5zXebxuOfi1Gaz7kV5C3anFWwvclwuy7zUrL0WvwBVMZSbUVv+cyHaWpTqUuGTajprojLkvbXjnSGRzlKim5X8WrN/C4LEzd99PQJl9anGlwxlolbTX1kAnG/IMJ0rL2DJX3+R1COu3qEkrRbYCnPfT4miU69WxX1Kl9g843euoviKnJDAcp2BSqnkwFSpYZwOvUK6tU5k8ZWM/mOYWvGL16i9tcYjm+acPdjqyhhjqqle4b2ib73qEjh09UXjqfDW8e/VW+W5spaS0Zbxd0ZCVo7DuBzRrRisLLDTWUHp5DVGfUpsDjE9mWMKpNZWHfaInEVjK4bYmkOookogIzYenUEDFNs8mccpdSaHkUiViXCdYnQSgGnNxhKS3SAJh5vuMrEMnVzWbevEv8X+jv9UAk6kvcq38GlGXz09GXVWjFNcS38LBIYGL5HHctXWnXMds1KVdOzc18GemxjlStu/Vnof8AFfby/ba5dJRoJa3tsjEV3xVZW4n3tdWkvO2/xNs4yjQ6K2y3+LMXgU51kvHY9Dkx3m8vD/V38N/uIJy6d1aJ+L5fUte1uJiuGF1xeCWnl4+ITEZbbFQfgZ/tFR4sTK76JJayfgly+PzMebGyNuPurXLcvg7T4uJ73kxvGeG35zKvK5yWmmnJa2/ylzfkWuIWibf3Di3rtXIBN6fn/YnKaT6/QPUi/Lw+4lNGrJOpUFpw5smeVWVASrSK/E1rIsKsSmzCdnYa8VXmWIdnbdlRRy+XN/cs6mskhyFCyuwjaXSvw2XLp8WNxwKDOQWMroe1eZGphEJ1cuV9reRbVER4uotn5KqGH4HeLZZ4TE35nsqF9isqSdOTFam9tRCd7DVOT2epn8vzLZMvKNVMmsqbpoMo2AU5B1K4iSjPkTSBImmTQLFErniPWIJQ/OaGfZXil16ailNalimkk/2C3WNqse6SzLL5TsoJ6crX+XIHQy6qt4yXzRcQx3VX8efqibzl2s4prqcWWWnVJVK3JaX+hxDFVW5tqK9H9ziPv/xX5ft9Dxs4qjZ6aWMtlmWcFTjclYxuP7UYjGfy4Jrm3r3Vfd2LLL6lXhUajlG2ylo3/dK23+K/d+5lfK7128jHrr4beco8fG3fTRfd8jKV4e0qTduGN7NreS8+gPAqom5Tk7cvHyXI7FYmztz/APX/AOvscvJ306uOa7NRmoq0bW5fsOYZXi27FLhYub118dPRGjjQUIpBjCzqvryFJofqwEa8SkQtKfQ5HcJzXIcFLYnYo8bRbL6vC4pUoj2MVHh8FZ8UvQLUjfkPVKYGNMbQCNMG0NyQBoRwvw6kpw0CxgSpoNmXij2thYzWqGlBHso2JG1WsBw+RY4OLiEULjNOkIrU0hugwUIhqaBIrR0ZdT255YmgxFkmBgGiIJ046hMbJpEaO5PN4PhT5WI5p/jq+K/kThjCftE/Arqc0SlM8jzs/ru0PUbvs/gzhVzZ6V9zEeK47Iww2HbTtfpzv0b6/TbqX2eY+jNKMIK6trpp4GTyrLoUFww1k/ek+X2I4rF37sdub5y/bwPZyz/TzsOP9jYvGO9o79f0j9xOlSe7dj2nS5v06jVKlJu9r/QhqtMkwvE7t6Lz+hZ4qWp7gKHBTWiTfQDiZG3qOe3dLVZCVYPUYCSAQs0DuGqIDMYRBzgERzQyJVaQu6Q/VQDhBcpJx3F/Zu5aSpgZUwMlGOtiSpO4zTjdhfZknstGIWMCUoEqQE8jRDQiSUScRB4oE0jiSEHqZPhBoJFiCUUEiwaJxAD02WE6XtKTit1qrblbAscBPUvW5qp3q7ZrE4WULt9dt38RVVDQZ9l8Y/zEtH4vczk31PG5uLwy09Ljz8sdjK3U8Bo4w0tZYrFacMdn6vxf2Fo6b79Puec+r+hFO3i+p7UjiWdFdUWuWUlKS8ORQUJt+Jq8jwkoRcpK1+TLxnaM7qHsRPkVuIY5iGIVjSsCtUHJk5oDOQlIyATJyYNgA5EOIIwcmMITlchYk0eMNhKwCrEMpEZsNmXjAYSB3CRmhG8cCMUSc0BctRAzc7iA3JREBUzkyKYRCoSTJI8RJIRpokmQiiaQQhYjWGYpEPSZcpVY4iiqkHHwMjjcK4tq32Rq6ExTG8V/duuv7HP9Vx7m230+erplLfmpxY1t33X6fuced4uzzLOS2Wn6+bIWOasEoyd0krnquNc9mMI51OK2iNfWE8lo8FNX3e+lg1aobSajnyu6VrMSrSGq0hOsxEWqAJB5sXmCkGDkyU5A+PUAjIio6hJHi0APJIXrjF7njiA2XjEhUDyaF61RCNCRFEY1LhbAaDZOCOSuEjF9ADxRJpHJE0IPEEREkgoTROJAkhaCaZJMgeoQFiw0GLoJFlSlTlORDM2+DijujyEgzV1YvUqe5WLqZrUu+6/n9jhrE5dPiei36fscc9wxa+WaVPf86FnkUF7VaLn9Dji57Vl6bpbCOIOONa54TqClU44QKVBKZxwlOpns0ccAAZzZxwKGpEahxw0fJaX3Fqxxwl/CCCU+R6cASo7PzY1A8OCh0iPM44QTgTOOAPUSRxwUPGTpnHEgSJJHhwwPEYgenGuKK9lFdDw44zrSen//2Q=="
+                          alt=""
+                        />
+                        <div>
+                          <span className="">Phạm Kim Huệ</span>
+                          <div className="mt-2 flex">
+                            <Star />
+                            <Star />
+                            <Star />
+                            <Star />
+                            <Star />
+                          </div>
+                          <p className="text-xs mt-2">21/8/2024 10:30</p>
+                        </div>
+                      </div>
+                      <div className="mt-4 ml-[75px]">
+                        <p>
+                          Phân loại hàng:
+                          <span>Chân váy Jean ngắn , size: S</span>
+                        </p>
+                        <p>
+                          Màu sắc: <span>Đúng với mô tả</span>
+                        </p>
+                        <p>
+                          Chất liệu: <span>dày dặn</span>
+                        </p>
+                        <p>
+                          Nhận xét chung: Chân váy Jean dày dặn đúng form rất
+                          đẹp nha
+                        </p>
+                        <img
+                          className="my-4"
+                          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTdfKDCkaIX-YZGUaKS_kurggq409OrjxrefA&s"
+                          alt="hình ảnh từ người mua đánh giá"
+                        />
+                      </div>
+                      <div className="bg-gray-200 ml-[75px]">
+                        <p className="text-base font-medium my-4 pt-4">
+                          Phản hồi của người bán
+                        </p>
+                        <p>
+                          cảm ơn bạn đã đánh giá sản phẩm của chúng tôi, nếu có
+                          điểm nào ko hài lòng vui lòng liên hệ với chúng tôi!!!
+                        </p>
+                      </div>
+                    </div>
+                    <div className="border py-4">
+                      <div className="flex ">
+                        <img
+                          className="w-[60px] h-[60px] rounded-full mr-4"
+                          src="data:image/jpeg;base64,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"
+                          alt=""
+                        />
+                        <div>
+                          <span className="">Phạm Kim Huệ</span>
+                          <div className="mt-2 flex">
+                            <Star />
+                            <Star />
+                            <Star />
+                            <Star />
+                            <Star />
+                          </div>
+                          <p className="text-xs mt-2">21/8/2024 10:30</p>
+                        </div>
+                      </div>
+                      <div className="mt-4 ml-[75px]">
+                        <p>
+                          Phân loại hàng:
+                          <span>Chân váy Jean ngắn , size: S</span>
+                        </p>
+                        <p>
+                          Màu sắc: <span>Đúng với mô tả</span>
+                        </p>
+                        <p>
+                          Chất liệu: <span>dày dặn</span>
+                        </p>
+                        <p>
+                          Nhận xét chung: Chân váy Jean dày dặn đúng form rất
+                          đẹp nha
+                        </p>
+                        <img
+                          className="my-4"
+                          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTdfKDCkaIX-YZGUaKS_kurggq409OrjxrefA&s"
+                          alt="hình ảnh từ người mua đánh giá"
+                        />
+                      </div>
+                      <div className="bg-gray-200 ml-[75px]">
+                        <p className="text-base font-medium my-4 pt-4">
+                          Phản hồi của người bán
+                        </p>
+                        <p>
+                          cảm ơn bạn đã đánh giá sản phẩm của chúng tôi, nếu có
+                          điểm nào ko hài lòng vui lòng liên hệ với chúng tôi!!!
+                        </p>
+                      </div>
+                    </div>
+                    <button className="px-2 py-2 border-2 border-black rounded-full text-white bg-black ml-[75px]">
+                      Hiển thị thêm bình luận
+                    </button>
+                  </div>
+                </div>
+              )}
+              {activeButton === "comment" && (
+              <form className="m-auto w-full max-w-lg p-6 bg-white shadow-lg rounded-lg">
+              <h1 className="font-semibold text-2xl mb-4 text-center">Đánh giá sản phẩm</h1>
+            
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700" htmlFor="rating">
+                  Chất lượng sản phẩm:
+                </label>
+                <div className="flex items-center mt-2">
+                  <input type="radio" id="star5" name="rating" value="5" className="hidden" />
+                  <label htmlFor="star5" className="cursor-pointer text-yellow-500">★</label>
+                  <input type="radio" id="star4" name="rating" value="4" className="hidden" />
+                  <label htmlFor="star4" className="cursor-pointer text-yellow-500">★</label>
+                  <input type="radio" id="star3" name="rating" value="3" className="hidden" />
+                  <label htmlFor="star3" className="cursor-pointer text-yellow-500">★</label>
+                  <input type="radio" id="star2" name="rating" value="2" className="hidden" />
+                  <label htmlFor="star2" className="cursor-pointer text-yellow-500">★</label>
+                  <input type="radio" id="star1" name="rating" value="1" className="hidden" />
+                  <label htmlFor="star1" className="cursor-pointer text-yellow-500">★</label>
+                </div>
               </div>
-            <div className="prose prose-sm sm:prose dark:prose-invert sm:max-w-4xl mt-7">
-              <p>The patented eighteen-inch hardwood Arrowhead deck --- finely mortised in, makes this the strongest and most rigid canoe ever built. You cannot buy a canoe that will afford greater satisfaction.</p>
-              <p>The St. Louis Meramec Canoe Company was founded by Alfred Wickett in 1922. Wickett had previously worked for the Old Town Canoe Co from 1900 to 1914. Manufacturing of the classic wooden canoes in Valley Park, Missouri ceased in 1978.</p>
-              <ul>
-                <li>Regular fit, mid-weight t-shirt</li>
-                <li>Natural color, 100% premium combed organic cotton</li>
-                <li>Quality cotton grown without the use of herbicides or pesticides - GOTS certified</li>
-                <li>Soft touch water based printed in the USA</li>
-              </ul>
+            
+              {/* <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700" htmlFor="color">
+                  Màu sắc:
+                </label>
+                <input
+                  id="color"
+                  type="text"
+                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  placeholder="Nhập màu sắc sản phẩm"
+                />
+              </div> */}
+            
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700" htmlFor="review">
+                  Nhận xét:
+                </label>
+                <textarea
+                  id="review"
+                  rows={4}
+                  className="px-2 py-2 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  placeholder="Nhập nhận xét của bạn"
+                ></textarea>
+              </div>
+            
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700" htmlFor="image">
+                  Tải hình ảnh lên:
+                </label>
+                <input
+                  id="image"
+                  type="file"
+                  accept="image/*"
+                  className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border file:border-gray-300 file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100"
+                />
+              </div>
+            
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700" htmlFor="video">
+                  Tải video lên:
+                </label>
+                <input
+                  id="video"
+                  type="file"
+                  accept="video/*"
+                  className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border file:border-gray-300 file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100"
+                />
+              </div>
+            
+              <div className="text-center">
+                <button
+                  type="submit"
+                  className="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                >
+                  Gửi đánh giá
+                </button>
+              </div>
+            </form>
+            
+              )}
             </div>
           </div>
-          <hr className="border-slate-200 dark:border-slate-700"/>
-          <div className="">
-            <h2 className="text-2xl font-semibold flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" className="w-7 h-7 mb-0.5">
-                <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd"></path>
-              </svg>
-              <span className="ml-1.5"> 4,87 · 142 Reviews</span>
-            </h2>
-            <div className="mt-10">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-y-11 gap-x-28">
-                <div className="nc-ReviewItem flex flex-col " data-nc-id="ReviewItem">
-                  <div className=" flex space-x-4 ">
-                    <div className="flex-shrink-0 pt-0.5">
-                      <div className="wil-avatar relative flex-shrink-0 inline-flex items-center justify-center text-neutral-100 uppercase font-semibold shadow-inner rounded-full h-10 w-10 text-lg ring-1 ring-white dark:ring-neutral-900">
-                        <img src={user1} alt="Cody Fisher" loading="lazy" decoding="async" data-nimg="fill" className="absolute inset-0 w-full h-full object-cover rounded-full"  sizes="100px"/>
-                        <span className="wil-avatar__name">C</span>
-                      </div>
-                    </div>
-                    <div className="flex-1 flex justify-between">
-                      <div className="text-sm sm:text-base">
-                        <span className="block font-semibold">Cody Fisher</span>
-                        <span className="block mt-0.5 hd-all-textgrey text-sm">May 20,2021</span>
-                      </div>
-                      <div className="mt-0.5 flex text-yellow-500">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" className="w-5 h-5">
-                          <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd"></path>
-                        </svg>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" className="w-5 h-5">
-                          <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd"></path>
-                        </svg>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" className="w-5 h-5">
-                          <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd"></path>
-                        </svg>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" className="w-5 h-5">
-                          <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd"></path>
-                        </svg>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" className="w-5 h-5">
-                          <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd"></path>
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="mt-4 prose prose-sm sm:prose dark:prose-invert sm:max-w-2xl">
-                    <p className="text-slate-600">Very nice feeling sweater. I like it better than a regular hoody because it is tailored to be a slimmer fit. Perfect for going out when you want to stay comfy.The head opening is a little tight which makes it a little.</p>
-                  </div>
-                </div>
-                <div className="nc-ReviewItem flex flex-col " data-nc-id="ReviewItem">
-                  <div className=" flex space-x-4 ">
-                    <div className="flex-shrink-0 pt-0.5">
-                      <div className="wil-avatar relative flex-shrink-0 inline-flex items-center justify-center text-neutral-100 uppercase font-semibold shadow-inner rounded-full h-10 w-10 text-lg ring-1 ring-white dark:ring-neutral-900">
-                        <img alt="Stiven Hokinhs" loading="lazy" decoding="async" data-nimg="fill" className="absolute inset-0 w-full h-full object-cover rounded-full" sizes="100px" src={user1}/>
-                        <span className="wil-avatar__name">S</span>
-                      </div>
-                    </div>
-                    <div className="flex-1 flex justify-between">
-                      <div className="text-sm sm:text-base">
-                        <span className="block font-semibold">Stiven Hokinhs</span>
-                        <span className="block mt-0.5 hd-all-textgrey text-sm">December 22,2021</span>
-                      </div>
-                      <div className="mt-0.5 flex text-yellow-500">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" className="w-5 h-5">
-                          <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd"></path>
-                        </svg>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" className="w-5 h-5">
-                          <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd"></path>
-                        </svg>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" className="w-5 h-5">
-                          <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd"></path>
-                        </svg>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" className="w-5 h-5">
-                          <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd"></path>
-                        </svg>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" className="w-5 h-5">
-                          <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd"></path>
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="mt-4 prose prose-sm sm:prose dark:prose-invert sm:max-w-2xl">
-                    <p className="text-slate-600 ">I love the charcoal heavyweight hoodie. Still looks new after plenty of washes. If you’re unsure which hoodie to pick.</p>
-                  </div>
-                </div>
-                <div className="nc-ReviewItem flex flex-col " data-nc-id="ReviewItem">
-                  <div className=" flex space-x-4 ">
-                    <div className="flex-shrink-0 pt-0.5">
-                      <div className="wil-avatar relative flex-shrink-0 inline-flex items-center justify-center text-neutral-100 uppercase font-semibold shadow-inner rounded-full h-10 w-10 text-lg ring-1 ring-white dark:ring-neutral-900">
-                        <img alt="Gropishta keo" loading="lazy" decoding="async" data-nimg="fill" className="absolute inset-0 w-full h-full object-cover rounded-full" sizes="100px" src={user1}/>
-                        <span className="wil-avatar__name">G</span>
-                      </div>
-                    </div>
-                    <div className="flex-1 flex justify-between">
-                      <div className="text-sm sm:text-base">
-                        <span className="block font-semibold">Gropishta keo</span>
-                        <span className="block mt-0.5 hd-all-textgrey text-sm">August 15,2022</span>
-                      </div>
-                      <div className="mt-0.5 flex text-yellow-500">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" className="w-5 h-5">
-                          <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd"></path>
-                        </svg>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" className="w-5 h-5">
-                          <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd"></path>
-                        </svg>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" className="w-5 h-5">
-                          <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd"></path>
-                        </svg>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" className="w-5 h-5">
-                          <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd"></path>
-                        </svg>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" className="w-5 h-5">
-                          <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd"></path>
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="mt-4 prose prose-sm sm:prose dark:prose-invert sm:max-w-2xl">
-                    <p className="text-slate-600">The quality and sizing mentioned were accurate and really happy with the purchase. Such a cozy and comfortable hoodie. Now that it’s colder, my husband wears his all the time. I wear hoodies all the time. </p>
-                  </div>
-                </div>
-                <div className="nc-ReviewItem flex flex-col " data-nc-id="ReviewItem">
-                  <div className=" flex space-x-4 ">
-                    <div className="flex-shrink-0 pt-0.5">
-                      <div className="wil-avatar relative flex-shrink-0 inline-flex items-center justify-center text-neutral-100 uppercase font-semibold shadow-inner rounded-full h-10 w-10 text-lg ring-1 ring-white dark:ring-neutral-900">
-                        <img alt="Dahon Stiven" loading="lazy" decoding="async" data-nimg="fill" className="absolute inset-0 w-full h-full object-cover rounded-full" sizes="100px"  src={user1}/>
-                        <span className="wil-avatar__name">D</span>
-                      </div>
-                    </div>
-                    <div className="flex-1 flex justify-between">
-                      <div className="text-sm sm:text-base">
-                        <span className="block font-semibold">Dahon Stiven</span>
-                        <span className="block mt-0.5 hd-all-textgrey text-sm">December 12,2022</span>
-                      </div>
-                      <div className="mt-0.5 flex text-yellow-500">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" className="w-5 h-5">
-                          <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd"></path>
-                        </svg>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" className="w-5 h-5">
-                          <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd"></path>
-                        </svg>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" className="w-5 h-5">
-                          <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd"></path>
-                        </svg>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" className="w-5 h-5">
-                          <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd"></path>
-                        </svg>
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon" className="w-5 h-5">
-                          <path fill-rule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clip-rule="evenodd"></path>
-                        </svg>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="mt-4 prose prose-sm sm:prose dark:prose-invert sm:max-w-2xl">
-                    <p className="text-slate-600 ">Before buying this, I didn't really know how I would tell a "high quality" sweatshirt, but after opening, I was very impressed. The material is super soft and comfortable and the sweatshirt also has a good weight to it.</p>
-                  </div>
-                </div>
-              </div>
-              <button className="nc-Button relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm sm:text-base font-medium py-3 px-4 sm:py-3.5 sm:px-6  ttnc-ButtonSecondary bg-black text-white  mt-10 border border-slate-300 dark:border-slate-700  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0 ">Hiển thị tất cả <span className="px-1">142</span> đánh giá</button>
-            </div>
-          </div>
-          <hr className="border-slate-200 dark:border-slate-700"/>
         </div>
 
-        
         <div className="container m-auto mb-[50px] mt-10">
           <p className="lg:text-2xl sm:text-xl text-base mb-[30px] font-semibold m-auto text-center">
             Bạn cũng có thể thích
@@ -860,7 +1016,7 @@ const ProductDetail = () => {
         </div>
         <div className="container m-auto mb-[50px]">
           <p className="lg:text-2xl sm:text-xl text-base mb-[30px] font-semibold m-auto text-center">
-          Sản phẩm đã xem gần đây
+            Sản phẩm đã xem gần đây
           </p>
           <div>
             <div className="grid xl:grid-cols-4 grid-cols-2 lg:grid-cols-3 gap-3 sm:mx-7 sm:gap-x-10 xl:gap-8 relative">
