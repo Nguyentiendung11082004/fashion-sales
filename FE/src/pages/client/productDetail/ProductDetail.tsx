@@ -53,101 +53,102 @@ const ProductDetail = () => {
         </div>
 
         <div className="container py-10 lg:flex">
-          <div className="w-full lg:w-[55%]">
-            <div className="flex gap-3">
-              <div
-                className=" hd-img-soft w-1/5 max-h-[394px] sm:max-h-[608px] xl:max-h-[688px] lg:max-h-[535px] overflow-y-auto"
-                onWheel={handleWheel}
-                ref={containerRef}
-                style={{ scrollbarWidth: "none", msOverflowStyle: "none" }} // Hide scrollbar for Firefox and IE/Edge
-              >
-                <style>
-                  {`.hd-img-soft::-webkit-scrollbar {display: none; // Hide scrollbar for Chrome, Safari, and Opera}`}
-                </style>
-                <img
-                  alt="product detail 1"
-                  loading="lazy"
-                  decoding="async"
-                  data-nimg="fill"
-                  className=""
-                  sizes=""
-                  src={pro1}
-                />
-                <img
-                  alt="product detail 1"
-                  loading="lazy"
-                  decoding="async"
-                  data-nimg="fill"
-                  className=""
-                  sizes=""
-                  src={pro1}
-                />
-                <img
-                  alt="product detail 1"
-                  loading="lazy"
-                  decoding="async"
-                  data-nimg="fill"
-                  className=""
-                  sizes=""
-                  src={pro1}
-                />
-                <img
-                  alt="product detail 1"
-                  loading="lazy"
-                  decoding="async"
-                  data-nimg="fill"
-                  className=""
-                  sizes=""
-                  src={pro1}
-                />
-                <img
-                  alt="product detail 1"
-                  loading="lazy"
-                  decoding="async"
-                  data-nimg="fill"
-                  className=""
-                  sizes=""
-                  src={pro1}
-                />
-                <img
-                  alt="product detail 1"
-                  loading="lazy"
-                  decoding="async"
-                  data-nimg="fill"
-                  className=""
-                  sizes=""
-                  src={pro1}
-                />
-                <img
-                  alt="product detail 1"
-                  loading="lazy"
-                  decoding="async"
-                  data-nimg="fill"
-                  className=""
-                  sizes=""
-                  src={pro1}
-                />
-              </div>
-              <div className="w-4/5">
-                {/* <Zomdetail /> */}
-                <div
-                  className="group w-full relative overflow-hidden"
-                  onMouseMove={handleMouseMove}
-                >
-                  <img
-                    ref={imgRef}
-                    alt="product detail 1"
-                    loading="lazy"
-                    decoding="async"
-                    data-nimg="fill"
-                    className="w-full h-full object-cover transition-transform ease-in-out duration-300 group-hover:scale-150"
-                    sizes=""
-                    src={pro1}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
+        <div className="w-full lg:w-[55%]">
+  <div className="lg:flex lg:gap-3">
+    <div className="lg:w-4/5 w-full lg:order-2">
+      {/* <Zomdetail /> */}
+      <div
+        className="group lg:w-full h-full relative overflow-hidden mb-[10px] "
+        onMouseMove={handleMouseMove}
+      >
+        <img
+          ref={imgRef}
+          alt="product detail 1"
+          loading="lazy"
+          decoding="async"
+          data-nimg="fill"
+          className="w-full lg:h-full object-cover transition-transform ease-in-out duration-300 group-hover:scale-150"
+          sizes=""
+          src={pro1}
+        />
+      </div>
+    </div>
+    <div
+      className="lg:order-1 hd-img-soft lg:w-1/5 w-full max-h-[394px] sm:max-h-[608px] xl:max-h-[688px] lg:max-h-[535px] overflow-x-auto lg:overflow-y-auto flex lg:flex-col flex-row"
+      onWheel={handleWheel}
+      ref={containerRef}
+      style={{ scrollbarWidth: "none", msOverflowStyle: "none" }} // Hide scrollbar for Firefox and IE/Edge
+    >
+      <style>
+        {`.hd-img-soft::-webkit-scrollbar {display: none;}`} {/* Hide scrollbar for Chrome, Safari, and Opera */}
+      </style>
+      <img
+        alt="product detail 1"
+        loading="lazy"
+        decoding="async"
+        data-nimg="fill"
+        className="w-24 lg:w-auto flex-shrink-0"
+        sizes=""
+        src={pro1}
+      />
+      <img
+        alt="product detail 1"
+        loading="lazy"
+        decoding="async"
+        data-nimg="fill"
+        className="w-24 lg:w-auto flex-shrink-0"
+        sizes=""
+        src={pro1}
+      />
+      <img
+        alt="product detail 1"
+        loading="lazy"
+        decoding="async"
+        data-nimg="fill"
+        className="w-24 lg:w-auto flex-shrink-0"
+        sizes=""
+        src={pro1}
+      />
+      <img
+        alt="product detail 1"
+        loading="lazy"
+        decoding="async"
+        data-nimg="fill"
+        className="w-24 lg:w-auto flex-shrink-0"
+        sizes=""
+        src={pro1}
+      />
+      <img
+        alt="product detail 1"
+        loading="lazy"
+        decoding="async"
+        data-nimg="fill"
+        className="w-24 lg:w-auto flex-shrink-0"
+        sizes=""
+        src={pro1}
+      />
+      <img
+        alt="product detail 1"
+        loading="lazy"
+        decoding="async"
+        data-nimg="fill"
+        className="w-24 lg:w-auto flex-shrink-0"
+        sizes=""
+        src={pro1}
+      />
+      <img
+        alt="product detail 1"
+        loading="lazy"
+        decoding="async"
+        data-nimg="fill"
+        className="w-24 lg:w-auto flex-shrink-0"
+        sizes=""
+        src={pro1}
+      />
+    </div>
+  </div>
+</div>
+
 
           <div className="w-full lg:w-[45%] pt-10 lg:pt-0 lg:pl-7 xl:pl-9 2xl:pl-10">
             <div className="space-y-7 2xl:space-y-8">
@@ -163,8 +164,8 @@ const ProductDetail = () => {
                   </div>
                   <div className="h-7 border-l border-slate-300 dark:border-slate-700 lg:block xl:block block sm:hidden"></div>
                   <div className="flex items-center lg:block xl:block sm:hidden">
-                    <a
-                      href="#reviews"
+                    <Link
+                      to="#reviews"
                       className="flex items-center text-sm font-medium"
                     >
                       <svg
@@ -188,7 +189,7 @@ const ProductDetail = () => {
                           142 reviews
                         </span>
                       </div>
-                    </a>
+                    </Link>
                   </div>
                 </div>
                 <p className="mt-4 hd-all-textgrey text-sm">
@@ -227,14 +228,14 @@ const ProductDetail = () => {
                         <span className="ml-1 font-semibold">XS</span>
                       </span>
                     </label>
-                    <a
+                    <Link
                       target="_blank"
                       rel="noopener noreferrer"
-                      href="##"
+                      to="##"
                       className="text-primary-6000 hover:text-primary-500 text-sm"
                     >
                       Xem bảng kích thước
-                    </a>
+                    </Link>
                   </div>
                   <div className="grid grid-cols-5 sm:grid-cols-7 gap-2 mt-3 ">
                     <div
@@ -382,14 +383,14 @@ const ProductDetail = () => {
 
         <div className="w-full bg-[#f6f6f8]">
           <div className="container py-[45px]">
-            <div className="w-[50%] text-center m-auto flex justify-between">
+            <div className="w-[100%] text-center m-auto flex justify-center">
               <button
                 onClick={() => handleButtonClick("details")}
                 className={`${
                   activeButton === "details"
                     ? "border-black text-black border-2"
                     : " text-[#8e8e8e]"
-                } font-medium cursor-pointer py-2 px-6 rounded-full`}
+                } font-medium cursor-pointer lg:text-base text-[10px] lg:py-2 lg:px-6 px-2 py-2 rounded-full`}
               >
                 Chi tiết sản phẩm
               </button>
@@ -399,7 +400,7 @@ const ProductDetail = () => {
                   activeButton === "reviews"
                     ? "border-black text-black border-2"
                     : "border-black text-[#8e8e8e]"
-                } btn_cmt font-medium cursor-pointer py-2 px-6 rounded-full`}
+                } btn_cmt text-[10px] lg:text-base font-medium cursor-pointer lg:py-2 lg:px-6 px-2 py-2 rounded-full`}
               >
                 Xem đánh giá sản phẩm
               </button>
@@ -409,7 +410,7 @@ const ProductDetail = () => {
                   activeButton === "comment"
                     ? "border-black text-black border-2"
                     : "border-black text-[#8e8e8e]"
-                } btn_cmt font-medium cursor-pointer py-2 px-6 rounded-full`}
+                } btn_cmt text-[10px] lg:text-base font-medium cursor-pointer lg:py-2 lg:px-6 px-2 py-2 rounded-full`}
               >
                 Viết bình luận
               </button>
@@ -417,7 +418,7 @@ const ProductDetail = () => {
 
             <div className="mt-[20px] w-full">
               {activeButton === "details" && (
-                <div className="detail_pageDetail flex flex-col">
+                <div className="detail_pageDetail flex flex-col lg:text-base text-[10px]">
                   <p className="py-2 relative">
                     <span className="text-[#9b9791] mr-[200px]">Danh mục:</span>
                     <span className="absolute left-[200px] font-medium">
@@ -525,7 +526,7 @@ const ProductDetail = () => {
                         </p>
                       </div>
                     </div>
-                    <div className="border py-4">
+                    <div className="border py-4 lg:text-base text-sm">
                       <div className="flex ">
                         <img
                           className="w-[60px] h-[60px] rounded-full mr-4"
@@ -632,28 +633,88 @@ const ProductDetail = () => {
                 </div>
               )}
               {activeButton === "comment" && (
-              <form className="m-auto w-full max-w-lg p-6 bg-white shadow-lg rounded-lg">
-              <h1 className="font-semibold text-2xl mb-4 text-center">Đánh giá sản phẩm</h1>
-            
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700" htmlFor="rating">
-                  Chất lượng sản phẩm:
-                </label>
-                <div className="flex items-center mt-2">
-                  <input type="radio" id="star5" name="rating" value="5" className="hidden" />
-                  <label htmlFor="star5" className="cursor-pointer text-yellow-500">★</label>
-                  <input type="radio" id="star4" name="rating" value="4" className="hidden" />
-                  <label htmlFor="star4" className="cursor-pointer text-yellow-500">★</label>
-                  <input type="radio" id="star3" name="rating" value="3" className="hidden" />
-                  <label htmlFor="star3" className="cursor-pointer text-yellow-500">★</label>
-                  <input type="radio" id="star2" name="rating" value="2" className="hidden" />
-                  <label htmlFor="star2" className="cursor-pointer text-yellow-500">★</label>
-                  <input type="radio" id="star1" name="rating" value="1" className="hidden" />
-                  <label htmlFor="star1" className="cursor-pointer text-yellow-500">★</label>
-                </div>
-              </div>
-            
-              {/* <div className="mb-4">
+                <form className="m-auto w-full max-w-lg p-6 bg-white shadow-lg rounded-lg">
+                  <h1 className="font-semibold lg:text-2xl text-base mb-4 text-center">
+                    Đánh giá sản phẩm
+                  </h1>
+
+                  <div className="mb-4">
+                    <label
+                      className="block lg:text-sm text-[10px] font-medium text-gray-700"
+                      htmlFor="rating"
+                    >
+                      Chất lượng sản phẩm:
+                    </label>
+                    <div className="flex items-center mt-2">
+                      <input
+                        type="radio"
+                        id="star5"
+                        name="rating"
+                        value="5"
+                        className="hidden"
+                      />
+                      <label
+                        htmlFor="star5"
+                        className="cursor-pointer text-yellow-500"
+                      >
+                        ★
+                      </label>
+                      <input
+                        type="radio"
+                        id="star4"
+                        name="rating"
+                        value="4"
+                        className="hidden"
+                      />
+                      <label
+                        htmlFor="star4"
+                        className="cursor-pointer text-yellow-500"
+                      >
+                        ★
+                      </label>
+                      <input
+                        type="radio"
+                        id="star3"
+                        name="rating"
+                        value="3"
+                        className="hidden"
+                      />
+                      <label
+                        htmlFor="star3"
+                        className="cursor-pointer text-yellow-500"
+                      >
+                        ★
+                      </label>
+                      <input
+                        type="radio"
+                        id="star2"
+                        name="rating"
+                        value="2"
+                        className="hidden"
+                      />
+                      <label
+                        htmlFor="star2"
+                        className="cursor-pointer text-yellow-500"
+                      >
+                        ★
+                      </label>
+                      <input
+                        type="radio"
+                        id="star1"
+                        name="rating"
+                        value="1"
+                        className="hidden"
+                      />
+                      <label
+                        htmlFor="star1"
+                        className="cursor-pointer text-yellow-500"
+                      >
+                        ★
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700" htmlFor="color">
                   Màu sắc:
                 </label>
@@ -664,53 +725,61 @@ const ProductDetail = () => {
                   placeholder="Nhập màu sắc sản phẩm"
                 />
               </div> */}
-            
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700" htmlFor="review">
-                  Nhận xét:
-                </label>
-                <textarea
-                  id="review"
-                  rows={4}
-                  className="px-2 py-2 mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                  placeholder="Nhập nhận xét của bạn"
-                ></textarea>
-              </div>
-            
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700" htmlFor="image">
-                  Tải hình ảnh lên:
-                </label>
-                <input
-                  id="image"
-                  type="file"
-                  accept="image/*"
-                  className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border file:border-gray-300 file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100"
-                />
-              </div>
-            
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700" htmlFor="video">
-                  Tải video lên:
-                </label>
-                <input
-                  id="video"
-                  type="file"
-                  accept="video/*"
-                  className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border file:border-gray-300 file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100"
-                />
-              </div>
-            
-              <div className="text-center">
-                <button
-                  type="submit"
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                >
-                  Gửi đánh giá
-                </button>
-              </div>
-            </form>
-            
+
+                  <div className="mb-4">
+                    <label
+                      className="block lg:text-sm text-[10px] font-medium text-gray-700"
+                      htmlFor="review"
+                    >
+                      Nhận xét:
+                    </label>
+                    <textarea
+                      id="review"
+                      rows={4}
+                      className="px-2 py-2 placeholder:lg:text-sm text-[10px] mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                      placeholder="Nhập nhận xét của bạn"
+                    ></textarea>
+                  </div>
+
+                  <div className="mb-4">
+                    <label
+                      className="block lg:text-sm text-[10px] font-medium text-gray-700"
+                      htmlFor="image"
+                    >
+                      Tải hình ảnh lên:
+                    </label>
+                    <input
+                      id="image"
+                      type="file"
+                      accept="image/*"
+                      className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border file:border-gray-300 file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100"
+                    />
+                  </div>
+
+                  <div className="mb-4">
+                    <label
+                      className="block lg:text-sm text-[10px] font-medium text-gray-700"
+                      htmlFor="video"
+                    >
+                      Tải video lên:
+                    </label>
+                    <input
+                      id="video"
+                      type="file"
+                      accept="video/*"
+                      className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border file:border-gray-300 file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100"
+                    />
+                  </div>
+
+                  <div className="text-center">
+                    <button
+                      type="submit"
+                      className="inline-flex items-center px-4 py-2 border border-transparent lg:text-base text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    >
+                      Gửi đánh giá
+                    </button>
+                  </div>
+                </form>
               )}
             </div>
           </div>
