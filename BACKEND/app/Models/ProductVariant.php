@@ -17,4 +17,11 @@ class ProductVariant extends Model
         'sku',
         'slug',
     ];
+
+    public function product(){
+        return $this->belongsTo(Product::class);
+    }
+    public function attributes(){
+        return $this->belongsToMany(Attribute::class,"product_variant_has_attributes")->withPivot("attribute_item_id");
+    }
 }

@@ -13,7 +13,12 @@ class Category extends Model
        
         'status',
     ];
+
     protected $casts=[
         "status"=>"boolean"
     ];
+
+    public function categorychildrens(){
+        return $this->hasMany(CategoryChildren::class);
+    }
 }
