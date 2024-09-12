@@ -39,9 +39,6 @@ const LayoutAdmin: React.FC = () => {
           <div className="demo-logo-vertical" />
         </div>
         <img src={Logo} alt="" className="w-[80px] h-[80px] m-auto mb-4" />
-        {/* <h1 className="text-white text-center font-bold mb-4 text-lg">
-          Xin chào admin
-        </h1> */}
         <Menu
           theme="dark"
           mode="inline"
@@ -139,7 +136,7 @@ const LayoutAdmin: React.FC = () => {
               />
             </div>
           </div>
-          <div className="header__right flex items-center space-x-6">
+          <div className="header__right flex mr-6 items-center space-x-6">
             <div>
               <img
                 className="icon w-6 h-6"
