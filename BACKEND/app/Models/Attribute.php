@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class Attribute extends Model
 {
     use HasFactory;
-    protected $fillable = ["name"];
+    protected $fillable = ["name"
+,'slug'];
     public function attributeitems()
     {
         return $this->hasMany(AttributeItem::class);
