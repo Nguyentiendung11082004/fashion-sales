@@ -31,8 +31,8 @@ const Header = (props: Props) => {
             </div>
             <div className="mx-auto lg:mx-0">
               <span>
-              Giảm giá mùa hè<span className="text-[red] px-[2px]">50%</span>
-                !<span className="text-black pl-[2px]">Mua ngay</span>
+                Giảm giá mùa hè<span className="text-[red] px-[2px]">50%</span>!
+                <span className="text-black pl-[2px]">Mua ngay</span>
               </span>
             </div>
             <div className="flex items-center mx-auto lg:mx-0">
@@ -42,9 +42,8 @@ const Header = (props: Props) => {
               </div>
               <div className="mx-5">
                 <select className="bg-[#F6F6F8]">
-                <option>Viet nam</option>
+                  <option>Viet nam</option>
                   <option>English</option>
-                  
                 </select>
               </div>
               <div className="flex items-center">
@@ -55,14 +54,13 @@ const Header = (props: Props) => {
                   <option>France</option>
                 </select>
               </div>
-              {/* <div></div> */}
             </div>
           </div>
         </section>
         <div className="w-[100%] bg-[#fff] sticky top-0 left-0 right-0  z-20 ">
-          <header className="container bg-[#fff] h-[70px] grid grid-cols-12 gap-4 ">
+          <header className="container bg-[#fff] h-[150px] grid grid-cols-12 gap-4 ">
             <div className="lg:col-span-2 col-span-4 flex justify-center items-center md:items-center md:justify-center lg:justify-start  order-2 lg:order-1">
-              <img src={Logo} className="h-9" alt="Logo" />
+              <img src={Logo} className="w-[150px] h-[150px]" alt="Logo" />
             </div>
             <div className="col-span-4 flex items-center justify-start md:items-center md:justify-start lg:hidden  order-1  ">
               <MenuHome />

@@ -43,11 +43,11 @@ const Router = () => {
         <Route path="register" element={<Register />} />
         <Route path="/admin" element={<LayoutAdmin />}>
           <Route index element={<Dashboard />} />
-          <Route path="/admin/products" element={<ProductPageManager />} />
-          <Route path="/admin/category" element={<CategoryPage />} />
-          <Route path="/admin/comment" element={<CommentPage />} />
-          <Route path="/admin/user" element={<UserPage />} />
-          <Route path="/admin/order" element={<OrderPage />} />
+          <Route path="products" element={<ProductPageManager />} />
+          <Route path="category" element={<CategoryPage />} />
+          <Route path="comment" element={<CommentPage />} />
+          <Route path="user" element={<UserPage />} />
+          <Route path="order" element={<OrderPage />} />
           
         </Route>
         <Route path="*" element={<NotFound />} />

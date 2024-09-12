@@ -130,17 +130,3 @@ body {
   -webkit-appearance: none;
 }
 
-/* custom-menu.css */
-.ant-menu-item-selected {
-  background-color: #fdee99 !important;
-  color: #000000; /* Hoặc #333333 cho sự nhẹ nhàng hơn */
-  border: none;
-  padding: 10px 20px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s ease; /* Thay đổi màu nền của menu item khi chọn */
-}
-
-.ant-menu-item-selected .ant-menu-item-content {
-  color: #1d4ed8 !important; /* Thay đổi màu chữ của menu item khi chọn */
-}

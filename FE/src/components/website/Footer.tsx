@@ -17,7 +17,7 @@ const Footer = (props: Props) => {
         <div className=" mt-5 lg:col-span-3 md:col-span-6 md:order-1 lg:order-1">
           <img
             src={Logo}
-            className="h-9 mb-10"
+            className="w-[150px] h-[150px] mb-10"
             alt="Logo"
           />
           <div className="flex mb-5">
