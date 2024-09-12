@@ -29,28 +29,42 @@ class Product extends Model
 
     ];
 
-    public function brand(){
+    public function brand()
+    {
         return $this->belongsTo(Brand::class);
     }
 
-    public function comments(){
+    public function comments()
+    {
         return $this->hasMany(Comments::class);
     }
-    public function categorychildren(){
+    public function categorychildren()
+    {
         return $this->belongsTo(CategoryChildren::class);
     }
 
-    public function attributes(){
-        return $this->belongsToMany(Attribute::class,"product_has_attributes","product_id","attribute_id")->withPivot("attribute_item_ids");
+    public function attributes()
+    {
+        return $this->belongsToMany(Attribute::class, "product_has_attributes", "product_id", "attribute_id")->withPivot("attribute_item_ids");
     }
-    public function variants(){
+    public function variants()
+    {
         return $this->hasMany(ProductVariant::class);
     }
-    public function galleries(){
+    public function galleries()
+    {
         return $this->hasMany(ProductGallery::class);
     }
-    public function tags(){
-        return $this->belongsToMany(Tag::class,"product_tags");
+    public function tags()
+    {
+        return $this->belongsToMany(Tag::class, "product_tags");
     }
-
+    protected $casts = [
+        'type' => "boolean",
+        "status" => "boolean",
+        'is_show_home' => "boolean",
+        'trend' => "boolean",
+        'is_new' => "boolean",
+        // "attribute_item_id"=>"json",
+    ];
 }

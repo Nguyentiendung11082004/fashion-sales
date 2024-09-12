@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('slug');
             $table->string('sku');
             $table->string('name')->unique();
-            $table->integer("views");
+            $table->integer("views")->default(0);
             $table->string('img_thumbnail');
             $table->double('price_regular')->nullable();
             $table->double('price_sale')->nullable();
