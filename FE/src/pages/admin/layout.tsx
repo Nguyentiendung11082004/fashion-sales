@@ -13,7 +13,8 @@ import {
 import { Button, Layout, Menu, theme } from 'antd';
 import { NavLink, Outlet } from 'react-router-dom';
 import { AvatarUserAdmin } from '@/assets';
-
+import Logo  from "../../assets/images/logo.png";
+ import '../../index.css'
 const { Header, Sider, Content } = Layout;
 
 const LayoutAdmin: React.FC = () => {
@@ -25,12 +26,14 @@ const LayoutAdmin: React.FC = () => {
   return (
     <Layout>
       <Sider trigger={null} collapsible collapsed={collapsed} width={250} >
-        <div className="flex items-center justify-center h-[25px]">
-          <div className="demo-logo-vertical" />
+        <div className="flex items-center justify-center h-[75px]">
+        <img src={Logo} className="h-8 mx-auto text-white" alt="Logo" />
         </div>
-        <h1 className='text-white text-center font-bold mb-4 text-lg'>
+        {/* <h1 className='text-white text-center font-bold mb-4 text-lg'>
           Xin chào admin
-        </h1>
+        </h1> */}
+    
+
         <Menu
           theme="dark"
           mode="inline"
