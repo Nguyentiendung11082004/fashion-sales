@@ -15,6 +15,8 @@ class AttributeItemController extends Controller
      */
     public function index()
     {
+        echo 1;
+        die;
         $attributeItems = AttributeItem::query()->paginate(5);
         return response()->json($attributeItems, 200);
     }
