@@ -6,6 +6,8 @@ use App\Models\Attribute;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Database\QueryException;
+use App\Http\Requests\StoreAttributeRequest;
+use App\Http\Requests\UpdateAttributeRequest;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class AttributeController extends Controller
@@ -21,7 +23,7 @@ class AttributeController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreAttributeRequest $request)
     {
         try {
             // Lấy toàn bộ dữ liệu từ request
@@ -67,7 +69,7 @@ class AttributeController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateAttributeRequest $request, string $id)
     {
         try {
             $data = $request->all();

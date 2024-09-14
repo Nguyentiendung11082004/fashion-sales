@@ -6,6 +6,8 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\AttributeItem;
 use Illuminate\Database\QueryException;
+use App\Http\Requests\StoreAttributeItemRequest;
+use App\Http\Requests\UpdateAttributeItemRequest;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class AttributeItemController extends Controller
@@ -15,8 +17,7 @@ class AttributeItemController extends Controller
      */
     public function index()
     {
-        echo 1;
-        die;
+        
         $attributeItems = AttributeItem::query()->paginate(5);
         return response()->json($attributeItems, 200);
     }
@@ -24,7 +25,7 @@ class AttributeItemController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreAttributeItemRequest $request)
     {
         try {
             // Lấy toàn bộ dữ liệu từ request
@@ -70,7 +71,7 @@ class AttributeItemController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateAttributeItemRequest $request, string $id)
     {
         try {
             $data = $request->all();
