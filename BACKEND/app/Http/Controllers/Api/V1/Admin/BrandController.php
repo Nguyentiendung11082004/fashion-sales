@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api\V1\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Brand\BrandRequest;
+use App\Http\Requests\Brand\UpdateBrandRequest;
 use App\Http\Resources\BrandResource;
 use App\Models\Brand;
 use Illuminate\Http\Request;
@@ -68,9 +70,16 @@ class BrandController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(BrandRequest $request)
     {
         //
+        $params = $request->all();
+        $brand = Brand::create($params);
+        return response()->json([
+            'data' => new BrandResource($brand),
+            'success'=>true,
+            'message' => 'Brand đã được thêm thành công'
+        ], 201);
     }
 
     /**
@@ -79,14 +88,25 @@ class BrandController extends Controller
     public function show(string $id)
     {
         //
+        $brand = Brand::query()->findOrFail($id);
+        return new BrandResource($brand);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateBrandRequest $request, string $id)
     {
         //
+        $brand = Brand::query()->findOrFail($id);
+        $params = $request->all();
+        $brand->update($params);
+        return response()->json([
+            'data' => new BrandResource($brand),
+            'success'=>true,
+            'message' => 'Brand đã được sửa thành công'
+        ], 200);
+
     }
 
     /**
@@ -94,6 +114,13 @@ class BrandController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $brand = Brand::query()->findOrFail($id);
+
+      
+        $brand->delete();
+        return response()->json([
+            'status'=>true,
+            'message'=> "Xóa brand thành công."
+        ],200);
     }
 }
