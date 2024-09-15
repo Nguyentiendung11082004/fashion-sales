@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Product\StoreProduct;
 use App\Models\Attribute;
+use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductGallery;
@@ -45,11 +46,12 @@ class ProductController extends Controller
             $category = Category::query()->with(["categorychildrens"])->get();
             $tag = Tag::query()->get();
             $attribute = Attribute::with(["attributeitems"])->get();
-
+            $brand = Brand::query()->get();
             return response()->json([
                 'category' => $category,
                 'tag' => $tag,
                 'attribute' => $attribute,
+                "brand" => $brand
             ], Response::HTTP_OK);
         } catch (\Exception $ex) {
             Log::error('API/V1/Admin/ProductController@create: ', [$ex->getMessage()]);
@@ -65,15 +67,14 @@ class ProductController extends Controller
      */
     public function store(StoreProduct $request)
     {
-
-        //
-
         // dd($request->all());
+       
         try {
 
             $respone = DB::transaction(function () use ($request) {
 
                 $dataProduct = $request->except(["attribute_id", "attribute_item_id", "product_variant"]);
+
                 $dataProduct["slug"] = Str::slug($request->input("name"));
                 if ($request->hasFile('img_thumbnail')) {
                     $path = Storage::put("public/product", $dataProduct["img_thumbnail"]);
@@ -116,7 +117,7 @@ class ProductController extends Controller
                             "quantity" => $item["quantity"],
                             "image" => $url,
                             "sku" => $item["sku"],
-                            
+
                         ]);
                         foreach ($item["attribute_item_id"] as $key => $id) {
                             $productVariant->attributes()->attach($request->input('attribute_id')[$key], ["attribute_item_id" => $id]);
@@ -129,11 +130,11 @@ class ProductController extends Controller
                     "data" => $product
                 ];
             });
-            return response()->json($respone);
+            return response()->json($respone, Response::HTTP_CREATED);
         } catch (\Exception $ex) {
 
-            // Log::error('API/V1/Admin/ProductController@store: ', [$ex->getMessage()]);
-            dd($ex->getMessage());
+            Log::error('API/V1/Admin/ProductController@store: ', [$ex->getMessage()]);
+            // dd($ex->getMessage());
             return response()->json([
                 'message' => 'Đã có lỗi nghiêm trọng xảy ra'
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -146,6 +147,31 @@ class ProductController extends Controller
     public function show(string $id)
     {
         //
+        // echo 1;
+        try {
+
+            $product = Product::query()->findOrFail($id)->load(["brand", "categorychildren", "attributes", "variants", "galleries", "tags"]);
+            // dd($product->toArray());
+            $category = Category::query()->with(["categorychildrens"])->get();
+            $tag = Tag::query()->pluck('name', 'id');
+            $attribute = Attribute::with(["attributeitems"])->get();
+            $brand = Brand::query()->pluck('name', 'id');
+            return response()->json([
+                "product" => $product,
+                "category" => $category,
+                "tag" => $tag,
+                "attribute" => $attribute,
+                "brand" => $brand,
+
+            ], Response::HTTP_OK);
+            // dd($product->toArray());
+        } catch (\Exception $ex) {
+            Log::error('API/V1/Admin/ProductController@show: ', [$ex->getMessage()]);
+
+            return response()->json([
+                'message' => 'Đã có lỗi nghiêm trọng xảy ra'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
@@ -153,7 +179,86 @@ class ProductController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        try {
+            $product = Product::query()->findOrFail($id)->load(["galleries"]);
+            $respone = DB::transaction(function () use ($request, $product) {
+
+                $dataProduct = $request->except(["attribute_id", "attribute_item_id", "product_variant"]);
+                // dd($dataProduct);
+                $dataProduct["slug"] = Str::slug($request->input("name"));
+                // dd($dataProduct);
+
+                if ($request->file('img_thumbnail')) {
+                    $path = Storage::put("public/product", $dataProduct["img_thumbnail"]);
+                    $url = url(Storage::url($path));
+                    $dataProduct["img_thumbnail"] = $url;
+                    $relativePath=str_replace("/storage/","public",parse_url($product->img_thumbnail,PHP_URL_PATH));
+                    Storage::delete($relativePath);
+                }
+                dd($product->toArray());
+                if ($request->has('gallery')) {
+
+                    foreach ($request->gallery as $index  => $gallery) {
+
+                        $path = Storage::put("public/product", $gallery);
+                        $url = url(Storage::url($path));
+                        ProductGallery::query()->where('id', $id)->update([
+                            "image" => $url
+                        ]);
+                        $relativePath=str_replace("/storage/","public",parse_url($product->img_thumbnail,PHP_URL_PATH));
+                        Storage::delete($relativePath);
+
+                    }
+                }
+
+                // dd($dataProduct['tags']);
+                $product->update($dataProduct);
+
+                $product->tags()->sync($dataProduct['tags']);
+
+
+                if ($request->input('type') == 1) {
+                    // create product_has_attribute
+
+                    foreach ($request->input("attribute_item_id") as $attributeId => $attributeItemId) {
+                        $product->attributes()->attach($attributeId, ["attribute_item_ids" => json_encode($attributeItemId)]);
+                    }
+                    // thêm mới productvariant
+
+                    foreach ($request->input("product_variant") as $item) {
+                        if ($request->hasFile($item["image"])) {
+                            $path = Storage::put("public/product", $item["image"]);
+                            $url = url(Storage::url($path));
+                        }
+                        $productVariant = ProductVariant::query()->create([
+                            "product_id" => $product->id,
+                            "price_regular" => $item["price_regular"],
+                            "price_sale" => $item["price_sale"],
+                            "quantity" => $item["quantity"],
+                            "image" => $url,
+                            "sku" => $item["sku"],
+
+                        ]);
+                        foreach ($item["attribute_item_id"] as $key => $id) {
+                            $productVariant->attributes()->attach($request->input('attribute_id')[$key], ["attribute_item_id" => $id]);
+                        }
+                    }
+                }
+
+                return [
+                    "message" => "cập nhật thành công !",
+                    "data" => $product
+                ];
+            });
+            return response()->json($respone, Response::HTTP_CREATED);
+        } catch (\Exception $ex) {
+
+            // Log::error('API/V1/Admin/ProductController@store: ', [$ex->getMessage()]);
+            dd($ex->getMessage());
+            return response()->json([
+                'message' => 'Đã có lỗi nghiêm trọng xảy ra'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
