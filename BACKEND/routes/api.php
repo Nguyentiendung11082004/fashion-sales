@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\V1\Admin\BrandController;
 use App\Http\Controllers\Api\V1\Admin\CommentsController;
 use App\Http\Controllers\Api\V1\Admin\ProductController;
 use Illuminate\Http\Request;
@@ -23,5 +24,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::prefix("admin/")->group(function(){
     Route::resource("products",ProductController::class);
     Route::resource("comments",CommentsController::class);
+    Route::resource("brand",BrandController::class);
 });
 
