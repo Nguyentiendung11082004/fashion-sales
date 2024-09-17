@@ -2,8 +2,23 @@ import React from 'react'
 import TableProduct from './_components/TableProduct'
 import { PlusOutlined } from '@ant-design/icons'
 import { Input, Select } from 'antd'
+import { useQueries, useQuery } from '@tanstack/react-query'
+import axios from 'axios'
 
 const ProductPageManager = () => {
+
+  const { data, isLoading } = useQuery({
+    queryKey: ['products'],
+    queryFn: async () => {
+      try {
+        const { data } = await axios.get('http://127.0.0.1:8000/api/admin/products/create');
+        return data;
+      } catch (error) {
+        throw (error)
+      }
+    }
+  })
+  console.log("data", data)
   return (
     <div className="p-6 min-h-screen">
       <div className="flex items-center justify-between mb-6">
@@ -17,20 +32,20 @@ const ProductPageManager = () => {
       </div>
       <div className="">
         <div className="flex space-x-4 py-4">
-          <Input 
-            placeholder="Nhập tên sản phẩm bạn muốn tìm" 
-            className="w-1/4" 
+          <Input
+            placeholder="Nhập tên sản phẩm bạn muốn tìm"
+            className="w-1/4"
           />
           <Select
             mode="multiple"
             allowClear
-            className="w-[32%]" 
+            className="w-[32%]"
             placeholder="Chọn danh mục sản phẩm bạn muốn tìm"
             defaultValue={[]}
             options={[
-            
+
             ]}
-            
+
           />
         </div>
         <div className="p-4 bg-white rounded-lg overflow-hidden shadow-md">
