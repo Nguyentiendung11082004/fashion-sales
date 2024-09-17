@@ -22,20 +22,43 @@ class StoreProduct extends FormRequest
     public function rules(): array
     {
         return [
-            "brand_id" => "required",
-            "category_children_id" => "required",
-            'type' => "required",
-           
-            'sku' => "required",
-            'name' => "required|unique:products",
+            'brand_id' => 'required|integer|exists:brands,id',
+            'category_children_id' => 'required|integer|exists:categories,id',
+            'tags' => 'required|array|min:1',
+            'tags.*' => 'integer|exists:tags,id',
+            'gallery' => 'required|array|min:1',
+            'gallery.*' => 'string',
+            'type' => 'required|integer|in:0,1', // Type chỉ có 2 loại: 0 (simple) và 1 (variant)
+            'sku' => 'required|string|max:255|unique:products,sku',
+            'name' => 'required|string|max:255|unique:products,name',
             
-            'img_thumbnail' => "required",
-            'price_regular' => $this->input("type") == 0 ? "required" : "nullable",
-            'price_sale' => $this->input("type") == 0 ? "required" : "nullable",
-            "quantity" => $this->input("type") == 0 ? "required" : "nullable",
-            'description' => "required",
-            "short_description" => "required",
-            
+            'img_thumbnail' => 'required|string',
+
+            // Nếu type = 0 thì các trường này là bắt buộc, nếu type = 1 thì không bắt buộc
+            'price_regular' => 'numeric|min:0|required_if:type,0',
+            'price_sale' => 'numeric|min:0|lt:price_regular|required_if:type,0',
+            'quantity' => 'integer|min:1|required_if:type,0',
+
+            'description' => 'required|string',
+            'short_description' => 'required|string',
+
+            // Nếu type = 1 thì các thuộc tính, biến thể là bắt buộc
+            'attribute_id' => 'required_if:type,1|array|min:1',
+            'attribute_id.*' => 'integer|exists:attributes,id',
+
+            'attribute_item_id' => 'required_if:type,1|array',
+            'attribute_item_id.*' => 'array|min:1',
+            'attribute_item_id.*.*' => 'integer|exists:attribute_items,id',
+
+            'product_variant' => 'required_if:type,1|array|min:1',
+            'product_variant.*.attribute_item_id' => 'required_if:type,1|array|min:1',
+            'product_variant.*.attribute_item_id.*' => 'integer|exists:attribute_items,id',
+            'product_variant.*.sku' => 'required_if:type,1|string|max:255|distinct',
+            'product_variant.*.quantity' => 'integer|min:1|required_if:type,1',
+            'product_variant.*.price_regular' => 'numeric|min:0|required_if:type,1',
+            'product_variant.*.price_sale' => 'numeric|min:0|lt:product_variant.*.price_regular|required_if:type,1',
+            'product_variant.*.image' => 'required_if:type,1|string',
+
         ];
     }
 }
