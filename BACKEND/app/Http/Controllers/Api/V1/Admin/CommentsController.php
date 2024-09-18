@@ -17,81 +17,61 @@ class CommentsController extends Controller
     public function index(Request $request)
     {
         try {
-            // Xác thực tham số đầu vào
-            $validated = $request->validate([
-                'search' => 'nullable|string',
-                'email' => 'nullable|string|email',
-                'phone_number' => 'nullable|string',
-                'name' => 'nullable|string',
-                'per_page' => 'nullable|integer|min:1',
-                'page' => 'nullable|integer|min:1'
-            ]);
+            // Lấy tất cả các bình luận
+            $comments = Comments::query()
+                ->leftJoin('users', 'comments.user_id', '=', 'users.id')
+                ->leftJoin('products', 'comments.product_id', '=', 'products.id')
+                ->select(
+                    'comments.*',
+                    'users.name as user_name',
+                    'users.email as user_email',
+                    'users.phone_number as user_phone',  
+                    'products.name as product_name'
+                )
+                ->get();
     
-            $searchTerm = $validated['search'] ?? '';
-            $email = $validated['email'] ?? null;
-            $phoneNumber = $validated['phone_number'] ?? null;
-            $name = $validated['name'] ?? null;
-            $perPage = $validated['per_page'] ?? 15;
-            $page = $validated['page'] ?? 1;
-    
-            $perPage = min($perPage, 8); // Giới hạn tối đa là 100 mục
-    
-            // Tạo truy vấn
-            $query = Comments::query()
-                ->join('users', 'comments.user_id', '=', 'users.id')
-                ->join('products', 'comments.product_id', '=', 'products.id')
-                ->select('comments.*');
-    
-            // Thêm điều kiện tìm kiếm theo email
-            if ($email) {
-                $query->where('users.email', $email);
-            }
-    
-            // Thêm điều kiện tìm kiếm theo phone_number
-            if ($phoneNumber) {
-                $query->where('users.phone_number', $phoneNumber);
-            }
-    
-            // Thêm điều kiện tìm kiếm theo tên sản phẩm
-            if ($name) {
-                $query->where('products.name', 'like', "%$name%");
-            }
-    
-            // Thêm điều kiện tìm kiếm theo nội dung nếu có
-            if (!empty($searchTerm)) {
-                $query->where('comments.content', 'like', "%$searchTerm%");
-            }
-    
-            // Phân trang
-            $comments = $query->paginate($perPage, ['*'], 'page', $page);
-    
-            // Kiểm tra dữ liệu
-            if ($comments->isEmpty()) {
-                if ($page > 1) {
-                    return response()->json([
-                        'status' => false,
-                        'message' => 'Không có dữ liệu ở trang hiện tại. Vui lòng kiểm tra trang trước đó hoặc thay đổi từ khóa tìm kiếm.'
-                    ], Response::HTTP_NOT_FOUND);
-                } else {
-                    return response()->json([
-                        'status' => false,
-                        'message' => 'Không có dữ liệu phù hợp với từ khóa tìm kiếm.'
-                    ], Response::HTTP_NOT_FOUND);
+            // Thay thế thông tin người dùng và sản phẩm nếu không tồn tại
+            foreach ($comments as $comment) {
+                if (is_null($comment->user_name)) {
+                    $comment->user_name = 'Người dùng đã bị xóa';
+                    $comment->user_email = 'Không có thông tin';
+                    $comment->user_phone = 'Không có thông tin';
+                }
+                if (is_null($comment->product_name)) {
+                    $comment->product_name = 'Sản phẩm đã bị xóa';
                 }
             }
     
+            // Kiểm tra dữ liệu
+            if ($comments->isEmpty()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Không có dữ liệu.',
+                    'data' => []
+                ], Response::HTTP_NOT_FOUND);
+            }
+    
+            // Trả về dữ liệu với cấu trúc rõ ràng
             return response()->json([
-                'data' => $comments
+                'status' => true,
+                'message' => 'Danh sách bình luận được lấy thành công.',
+                'data' => [
+                    'total' => $comments->count(),
+                    'comments' => $comments
+                ]
             ], Response::HTTP_OK);
+    
         } catch (\Exception $ex) {
             Log::error('API/V1/Admin/CommentsController@index: ', [$ex->getMessage()]);
     
             return response()->json([
                 'status' => false,
-                'message' => 'Đã có lỗi nghiêm trọng xảy ra trong quá trình tìm kiếm.'
+                'message' => 'Đã có lỗi nghiêm trọng xảy ra trong quá trình lấy dữ liệu.'
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+    
+    
     /**
      * Store a newly created resource in storage.
      */
@@ -121,18 +101,31 @@ class CommentsController extends Controller
      */
     public function destroy(string $id)
     {
-        //
-        $comments = Comments::query()->findOrFail($id);
-
-        if($comments->image && Storage::disk('public')->exists($comments->image)){
-            Storage::disk('public')->delete($comments->image);
-
+        try {
+            // Tìm bình luận theo ID
+            $comment = Comments::findOrFail($id);
+    
+            // Nếu bình luận có hình ảnh liên quan, xóa hình ảnh
+            if ($comment->image && Storage::disk('public')->exists($comment->image)) {
+                Storage::disk('public')->delete($comment->image);
+            }
+    
+            // Xóa bình luận
+            $comment->delete();
+    
+            return response()->json([
+                'status' => true,
+                'message' => "Xóa bình luận thành công."
+            ], 200);
+    
+        } catch (\Exception $ex) {
+            Log::error('API/V1/Admin/CommentsController@destroy: ', [$ex->getMessage()]);
+    
+            return response()->json([
+                'status' => false,
+                'message' => 'Đã có lỗi xảy ra trong quá trình xóa bình luận.'
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-        $comments->delete();
-        return response()->json([
-            'status'=>true,
-            'message'=> "Xóa comments thành công."
-        ],200);
-
     }
+    
 }

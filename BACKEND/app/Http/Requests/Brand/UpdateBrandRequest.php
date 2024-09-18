@@ -32,8 +32,8 @@ class UpdateBrandRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' =>'required|string|max:255',
-            'address' =>'required|string|max:255',
+            'name' => 'required|string|min:3|max:255|unique:brands,name|regex:/^[a-zA-Z0-9\s]+$/',
+            'address' => 'required|string|min:5|max:255|regex:/^[a-zA-Z0-9\s,.]+$/'
         ];
     }
 }
