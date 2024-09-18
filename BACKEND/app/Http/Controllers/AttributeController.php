@@ -28,19 +28,18 @@ class AttributeController extends Controller
         try {
             // Lấy toàn bộ dữ liệu từ request
             $data = $request->all();
-    
+
             // Tạo slug từ name
-            $data['slug'] = Str::slug($data['name'], '-');
-    
+            $data['slug'] = $this->generateUniqueSlug($data['name']);
+
             // Tạo attribute mới
             $attribute = Attribute::create($data);
-    
+
             // Trả về JSON với thông báo thành công và dữ liệu attribute
             return response()->json([
                 'message' => 'Thêm Thuộc Tính Thành Công!',
                 'data' => $attribute
             ], 201);
-    
         } catch (QueryException $e) {
             // Trả về lỗi nếu có vấn đề trong quá trình thêm mới
             return response()->json([
@@ -76,7 +75,14 @@ class AttributeController extends Controller
             $data['slug'] = Str::slug($data['name'], '-');
             // Tìm attribute theo ID
             $attribute = Attribute::findOrFail($id);
-
+            // Kiểm tra xem giá trị 'name' có thay đổi hay không
+            if ($data['name'] !== $attribute->name) {
+                // Nếu 'name' thay đổi, tạo slug mới và đảm bảo slug duy nhất
+                $data['slug'] = $this->generateUniqueSlug($data['name'], $id);
+            } else {
+                // Nếu không thay đổi, giữ nguyên slug hiện tại
+                $data['slug'] = $attribute->slug;
+            }
             // Cập nhật attribute với dữ liệu mới
             $attribute->update($data);
 
@@ -107,21 +113,19 @@ class AttributeController extends Controller
         try {
             // Tìm attribute theo ID
             $attribute = Attribute::findOrFail($id);
-    
+
             // Xóa attribute
             $attribute->delete();
-    
+
             // Trả về JSON với thông báo sau khi xóa thành công
             return response()->json([
                 'message' => 'Xóa Thuộc Tính Thành Công!'
             ], 200);
-    
         } catch (ModelNotFoundException $e) {
             // Trả về lỗi 404 nếu không tìm thấy attribute
             return response()->json([
                 'message' => 'Thuộc tính Tồn Tại!'
             ], 404);
-    
         } catch (QueryException $e) {
             // Trả về lỗi 500 nếu có vấn đề trong quá trình xóa
             return response()->json([
@@ -129,5 +133,21 @@ class AttributeController extends Controller
                 'error' => $e->getMessage() // Tùy chọn: trả về chi tiết lỗi nếu cần
             ], 500);
         }
+    }
+    private function generateUniqueSlug($value, $id = null)
+    {
+        // Tạo slug từ 'value'
+        $slug = Str::slug($value, '-');
+
+        // Kiểm tra slug trùng lặp, bỏ qua chính bản ghi đang được cập nhật (nếu có id)
+        $original_slug = $slug;
+        $count = 1;
+
+        // Vòng lặp kiểm tra slug có trùng lặp không, nếu có thì thêm số
+        while (Attribute::where('slug', $slug)->where('id', '!=', $id)->exists()) {
+            $slug = $original_slug . '-' . $count;
+            $count++;
+        }
+        return $slug;
     }
 }

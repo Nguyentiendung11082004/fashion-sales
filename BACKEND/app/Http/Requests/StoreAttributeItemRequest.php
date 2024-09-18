@@ -22,7 +22,21 @@ class StoreAttributeItemRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'value' => 'required|string|max:255|unique:attributeItems,value',
+            'value' => 'required|string|max:255|unique:attribute_items,value',
+        ];
+    }
+     /**
+     * Get custom messages for validator errors.
+     *
+     * @return array
+     */
+    public function messages(): array
+    {
+        return [
+            'value.required' => 'Tên là trường bắt buộc.',
+            'value.string' => 'Tên phải là chuỗi ký tự.',
+            'value.max' => 'Tên không được vượt quá 255 ký tự.',
+            'value.unique' => 'Tên này đã tồn tại. Vui lòng chọn tên khác.',
         ];
     }
 }

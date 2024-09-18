@@ -12,7 +12,6 @@ class AttributeItem extends Model
         "attribute_id",
         "value",
         'slug'
-
     ];
 
     public function attribute()
