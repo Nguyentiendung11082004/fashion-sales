@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Brand::class)->constrained();
+            $table->foreignIdFor(Brand::class)->nullable()->constrained()->onDelete("set null");
             $table->foreignIdFor(CategoryChildren::class)->constrained();
             $table->boolean('type')->default(false)->comment("loại sản phẩm 1-productvariant|0-simpleproduct");
             $table->string('slug');

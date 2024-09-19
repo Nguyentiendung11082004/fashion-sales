@@ -27,12 +27,12 @@ class StoreProduct extends FormRequest
             'tags' => 'required|array|min:1',
             'tags.*' => 'integer|exists:tags,id',
             'gallery' => 'required|array|min:1',
-            'gallery.*' => 'string',
+            'gallery.*' => 'image|mimes:jpeg,png,jpg',
             'type' => 'required|integer|in:0,1', // Type chỉ có 2 loại: 0 (simple) và 1 (variant)
             'sku' => 'required|string|max:255|unique:products,sku',
             'name' => 'required|string|max:255|unique:products,name',
             
-            'img_thumbnail' => 'required|string',
+            'img_thumbnail' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
 
             // Nếu type = 0 thì các trường này là bắt buộc, nếu type = 1 thì không bắt buộc
             'price_regular' => 'numeric|min:0|required_if:type,0',
@@ -57,7 +57,8 @@ class StoreProduct extends FormRequest
             'product_variant.*.quantity' => 'integer|min:1|required_if:type,1',
             'product_variant.*.price_regular' => 'numeric|min:0|required_if:type,1',
             'product_variant.*.price_sale' => 'numeric|min:0|lt:product_variant.*.price_regular|required_if:type,1',
-            'product_variant.*.image' => 'required_if:type,1|string',
+            'product_variant.*.image' => 'nullable|image|mimes:jpeg,png,jpg',
+
 
         ];
     }

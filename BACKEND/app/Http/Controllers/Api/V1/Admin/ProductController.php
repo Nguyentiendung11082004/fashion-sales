@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Product\StoreProduct;
+use App\Http\Requests\Product\UpdateProduct;
 use App\Models\Attribute;
 use App\Models\Brand;
 use App\Models\Category;
@@ -106,7 +107,11 @@ class ProductController extends Controller
                     // thêm mới productvariant
 
                     foreach ($request->input("product_variant") as $item) {
-                        if ($request->hasFile($item["image"])) {
+                        // $url=null;
+                        // dd($item);
+                        if (isset(($item["image"]))) {
+
+                            echo 1;die;
                             $path = Storage::put("public/product", $item["image"]);
                             $url = url(Storage::url($path));
                         }
@@ -174,13 +179,14 @@ class ProductController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateProduct $request, string $id)
     {
         try {
 
 
             $product = Product::query()->findOrFail($id);
-            // dd($product->galleries->toArray());
+
+
             DB::transaction(function () use ($request, $product) {
                 $dataProduct = $request->except([
                     "attribute_id",
@@ -189,15 +195,14 @@ class ProductController extends Controller
                     "gallery",
                     "tags"
                 ]);
-                // dd($dataProduct);
                 if ($request->hasFile('img_thumbnail')) {
+                   
                     $path = Storage::put("public/product", $dataProduct["img_thumbnail"]);
                     $dataProduct["img_thumbnail"] = url(Storage::url($path));
                     $relativePath = str_replace("/storage/", 'public/', parse_url($product->img_thumbnail, PHP_URL_PATH));
                     Storage::delete($relativePath);
                 }
-                $dataProduct['slug']=Str::slug($dataProduct["name"]);
-                $product->update($dataProduct);
+                $dataProduct['slug'] = Str::slug($dataProduct["name"]);
 
                 // Xử lý ảnh gallery
                 if ($request->has('gallery') && is_array($request->input('gallery'))) {
@@ -205,7 +210,7 @@ class ProductController extends Controller
                     foreach ($request->input('gallery') as $galleryItem) {
                         // Kiểm tra xem ID có tồn tại và ảnh có mới không
                         if (isset($galleryItem['id']) && isset($galleryItem['image'])) {
-                                                    
+
                             // Cập nhật ảnh gallery dựa trên ID
                             // echo 1;die;
                             $gallery = ProductGallery::query()->findOrFail($galleryItem['id']);
@@ -214,12 +219,12 @@ class ProductController extends Controller
                                 // Xóa ảnh cũ nếu có
                                 $relativePath = str_replace("/storage/", 'public/', parse_url($gallery->image, PHP_URL_PATH));
                                 Storage::delete($relativePath);
-        
+
                                 // Lưu ảnh mới
                                 $path = Storage::put("public/product", $galleryItem['image']);
                                 // dd($path);
                                 $url = url(Storage::url($path));
-        
+
                                 // Cập nhật thông tin ảnh trong gallery
                                 $gallery->update([
                                     "image" => $url
@@ -233,48 +238,104 @@ class ProductController extends Controller
 
 
                 if ($request->input('type') == 1) {
-                    $variant=$product->load(["variants"]);
-                    dd($variant);
+                    // Xử lý thêm hoặc cập nhật các thuộc tính của sản phẩm
+                    $syncData = [];
                     foreach ($request->input("attribute_item_id") as $attributeId => $attributeItemId) {
-                        $product->attributes()->sync($attributeId, ["attribute_item_ids" => json_encode($attributeItemId)]);
+                        $syncData[$attributeId] = ["attribute_item_ids" => json_encode($attributeItemId)];
                     }
-              
+                    $product->attributes()->sync($syncData);
 
-                    foreach ($request->input("product_variant") as $item) {
-                        if ($request->hasFile($item["image"])) {
+                    // Lấy biến thể hiện tại của sản phẩm từ database
+                    $variant = $product->load(["variants"])->toArray();
+                    $syncVariant = [];
+
+                    foreach ($request->input("product_variant") as $keys => $item) {
+                        // Kiểm tra nếu có image mới, lưu ảnh, nếu không giữ lại ảnh cũ
+                        if (isset($item["image"]) && $request->hasFile("product_variant.$keys.image")) {
                             $path = Storage::put("public/product", $item["image"]);
                             $url = url(Storage::url($path));
+                        } else {
+                            // Giữ ảnh cũ nếu không upload ảnh mới
+                            $url = $variant["variants"][$keys]["image"] ?? null;
                         }
-                        $productVariant = ProductVariant::query()->create([
-                            "product_id" => $product->id,
-                            "price_regular" => $item["price_regular"],
-                            "price_sale" => $item["price_sale"],
-                            "quantity" => $item["quantity"],
-                            "image" => $url,
-                            "sku" => $item["sku"],
 
-                        ]);
-                        foreach ($item["attribute_item_id"] as $key => $id) {
-                            $productVariant->attributes()->sync($request->input('attribute_id')[$key], ["attribute_item_id" => $id]);
+                        // Kiểm tra xem biến thể có tồn tại trong DB không, nếu có thì update, nếu không thì tạo mới
+                        if (isset($variant["variants"][$keys])) {
+                            ProductVariant::where('id', $variant["variants"][$keys]["id"])
+                                ->update([
+                                    "product_id" => $product->id,
+                                    "price_regular" => $item["price_regular"],
+                                    "price_sale" => $item["price_sale"],
+                                    "quantity" => $item["quantity"],
+                                    "image" => $url,
+                                    "sku" => $item["sku"],
+                                ]);
+
+                            $productVariant = ProductVariant::findOrFail($variant["variants"][$keys]["id"]);
+                        } else {
+                            // Nếu không có, tạo mới biến thể
+                            $productVariant = ProductVariant::create([
+                                "product_id" => $product->id,
+                                "price_regular" => $item["price_regular"],
+                                "price_sale" => $item["price_sale"],
+                                "quantity" => $item["quantity"],
+                                "image" => $url,
+                                "sku" => $item["sku"],
+                            ]);
                         }
+
+                        // Xử lý thuộc tính của biến thể
+                        foreach ($item["attribute_item_id"] as $key => $id) {
+                            $syncVariant[$request->input('attribute_id')[$key]] = ["attribute_item_id" => $id];
+                        }
+                        $productVariant->attributes()->sync($syncVariant);
                     }
                 }
+                if ($request->input('type') == 0 && $product->type == 1) {
+                    $variants = ProductVariant::where('product_id', $product->id)->get();
 
+                    foreach ($variants as $variant) {
+                        if ($variant->image) {
+                            $relativePath = str_replace("/storage/", 'public/', parse_url($variant->image, PHP_URL_PATH));
+                            Storage::delete($relativePath);
+                        }
+                    }
+
+                    DB::table('product_variant_has_attributes')->whereIn('product_variant_id', function ($query) use ($product) {
+                        $query->select('id')
+                            ->from('product_variants')
+                            ->where('product_id', $product->id);
+                    })->delete();
+
+                    // Sau đó xóa tất cả các biến thể
+                    ProductVariant::where('product_id', $product->id)->delete();
+
+                    // Xóa thuộc tính sản phẩm (nếu có)
+                    DB::table('product_has_attributes')->where('product_id', $product->id)->delete();
+
+                    // Nếu cần, cập nhật lại thông tin sản phẩm như giá cả, số lượng, vì sản phẩm giờ là "đơn giản"
+                    // $dataProduct['quantity'] = $request->input('quantity', 0);  // Đặt giá trị số lượng
+                    // $dataProduct['price_regular'] = $request->input('price_regular', 0);
+                    // $dataProduct['price_sale'] = $request->input('price_sale', null);  // Có thể giữ giá trị null nếu không có giá giảm
+                }
+
+
+                $product->update($dataProduct);
             });
-            // dd($product->galleries->toArray());
+
 
             return [
                 "message" => "cập nhật thành công !",
-                // "data" => $product
+
             ];
 
             return response()->json($respone, Response::HTTP_CREATED);
         } catch (\Exception $ex) {
 
-            // Log::error('API/V1/Admin/ProductController@store: ', [$ex->getMessage()]);
-            dd($ex->getMessage());
+            // Log::debug();
             return response()->json([
-                'message' => 'Đã có lỗi nghiêm trọng xảy ra'
+                "message" => $ex->getMessage(),
+
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
@@ -285,5 +346,6 @@ class ProductController extends Controller
     public function destroy(string $id)
     {
         //
+
     }
 }
