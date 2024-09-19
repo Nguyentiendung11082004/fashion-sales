@@ -88,6 +88,7 @@ class ProductController extends Controller
 
 
                     $path = Storage::put("public/product", $gallery);
+                    // dd($path);
                     $url = url(Storage::url($path));
                     ProductGallery::query()->create([
                         "product_id" => $product->id,
@@ -107,11 +108,10 @@ class ProductController extends Controller
                     // thêm mới productvariant
 
                     foreach ($request->input("product_variant") as $item) {
-                        // $url=null;
+                        $url = null;
                         // dd($item);
                         if (isset(($item["image"]))) {
 
-                            echo 1;die;
                             $path = Storage::put("public/product", $item["image"]);
                             $url = url(Storage::url($path));
                         }
@@ -196,11 +196,13 @@ class ProductController extends Controller
                     "tags"
                 ]);
                 if ($request->hasFile('img_thumbnail')) {
-                   
+                    //    echo 1;die;
                     $path = Storage::put("public/product", $dataProduct["img_thumbnail"]);
                     $dataProduct["img_thumbnail"] = url(Storage::url($path));
                     $relativePath = str_replace("/storage/", 'public/', parse_url($product->img_thumbnail, PHP_URL_PATH));
                     Storage::delete($relativePath);
+                } else {
+                    $dataProduct["img_thumbnail"] = $product->img_thumbnail;
                 }
                 $dataProduct['slug'] = Str::slug($dataProduct["name"]);
 
@@ -313,10 +315,7 @@ class ProductController extends Controller
                     // Xóa thuộc tính sản phẩm (nếu có)
                     DB::table('product_has_attributes')->where('product_id', $product->id)->delete();
 
-                    // Nếu cần, cập nhật lại thông tin sản phẩm như giá cả, số lượng, vì sản phẩm giờ là "đơn giản"
-                    // $dataProduct['quantity'] = $request->input('quantity', 0);  // Đặt giá trị số lượng
-                    // $dataProduct['price_regular'] = $request->input('price_regular', 0);
-                    // $dataProduct['price_sale'] = $request->input('price_sale', null);  // Có thể giữ giá trị null nếu không có giá giảm
+                   
                 }
 
 
@@ -346,6 +345,57 @@ class ProductController extends Controller
     public function destroy(string $id)
     {
         //
+        try {
+            $product = Product::query()->findOrFail($id);
+            $respone = DB::transaction(function () use ($product) {
+                if (!empty($product->img_thumbnail)) {
+                    $relativePath = str_replace("/storage/", 'public/', parse_url($product->img_thumbnail, PHP_URL_PATH));
+                    Storage::delete($relativePath);
+                }
+                $gallerys = ProductGallery::query()->where('product_id', $product->id)->get()->toArray();
+                // dd($gallerys);
+                foreach ($gallerys as  $item) {
+                    if (!empty($item)) {
+                        // dd($item);
+                        $relativePath = str_replace("/storage/", 'public/', parse_url($item["image"], PHP_URL_PATH));
+                        Storage::delete($relativePath);
+                    }
+                }
+                ProductGallery::query()->where('product_id', $product->id)->delete();
+                $product->tags()->sync([]);
+                if ($product->type == 1) {
+                    $variants = ProductVariant::where('product_id', $product->id)->get();
 
+                    foreach ($variants as $variant) {
+                        if ($variant->image) {
+                            $relativePath = str_replace("/storage/", 'public/', parse_url($variant->image, PHP_URL_PATH));
+                            Storage::delete($relativePath);
+                        }
+                    }
+
+                    DB::table('product_variant_has_attributes')->whereIn('product_variant_id', function ($query) use ($product) {
+                        $query->select('id')
+                            ->from('product_variants')
+                            ->where('product_id', $product->id);
+                    })->delete();
+
+                    ProductVariant::where('product_id', $product->id)->delete();
+
+                    $product->attributes()->sync([]);
+                }
+                $product->delete();
+
+                return [
+                    "message" => "xóa dữ liệu thành công"
+                ];
+            });
+            return response()->json($respone);
+        } catch (\Exception $ex) {
+            return response()->json(
+                [
+                    "message" => $ex->getMessage()
+                ]
+            );
+        }
     }
 }
