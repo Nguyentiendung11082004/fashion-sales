@@ -21,10 +21,10 @@ class StoreProduct extends FormRequest
      */
     public function rules(): array
     {
-        dd(request()->all());
+        // dd(request()->all());
         return [
             'brand_id' => 'required|integer|exists:brands,id',
-            'category_children_id' => 'required|integer|exists:categories,id',
+            'category_id' => 'required|integer|exists:categories,id',
             'tags' => 'required|array|min:1',
             'tags.*' => 'integer|exists:tags,id',
             'gallery' => 'required|array|min:1',
