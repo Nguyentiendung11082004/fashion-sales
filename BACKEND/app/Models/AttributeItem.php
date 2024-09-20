@@ -10,7 +10,8 @@ class AttributeItem extends Model
     use HasFactory;
     protected $fillable=[
         "attribute_id",
-        "value"
+        "value",
+        "slug"
 
     ];
 

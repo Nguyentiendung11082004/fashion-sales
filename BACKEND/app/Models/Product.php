@@ -10,7 +10,7 @@ class Product extends Model
     use HasFactory;
     protected $fillable = [
         "brand_id",
-        "category_children_id",
+        "category_id",
         'type',
         'slug',
         'sku',
@@ -38,9 +38,9 @@ class Product extends Model
     {
         return $this->hasMany(Comments::class);
     }
-    public function categorychildren()
+    public function category()
     {
-        return $this->belongsTo(CategoryChildren::class);
+        return $this->belongsTo(Category::class);
     }
 
     public function attributes()

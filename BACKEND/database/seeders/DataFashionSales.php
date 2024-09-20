@@ -11,6 +11,7 @@ use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Stringable;
 
 class DataFashionSales extends Seeder
 {
@@ -25,31 +26,44 @@ class DataFashionSales extends Seeder
             [
                 [
                     "name" => "Áo",
+                    'slug' => "ao",
+                    'description' => "đẹp",
+                    'parent_id'=>null,
+                    "img_thumbnail" => "test.jpg",
+
 
                     // 'status'=>,
                 ],
                 [
-                    "name" => "quần",
+                    "name" => "Áo khoác",
+                    'slug' => "ao-khoac",
+                    'description' => "đẹp",
+                    "parent_id" => 1,
+                    "img_thumbnail" => "test.jpg",
+
+                ],
+                [
+                    "name" => "giày",
+                    'slug' => "giay",
+                    'description' => "đẹp",
+                    'parent_id'=>null,
+
+                    "img_thumbnail" => "test.jpg",
+
 
                     // 'status'=>,
                 ],
+                [
+                    "name" => "giày thể thao",
+                    'slug' => "giay-the-thao",
+                    'description' => "đẹp",
+                    "parent_id" => 3,
+                    "img_thumbnail" => "test.jpg",
+
+                ],
             ]
         );
-        // tạo dữ liệu category_children
-        CategoryChildren::query()->insert([
-            [
-                "category_id" => 1,
-                "name" => "áo ba lỗ",
-                'description' => "Áo ba lỗ thời trang",
-                "img_thumbnail" => "https://demo-kalles-4-1.myshopify.com/cdn/shop/products/famer2052212158_q1_2-1_26f6b1d8-3197-4c2b-9230-2247b4c15689.jpg?v=1652168784&width=600",
-            ],
-            [
-                "category_id" => 2,
-                "name" => "quần đùi",
-                'description' => "quần đùi thời trang",
-                "img_thumbnail" => "https://demo-kalles-4-1.myshopify.com/cdn/shop/files/71.jpg?v=1713694592&width=600",
-            ]
-        ]);
+
         // THÊM MỚI USER and role
         Role::query()->insert([
             ["name" => "client"],
@@ -98,10 +112,18 @@ class DataFashionSales extends Seeder
         Brand::query()->insert([
             [
                 "name" => "DIOR",
+                'slug'=>'dior',
+                'image'=>'test.jpg',
+                'email'=>'test@gmail.com',
+                'phone_number'=>"0987654321",
                 "address" => "hà nội"
             ],
             [
                 "name" => "CHANEL",
+                'slug'=>'CHANEL',
+                'image'=>'test1.jpg',
+                'email'=>'test@2gmail.com',
+                'phone_number'=>"0987654322",
                 "address" => "hà nội"
             ],
         ]);

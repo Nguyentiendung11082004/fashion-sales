@@ -16,6 +16,7 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(Attribute::class)->constrained();
             $table->string('value')->unique();
+            $table->string('slug');
             $table->timestamps();
         });
     }

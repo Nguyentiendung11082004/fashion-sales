@@ -24,11 +24,11 @@ class StoreProduct extends FormRequest
         // dd(request()->all());
         return [
             'brand_id' => 'required|integer|exists:brands,id',
-            'category_children_id' => 'required|integer|exists:categories,id',
+            'category_id' => 'required|integer|exists:categories,id',
             'tags' => 'required|array|min:1',
             'tags.*' => 'integer|exists:tags,id',
             'gallery' => 'required|array|min:1',
-            // 'gallery.*' => 'image|mimes:jpeg,png,jpg',
+            'gallery.*' => 'image|mimes:jpeg,png,jpg',
             'type' => 'required|integer|in:0,1', // Type chỉ có 2 loại: 0 (simple) và 1 (variant)
             'sku' => 'required|string|max:255|unique:products,sku',
             'name' => 'required|string|max:255|unique:products,name',

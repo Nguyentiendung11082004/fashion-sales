@@ -25,18 +25,18 @@ class UpdateProduct extends FormRequest
         // dd($product);
         return [
             'brand_id' => 'required|integer|exists:brands,id',
-            'category_children_id' => 'required|integer|exists:categories,id',
+            'category_id' => 'required|integer|exists:categories,id',
             'tags' => 'required|array|min:1',
             'tags.*' => 'integer|exists:tags,id',
-            'gallery' => 'required|array|min:1',
-            'gallery.*.id' => 'required|integer|exists:product_galleries,id', // Kiểm tra 'id' tồn tại trong bảng galleries
-            'gallery.*.image' => 'required|string', // Kiểm tra 'image' là chuỗi
+            'gallery' => 'array|min:1',
+            'gallery.*.id' => 'integer|exists:product_galleries,id', // Kiểm tra 'id' tồn tại trong bảng galleries
+            'gallery.*.image' => 'image|mimes:jpeg,png,jpg', // Kiểm tra 'image' là chuỗi
 
             'type' => 'required|integer|in:0,1', // Type chỉ có 2 loại: 0 (simple) và 1 (variant)
             'sku' => 'required|string|max:255|unique:products,sku,' . $productId,
             'name' => 'required|string|max:255|unique:products,name,' . $productId,
 
-            'img_thumbnail' => 'required|image|mimes:jpeg,png,jpg',
+            'img_thumbnail' => 'image|mimes:jpeg,png,jpg',
 
             // Nếu type = 0 thì các trường này là bắt buộc, nếu type = 1 thì không bắt buộc
             'price_regular' => 'numeric|min:0|required_if:type,0',
