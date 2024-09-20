@@ -38,9 +38,9 @@ class Product extends Model
     {
         return $this->hasMany(Comments::class);
     }
-    public function categorychildren()
+    public function category()
     {
-        return $this->belongsTo(CategoryChildren::class);
+        return $this->belongsTo(Category::class);
     }
 
     public function attributes()
