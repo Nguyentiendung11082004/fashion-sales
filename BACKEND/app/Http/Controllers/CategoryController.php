@@ -18,7 +18,7 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $categories = Category::query()->paginate(5);
+        $categories = Category::query()->latest('id')->get();
         return response()->json($categories, 200);
     }
     /**
@@ -32,6 +32,7 @@ class CategoryController extends Controller
             if ($request->hasFile('img_thumbnail')) {
                 // Upload ảnh lưu vào thư mục public/storage/category
                 $data['img_thumbnail'] = Storage::disk('public')->put('categories', $request->file('img_thumbnail'));
+                $data['img_thumbnail'] = url(Storage::url($data['img_thumbnail']));
             }
             // Tạo slug từ name
             $data['slug'] = $this->generateUniqueSlug($data['name']);
@@ -82,9 +83,11 @@ class CategoryController extends Controller
             if ($request->hasFile('img_thumbnail')) {
                 // Upload ảnh lưu vào thư mục /storage/app/public/category
                 $data['img_thumbnail'] = Storage::disk('public')->put('categories', $request->file('img_thumbnail'));
+                $data['img_thumbnail'] = url(Storage::url($data['img_thumbnail']));
                 // Xóa ảnh cũ nếu có
-                if ($category->img_thumbnail && Storage::disk('public')->exists($category->img_thumbnail)) {
-                    Storage::disk('public')->delete($category->img_thumbnail);
+                if (!empty($category->img_thumbnail)) {
+                    $relativePath = str_replace("/storage/", 'public/', parse_url($category->img_thumbnail, PHP_URL_PATH));
+                    Storage::delete($relativePath);
                 }
             } else {
                 // Nếu không có ảnh mới, giữ nguyên ảnh cũ
@@ -133,8 +136,9 @@ class CategoryController extends Controller
 
             // Xóa attribute
             $category->delete();
-            if ($category->img_thumbnail && Storage::disk('public')->exists($category->img_thumbnail)) {
-                Storage::disk('public')->delete($category->img_thumbnail);
+            if (!empty($category->img_thumbnail)) {
+                $relativePath = str_replace("/storage/", 'public/', parse_url($category->img_thumbnail, PHP_URL_PATH));
+                Storage::delete($relativePath);
             }
             // Trả về JSON với thông báo sau khi xóa thành công
             return response()->json([
