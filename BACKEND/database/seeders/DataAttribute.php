@@ -22,9 +22,11 @@ class DataAttribute extends Seeder
             [
                 [
                     "name" => "size",
+                    "slug" => 'size'
                 ],
                 [
                     "name" => "color",
+                    "slug" => 'color'
                 ],
             ]
         );
@@ -32,35 +34,46 @@ class DataAttribute extends Seeder
         AttributeItem::query()->insert([
             [
                 "attribute_id" => 1,
-                "value" => "S"
+                "value" => "S",
+                "slug" => "S",
             ],
             [
                 "attribute_id" => 1,
-                "value" => "M"
+                "value" => "M",
+                "slug" => "M",
             ],
             [
                 "attribute_id" => 1,
-                "value" => "40"
+                "value" => "40",
+                "slug" => "40",
             ],
             [
                 "attribute_id" => 1,
-                "value" => "41"
+                "value" => "41",
+                "slug" => "41",
             ],
             [
                 "attribute_id" => 2,
-                "value" => "RED"
+                "value" => "RED",
+                "slug" => "RED",
             ],
             [
                 "attribute_id" => 2,
-                "value" => "BLACK"
+                "value" => "BLACK",
+                "slug" => "BLACK",
             ],
         ]);
         // CREATE tag
         Tag::query()->insert([
-            ["name"=>"spre"],
-            ["name"=>"spdep"],
+            [
+                "name" => "spre",
+                "slug" => "spre"
+            ],
+            [
+                "name" => "spdep",
+                "slug" => "spdep"
+            ],
 
         ]);
-
     }
 }
