@@ -23,6 +23,7 @@ class StoreAttributeItemRequest extends FormRequest
     {
         return [
             'value' => 'required|string|max:255|unique:attribute_items,value',
+            'attribute_id' => 'required',
         ];
     }
      /**
