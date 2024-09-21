@@ -17,7 +17,7 @@ class CommentsController extends Controller
     public function index(Request $request)
     {
         try {
-            // Lấy tất cả các bình luận
+            // Lấy tất cả các bình luận và sắp xếp theo ID mới nhất
             $comments = Comments::query()
                 ->leftJoin('users', 'comments.user_id', '=', 'users.id')
                 ->leftJoin('products', 'comments.product_id', '=', 'products.id')
@@ -28,6 +28,7 @@ class CommentsController extends Controller
                     'users.phone_number as user_phone',  
                     'products.name as product_name'
                 )
+                ->orderBy('comments.id', 'desc') // Thêm sắp xếp theo ID giảm dần
                 ->get();
     
             // Thay thế thông tin người dùng và sản phẩm nếu không tồn tại
@@ -70,6 +71,7 @@ class CommentsController extends Controller
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+    
     
     
     /**

@@ -25,9 +25,9 @@ class BrandController extends Controller
     public function index(Request $request)
     {
         try {
-            // Lấy tất cả các thương hiệu
-            $brands = Brand::all();
-
+            // Lấy tất cả các thương hiệu và sắp xếp theo ID mới nhất
+            $brands = Brand::query()->latest('id')->get();
+        
             // Kiểm tra dữ liệu
             if ($brands->isEmpty()) {
                 return response()->json([
@@ -36,7 +36,7 @@ class BrandController extends Controller
                     'data' => []
                 ], Response::HTTP_NOT_FOUND);
             }
-
+        
             // Trả về dữ liệu với cấu trúc rõ ràng
             return response()->json([
                 'status' => true,
@@ -48,12 +48,13 @@ class BrandController extends Controller
             ], Response::HTTP_OK);
         } catch (\Exception $ex) {
             Log::error('API/V1/Admin/BrandController@index: ', [$ex->getMessage()]);
-
+        
             return response()->json([
                 'status' => false,
                 'message' => 'Đã có lỗi nghiêm trọng xảy ra. Vui lòng thử lại sau.'
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+        
     }
 
 
@@ -62,35 +63,35 @@ class BrandController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(BrandRequest $request)
-    {
-        try {
+        public function store(BrandRequest $request)
+        {
+            try {
 
-            $params = $request->all();
-            $imagePath = null;
-            if ($request->hasFile('image')) {
-                $imagePath = Storage::disk('public')->put('brands', $request->file('image'));
-                $params['image'] = url(Storage::url($imagePath));
+                $params = $request->all();
+                $imagePath = null;
+                if ($request->hasFile('image')) {
+                    $imagePath = Storage::disk('public')->put('brands', $request->file('image'));
+                    $params['image'] = url(Storage::url($imagePath));
+                }
+                $params['slug'] = $this->generateUniqueSlug($params['name']);
+                $brand = Brand::create($params);
+                return response()->json([
+                    'data' => new BrandResource($brand),
+                    'success' => true,
+                    'message' => 'Brand đã được thêm thành công'
+                ], 201);
+            } catch (QueryException $e) {
+                // Xóa ảnh đã upload nếu có lỗi cơ sở dữ liệu
+                if ($imagePath) {
+                    Storage::disk('public')->delete($imagePath);
+                }
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Thêm Brand thất bại!',
+                    'error' => $e->getMessage()
+                ], 500);
             }
-            $params['slug'] = $this->generateUniqueSlug($params['name']);
-            $brand = Brand::create($params);
-            return response()->json([
-                'data' => new BrandResource($brand),
-                'success' => true,
-                'message' => 'Brand đã được thêm thành công'
-            ], 201);
-        } catch (QueryException $e) {
-            // Xóa ảnh đã upload nếu có lỗi cơ sở dữ liệu
-            if ($imagePath) {
-                Storage::disk('public')->delete($imagePath);
-            }
-            return response()->json([
-                'success' => false,
-                'message' => 'Thêm Brand thất bại!',
-                'error' => $e->getMessage()
-            ], 500);
         }
-    }
 
 
     /**
@@ -154,13 +155,22 @@ class BrandController extends Controller
      */
     public function destroy(string $id)
     {
+       
         $brand = Brand::query()->findOrFail($id);
-
-
+        if ($brand->image) {
+            $imagePath = str_replace(url('/storage'), '', $brand->image);
+            if (Storage::disk('public')->exists($imagePath)) {
+                Storage::disk('public')->delete($imagePath);
+            }
+        }
+    
+      
         $brand->delete();
+    
+       
         return response()->json([
             'status' => true,
-            'message' => "Xóa brand thành công."
+            'message' => "Xóa brand và ảnh thành công."
         ], 200);
     }
     private function generateUniqueSlug($value, $id = null)
