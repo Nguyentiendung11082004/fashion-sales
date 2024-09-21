@@ -32,8 +32,11 @@ class UpdateBrandRequest extends FormRequest
     public function rules(): array
     {
         return [
-        'name' => 'required|string|min:3|max:255|unique:brands,name,' . $this->route('brand'),
-        'address' => 'required|string|min:5|max:255'
+            'name' => 'required|string|min:3|max:255|unique:brands,name,' . $this->route('brand') . ',id',
+        'image' => 'sometimes|image|mimes:jpeg,png,jpg,gif|max:2048', // Cho phép bỏ qua ảnh nếu không upload mới
+        'email' => 'required|email|max:255|unique:brands,email,' . $this->route('brand') . ',id',
+        'phone_number' => 'required|string|size:10|regex:/^[0-9]{10}$/|unique:brands,phone_number,' . $this->route('brand') . ',id',
+        'address' => 'required|string|min:5|max:255',
 
         ];
     }

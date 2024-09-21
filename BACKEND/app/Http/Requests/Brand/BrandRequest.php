@@ -33,9 +33,11 @@ class BrandRequest extends FormRequest
     {
         return [
             //
-             'name' => 'required|string|min:3|max:255|unique:brands,name',
+            'name' => 'required|string|min:3|max:255|unique:brands,name,' . $this->route('id'),
+            'image' => 'sometimes|image|mimes:jpeg,png,jpg,gif|max:2048', // Cho phép bỏ qua ảnh nếu không upload mới
+            'email' => 'required|email|max:255|unique:brands,email,' . $this->route('id'),
+            'phone_number' => 'required|string|size:10|regex:/^[0-9]{10}$/|unique:brands,phone_number,' . $this->route('id'),
             'address' => 'required|string|min:5|max:255',
-
         ];
     }
 }
