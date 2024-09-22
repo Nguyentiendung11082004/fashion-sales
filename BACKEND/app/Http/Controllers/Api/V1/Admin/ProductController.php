@@ -77,7 +77,6 @@ class ProductController extends Controller
                 $dataProduct = $request->except(["attribute_id", "attribute_item_id", "product_variant"]);
 
                 $dataProduct["slug"] = Str::slug($request->input("name"));
-                // dd($dataProduct);
 
                 $product = Product::query()->create($dataProduct);
                 foreach ($request->gallery as  $gallery) {
