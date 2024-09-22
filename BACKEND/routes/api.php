@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\V1\Admin\ProductController;
 use App\Http\Controllers\Api\V1\Admin\TagController;
+use App\Http\Controllers\Api\V1\Client\ProductDetailController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -24,4 +25,11 @@ Route::prefix("v1/")->group(function(){
     Route::resource("products",ProductController::class);
     Route::resource("tags",TagController::class);
 
+
+//  để tạm vậy rồi tôi sẽ chia các route admin và client ra sau.
+    // client
+    Route::get('product-detail/{product_id}',[ProductDetailController::class,"productdetail"]);
+
+
 });
+
