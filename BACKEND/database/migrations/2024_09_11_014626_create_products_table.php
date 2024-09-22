@@ -1,7 +1,7 @@
 <?php
 
 use App\Models\Brand;
-use App\Models\CategoryChildren;
+use App\Models\Category;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -15,8 +15,8 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(Brand::class)->constrained();
-            $table->foreignIdFor(CategoryChildren::class)->constrained();
+            $table->foreignIdFor(Brand::class)->nullable()->constrained()->onDelete("set null");
+            $table->foreignIdFor(Category::class)->constrained();
             $table->boolean('type')->default(false)->comment("loại sản phẩm 1-productvariant|0-simpleproduct");
             $table->string('slug');
             $table->string('sku');

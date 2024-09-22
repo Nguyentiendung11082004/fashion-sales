@@ -7,6 +7,9 @@ use App\Models\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+
+use function Laravel\Prompts\alert;
 
 class TagController extends Controller
 {
@@ -17,7 +20,7 @@ class TagController extends Controller
     {
         //
         try {
-            $tags = Tag::query()->get();
+            $tags = Tag::query()->latest('id')->get();
             return response()->json([
                 'data' => $tags
             ], Response::HTTP_OK);
@@ -40,15 +43,17 @@ class TagController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        
         try {
 
             $request->validate([
                 "name" => 'required|unique:tags,name'
+                
             ]);
             $tag = Tag::query()->create(
                 [
-                    "name" => $request->input("name")
+                    "name" => $request->input("name"),
+                    "slug"=>Str::slug($request->input("name"))
                 ]
             );
             return response()->json(

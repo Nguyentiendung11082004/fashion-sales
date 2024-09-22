@@ -13,7 +13,12 @@ return new class extends Migration
     {
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('parent_id')->nullable()->constrained('categories')->onDelete('cascade');
+
             $table->string("name")->unique();
+            $table->string('slug');
+            $table->text('description');
+            $table->string('img_thumbnail');
             $table->boolean('status')->default(true)->comment('hoạt động|k hoạt động');
             $table->timestamps();
         });

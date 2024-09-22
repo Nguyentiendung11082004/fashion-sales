@@ -1,3 +1,4 @@
+
 export interface Iproduct {
     id: number;
     type: boolean;
@@ -5,7 +6,8 @@ export interface Iproduct {
     category_id: number;
     name: string;
     views: number;
-    image_thumbnail: string;
+    img_thumbnail: string;
+    gallery: string[];
     slug: string;
     price_regular: number;
     price_sale: number;

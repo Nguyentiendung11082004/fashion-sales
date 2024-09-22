@@ -17,6 +17,8 @@
     "@ant-design/charts": "^2.2.1",
     "@ant-design/cssinjs": "^1.21.0",
     "@ant-design/icons": "^5.3.7",
+    "@cloudinary/react": "^1.13.0",
+    "@cloudinary/url-gen": "^1.21.0",
     "@emotion/react": "^11.13.0",
     "@emotion/styled": "^11.13.0",
     "@fortawesome/fontawesome-svg-core": "^6.6.0",

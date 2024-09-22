@@ -1,8 +1,7 @@
-import Loading from '@/common/Loading/Loading';
+
 import { Itags } from '@/common/types/tags';
 import instance from '@/configs/axios';
 import { createTag, updateTag } from '@/services/api/tags.api';
-import { PoweroffOutlined } from '@ant-design/icons';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button, Form, Input, Skeleton } from 'antd';
 import { useEffect, useState } from 'react';
