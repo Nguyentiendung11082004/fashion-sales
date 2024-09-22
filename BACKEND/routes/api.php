@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Api\V1\Admin\BrandController;
+use App\Http\Controllers\Api\V1\Admin\CommentsController;
 use App\Http\Controllers\Api\V1\Admin\ProductController;
 use App\Http\Controllers\Api\V1\Admin\TagController;
 use App\Http\Controllers\Api\V1\Client\ProductDetailController;
@@ -23,6 +25,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::prefix("v1/")->group(function(){
     Route::resource("products",ProductController::class);
+    Route::resource("comments",CommentsController::class);
+    Route::resource("brand",BrandController::class);
     Route::resource("tags",TagController::class);
 
 
