@@ -35,7 +35,7 @@ class BrandRequest extends FormRequest
         return [
             //
              'name' => 'required|string|min:3|max:255|unique:brands,name',
-             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+             'image' => 'nullable',
              'email' => 'required|email|max:255|unique:brands,email',
              'phone_number' => 'required|string|size:10|regex:/^[0-9]{10}$/|unique:brands,phone_number',
 

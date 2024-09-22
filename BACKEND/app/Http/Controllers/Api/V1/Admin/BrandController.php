@@ -63,36 +63,30 @@ class BrandController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-        public function store(BrandRequest $request)
-        {
-            try {
-
-                $params = $request->all();
-                $imagePath = null;
-                if ($request->hasFile('image')) {
-                    $imagePath = Storage::disk('public')->put('brands', $request->file('image'));
-                    $params['image'] = url(Storage::url($imagePath));
-                }
-                $params['slug'] = $this->generateUniqueSlug($params['name']);
-                $brand = Brand::create($params);
-                return response()->json([
-                    'data' => new BrandResource($brand),
-                    'success' => true,
-                    'message' => 'Brand đã được thêm thành công'
-                ], 201);
-            } catch (QueryException $e) {
-                // Xóa ảnh đã upload nếu có lỗi cơ sở dữ liệu
-                if ($imagePath) {
-                    Storage::disk('public')->delete($imagePath);
-                }
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Thêm Brand thất bại!',
-                    'error' => $e->getMessage()
-                ], 500);
+    public function store(BrandRequest $request)
+    {
+        try {
+            $params = $request->all();
+            if ($request->has('image')) {
+                $params['image'] = $request->input('image');
             }
+            $params['slug'] = $this->generateUniqueSlug($params['name']);
+            $brand = Brand::create($params);
+            return response()->json([
+                'data' => new BrandResource($brand),
+                'success' => true,
+                'message' => 'Brand đã được thêm thành công'
+            ], 201);
+    
+        } catch (QueryException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Thêm Brand thất bại!',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
+    }
+    
 
     /**
      * Display the specified resource.
@@ -110,37 +104,44 @@ class BrandController extends Controller
     public function update(UpdateBrandRequest $request, string $id)
     {
         try {
-          
+            // Lấy tất cả các tham số trừ trường 'image' từ request
             $data = $request->except('image');
+            
+            // Tìm brand theo id
             $brand = Brand::findOrFail($id);
-            if ($request->hasFile('image')) {
-                $data['image'] = Storage::disk('public')->put('brands', $request->file('image'));
-                $data['image'] = url(Storage::url($data['image']));
-                if (!empty($brand->image)) {
-                    $relativePath = str_replace("/storage/", 'public/', parse_url($brand->image, PHP_URL_PATH));
-                    if (Storage::exists($relativePath)) {
-                        Storage::delete($relativePath);
-                    }
-                }
+    
+            // Xử lý ảnh: nếu có ảnh mới, sử dụng giá trị ảnh từ request, nếu không giữ nguyên ảnh cũ
+            if ($request->filled('image')) {
+                // Lấy chuỗi từ trường 'image' trong request
+                $data['image'] = $request->input('image');
             } else {
+                // Nếu không có ảnh mới, giữ nguyên giá trị ảnh cũ
                 $data['image'] = $brand->image;
             }
+    
+            // Nếu tên thay đổi, tạo slug mới
             if ($data['name'] !== $brand->name) { 
                 $data['slug'] = $this->generateUniqueSlug($data['name'], $id);
             } else {    
                 $data['slug'] = $brand->slug;
             } 
-            $brand->update($data);   
+    
+            // Cập nhật bản ghi Brand
+            $brand->update($data);
+    
             return response()->json([
                 'data' => new BrandResource($brand),
                 'success' => true,
                 'message' => 'Brand đã được sửa thành công'
             ], 200);
-        } catch (ModelNotFoundException $e) {  
+            
+        } catch (ModelNotFoundException $e) {
+            // Xử lý lỗi nếu không tìm thấy brand
             return response()->json([
                 'message' => 'Brand không tồn tại!'
             ], 404);
         } catch (QueryException $e) {
+            // Xử lý lỗi truy vấn cơ sở dữ liệu
             return response()->json([
                 'success' => false,
                 'message' => 'Cập nhật Brand thất bại!',
@@ -157,12 +158,7 @@ class BrandController extends Controller
     {
        
         $brand = Brand::query()->findOrFail($id);
-        if ($brand->image) {
-            $imagePath = str_replace(url('/storage'), '', $brand->image);
-            if (Storage::disk('public')->exists($imagePath)) {
-                Storage::disk('public')->delete($imagePath);
-            }
-        }
+     
     
       
         $brand->delete();
