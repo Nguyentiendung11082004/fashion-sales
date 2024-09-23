@@ -150,10 +150,6 @@ class CategoryController extends Controller
 
             // Xóa attribute
             $category->delete();
-            if (!empty($category->img_thumbnail)) {
-                $relativePath = str_replace("/storage/", 'public/', parse_url($category->img_thumbnail, PHP_URL_PATH));
-                Storage::delete($relativePath);
-            }
             // Trả về JSON với thông báo sau khi xóa thành công
             return response()->json([
                 'message' => 'Xóa Thuộc Tính Thành Công!'
