@@ -129,4 +129,36 @@ body {
 .hd-switch > input[type="checkbox"]{
   -webkit-appearance: none;
 }
+/* custom table antd */
+.custom-table {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.custom-table .ant-table {
+  background-color: #ffffff;
+}
+
+.custom-table .ant-table-header {
+  background-color: #f7f7f7;
+}
+
+.custom-table .ant-table-tbody > tr:hover {
+  background-color: #f0f0f0;
+}
+
+.custom-table .ant-table-thead > tr > th {
+  color: #555;
+  font-weight: bold;
+  margin: 0;
+}
+
+.custom-table .ant-table-tbody > tr > td {
+  color: #333;
+}
+.ant-form-item{
+  margin: 10px 0px;
+}
+
 

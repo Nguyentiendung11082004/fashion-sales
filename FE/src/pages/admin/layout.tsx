@@ -8,6 +8,7 @@ import {
   UploadOutlined,
   UserOutlined,
   VideoCameraOutlined,
+  TagsOutlined 
 } from "@ant-design/icons";
 import { Button, Layout, Menu } from "antd";
 import { NavLink, Outlet } from "react-router-dom";
@@ -21,6 +22,7 @@ import {
   faTable,
 } from "@fortawesome/free-solid-svg-icons";
 import { Logo } from "@/components/icons";
+
 
 const { Sider } = Layout;
 
@@ -103,6 +105,15 @@ const LayoutAdmin: React.FC = () => {
               label: (
                 <NavLink className="text-white" to="/admin/order">
                   Đơn hàng
+                </NavLink>
+              ),
+            },
+            {
+              key: "7",
+              icon: <TagsOutlined />,
+              label: (
+                <NavLink className="text-white" to="/admin/tags">
+                  Tags
                 </NavLink>
               ),
             },

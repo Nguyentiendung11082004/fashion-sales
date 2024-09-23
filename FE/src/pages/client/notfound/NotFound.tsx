@@ -1,8 +1,13 @@
 import NotfoundIcon1 from "@/components/icons/notfound/NotfoundIcon1";
+import { Button } from "antd";
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const NotFound = () => {
+  const nav = useNavigate()
+  const handleComeBack = () => {
+    nav(-1);
+  }
   return (
     <>
       <div className="container mt-4">
@@ -19,12 +24,12 @@ const NotFound = () => {
             </div>
           </center>
           <center className="mt-6 pb-8">
-            <Link
-              to="#"
+
+            <Button
               className="text-gray-500 font-mono text-xl bg-gray-200 p-3 rounded-md hover:shadow-md"
-            >
-              Go back
-            </Link>
+              onClick={handleComeBack}
+            >Go back</Button>
+
           </center>
         </div>
       </div>
