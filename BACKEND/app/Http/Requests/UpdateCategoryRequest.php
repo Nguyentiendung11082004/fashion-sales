@@ -24,7 +24,7 @@ class UpdateCategoryRequest extends FormRequest
         return [
             'name' => 'required|string|max:255|unique:categories,name,' . $this->route('category'),
             'parent_id' => 'nullable|integer|exists:categories,id',
-            'img_thumbnail' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'img_thumbnail' => 'nullable|string|max:255',
             'description' => 'nullable|string|max:255',
         ];
     }
@@ -44,9 +44,8 @@ class UpdateCategoryRequest extends FormRequest
             'parent_id.integer' => 'ID của danh mục cha phải là một số nguyên.',
             'parent_id.exists' => 'Danh mục cha không tồn tại.',
 
-            'img_thumbnail.image' => 'Tệp tải lên phải là một hình ảnh.',
-            'img_thumbnail.mimes' => 'Ảnh phải thuộc một trong các định dạng: jpeg, png, jpg, gif, svg.',
-            'img_thumbnail.max' => 'Kích thước ảnh không được vượt quá 2MB.',
+            'img_thumbnail.string' => 'Tên ảnh phải là chuỗi ký tự.',
+            'img_thumbnail.mimes' => 'Tên ảnh không được vượt quá 255 ký tự.',
 
             'description.string' => 'Mô tả phải là chuỗi ký tự.',
             'description.max' => 'Mô tả không được vượt quá 255 ký tự.',
