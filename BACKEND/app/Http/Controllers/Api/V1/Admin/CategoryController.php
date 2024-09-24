@@ -30,11 +30,6 @@ class CategoryController extends Controller
         try {
             // Lấy toàn bộ dữ liệu từ request
             $data = $request->all();
-            // if ($request->hasFile('img_thumbnail')) {
-            //     // Upload ảnh lưu vào thư mục public/storage/category
-            //     $data['img_thumbnail'] = Storage::disk('public')->put('categories', $request->file('img_thumbnail'));
-            //     $data['img_thumbnail'] = url(Storage::url($data['img_thumbnail']));
-            // }
             if ($request->has('img_thumbnail')) {
                 $data['img_thumbnail'] = $request->input('img_thumbnail');
             }
@@ -85,20 +80,6 @@ class CategoryController extends Controller
             // dd($data);
             // Tìm attribute theo ID
             $category = Category::findOrFail($id);
-            // if ($request->hasFile('img_thumbnail')) {
-            //     // Upload ảnh lưu vào thư mục /storage/app/public/category
-            //     $data['img_thumbnail'] = Storage::disk('public')->put('categories', $request->file('img_thumbnail'));
-            //     $data['img_thumbnail'] = url(Storage::url($data['img_thumbnail']));
-            //     // Xóa ảnh cũ nếu có
-            //     if (!empty($category->img_thumbnail)) {
-            //         $relativePath = str_replace("/storage/", 'public/', parse_url($category->img_thumbnail, PHP_URL_PATH));
-            //         Storage::delete($relativePath);
-            //     }
-            // } else {
-            //     // Nếu không có ảnh mới, giữ nguyên ảnh cũ
-            //     $data['img_thumbnail'] = $category->img_thumbnail;
-            // }
-
             // Xử lý ảnh: nếu có ảnh mới, sử dụng giá trị ảnh từ request, nếu không giữ nguyên ảnh cũ
             if ($request->filled('img_thumbnail')) {
                 // Lấy chuỗi từ trường 'image' trong request
