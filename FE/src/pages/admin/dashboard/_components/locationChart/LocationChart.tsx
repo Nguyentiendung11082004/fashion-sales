@@ -45,7 +45,7 @@ const options = {
   plugins: {
     legend: {
       display: true,
-      position: "top",
+      position: "top" as const, 
     },
     title: {
       display: true,
@@ -53,6 +53,7 @@ const options = {
     },
   },
 };
+
 
 const LocationChart = () => {
   return (

@@ -1,3 +1,4 @@
+import TableSeller from "@/pages/admin/tableSeller/TableSeller";
 import {
   faBagShopping,
   faBedPulse,
@@ -8,13 +9,11 @@ import {
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import React from "react";
-import Chart from "../chart/Chart";
-import DonutChartWithStats from "../pieChart/DonutChartWithStats";
-import LocationChart from "../locationChart/LocationChart";
+import DonutChartWithStats from "./_components/pieChart/DonutChartWithStats";
 import TableProduct from "../products/_components/TableProduct";
-import TableSeller from "@/pages/admin/tableSeller/TableSeller";
 import TableOrder from "../tableOrder/TableOrder";
+import Chart from "./_components/chart/Chart";
+import LocationChart from "./_components/locationChart/LocationChart";
 
 const Dashboard = () => {
   return (
