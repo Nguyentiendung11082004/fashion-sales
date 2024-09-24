@@ -7,8 +7,8 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Database\QueryException;
-use App\Http\Requests\StoreAttributeRequest;
-use App\Http\Requests\UpdateAttributeRequest;
+use App\Http\Requests\Attribute\StoreAttributeRequest;
+use App\Http\Requests\Attribute\UpdateAttributeRequest;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class AttributeController extends Controller

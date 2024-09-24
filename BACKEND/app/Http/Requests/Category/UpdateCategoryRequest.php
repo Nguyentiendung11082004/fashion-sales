@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Category;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -24,7 +24,7 @@ class UpdateCategoryRequest extends FormRequest
         return [
             'name' => 'required|string|max:255|unique:categories,name,' . $this->route('category'),
             'parent_id' => 'nullable|integer|exists:categories,id',
-            'img_thumbnail' => 'nullable|string|max:255',
+            'img_thumbnail' => 'nullable',
             'description' => 'nullable|string|max:255',
         ];
     }

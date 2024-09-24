@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Category;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -21,10 +21,11 @@ class StoreCategoryRequest extends FormRequest
      */
     public function rules(): array
     {
+        // dd(request()->all());
         return [
             'name' => 'required|string|max:255|unique:categories,name',
             'parent_id' => 'nullable|integer|exists:categories,id',
-            'img_thumbnail' => 'nullable|string|max:255',
+            'img_thumbnail' => 'nullable',
             'description' => 'nullable|string|max:255',
         ];
     }

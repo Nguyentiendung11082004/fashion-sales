@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\AttributeItem;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreAttributeItemRequest extends FormRequest
+class UpdateAttributeItemRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,11 +22,10 @@ class StoreAttributeItemRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'value' => 'required|string|max:255|unique:attribute_items,value',
-            'attribute_id' => 'required',
+            'value' => 'required|string|max:255|unique:attribute_items,value,' . $this->route('attributeItem')
         ];
     }
-     /**
+         /**
      * Get custom messages for validator errors.
      *
      * @return array

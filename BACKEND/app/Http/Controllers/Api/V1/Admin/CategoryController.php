@@ -8,8 +8,8 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Storage;
-use App\Http\Requests\StoreCategoryRequest;
-use App\Http\Requests\UpdateCategoryRequest;
+use App\Http\Requests\Category\StoreCategoryRequest;
+use App\Http\Requests\Category\UpdateCategoryRequest;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class CategoryController extends Controller
@@ -81,8 +81,8 @@ class CategoryController extends Controller
     {
         try {
             // Lấy toàn bộ dữ liệu từ request
-            $data = $request->all();
-            dd($data);
+            $data = $request->except('img_thumbnail');
+            // dd($data);
             // Tìm attribute theo ID
             $category = Category::findOrFail($id);
             // if ($request->hasFile('img_thumbnail')) {

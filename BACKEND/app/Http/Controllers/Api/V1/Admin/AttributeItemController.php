@@ -7,9 +7,9 @@ use Illuminate\Http\Request;
 use App\Models\AttributeItem;
 use App\Http\Controllers\Controller;
 use Illuminate\Database\QueryException;
-use App\Http\Requests\StoreAttributeItemRequest;
-use App\Http\Requests\UpdateAttributeItemRequest;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use App\Http\Requests\AttributeItem\StoreAttributeItemRequest;
+use App\Http\Requests\AttributeItem\UpdateAttributeItemRequest;
 
 class AttributeItemController extends Controller
 {
