@@ -49,7 +49,7 @@ class CommentsController extends Controller
                     'status' => false,
                     'message' => 'Không có dữ liệu.',
                     'data' => []
-                ], Response::HTTP_NOT_FOUND);
+                ], Response::HTTP_OK);
             }
     
             // Trả về dữ liệu với cấu trúc rõ ràng
