@@ -3,7 +3,7 @@ import { Itags } from "@/common/types/tags";
 import { deleteTag, getTags } from "@/services/api/tags.api";
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Button, Pagination, Popconfirm, Table } from "antd";
+import { Button, Modal, Pagination, Popconfirm, Table } from "antd";
 import { ColumnType } from "antd/es/table";
 import { useState } from "react";
 import { Link } from "react-router-dom";
@@ -12,8 +12,8 @@ import { toast } from "react-toastify";
 type Props = {};
 
 const Tags = (props: Props) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentTagId, setCurrentTagId] = useState<number | null>(null);
+  const [visiable,setVisiable] = useState(false)
   const queryClient = useQueryClient();
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(5);
@@ -24,26 +24,32 @@ const Tags = (props: Props) => {
 
   });
 
+
   const { mutate } = useMutation({
     mutationFn: deleteTag,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tags'] });
-      toast.success('Xoá thành công');
+      toast.success('Xoá thành công',{
+        style:{backgroundColor:'green',color:'#fff'}
+      });
     },
     onError: () => {
       toast.error('Xoá thất bại');
     }
   });
 
-  const showModal = (id: number | null) => {
+  const handleOpen = (id:number) => {
     setCurrentTagId(id);
-    setIsModalOpen(true);
-  };
+    setVisiable(true)
+  }
+  const handleRemove = () => {
+    if(currentTagId) {
+      mutate(currentTagId);
+      setVisiable(false)
+    }
+  }
 
-  const handleClose = () => {
-    setIsModalOpen(false);
-    setCurrentTagId(null);
-  };
+
 
   const columns: ColumnType<Itags>[] = [
     {
@@ -59,14 +65,11 @@ const Tags = (props: Props) => {
       render: (record: Itags) => (
         <div>
           <Link to={`edit/${record?.id}`}>
-            <Button className="mx-2 bg-yellow-400 text-white"><EditOutlined /></Button>
+            <Button className="mx-2 btn-warning"><EditOutlined /></Button>
           </Link>
-          <Popconfirm
-            title="Bạn có muốn xoá?"
-            onConfirm={() => mutate(record?.id)}
-          >
-            <Button className="bg-red-500 text-white"><DeleteOutlined /></Button>
-          </Popconfirm>
+            <Button className="btn-danger"
+            onClick={()=> handleOpen(record?.id)}
+            ><DeleteOutlined /></Button>
         </div>
       ),
     },
@@ -83,7 +86,7 @@ const Tags = (props: Props) => {
         <h1 className="text-3xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2">Tags</h1>
         <div>
           <Link to={`create`}>
-            <Button className="my-2" type="primary" onClick={() => showModal(null)}>
+            <Button className="my-2" type="primary">
               <PlusOutlined /> Thêm tag
             </Button>
           </Link>
@@ -98,7 +101,6 @@ const Tags = (props: Props) => {
             <Pagination
               className="mt-4"
               align="end"
-
               current={currentPage}
               total={dataSource.length}
               pageSize={pageSize}
@@ -106,6 +108,14 @@ const Tags = (props: Props) => {
                 setCurrentPage(page);
               }}
             />
+            <Modal
+            title="Bạn có chắc chắn muốn xoá"
+            open={visiable}
+            onOk={()=> handleRemove()}
+            onCancel={()=> setVisiable(false)}
+            >
+
+            </Modal>
           </>
         )}
       </div>

@@ -1,7 +1,7 @@
 
 export interface Iproduct {
     id: number;
-    type: boolean;
+    type: number;
     brand_id: number;
     category_id: number;
     name: string;
@@ -18,4 +18,5 @@ export interface Iproduct {
     is_show_home: boolean;
     is_trend: boolean;
     is_new: string;
+    attribute_item_id: number[];
 }

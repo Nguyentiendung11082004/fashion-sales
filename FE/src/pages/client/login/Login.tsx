@@ -1,4 +1,4 @@
-import { Logo } from "@/components/icons";
+// import { Logo } from "@/components/icons";
 import BackgroundLogin from "@/components/icons/login/Background";
 import LoginIcon1 from "@/components/icons/login/LoginIcon1";
 import { Link } from "react-router-dom";
@@ -12,11 +12,11 @@ const Login = () => {
         <div>
           <BackgroundLogin />
         </div>
-        <img
+        {/* <img
           src={Logo}
           className="absolute h-10 z-10 lg:ml-[140px] mt-[30px] mx-auto"
           alt="Logo"
-        />
+        /> */}
         <div className="absolute lg:right-[12%] top-[10%]">
           <div className="w-full m-9 p-[50px] lg:w-[450px] shadow-2xl border">
             <h2 className="text-2xl font-semibold text-gray-700 text-center">

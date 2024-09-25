@@ -21,7 +21,7 @@ import {
   faShoppingBag,
   faTable,
 } from "@fortawesome/free-solid-svg-icons";
-import { Logo } from "@/components/icons";
+import { LogoAdmin } from "@/components/icons";
 
 
 const { Sider } = Layout;
@@ -40,7 +40,7 @@ const LayoutAdmin: React.FC = () => {
         <div className="flex items-center justify-center h-[25px] bg-[black]">
           <div className="demo-logo-vertical" />
         </div>
-        <img src={Logo} alt="" className="w-[80px] h-[80px] m-auto mb-4" />
+        <img src={LogoAdmin} alt="" className="w-[180px] h-[100px] m-auto mb-4" />
         <Menu
           theme="dark"
           mode="inline"

@@ -27,7 +27,7 @@ return new class extends Migration
             $table->double('price_sale')->nullable();
             $table->integer("quantity")->nullable();
             $table->text('description');
-            $table->text("short_description");
+            $table->text("description_title");
             $table->boolean("status")->default(true);
             $table->boolean('is_show_home')->default(true);
             $table->boolean('trend')->default(true);

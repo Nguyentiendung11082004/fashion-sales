@@ -6,7 +6,7 @@ import Twitter from "@/assets/icons/twitter.d12eec73.svg";
 import Youtube from "@/assets/icons/youtube.bcae2a7a.svg";
 import Flag from "@/assets/icons/vn.svg";
 import Map from "@/assets/icons/map.svg";
-import Logo from "@/assets/images/logo_website.png";
+import LogoAdmin from "@/assets/images/logo-admin.png";
 import EyeBoxPr from "@/assets/icons/icon11.svg";
 import HeroRight from "@/assets/images/hero-right1.webp";
 import User1 from "@/assets/images/z5513883787421_7d1f10db8a5171d1da722feb02185edd.jpg";
@@ -46,7 +46,7 @@ export {
   Youtube,
   Flag,
   Map,
-  Logo,
+  LogoAdmin,
   EyeBoxPr,
   HeroRight,
   Product2,

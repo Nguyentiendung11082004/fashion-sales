@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React from "react";
 import { Link } from "react-router-dom";
-import { Logo } from "../icons";
+// import { Logo } from "../icons";
 import MapFooter from "../icons/FooterWebsite/MapFooter";
 import EmailFooter from "../icons/FooterWebsite/EmailFooter";
 import PhoneFooter from "../icons/FooterWebsite/PhoneFooter";
@@ -15,11 +15,11 @@ const Footer = (props: Props) => {
     <footer className="bg-[#f6f6f8] mt-5 py-16 ">
       <div className="container grid lg:grid-cols-12 md:grid-cols-2 sm:grid-cols-1 gap-4 ">
         <div className=" mt-5 lg:col-span-3 md:col-span-6 md:order-1 lg:order-1">
-          <img
+          {/* <img
             src={Logo}
             className="w-[150px] h-[150px] mb-10"
             alt="Logo"
-          />
+          /> */}
           <div className="flex mb-5">
             <div className="mr-2">
             <MapFooter/>

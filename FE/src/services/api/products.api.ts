@@ -11,5 +11,15 @@ const handleRequest = async (method: 'get' | 'post' | 'put' | 'delete',url: stri
     }
 }
 
-export const getProducts = () => handleRequest('get',`/products/create`);
-export const createProduct = (product:Iproduct) => handleRequest('post',`/products`, product)
+export const productsIndex = () => handleRequest('get',`/products`); 
+// getall
+export const productShow = (id:number) => handleRequest('get', `/products/${id}`)
+// get id
+export const productCreate = () => handleRequest('get',`/products/create`);
+// get theo attribute
+export const productStore = (product:Iproduct) => handleRequest('post',`/products`, product)
+/// add prouduct
+export const productUpdate = (product:Iproduct,id:number) => handleRequest('put', `/products/${id}`, product)
+// update
+export const productDestroy = (id:number) => handleRequest(`delete`, `products/${id}`)
+// delete

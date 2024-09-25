@@ -96,7 +96,7 @@ const FormTag = () => {
               htmlType='submit'
               type="primary"
               className='mt-2'
-            loading={isLoading}
+              loading={isLoading}
             >
               {isLoading ? 'Loading' : 'Submit'}
             </Button>
