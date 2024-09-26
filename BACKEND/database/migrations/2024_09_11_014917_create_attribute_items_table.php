@@ -15,8 +15,8 @@ return new class extends Migration
         Schema::create('attribute_items', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Attribute::class)->constrained()->onDelete('cascade');
-            $table->string('value',255)->unique();
-            $table->string('slug',255);
+            $table->string('value')->unique();
+            $table->string('slug');
             $table->timestamps();
         });
     }

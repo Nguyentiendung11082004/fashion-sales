@@ -11,7 +11,8 @@ class AttributeItem extends Model
     protected $fillable = [
         "attribute_id",
         "value",
-        'slug'
+        "slug"
+
     ];
 
     public function attribute()
