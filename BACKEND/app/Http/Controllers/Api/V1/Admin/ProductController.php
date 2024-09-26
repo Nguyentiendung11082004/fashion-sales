@@ -12,11 +12,9 @@ use App\Models\Product;
 use App\Models\ProductGallery;
 use App\Models\ProductVariant;
 use App\Models\Tag;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 
@@ -73,6 +71,7 @@ class ProductController extends Controller
         try {
 
             $respone = DB::transaction(function () use ($request) {
+
 
                 $dataProduct = $request->except(["attribute_id", "attribute_item_id", "product_variant"]);
 
@@ -138,7 +137,9 @@ class ProductController extends Controller
         try {
             // dd($id);
             $product = Product::query()->latest('id')->findOrFail($id)->load(["brand", "category", "attributes", "variants", "galleries", "tags"]);
-            // dd($product->toArray());
+            foreach ($product->attributes as  $item) {
+                $item->pivot->attribute_item_ids = json_decode($item->pivot->attribute_item_ids);
+            }
             $category = Category::query()->latest('id')->get();
             // dd($category->toArray());
             $tag = Tag::query()->latest('id')->pluck('name', 'id');
@@ -190,7 +191,7 @@ class ProductController extends Controller
                 // dd($request->input('gallery'));
 
                 if (isset($request->gallery)) {
-                  
+
                     foreach ($request->gallery as $galleryItem) {
                         // dd($galleryItem);
                         // Kiểm tra xem ID có tồn tại và ảnh có mới không
@@ -223,9 +224,8 @@ class ProductController extends Controller
 
                         if (isset($item["image"])) {
 
-                           
+
                             $url = $item["image"];
-                           
                         } else {
                             // Giữ ảnh cũ nếu không upload ảnh mới
                             $url = $variant["variants"][$keys]["image"] ?? null;

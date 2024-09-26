@@ -24,4 +24,5 @@ class ProductVariant extends Model
     public function attributes(){
         return $this->belongsToMany(Attribute::class,"product_variant_has_attributes")->withPivot("attribute_item_id");
     }
+   
 }
