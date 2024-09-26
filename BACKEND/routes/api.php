@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\V1\Admin\BrandController;
 use App\Http\Controllers\Api\V1\Admin\CommentsController;
 use App\Http\Controllers\Api\V1\Admin\ProductController;
 use App\Http\Controllers\Api\V1\Admin\TagController;
+use App\Http\Controllers\Api\V1\Client\HomeProductController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -28,5 +29,6 @@ Route::prefix("v1/")->group(function(){
     Route::resource("brand",BrandController::class);
     Route::resource("tags",TagController::class);
 
+    Route::get('product-home', [HomeProductController::class, "homeproduct"]);
 });
 
