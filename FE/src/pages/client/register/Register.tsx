@@ -1,5 +1,4 @@
 import { Logo } from "@/components/icons";
-import React from "react";
 import { Link } from "react-router-dom";
 
 const Register = () => {
@@ -20,6 +19,7 @@ const Register = () => {
               </div>
             </div>
           </aside>
+
           <main className="flex items-center justify-center px-8 py-8 sm:px-12 lg:col-span-7 lg:px-16 lg:py-12 xl:col-span-6">
             <div className="max-w-xl lg:max-w-3xl">
               <img
@@ -67,7 +67,7 @@ const Register = () => {
                     htmlFor="Email"
                     className="block text-sm font-medium text-gray-700"
                   >
-                   
+
                     Eamil của bạn
                   </label>
                   <input

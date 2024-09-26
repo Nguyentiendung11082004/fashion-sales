@@ -5,7 +5,6 @@
 }
 
 @layer antd {
-    /* Import các CSS của antd tại đây */
     @import "antd/dist/reset.css";
 }
 

@@ -1,21 +1,25 @@
-import { Route, Routes } from "react-router-dom";
-import LayoutWebsite from "../pages/client/layout";
-import HomePage from "../pages/client/home/HomePage";
-import LayoutAdmin from "@/pages/admin/layout";
+import CategoryPage from "@/pages/admin/category/Category";
 import Dashboard from "@/pages/admin/dashboard/Dashboard";
+import LayoutAdmin from "@/pages/admin/layout";
+import ProductPageManager from "@/pages/admin/products/page";
 import About from "@/pages/client/about/About";
-import Cart from "@/pages/client/cart/Cart";
 import Account from "@/pages/client/account/Account";
+import Cart from "@/pages/client/cart/Cart";
 import Checkout from "@/pages/client/checkout/Checkout";
 import Contact from "@/pages/client/contact/Contact";
-import ProductDetail from "@/pages/client/productDetail/ProductDetail";
-import HistoryOrder from "@/pages/client/historyOrder/HistoryOrder";
-import NotFound from "@/pages/client/notfound/NotFound";
-import Login from "@/pages/client/login/Login";
-import Register from "@/pages/client/register/Register";
-import Products from "@/pages/client/products/Products";
 import ForgotPassword from "@/pages/client/forgotpassword/ForgotPassword";
-
+import HistoryOrder from "@/pages/client/historyOrder/HistoryOrder";
+import Login from "@/pages/client/login/Login";
+import NotFound from "@/pages/client/notfound/NotFound";
+import ProductDetail from "@/pages/client/productDetail/ProductDetail";
+import Products from "@/pages/client/products/Products";
+import Register from "@/pages/client/register/Register";
+import { Route, Routes } from "react-router-dom";
+import HomePage from "../pages/client/home/HomePage";
+import LayoutWebsite from "../pages/client/layout";
+import CommentPage from "@/pages/admin/comment/Comment";
+import UserPage from "@/pages/admin/user/User";
+import OrderPage from "@/pages/admin/order/Order";
 const Router = () => {
   return (
     <>
@@ -39,6 +43,12 @@ const Router = () => {
         <Route path="register" element={<Register />} />
         <Route path="/admin" element={<LayoutAdmin />}>
           <Route index element={<Dashboard />} />
+          <Route path="/admin/products" element={<ProductPageManager />} />
+          <Route path="/admin/category" element={<CategoryPage />} />
+          <Route path="/admin/comment" element={<CommentPage />} />
+          <Route path="/admin/user" element={<UserPage />} />
+          <Route path="/admin/order" element={<OrderPage />} />
+          
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
