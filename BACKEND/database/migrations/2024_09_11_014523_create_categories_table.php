@@ -12,13 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('categories', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('parent_id')->nullable()->constrained('categories')->onDelete('cascade');
-            $table->string("name")->unique();
-            $table->string('slug');
-            $table->text('description');
-            $table->string('img_thumbnail');
-            $table->boolean('status')->default(true)->comment('hoạt động|k hoạt động');
+            $table->id(); // Tạo khóa chính 'id'
+            $table->string('slug')->unique(); // Tạo trường slug và đảm bảo duy nhất
+            $table->string('name'); // Tên danh mục
+            $table->text('description')->nullable(); // Mô tả, có thể nullable
+            $table->string('img_thumbnail')->nullable(); // Đường dẫn ảnh thumbnail, nullable
+            $table->foreignId('parent_id')->nullable()->constrained('categories')->onDelete('set null'); // Tham chiếu đến bảng categories
             $table->timestamps(); // Tạo trường created_at và updated_at
         });
     }
