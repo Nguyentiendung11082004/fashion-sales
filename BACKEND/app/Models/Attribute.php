@@ -19,12 +19,8 @@ class Attribute extends Model
     }
     public function productvariants()
     {
-        return $this->belongsToMany(ProductVariant::class, "product_variant_has_attributes")->withPivot('attribute_item_id');
+        return $this->belongsToMany(ProductVariant::class, "product_variant_has_attributes")->withPivot('attribute_item_id','value');
     }
-    // public function filteredAttributeItems()
-    // {
-    //     return $this->belongsToMany(AttributeItem::class, 'product_variant_has_attributes')
-    //                 ->whereColumn('attribute_items.id', 'product_variant_has_attributes.attribute_item_id');  // Lọc theo cột của pivot
-    // }
+    
     
 }

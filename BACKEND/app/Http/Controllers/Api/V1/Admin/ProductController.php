@@ -12,6 +12,7 @@ use App\Models\Product;
 use App\Models\ProductGallery;
 use App\Models\ProductVariant;
 use App\Models\Tag;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -72,7 +73,6 @@ class ProductController extends Controller
 
             $respone = DB::transaction(function () use ($request) {
 
-
                 $dataProduct = $request->except(["attribute_id", "attribute_item_id", "product_variant"]);
 
                 $dataProduct["slug"] = Str::slug($request->input("name"));
@@ -108,8 +108,9 @@ class ProductController extends Controller
                             "sku" => $item["sku"],
 
                         ]);
-                        foreach ($item["attribute_item_id"] as $key => $id) {
-                            $productVariant->attributes()->attach($request->input('attribute_id')[$key], ["attribute_item_id" => $id]);
+                        foreach ($item["attribute_item_id"] as $key => $value) {
+                            // dd($value);
+                            $productVariant->attributes()->attach($request->input('attribute_id')[$key], ["attribute_item_id" => $value["id"], "value" => $value['value']]);
                         }
                     }
                 }
@@ -186,15 +187,10 @@ class ProductController extends Controller
 
                 $dataProduct['slug'] = Str::slug($dataProduct["name"]);
 
-                // dd($request->all());
-                // Xử lý ảnh gallery
-                // dd($request->input('gallery'));
-
                 if (isset($request->gallery)) {
 
                     foreach ($request->gallery as $galleryItem) {
-                        // dd($galleryItem);
-                        // Kiểm tra xem ID có tồn tại và ảnh có mới không
+                       
                         if (isset($galleryItem['id']) && isset($galleryItem['image'])) {
 
                             $gallery = ProductGallery::query()->findOrFail($galleryItem['id']);
@@ -217,23 +213,33 @@ class ProductController extends Controller
                     $product->attributes()->sync($syncData);
 
                     // Lấy biến thể hiện tại của sản phẩm từ database
-                    $variant = $product->load(["variants"])->toArray();
-                    $syncVariant = [];
-                    // dd($request->product_variant);
+                   
+
+                   
+                    // Tải các biến thể hiện có của sản phẩm và chuyển đổi thành mảng
+                    $existingVariants = $product->load(['variants'])->toArray()['variants'];
+
+                    // Tạo một mảng để lưu trữ ID của các biến thể được xử lý từ yêu cầu
+                    $processedVariantIds = [];
+
+                    // Vòng lặp qua các biến thể từ yêu cầu
                     foreach ($request->product_variant as $keys => $item) {
+                        // Đặt lại $syncVariant cho mỗi biến thể
+                        $syncVariant = [];
 
+                        // Xử lý hình ảnh
                         if (isset($item["image"])) {
-
-
+                           
                             $url = $item["image"];
                         } else {
                             // Giữ ảnh cũ nếu không upload ảnh mới
-                            $url = $variant["variants"][$keys]["image"] ?? null;
+                            $url = $existingVariants[$keys]["image"] ?? null;
                         }
 
                         // Kiểm tra xem biến thể có tồn tại trong DB không, nếu có thì update, nếu không thì tạo mới
-                        if (isset($variant["variants"][$keys])) {
-                            ProductVariant::where('id', $variant["variants"][$keys]["id"])
+                        if (isset($existingVariants[$keys])) {
+                            // Cập nhật biến thể hiện có
+                            ProductVariant::where('id', $existingVariants[$keys]["id"])
                                 ->update([
                                     "product_id" => $product->id,
                                     "price_regular" => $item["price_regular"],
@@ -243,9 +249,13 @@ class ProductController extends Controller
                                     "sku" => $item["sku"],
                                 ]);
 
-                            $productVariant = ProductVariant::findOrFail($variant["variants"][$keys]["id"]);
+                            // Lấy biến thể sau khi cập nhật
+                            $productVariant = ProductVariant::findOrFail($existingVariants[$keys]["id"]);
+
+                            // Thêm ID vào mảng đã xử lý
+                            $processedVariantIds[] = $existingVariants[$keys]["id"];
                         } else {
-                            // Nếu không có, tạo mới biến thể
+                            // Tạo mới biến thể
                             $productVariant = ProductVariant::create([
                                 "product_id" => $product->id,
                                 "price_regular" => $item["price_regular"],
@@ -254,24 +264,49 @@ class ProductController extends Controller
                                 "image" => $url,
                                 "sku" => $item["sku"],
                             ]);
+
+                            // Thêm ID vào mảng đã xử lý
+                            $processedVariantIds[] = $productVariant->id;
                         }
 
                         // Xử lý thuộc tính của biến thể
-                        foreach ($item["attribute_item_id"] as $key => $id) {
-                            $syncVariant[$request->input('attribute_id')[$key]] = ["attribute_item_id" => $id];
+                        foreach ($item["attribute_item_id"] as $key => $value) {
+                            // Lấy attribute_id tương ứng
+                            $attributeId = $request->input('attribute_id')[$key] ?? null;
+                            if ($attributeId) {
+                                $syncVariant[$attributeId] = [
+                                    "attribute_item_id" => $value["id"],
+                                    "value" => $value["value"]
+                                ];
+                            }
                         }
+
+                        // Đồng bộ hóa thuộc tính
                         $productVariant->attributes()->sync($syncVariant);
+                    }
+
+                    // Sau khi xử lý tất cả các biến thể từ yêu cầu, xóa các biến thể không được xử lý
+                    if (!empty($existingVariants)) {
+                        // dd($existingVariants);
+                        // Lấy tất cả ID của biến thể hiện có
+                        $existingVariantIds = array_column($existingVariants, 'id');
+                        // dd($existingVariantIds,$processedVariantIds);
+
+                        // Xác định các ID cần xóa
+                        $variantIdsToDelete = array_diff($existingVariantIds, $processedVariantIds);
+                        // dd($variantIdsToDelete);
+
+                        if (!empty($variantIdsToDelete)) {
+                            // Tách các thuộc tính liên kết trước khi xóa
+                            ProductVariant::whereIn('id', $variantIdsToDelete)->each(function ($variant) {
+                                $variant->attributes()->detach(); // Tách các thuộc tính
+                                $variant->delete(); // Xóa biến thể
+                            });
+                        }
                     }
                 }
                 if ($request->input('type') == 0 && $product->type == 1) {
-                    // $variants = ProductVariant::where('product_id', $product->id)->get();
 
-                    // foreach ($variants as $variant) {
-                    //     if ($variant->image) {
-                    //         $relativePath = str_replace("/storage/", 'public/', parse_url($variant->image, PHP_URL_PATH));
-                    //         Storage::delete($relativePath);
-                    //     }
-                    // }
 
                     DB::table('product_variant_has_attributes')->whereIn('product_variant_id', function ($query) use ($product) {
                         $query->select('id')

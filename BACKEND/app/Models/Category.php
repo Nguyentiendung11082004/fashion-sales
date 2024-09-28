@@ -14,11 +14,7 @@ class Category extends Model
         'description',
         'img_thumbnail',
         'parent_id',
-        'status',
-    ];
-
-    protected $casts = [
-        "status" => "boolean"
+     
     ];
 
     // Quan hệ với danh mục con
