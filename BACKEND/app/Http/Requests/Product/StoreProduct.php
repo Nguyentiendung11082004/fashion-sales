@@ -28,12 +28,13 @@ class StoreProduct extends FormRequest
             'tags' => 'required|array|min:1',
             'tags.*' => 'integer|exists:tags,id',
             'gallery' => 'required|array|min:1',
-            'gallery.*' => 'image|mimes:jpeg,png,jpg',
+            'gallery.*' => 'string',
             'type' => 'required|integer|in:0,1', // Type chỉ có 2 loại: 0 (simple) và 1 (variant)
             'sku' => 'required|string|max:255|unique:products,sku',
             'name' => 'required|string|max:255|unique:products,name',
             // img_thumbnail
-            'img_thumbnail' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'img_thumbnail' => 'required|string',
+            // |image|mimes:jpeg,png,jpg,gif,svg|max:2048',
 
             // Nếu type = 0 thì các trường này là bắt buộc, nếu type = 1 thì không bắt buộc
             'price_regular' => 'numeric|min:0|required_if:type,0',
@@ -41,7 +42,7 @@ class StoreProduct extends FormRequest
             'quantity' => 'integer|min:1|required_if:type,0',
 
             'description' => 'required|string',
-            'short_description' => 'required|string',
+            'description_title' => 'required|string',
 
             // Nếu type = 1 thì các thuộc tính, biến thể là bắt buộc
             'attribute_id' => 'required_if:type,1|array|min:1',
@@ -58,7 +59,7 @@ class StoreProduct extends FormRequest
             'product_variant.*.quantity' => 'integer|min:1|required_if:type,1',
             'product_variant.*.price_regular' => 'numeric|min:0|required_if:type,1',
             'product_variant.*.price_sale' => 'numeric|min:0|lt:product_variant.*.price_regular|required_if:type,1',
-            'product_variant.*.image' => 'nullable|image|mimes:jpeg,png,jpg',
+            'product_variant.*.image' => 'nullable|string',
 
 
         ];

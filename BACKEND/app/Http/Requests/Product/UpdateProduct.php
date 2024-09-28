@@ -22,7 +22,7 @@ class UpdateProduct extends FormRequest
     public function rules(): array
     {
         $productId=$this->route('product');
-        // dd($product);
+        // dd($productId);
         return [
             'brand_id' => 'required|integer|exists:brands,id',
             'category_id' => 'required|integer|exists:categories,id',
@@ -30,13 +30,13 @@ class UpdateProduct extends FormRequest
             'tags.*' => 'integer|exists:tags,id',
             'gallery' => 'array|min:1',
             'gallery.*.id' => 'integer|exists:product_galleries,id', // Kiểm tra 'id' tồn tại trong bảng galleries
-            'gallery.*.image' => 'image|mimes:jpeg,png,jpg', // Kiểm tra 'image' là chuỗi
+            'gallery.*.image' => 'string', // Kiểm tra 'image' là chuỗi
 
             'type' => 'required|integer|in:0,1', // Type chỉ có 2 loại: 0 (simple) và 1 (variant)
             'sku' => 'required|string|max:255|unique:products,sku,' . $productId,
             'name' => 'required|string|max:255|unique:products,name,' . $productId,
 
-            'img_thumbnail' => 'image|mimes:jpeg,png,jpg',
+            'img_thumbnail' => 'string',
 
             // Nếu type = 0 thì các trường này là bắt buộc, nếu type = 1 thì không bắt buộc
             'price_regular' => 'numeric|min:0|required_if:type,0',
@@ -44,7 +44,7 @@ class UpdateProduct extends FormRequest
             'quantity' => 'integer|min:1|required_if:type,0',
 
             'description' => 'required|string',
-            'short_description' => 'required|string',
+            'description_title' => 'required|string',
 
             // Nếu type = 1 thì các thuộc tính, biến thể là bắt buộc
             'attribute_id' => 'required_if:type,1|array|min:1',
@@ -61,7 +61,7 @@ class UpdateProduct extends FormRequest
             'product_variant.*.quantity' => 'integer|min:1|required_if:type,1',
             'product_variant.*.price_regular' => 'numeric|min:0|required_if:type,1',
             'product_variant.*.price_sale' => 'numeric|min:0|lt:product_variant.*.price_regular|required_if:type,1',
-            'product_variant.*.image' => 'nullable|image|mimes:jpeg,png,jpg',
+            'product_variant.*.image' => 'nullable|string',
 
 
         ];

@@ -21,7 +21,7 @@ class Product extends Model
         'price_sale',
         "quantity",
         'description',
-        "short_description",
+        "description_title",
         "status",
         'is_show_home',
         'trend',

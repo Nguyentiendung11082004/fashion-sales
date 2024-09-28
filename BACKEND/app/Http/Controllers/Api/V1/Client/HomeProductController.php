@@ -2,86 +2,79 @@
 namespace App\Http\Controllers\Api\V1\Client;
 
 use App\Http\Controllers\Controller;
-use App\Models\Product;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class HomeProductController extends Controller
 {
-    /**
-     * Lấy sản phẩm trend và sản phẩm is_show_home cùng với các thuộc tính.
-     */
     public function homeProduct()
     {
         try {
             // Lấy sản phẩm có trend = true
-            $trendProductsTrend = Product::with([
-                'variants.attributes' => function ($query) {
-                    $query->with('attributeItems');
-                }
-            ])
-            ->where('trend', true)
-            ->select('id', 'name', 'price_regular', 'price_sale', 'img_thumbnail', 'trend')
-            ->get();
+            $products = DB::table('products')
+                ->where('trend', true)
+                ->select('id', 'name', 'price_regular', 'price_sale', 'img_thumbnail')
+                ->get();
 
-            // Lấy sản phẩm có is_show_home = true
-            $homeProductsShow = Product::with([
-                'variants.attributes' => function ($query) {
-                    $query->with('attributeItems');
-                }
-            ])
-            ->where('is_show_home', true)
-            ->select('id', 'name', 'price_regular', 'price_sale', 'img_thumbnail', 'is_show_home')
-            ->get();
+            // Lấy các variants (biến thể) liên quan đến sản phẩm
+            $productIds = $products->pluck('id');
+            $variants = DB::table('product_variants')
+                ->whereIn('product_id', $productIds)
+                ->select('id', 'product_id', 'price_regular', 'price_sale', 'quantity', 'image', 'sku')
+                ->get();
 
-            // Định dạng dữ liệu sản phẩm trend
-            $formattedTrendProducts = $trendProductsTrend->map(function ($product) {
-                $attributes = $product->variants->flatMap(function ($variant) {
-                    return $variant->attributes->map(function ($attribute) {
+            // Lấy các thuộc tính của biến thể qua bảng pivot
+            $variantIds = $variants->pluck('id');
+            $attributes = DB::table('product_variant_has_attributes')
+                ->join('attributes', 'product_variant_has_attributes.attribute_id', '=', 'attributes.id')
+                ->join('attribute_items', 'product_variant_has_attributes.attribute_item_id', '=', 'attribute_items.id')
+                ->whereIn('product_variant_has_attributes.product_variant_id', $variantIds)
+                ->select('product_variant_has_attributes.product_variant_id', 'attributes.name as attribute_name', 'attribute_items.value as attribute_value')
+                ->get();
+
+            // Định dạng dữ liệu sản phẩm và biến thể
+            $formattedProducts = $products->map(function ($product) use ($variants, $attributes) {
+                // Lọc ra các biến thể thuộc về sản phẩm hiện tại
+                $productVariants = $variants->where('product_id', $product->id);
+
+                // Định dạng biến thể cùng với các thuộc tính
+                $formattedVariants = $productVariants->map(function ($variant) use ($attributes) {
+                    // Lọc ra các thuộc tính thuộc về biến thể hiện tại
+                    $variantAttributes = $attributes->where('product_variant_id', $variant->id);
+
+                    // Định dạng các thuộc tính
+                    $formattedAttributes = $variantAttributes->map(function ($attribute) {
                         return [
-                            'attribute_name' => $attribute->name,
-                            'attribute_items' => $attribute->attributeItems->pluck('name')
+                            'attribute_name' => $attribute->attribute_name,
+                            'attribute_value' => $attribute->attribute_value,
                         ];
-                    });
-                });
+                    })->values(); // Loại bỏ các key không mong muốn
+
+                    return [
+                        'variant_id' => $variant->id,
+                        'price_regular' => $variant->price_regular,
+                        'price_sale' => $variant->price_sale,
+                        'quantity' => $variant->quantity,
+                        'image' => $variant->image,
+                        'sku' => $variant->sku,
+                        'attributes' => $formattedAttributes, // Sử dụng values() để loại bỏ key
+                    ];
+                })->values(); // Loại bỏ các key không mong muốn
 
                 return [
                     'id' => $product->id,
                     'name' => $product->name,
                     'price_regular' => $product->price_regular,
-                    'price_sale' => $product->price_sale, // Thêm giá sale
+                    'price_sale' => $product->price_sale,
                     'img_thumbnail' => $product->img_thumbnail,
-                    'trend' => $product->trend,
-                    'attributes' => $attributes
+                    'variants' => $formattedVariants, // Sử dụng values() để loại bỏ key
                 ];
-            });
-
-            // Định dạng dữ liệu sản phẩm is_show_home
-            $formattedHomeProducts = $homeProductsShow->map(function ($product) {
-                $attributes = $product->variants->flatMap(function ($variant) {
-                    return $variant->attributes->map(function ($attribute) {
-                        return [
-                            'attribute_name' => $attribute->name,
-                            'attribute_items' => $attribute->attributeItems->pluck('name')
-                        ];
-                    });
-                });
-
-                return [
-                    'id' => $product->id,
-                    'name' => $product->name,
-                    'price_regular' => $product->price_regular,
-                    'price_sale' => $product->price_sale, // Thêm giá sale
-                    'img_thumbnail' => $product->img_thumbnail,
-                    'is_show_home' => $product->is_show_home,
-                    'attributes' => $attributes
-                ];
-            });
+            })->values(); // Loại bỏ các key không mong muốn
 
             return response()->json([
-                'message' => 'Lấy dữ liệu sản phẩm trend và is_show_home thành công',
-                'trend_products' => $formattedTrendProducts,
-                'show_home_products' => $formattedHomeProducts
+                'message' => 'Lấy dữ liệu sản phẩm thành công',
+                'trend_products' => $formattedProducts,
             ], Response::HTTP_OK);
         } catch (\Exception $ex) {
             return response()->json([
@@ -90,4 +83,7 @@ class HomeProductController extends Controller
         }
     }
 }
+
+
+
 ?>
