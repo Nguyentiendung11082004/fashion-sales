@@ -187,10 +187,18 @@ class ProductController extends Controller
 
                 $dataProduct['slug'] = Str::slug($dataProduct["name"]);
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 58ec1d88cf35d251f8421e5c8a6f8ad4dba53a57
                 if (isset($request->gallery)) {
 
                     foreach ($request->gallery as $galleryItem) {
+<<<<<<< HEAD
                        
+=======
+                        
+>>>>>>> 58ec1d88cf35d251f8421e5c8a6f8ad4dba53a57
                         if (isset($galleryItem['id']) && isset($galleryItem['image'])) {
 
                             $gallery = ProductGallery::query()->findOrFail($galleryItem['id']);
@@ -201,17 +209,16 @@ class ProductController extends Controller
                     }
                 }
 
-                // dd($request->tags);
                 $product->tags()->sync($request->tags);
 
                 if ($request->input('type') == 1) {
-                    // Xử lý thêm hoặc cập nhật các thuộc tính của sản phẩm
                     $syncData = [];
                     foreach ($request->input("attribute_item_id") as $attributeId => $attributeItemId) {
                         $syncData[$attributeId] = ["attribute_item_ids" => json_encode($attributeItemId)];
                     }
                     $product->attributes()->sync($syncData);
 
+<<<<<<< HEAD
                     // Lấy biến thể hiện tại của sản phẩm từ database
                    
 
@@ -223,6 +230,10 @@ class ProductController extends Controller
                     $processedVariantIds = [];
 
                     // Vòng lặp qua các biến thể từ yêu cầu
+=======
+                    $variant = $product->load(["variants"])->toArray();
+                    $syncVariant = [];
+>>>>>>> 58ec1d88cf35d251f8421e5c8a6f8ad4dba53a57
                     foreach ($request->product_variant as $keys => $item) {
                         // Đặt lại $syncVariant cho mỗi biến thể
                         $syncVariant = [];
@@ -232,6 +243,7 @@ class ProductController extends Controller
                            
                             $url = $item["image"];
                         } else {
+<<<<<<< HEAD
                             // Giữ ảnh cũ nếu không upload ảnh mới
                             $url = $existingVariants[$keys]["image"] ?? null;
                         }
@@ -240,6 +252,13 @@ class ProductController extends Controller
                         if (isset($existingVariants[$keys])) {
                             // Cập nhật biến thể hiện có
                             ProductVariant::where('id', $existingVariants[$keys]["id"])
+=======
+                            $url = $variant["variants"][$keys]["image"] ?? null;
+                        }
+
+                        if (isset($variant["variants"][$keys])) {
+                            ProductVariant::where('id', $variant["variants"][$keys]["id"])
+>>>>>>> 58ec1d88cf35d251f8421e5c8a6f8ad4dba53a57
                                 ->update([
                                     "product_id" => $product->id,
                                     "price_regular" => $item["price_regular"],
@@ -255,7 +274,10 @@ class ProductController extends Controller
                             // Thêm ID vào mảng đã xử lý
                             $processedVariantIds[] = $existingVariants[$keys]["id"];
                         } else {
+<<<<<<< HEAD
                             // Tạo mới biến thể
+=======
+>>>>>>> 58ec1d88cf35d251f8421e5c8a6f8ad4dba53a57
                             $productVariant = ProductVariant::create([
                                 "product_id" => $product->id,
                                 "price_regular" => $item["price_regular"],
@@ -269,6 +291,7 @@ class ProductController extends Controller
                             $processedVariantIds[] = $productVariant->id;
                         }
 
+<<<<<<< HEAD
                         // Xử lý thuộc tính của biến thể
                         foreach ($item["attribute_item_id"] as $key => $value) {
                             // Lấy attribute_id tương ứng
@@ -279,6 +302,10 @@ class ProductController extends Controller
                                     "value" => $value["value"]
                                 ];
                             }
+=======
+                        foreach ($item["attribute_item_id"] as $key => $id) {
+                            $syncVariant[$request->input('attribute_id')[$key]] = ["attribute_item_id" => $id];
+>>>>>>> 58ec1d88cf35d251f8421e5c8a6f8ad4dba53a57
                         }
 
                         // Đồng bộ hóa thuộc tính
@@ -347,19 +374,7 @@ class ProductController extends Controller
         try {
             $product = Product::query()->findOrFail($id);
             $respone = DB::transaction(function () use ($product) {
-                // if (!empty($product->img_thumbnail)) {
-                //     $relativePath = str_replace("/storage/", 'public/', parse_url($product->img_thumbnail, PHP_URL_PATH));
-                //     Storage::delete($relativePath);
-                // }
-                // $gallerys = ProductGallery::query()->where('product_id', $product->id)->get()->toArray();
-                // dd($gallerys);
-                // foreach ($gallerys as  $item) {
-                //     if (!empty($item)) {
-                //         // dd($item);
-                //         $relativePath = str_replace("/storage/", 'public/', parse_url($item["image"], PHP_URL_PATH));
-                //         Storage::delete($relativePath);
-                //     }
-                // }
+                
                 ProductGallery::query()->where('product_id', $product->id)->delete();
                 $product->tags()->sync([]);
                 if ($product->type == 1) {

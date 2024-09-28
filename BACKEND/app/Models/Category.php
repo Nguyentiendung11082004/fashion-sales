@@ -14,8 +14,8 @@ class Category extends Model
         'description',
         'img_thumbnail',
         'parent_id',
-     
     ];
+
 
     // Quan hệ với danh mục con
     public function children()

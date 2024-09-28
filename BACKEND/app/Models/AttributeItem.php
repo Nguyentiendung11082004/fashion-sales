@@ -8,16 +8,16 @@ use Illuminate\Database\Eloquent\Model;
 class AttributeItem extends Model
 {
     use HasFactory;
-    protected $fillable=[
+    protected $fillable = [
         "attribute_id",
         "value",
         "slug"
 
     ];
 
-    public function attribute(){
+    public function attribute()
+    {
         return $this->belongsTo(Attribute::class);
-
     }
 
     public function productvariants(){
