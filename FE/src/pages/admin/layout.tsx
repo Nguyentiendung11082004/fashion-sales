@@ -8,7 +8,7 @@ import {
   UploadOutlined,
   UserOutlined,
   VideoCameraOutlined,
-  TagsOutlined 
+  TagsOutlined,
 } from "@ant-design/icons";
 import { Button, Layout, Menu } from "antd";
 import { NavLink, Outlet } from "react-router-dom";
@@ -22,7 +22,6 @@ import {
   faTable,
 } from "@fortawesome/free-solid-svg-icons";
 import { Logo } from "@/components/icons";
-
 
 const { Sider } = Layout;
 
@@ -85,11 +84,30 @@ const LayoutAdmin: React.FC = () => {
               key: "4",
               icon: <UserOutlined />,
               label: (
-                <NavLink className="text-white" to="/admin/user">
-                  Người dùng
+                <NavLink to={""} className="text-white">
+                  Tài khoản
                 </NavLink>
               ),
+              children: [
+                {
+                  key: "10",
+                  label: (
+                    <NavLink to="/admin/clients" className="text-white">
+                      Khách hàng
+                    </NavLink>
+                  ),
+                },
+                {
+                  key: "11",
+                  label: (
+                    <NavLink to="/admin/employees" className="text-white">
+                      Nhân viên
+                    </NavLink>
+                  ),
+                },
+              ],
             },
+
             {
               key: "5",
               icon: <CommentOutlined />,

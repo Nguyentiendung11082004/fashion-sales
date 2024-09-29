@@ -35,7 +35,7 @@ class UserRequest extends FormRequest
                 'password'     => 'required|min:8',
                 'birth_date'   => 'nullable|date',
                 'is_active'    => 'boolean',
-                'gender'       => 'nullable|in:male,female,other',
+                'gender'       => 'nullable|boolean',
                 'role_id'      => 'required|exists:roles,id',
             ];
         }
@@ -67,8 +67,8 @@ class UserRequest extends FormRequest
                 'password'     => 'nullable|min:8',
                 'birth_date'   => 'nullable|date',
                 'is_active'    => 'boolean',
-                'gender'       => 'nullable|in:male,female,other',
-                'role_id'      => 'required|exists:roles,id',
+                'gender'       => 'nullable|boolean',
+                'role_id'      => 'exists:roles,id',
             ];
         }
 

@@ -43,7 +43,7 @@ class ClientController extends Controller
                 'birth_date'  => $request->birth_date,
                 'is_active'   => $request->is_active ?? 1,
                 'gender'      => $request->gender,
-                'role_id'     => $request->role_id,
+            'role_id'      => $request->role_id ?? 1,
                 'avatar'      => $request->avatar
             ];
        
@@ -118,7 +118,7 @@ class ClientController extends Controller
             'is_active'    => $request->is_active ?? $client->is_active,
             'gender'       => $request->gender,
             'role_id'      => $request->role_id,
-            'avatar'       => $request->avatar ?? $client->avatar //Kiểm tra avatar
+            'avatar'       => $request->avatar ?? $client->avatar ,
         ];
 
           // Kiểm tra nếu có file avatar mới

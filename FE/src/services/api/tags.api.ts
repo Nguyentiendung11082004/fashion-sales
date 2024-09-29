@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-catch */
 import { Itags } from "@/common/types/tags";
 import instance from "@/configs/axios";
 

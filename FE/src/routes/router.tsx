@@ -18,12 +18,14 @@ import { Route, Routes } from "react-router-dom";
 import HomePage from "../pages/client/home/HomePage";
 import LayoutWebsite from "../pages/client/layout";
 import CommentPage from "@/pages/admin/comment/Comment";
-import UserPage from "@/pages/admin/user/User";
 import OrderPage from "@/pages/admin/order/Order";
 import Tags from "@/pages/admin/tags/Tags";
 import FormTag from "@/pages/admin/tags/_components/TagForm";
 import ProductForm from "@/pages/admin/products/_components/ProductForm";
-
+import ClientPage from "@/pages/admin/account/client/Client";
+import EmployeePage from "@/pages/admin/account/employee/Employee";
+import FormClient from "@/pages/admin/account/client/components/FormClient";
+import FormEmployee from "@/pages/admin/account/employee/components/FormEmployee";
 
 const Router = () => {
   return (
@@ -36,7 +38,10 @@ const Router = () => {
           <Route path="about" element={<About />} />
           <Route path="cart" element={<Cart />} />
           <Route path="account" element={<Account />} />
-          <Route path="account/:id/forgotpassword" element={<ForgotPassword />} />
+          <Route
+            path="account/:id/forgotpassword"
+            element={<ForgotPassword />}
+          />
           <Route path="checkout" element={<Checkout />} />
           <Route path="contact" element={<Contact />} />
           <Route path="history-order" element={<HistoryOrder />} />
@@ -50,7 +55,13 @@ const Router = () => {
           <Route path="products/edit/:id" element={<ProductForm />} />
           <Route path="category" element={<CategoryPage />} />
           <Route path="comment" element={<CommentPage />} />
-          <Route path="user" element={<UserPage />} />
+          <Route path="clients" element={<ClientPage />} />
+          <Route path="clients/create" element={<FormClient />} />
+          <Route path="clients/edit/:id" element={<FormClient />} />
+          <Route path="employees" element={<EmployeePage />} />
+          <Route path="employees/create" element={<FormEmployee />} />
+          <Route path="employees/edit/:id" element={<FormEmployee />} />
+
           <Route path="order" element={<OrderPage />} />
           <Route path="tags" element={<Tags />} />
           <Route path="tags/create" element={<FormTag />} />
