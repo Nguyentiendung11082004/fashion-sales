@@ -48,7 +48,7 @@ const ProductPageManager = () => {
 
   const column: ColumnType<Iproduct>[] = [
     {
-      title: 'Stt',
+      title: 'STT',
       render: (_, record: any, index: number) => (<div>{(index + 1) + pageSize * (currentPage - 1)}</div>),
     },
     {
@@ -56,19 +56,18 @@ const ProductPageManager = () => {
       dataIndex: 'type',
       render: (text: any, record: Iproduct, index: number) => {
         return <p>
-          {record.type === 0 ? 'Sản phẩm biến thể' : 'Sản phẩm đơn'}
+          {record.type == 0 ? 'Sản phẩm đơn' : 'Sản phẩm biến thể'}
         </p>
-
       }
     },
-    {
-      title: 'brand_id',
-      dataIndex: 'brand_id',
-    },
-    {
-      title: 'category_id',
-      dataIndex: 'category_id',
-    },
+    // {
+    //   title: 'brand_id',
+    //   dataIndex: 'brand_id',
+    // },
+    // {
+    //   title: 'category_id',
+    //   dataIndex: 'category_id',
+    // },
     {
       title: 'name',
       dataIndex: 'name',
@@ -88,22 +87,22 @@ const ProductPageManager = () => {
       title: 'slug',
       dataIndex: 'slug',
     },
-    {
-      title: 'price_regular',
-      dataIndex: 'price_regular',
-    },
-    {
-      title: 'price_sale',
-      dataIndex: 'price_sale',
-    },
-    {
-      title: 'description',
-      dataIndex: 'description',
-    },
-    {
-      title: 'description_title',
-      dataIndex: 'description_title',
-    },
+    // {
+    //   title: 'price_regular',
+    //   dataIndex: 'price_regular',
+    // },
+    // {
+    //   title: 'price_sale',
+    //   dataIndex: 'price_sale',
+    // },
+    // {
+    //   title: 'description',
+    //   dataIndex: 'description',
+    // },
+    // {
+    //   title: 'description_title',
+    //   dataIndex: 'description_title',
+    // },
     {
       title: 'status',
       dataIndex: 'status',
@@ -125,28 +124,30 @@ const ProductPageManager = () => {
         color={is_trend ? 'green' : 'red'}
       >{is_trend == true ? 'Hot trend' : 'Lỗi thời'}</Tag>
     },
-    {
-      title: 'is_new',
-      dataIndex: 'is_new',
-      render: (is_new) => <Tag
-        color={is_new ? 'green' : 'red'}
-      >{is_new ? 'Sản phẩm mới' : 'Sản phẩm cũ'}</Tag>
-    },
+    // {
+    //   title: 'is_new',
+    //   dataIndex: 'is_new',
+    //   render: (is_new) => <Tag
+    //     color={is_new ? 'green' : 'red'}
+    //   >{is_new ? 'Sản phẩm mới' : 'Sản phẩm cũ'}</Tag>
+    // },
     {
       title: 'Thao tác',
       fixed: 'right',
       render: (record: Iproduct) => {
         return <div>
-          <Button className='btn-info'><EyeOutlined className='pl-2' /> </Button>
-          <Link to={`edit/${record?.id}`}>
-            <Button className='btn-warning mx-2'><EditOutlined className='pl-2' /> </Button>
+          <Link to={`${record?.id}`}>
+            <Button className='btn-info' style={{ width: '46px' }}><EyeOutlined className='pl-2' /> </Button>
           </Link>
-          <Button onClick={() => handleOpen(record?.id)} className='btn-danger' ><DeleteOutlined className='pl-2' /> </Button>
-
+          <Link to={`edit/${record?.id}`}>
+            <Button className='btn-warning mx-2' style={{ width: '46px' }}><EditOutlined className='pl-2' /> </Button>
+          </Link>
+          <Button onClick={() => handleOpen(record?.id)} className='btn-danger' style={{ width: '46px' }} ><DeleteOutlined className='pl-2' /> </Button>
         </div>
       }
     },
   ]
+
 
   const dataSource = data?.data?.map((product: Iproduct) => (
     {
@@ -154,6 +155,7 @@ const ProductPageManager = () => {
       ...product
     }
   )) || [];
+  console.log("dataSource",dataSource)
 
 
 

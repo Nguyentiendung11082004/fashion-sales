@@ -8,7 +8,8 @@ import {
   UploadOutlined,
   UserOutlined,
   VideoCameraOutlined,
-  TagsOutlined 
+  TagsOutlined,
+  OrderedListOutlined
 } from "@ant-design/icons";
 import { Button, Layout, Menu } from "antd";
 import { NavLink, Outlet } from "react-router-dom";
@@ -76,10 +77,38 @@ const LayoutAdmin: React.FC = () => {
               key: "3",
               icon: <UploadOutlined />,
               label: (
-                <NavLink className="text-white" to="/admin/category">
+                <NavLink className="text-white" to="/admin/categories">
                   Danh mục
                 </NavLink>
               ),
+
+            },
+            {
+              key: "8",
+              icon: <OrderedListOutlined />,
+              label: (
+                <NavLink className="text-white" to="/admin">
+                  Biến thể
+                </NavLink>
+              ),
+              children: [
+                {
+                  key: "10",
+                  label: (
+                    <NavLink className="text-white" to="/admin/attributes">
+                      Thuộc tính
+                    </NavLink>
+                  ),
+                },
+                {
+                  key: "11",
+                  label: (
+                    <NavLink className="text-white" to="/admin/attribute-values">
+                      Giá trị thuộc tính
+                    </NavLink>
+                  ),
+                },
+              ],
             },
             {
               key: "4",
@@ -116,7 +145,7 @@ const LayoutAdmin: React.FC = () => {
                   Tags
                 </NavLink>
               ),
-            },
+            }
           ]}
         />
       </Sider>

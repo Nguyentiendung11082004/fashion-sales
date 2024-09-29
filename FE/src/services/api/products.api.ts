@@ -19,7 +19,7 @@ export const productCreate = () => handleRequest('get',`/products/create`);
 // get theo attribute
 export const productStore = (product:Iproduct) => handleRequest('post',`/products`, product)
 /// add prouduct
-export const productUpdate = (product:Iproduct,id:number) => handleRequest('put', `/products/${id}`, product)
+export const productUpdate = (id:number,product:Iproduct) => handleRequest('put', `/products/${id}`, product)
 // update
 export const productDestroy = (id:number) => handleRequest(`delete`, `products/${id}`)
 // delete

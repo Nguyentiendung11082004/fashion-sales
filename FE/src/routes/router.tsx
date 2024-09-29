@@ -23,6 +23,10 @@ import OrderPage from "@/pages/admin/order/Order";
 import Tags from "@/pages/admin/tags/Tags";
 import FormTag from "@/pages/admin/tags/_components/TagForm";
 import ProductForm from "@/pages/admin/products/_components/ProductForm";
+import CategoryForm from "@/pages/admin/category/_components/CategoryForm";
+import ProductDetailAdmin from "@/pages/admin/products/_components/ProductDetail";
+import AttributeItem from "@/pages/admin/attribute/attribute-item/page";
+import AttributeItemValues from "@/pages/admin/attribute/attribute-item-values/page";
 
 
 const Router = () => {
@@ -46,9 +50,14 @@ const Router = () => {
         <Route path="/admin" element={<LayoutAdmin />}>
           <Route index element={<Dashboard />} />
           <Route path="products" element={<ProductPageManager />} />
+          <Route path="products/:id" element={<ProductDetailAdmin />} />
           <Route path="products/create" element={<ProductForm />} />
           <Route path="products/edit/:id" element={<ProductForm />} />
-          <Route path="category" element={<CategoryPage />} />
+          <Route path="categories" element={<CategoryPage />} />
+          <Route path="categories/create" element={<CategoryForm />} />
+          <Route path="categories/edit/:id" element={<CategoryForm />} />
+          <Route path="attributes" element={<AttributeItem />} />
+          <Route path="attribute-values" element={<AttributeItemValues />} />
           <Route path="comment" element={<CommentPage />} />
           <Route path="user" element={<UserPage />} />
           <Route path="order" element={<OrderPage />} />

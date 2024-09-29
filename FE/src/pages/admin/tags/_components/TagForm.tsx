@@ -1,11 +1,10 @@
-
 import { Itags } from '@/common/types/tags';
 import instance from '@/configs/axios';
 import { createTag, updateTag } from '@/services/api/tags.api';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button, Form, Input, Skeleton } from 'antd';
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 const FormTag = () => {
@@ -14,8 +13,9 @@ const FormTag = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = useState(false);
-
-  const [error, setError] = useState(null)
+  const [error, setError] = useState(null);
+  const location = useLocation();
+  const currentTagsPage = location.state?.currentTagsPage || 1;
   const { data, refetch, isFetching } = useQuery({
     queryKey: ['tag', id],
     queryFn: async () => {
@@ -23,13 +23,7 @@ const FormTag = () => {
       const response = await instance.get(`/tags/${id}`);
       return response.data.data;
     },
-    enabled: !!id,
   });
-  useEffect(() => {
-    if (data) {
-      form.setFieldsValue(data);
-    }
-  }, [data, form]);
 
   const createTagMutation = useMutation({
     mutationFn: createTag,
@@ -40,14 +34,16 @@ const FormTag = () => {
       queryClient.invalidateQueries({ queryKey: ['tags'] });
       toast.success('Thêm thành công');
       form.resetFields();
+      queryClient.setQueryData(['currentTagsPage'], 1);
       navigate('/admin/tags');
     },
     onError: (error: any) => {
-      setError(error.response.data.message)
+      setError(error.response.data.message);
       toast.error('Thêm thất bại');
-      setIsLoading(false)
+      setIsLoading(false);
     },
   });
+
   const updateTagMutation = useMutation({
     mutationFn: (tag: Itags) => updateTag(Number(id), tag),
     onMutate: () => {
@@ -58,6 +54,7 @@ const FormTag = () => {
       refetch();
       setIsLoading(false);
       toast.success('Sửa thành công');
+      queryClient.setQueryData(['currentTagsPage'], currentTagsPage); 
       navigate('/admin/tags');
     },
     onError: () => {
@@ -65,6 +62,7 @@ const FormTag = () => {
       toast.error('Sửa thất bại');
     },
   });
+
 
   const onFinish = (value: any) => {
     if (id) {
@@ -74,7 +72,6 @@ const FormTag = () => {
     }
   };
 
-
   return (
     <div className="p-6 min-h-screen">
       <div className="flex items-center justify-between mb-6">
@@ -82,16 +79,13 @@ const FormTag = () => {
           {id ? 'Sửa Tags' : 'Thêm Tags'}
         </h1>
       </div>
-
       {
         isFetching ? (<Skeleton />) : (
           <Form form={form} layout='vertical' onFinish={onFinish} initialValues={data}>
             <Form.Item name="name" label="Tên tag">
               <Input placeholder='Tên tag' />
             </Form.Item>
-            {
-              error ? (<div className=' text-red-600'>{error}</div>) : ''
-            }
+            {error && <div className='text-red-600'>{error}</div>}
             <Button
               htmlType='submit'
               type="primary"
@@ -100,7 +94,7 @@ const FormTag = () => {
             >
               {isLoading ? 'Loading' : 'Submit'}
             </Button>
-          </Form> 
+          </Form>
         )
       }
     </div>

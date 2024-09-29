@@ -11,7 +11,7 @@ import instance from "@/configs/axios";
     };
 
 export const getTags = () => handleRequest('get', `/tags`);
-export const getTag = (id: number | null) => handleRequest('get', `/tags/${id}`);
+export const getTag = (id:string | undefined | number) => handleRequest('get', `/tags/${id}`);
 export const createTag = (tag: Itags) => handleRequest('post', `/tags`, tag);
 export const updateTag = (id: number, tag: Itags) => handleRequest('put', `/tags/${id}`, tag);
 export const deleteTag = (id: number) => handleRequest('delete', `/tags/${id}`);

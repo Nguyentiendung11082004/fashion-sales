@@ -16,7 +16,6 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 
@@ -77,7 +76,6 @@ class ProductController extends Controller
                 $dataProduct = $request->except(["attribute_id", "attribute_item_id", "product_variant"]);
 
                 $dataProduct["slug"] = Str::slug($request->input("name"));
-                // dd($dataProduct);
 
                 $product = Product::query()->create($dataProduct);
                 foreach ($request->gallery as  $gallery) {
@@ -186,15 +184,11 @@ class ProductController extends Controller
 
                 $dataProduct['slug'] = Str::slug($dataProduct["name"]);
 
-                // dd($request->all());
-                // Xử lý ảnh gallery
-                // dd($request->input('gallery'));
 
                 if (isset($request->gallery)) {
                   
                     foreach ($request->gallery as $galleryItem) {
-                        // dd($galleryItem);
-                        // Kiểm tra xem ID có tồn tại và ảnh có mới không
+                        
                         if (isset($galleryItem['id']) && isset($galleryItem['image'])) {
 
                             $gallery = ProductGallery::query()->findOrFail($galleryItem['id']);
@@ -205,21 +199,17 @@ class ProductController extends Controller
                     }
                 }
 
-                // dd($request->tags);
                 $product->tags()->sync($request->tags);
 
                 if ($request->input('type') == 1) {
-                    // Xử lý thêm hoặc cập nhật các thuộc tính của sản phẩm
                     $syncData = [];
                     foreach ($request->input("attribute_item_id") as $attributeId => $attributeItemId) {
                         $syncData[$attributeId] = ["attribute_item_ids" => json_encode($attributeItemId)];
                     }
                     $product->attributes()->sync($syncData);
 
-                    // Lấy biến thể hiện tại của sản phẩm từ database
                     $variant = $product->load(["variants"])->toArray();
                     $syncVariant = [];
-                    // dd($request->product_variant);
                     foreach ($request->product_variant as $keys => $item) {
 
                         if (isset($item["image"])) {
@@ -228,11 +218,9 @@ class ProductController extends Controller
                             $url = $item["image"];
                            
                         } else {
-                            // Giữ ảnh cũ nếu không upload ảnh mới
                             $url = $variant["variants"][$keys]["image"] ?? null;
                         }
 
-                        // Kiểm tra xem biến thể có tồn tại trong DB không, nếu có thì update, nếu không thì tạo mới
                         if (isset($variant["variants"][$keys])) {
                             ProductVariant::where('id', $variant["variants"][$keys]["id"])
                                 ->update([
@@ -246,7 +234,6 @@ class ProductController extends Controller
 
                             $productVariant = ProductVariant::findOrFail($variant["variants"][$keys]["id"]);
                         } else {
-                            // Nếu không có, tạo mới biến thể
                             $productVariant = ProductVariant::create([
                                 "product_id" => $product->id,
                                 "price_regular" => $item["price_regular"],
@@ -257,7 +244,6 @@ class ProductController extends Controller
                             ]);
                         }
 
-                        // Xử lý thuộc tính của biến thể
                         foreach ($item["attribute_item_id"] as $key => $id) {
                             $syncVariant[$request->input('attribute_id')[$key]] = ["attribute_item_id" => $id];
                         }
@@ -313,19 +299,7 @@ class ProductController extends Controller
         try {
             $product = Product::query()->findOrFail($id);
             $respone = DB::transaction(function () use ($product) {
-                // if (!empty($product->img_thumbnail)) {
-                //     $relativePath = str_replace("/storage/", 'public/', parse_url($product->img_thumbnail, PHP_URL_PATH));
-                //     Storage::delete($relativePath);
-                // }
-                // $gallerys = ProductGallery::query()->where('product_id', $product->id)->get()->toArray();
-                // dd($gallerys);
-                // foreach ($gallerys as  $item) {
-                //     if (!empty($item)) {
-                //         // dd($item);
-                //         $relativePath = str_replace("/storage/", 'public/', parse_url($item["image"], PHP_URL_PATH));
-                //         Storage::delete($relativePath);
-                //     }
-                // }
+                
                 ProductGallery::query()->where('product_id', $product->id)->delete();
                 $product->tags()->sync([]);
                 if ($product->type == 1) {
