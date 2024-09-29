@@ -21,7 +21,7 @@ import {
   faShoppingBag,
   faTable,
 } from "@fortawesome/free-solid-svg-icons";
-import { Logo } from "@/components/icons";
+import { LogoAdmin } from "@/components/icons";
 
 
 const { Sider } = Layout;
@@ -40,7 +40,10 @@ const LayoutAdmin: React.FC = () => {
         <div className="flex items-center justify-center h-[25px] bg-[black]">
           <div className="demo-logo-vertical" />
         </div>
-        <img src={Logo} alt="" className="w-[80px] h-[80px] m-auto mb-4" />
+        <div className="w-[150px] my-[-20px] m-auto">
+          <img src={LogoAdmin} alt="" className="" />
+        </div>
+        
         <Menu
           theme="dark"
           mode="inline"
@@ -94,7 +97,7 @@ const LayoutAdmin: React.FC = () => {
               key: "5",
               icon: <CommentOutlined />,
               label: (
-                <NavLink className="text-white" to="/admin/comment">
+                <NavLink className="text-white" to="/admin/comments">
                   Bình luận
                 </NavLink>
               ),
@@ -114,6 +117,15 @@ const LayoutAdmin: React.FC = () => {
               label: (
                 <NavLink className="text-white" to="/admin/tags">
                   Tags
+                </NavLink>
+              ),
+            },
+            {
+              key: "8",
+              icon: <TagsOutlined />,
+              label: (
+                <NavLink className="text-white" to="/admin/brands">
+                  Brands
                 </NavLink>
               ),
             },

@@ -5,7 +5,7 @@ import { createProduct, getProducts } from '@/services/api/products.api'
 import { UploadOutlined } from '@ant-design/icons'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { Button, Form, Input, InputNumber, Radio, RadioChangeEvent, Select, Upload, message } from 'antd'
-import { UploadFile, UploadProps } from 'antd/es/upload'
+import { UploadFile, UploadProps} from 'antd/es/upload'
 import { useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 

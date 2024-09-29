@@ -23,6 +23,8 @@ const Tags = (props: Props) => {
     queryFn: getTags,
 
   });
+  console.log(data);
+  
 
   const { mutate } = useMutation({
     mutationFn: deleteTag,
@@ -76,6 +78,8 @@ const Tags = (props: Props) => {
     key: item?.id,
     ...item,
   })) || [];
+  console.log(dataSource);
+  
   if (isError) return <div>{isError}</div>;
   return (
     <div className="p-6 min-h-screen">

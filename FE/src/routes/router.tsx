@@ -17,12 +17,14 @@ import Register from "@/pages/client/register/Register";
 import { Route, Routes } from "react-router-dom";
 import HomePage from "../pages/client/home/HomePage";
 import LayoutWebsite from "../pages/client/layout";
-import CommentPage from "@/pages/admin/comment/Comment";
+import CommentPage from "@/pages/admin/comments/Comments";
 import UserPage from "@/pages/admin/user/User";
 import OrderPage from "@/pages/admin/order/Order";
 import Tags from "@/pages/admin/tags/Tags";
 import FormTag from "@/pages/admin/tags/_components/TagForm";
 import ProductForm from "@/pages/admin/products/_components/ProductForm";
+import BrandForm from "@/pages/admin/brands/_components/BrandForm";
+import Brands from "@/pages/admin/brands/Brands";
 
 
 const Router = () => {
@@ -49,7 +51,10 @@ const Router = () => {
           <Route path="products/create" element={<ProductForm />} />
           <Route path="products/edit/:id" element={<ProductForm />} />
           <Route path="category" element={<CategoryPage />} />
-          <Route path="comment" element={<CommentPage />} />
+          <Route path="comments" element={<CommentPage />} />
+          <Route path="brands" element={<Brands />} />
+          <Route path="brands/create" element={<BrandForm />} />
+          <Route path="brands/edit/:id" element={<BrandForm />} />
           <Route path="user" element={<UserPage />} />
           <Route path="order" element={<OrderPage />} />
           <Route path="tags" element={<Tags />} />

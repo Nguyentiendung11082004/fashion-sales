@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React from "react";
 import { Link } from "react-router-dom";
-import { Flag, Logo } from "../icons";
+import { Flag, LogoClient } from "../icons";
 import PhoneHome from "../icons/headerWebsite/PhoneHome";
 import EmailHome from "../icons/headerWebsite/EmailHome";
 import MapHome from "../icons/headerWebsite/MapHome";
@@ -58,9 +58,9 @@ const Header = (props: Props) => {
           </div>
         </section>
         <div className="w-[100%] bg-[#fff] sticky top-0 left-0 right-0  z-20 ">
-          <header className="container bg-[#fff] h-[150px] grid grid-cols-12 gap-4 ">
+          <header className="lg:mx-10 bg-[#fff] h-[70px] grid grid-cols-12 gap-4 ">
             <div className="lg:col-span-2 col-span-4 flex justify-center items-center md:items-center md:justify-center lg:justify-start  order-2 lg:order-1">
-              <img src={Logo} className="w-[150px] h-[150px]" alt="Logo" />
+                <img src={LogoClient} alt="" className="h-[40px]" />
             </div>
             <div className="col-span-4 flex items-center justify-start md:items-center md:justify-start lg:hidden  order-1  ">
               <MenuHome />

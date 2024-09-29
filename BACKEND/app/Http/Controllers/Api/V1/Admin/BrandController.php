@@ -27,16 +27,16 @@ class BrandController extends Controller
         try {
             // Lấy tất cả các thương hiệu và sắp xếp theo ID mới nhất
             $brands = Brand::query()->latest('id')->get();
-        
+
             // Kiểm tra dữ liệu
             if ($brands->isEmpty()) {
                 return response()->json([
                     'status' => false,
                     'message' => 'Không có dữ liệu.',
                     'data' => []
-                ], Response::HTTP_NOT_FOUND);
+                ], Response::HTTP_OK);
             }
-        
+
             // Trả về dữ liệu với cấu trúc rõ ràng
             return response()->json([
                 'status' => true,
@@ -48,13 +48,13 @@ class BrandController extends Controller
             ], Response::HTTP_OK);
         } catch (\Exception $ex) {
             Log::error('API/V1/Admin/BrandController@index: ', [$ex->getMessage()]);
-        
+
             return response()->json([
                 'status' => false,
                 'message' => 'Đã có lỗi nghiêm trọng xảy ra. Vui lòng thử lại sau.'
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-        
+
     }
 
 
@@ -77,7 +77,7 @@ class BrandController extends Controller
                 'success' => true,
                 'message' => 'Brand đã được thêm thành công'
             ], 201);
-    
+
         } catch (QueryException $e) {
             return response()->json([
                 'success' => false,
@@ -86,7 +86,7 @@ class BrandController extends Controller
             ], 500);
         }
     }
-    
+
 
     /**
      * Display the specified resource.
@@ -106,10 +106,10 @@ class BrandController extends Controller
         try {
             // Lấy tất cả các tham số trừ trường 'image' từ request
             $data = $request->except('image');
-            
+
             // Tìm brand theo id
             $brand = Brand::findOrFail($id);
-    
+
             // Xử lý ảnh: nếu có ảnh mới, sử dụng giá trị ảnh từ request, nếu không giữ nguyên ảnh cũ
             if ($request->filled('image')) {
                 // Lấy chuỗi từ trường 'image' trong request
@@ -118,23 +118,23 @@ class BrandController extends Controller
                 // Nếu không có ảnh mới, giữ nguyên giá trị ảnh cũ
                 $data['image'] = $brand->image;
             }
-    
+
             // Nếu tên thay đổi, tạo slug mới
-            if ($data['name'] !== $brand->name) { 
+            if ($data['name'] !== $brand->name) {
                 $data['slug'] = $this->generateUniqueSlug($data['name'], $id);
-            } else {    
+            } else {
                 $data['slug'] = $brand->slug;
-            } 
-    
+            }
+
             // Cập nhật bản ghi Brand
             $brand->update($data);
-    
+
             return response()->json([
                 'data' => new BrandResource($brand),
                 'success' => true,
                 'message' => 'Brand đã được sửa thành công'
             ], 200);
-            
+
         } catch (ModelNotFoundException $e) {
             // Xử lý lỗi nếu không tìm thấy brand
             return response()->json([
@@ -149,21 +149,21 @@ class BrandController extends Controller
             ], 500);
         }
     }
-    
+
 
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(string $id)
     {
-       
+
         $brand = Brand::query()->findOrFail($id);
-     
-    
-      
+
+
+
         $brand->delete();
-    
-       
+
+
         return response()->json([
             'status' => true,
             'message' => "Xóa brand và ảnh thành công."

@@ -1,4 +1,4 @@
-import { Logo } from "@/components/icons";
+import { LogoClient } from "@/components/icons";
 import React from "react";
 import { Link } from "react-router-dom";
 
@@ -7,7 +7,7 @@ const ForgotPassword = () => {
     <>
       <div>
         <img
-          src={Logo}
+          src={LogoClient}
           className="h-10 lg:ml-[140px] mt-[30px] mx-auto"
           alt="Logo"
         />
