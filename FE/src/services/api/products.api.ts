@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-catch */
 import { Iproduct } from "@/common/types/products";
 import instance from "@/configs/axios";
 
