@@ -17,7 +17,7 @@ import Register from "@/pages/client/register/Register";
 import { Route, Routes } from "react-router-dom";
 import HomePage from "../pages/client/home/HomePage";
 import LayoutWebsite from "../pages/client/layout";
-import CommentPage from "@/pages/admin/comment/Comment";
+import CommentPage from "@/pages/admin/comments/Comments";
 import UserPage from "@/pages/admin/user/User";
 import OrderPage from "@/pages/admin/order/Order";
 const Router = () => {

@@ -1,4 +1,4 @@
-// import { Logo } from "@/components/icons";
+import { LogoClient } from "@/components/icons";
 import React from "react";
 import { Link } from "react-router-dom";
 
@@ -6,11 +6,11 @@ const ForgotPassword = () => {
   return (
     <>
       <div>
-        {/* <img
-          src={Logo}
+        <img
+          src={LogoClient}
           className="h-10 lg:ml-[140px] mt-[30px] mx-auto"
           alt="Logo"
-        /> */}
+        /> 
         <section
           className="bg-[url('../src/assets/images/loginpage.svg')] 
              hidden lg:block  bg-no-repeat bg-cover bg-center text-white  lg:min-h-[620px] md:min-h-[420px]   lg:items-center lg:py-0 mt-16"
