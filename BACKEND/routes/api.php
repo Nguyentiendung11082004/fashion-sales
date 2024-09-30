@@ -40,7 +40,7 @@ Route::prefix("v1/")->group(function () {
     Route::apiResource('attributeItem', AttributeItemController::class);
     Route::apiResource('category', CategoryController::class);
 
-    Route::get('product-home', [HomeProductController::class, "homeproduct"]);
+    Route::get('product-home', [HomeProductController::class, "getHomeProducts"]);
     //  để tạm vậy rồi tôi sẽ chia các route admin và client ra sau.
     // client
     Route::get('product-detail/{product_id}', [ProductDetailController::class, "productdetail"]);

@@ -1,89 +1,67 @@
 <?php
+
 namespace App\Http\Controllers\Api\V1\Client;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\DB;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
+use App\Http\Helper\Product\GetUniqueAttribute;
 
 class HomeProductController extends Controller
 {
-    public function homeProduct()
+    //
+    public function getHomeProducts()
     {
         try {
-            // Lấy sản phẩm có trend = true
-            $products = DB::table('products')
-                ->where('trend', true)
-                ->select('id', 'name', 'price_regular', 'price_sale', 'img_thumbnail')
-                ->get();
+            // Lấy sản phẩm xu hướng (trend) và sản phẩm hiển thị trên trang chủ (is_show_home)
+            $trendProducts = Product::query()->with([
+                // "brand",
+                // "category",
+                // "galleries",
+                // "tags",
+                // "comments",
+                "variants.attributes"
+            ])->where('trend', true)->get();
 
-            // Lấy các variants (biến thể) liên quan đến sản phẩm
-            $productIds = $products->pluck('id');
-            $variants = DB::table('product_variants')
-                ->whereIn('product_id', $productIds)
-                ->select('id', 'product_id', 'price_regular', 'price_sale', 'quantity', 'image', 'sku')
-                ->get();
+            $homeShowProducts = Product::query()->with([
+                // "brand",
+                // "category",
+                // "galleries",
+                // "tags",
+                // "comments",
+                "variants.attributes"
+            ])->where('is_show_home', true)->get();
 
-            // Lấy các thuộc tính của biến thể qua bảng pivot
-            $variantIds = $variants->pluck('id');
-            $attributes = DB::table('product_variant_has_attributes')
-                ->join('attributes', 'product_variant_has_attributes.attribute_id', '=', 'attributes.id')
-                ->join('attribute_items', 'product_variant_has_attributes.attribute_item_id', '=', 'attribute_items.id')
-                ->whereIn('product_variant_has_attributes.product_variant_id', $variantIds)
-                ->select('product_variant_has_attributes.product_variant_id', 'attributes.name as attribute_name', 'attribute_items.value as attribute_value')
-                ->get();
+            // Khởi tạo đối tượng để lấy các thuộc tính độc nhất
+            $getUniqueAttributes = new GetUniqueAttribute();
 
-            // Định dạng dữ liệu sản phẩm và biến thể
-            $formattedProducts = $products->map(function ($product) use ($variants, $attributes) {
-                // Lọc ra các biến thể thuộc về sản phẩm hiện tại
-                $productVariants = $variants->where('product_id', $product->id);
+            // Thêm các thuộc tính độc nhất cho sản phẩm xu hướng
+            foreach ($trendProducts as $key => $product) {
+                $trendProducts[$key]['unique_attributes'] = $getUniqueAttributes->getUniqueAttributes($product->variants->toArray());
+            }
 
-                // Định dạng biến thể cùng với các thuộc tính
-                $formattedVariants = $productVariants->map(function ($variant) use ($attributes) {
-                    // Lọc ra các thuộc tính thuộc về biến thể hiện tại
-                    $variantAttributes = $attributes->where('product_variant_id', $variant->id);
+            // Thêm các thuộc tính độc nhất cho sản phẩm hiển thị trên trang chủ
+            foreach ($homeShowProducts as $key => $product) {
+                $homeShowProducts[$key]['unique_attributes'] = $getUniqueAttributes->getUniqueAttributes($product->variants->toArray());
+            }
 
-                    // Định dạng các thuộc tính
-                    $formattedAttributes = $variantAttributes->map(function ($attribute) {
-                        return [
-                            'attribute_name' => $attribute->attribute_name,
-                            'attribute_value' => $attribute->attribute_value,
-                        ];
-                    })->values(); // Loại bỏ các key không mong muốn
-
-                    return [
-                        'variant_id' => $variant->id,
-                        'price_regular' => $variant->price_regular,
-                        'price_sale' => $variant->price_sale,
-                        'quantity' => $variant->quantity,
-                        'image' => $variant->image,
-                        'sku' => $variant->sku,
-                        'attributes' => $formattedAttributes, // Sử dụng values() để loại bỏ key
-                    ];
-                })->values(); // Loại bỏ các key không mong muốn
-
-                return [
-                    'id' => $product->id,
-                    'name' => $product->name,
-                    'price_regular' => $product->price_regular,
-                    'price_sale' => $product->price_sale,
-                    'img_thumbnail' => $product->img_thumbnail,
-                    'variants' => $formattedVariants, // Sử dụng values() để loại bỏ key
-                ];
-            })->values(); // Loại bỏ các key không mong muốn
-
-            return response()->json([
-                'message' => 'Lấy dữ liệu sản phẩm thành công',
-                'trend_products' => $formattedProducts,
-            ], Response::HTTP_OK);
+            // Trả về kết quả JSON bao gồm sản phẩm trend và sản phẩm được hiển thị trên trang chủ
+            return response()->json(
+                [
+                    'trend_products' => $trendProducts,
+                    'home_show_products' => $homeShowProducts
+                ],
+                Response::HTTP_OK
+            );
         } catch (\Exception $ex) {
-            return response()->json([
-                'message' => 'Đã xảy ra lỗi: ' . $ex->getMessage()
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response()->json(
+                [
+                    "message" => $ex->getMessage()
+                ],
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
         }
     }
 }
-
-
-
-?>
