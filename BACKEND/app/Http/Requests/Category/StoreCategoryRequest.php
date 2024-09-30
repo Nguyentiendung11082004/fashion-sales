@@ -45,9 +45,6 @@ class StoreCategoryRequest extends FormRequest
             'parent_id.integer' => 'ID của danh mục cha phải là một số nguyên.',
             'parent_id.exists' => 'Danh mục cha không tồn tại.',
 
-            'img_thumbnail.image' => 'Tệp tải lên phải là một hình ảnh.',
-            'img_thumbnail.mimes' => 'Ảnh phải thuộc một trong các định dạng: jpeg, png, jpg, gif, svg.',
-            'img_thumbnail.max' => 'Kích thước ảnh không được vượt quá 2MB.',
 
             'description.string' => 'Mô tả phải là chuỗi ký tự.',
             'description.max' => 'Mô tả không được vượt quá 255 ký tự.',

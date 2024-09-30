@@ -45,7 +45,6 @@ class TagController extends Controller
     {
         
         try {
-         
 
             $request->validate([
                 "name" => 'required|unique:tags,name'

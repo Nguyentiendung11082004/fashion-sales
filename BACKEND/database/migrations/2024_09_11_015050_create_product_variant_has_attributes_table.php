@@ -19,6 +19,7 @@ return new class extends Migration
            $table->foreignIdFor(Attribute::class)->constrained();
            $table->foreignIdFor(AttributeItem::class)->constrained();
            $table->primary(["product_variant_id","attribute_id","attribute_item_id"]);
+           $table->string('value');
 
         });
     }

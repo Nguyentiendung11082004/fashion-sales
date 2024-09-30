@@ -54,7 +54,12 @@ class StoreProduct extends FormRequest
 
             'product_variant' => 'required_if:type,1|array|min:1',
             'product_variant.*.attribute_item_id' => 'required_if:type,1|array|min:1',
-            'product_variant.*.attribute_item_id.*' => 'integer|exists:attribute_items,id',
+
+            // 'product_variant.*.attribute_item_id.*' => 'integer|exists:attribute_items,id',
+
+            'product_variant.*.attribute_item_id.*.id' => 'required|integer|exists:attribute_items,id',
+            'product_variant.*.attribute_item_id.*.value' => 'required|string|max:255',
+
             'product_variant.*.sku' => 'required_if:type,1|string|max:255|distinct',
             'product_variant.*.quantity' => 'integer|min:1|required_if:type,1',
             'product_variant.*.price_regular' => 'numeric|min:0|required_if:type,1',
