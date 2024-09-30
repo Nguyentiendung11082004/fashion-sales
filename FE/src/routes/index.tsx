@@ -17,14 +17,8 @@ import Register from "@/pages/client/register/Register";
 import { Route, Routes } from "react-router-dom";
 import HomePage from "../pages/client/home/HomePage";
 import LayoutWebsite from "../pages/client/layout";
-<<<<<<< HEAD
 import CommentPage from "@/pages/admin/comments/Comments";
-import UserPage from "@/pages/admin/user/User";
-=======
-import CommentPage from "@/pages/admin/comment/Comment";
->>>>>>> 597b39cfaaeb4344fbc505f49f7445aaf9fd21f0
 import OrderPage from "@/pages/admin/order/Order";
-import UserPage from "@/pages/admin/user/user";
 import ClientPage from "@/pages/admin/account/client/Client";
 const Router = () => {
   return (

@@ -17,17 +17,11 @@ import Register from "@/pages/client/register/Register";
 import { Route, Routes } from "react-router-dom";
 import HomePage from "../pages/client/home/HomePage";
 import LayoutWebsite from "../pages/client/layout";
-<<<<<<< HEAD
 import CommentPage from "@/pages/admin/comments/Comments";
-import UserPage from "@/pages/admin/user/User";
-=======
-import CommentPage from "@/pages/admin/comment/Comment";
->>>>>>> 597b39cfaaeb4344fbc505f49f7445aaf9fd21f0
 import OrderPage from "@/pages/admin/order/Order";
 import Tags from "@/pages/admin/tags/Tags";
 import FormTag from "@/pages/admin/tags/_components/TagForm";
 import ProductForm from "@/pages/admin/products/_components/ProductForm";
-<<<<<<< HEAD
 import CategoryForm from "@/pages/admin/category/_components/CategoryForm";
 import ProductDetailAdmin from "@/pages/admin/products/_components/ProductDetail";
 import AttributeItem from "@/pages/admin/attribute/attribute-item/page";
@@ -35,12 +29,6 @@ import AttributeItemValues from "@/pages/admin/attribute/attribute-item-values/p
 import BrandForm from "@/pages/admin/brands/_components/BrandForm";
 import Brands from "@/pages/admin/brands/Brands";
 
-=======
-import ClientPage from "@/pages/admin/account/client/Client";
-import EmployeePage from "@/pages/admin/account/employee/Employee";
-import FormClient from "@/pages/admin/account/client/components/FormClient";
-import FormEmployee from "@/pages/admin/account/employee/components/FormEmployee";
->>>>>>> 597b39cfaaeb4344fbc505f49f7445aaf9fd21f0
 
 const Router = () => {
   return (
@@ -75,22 +63,11 @@ const Router = () => {
           <Route path="attributes" element={<AttributeItem />} />
           <Route path="attribute-values" element={<AttributeItemValues />} />
           <Route path="comment" element={<CommentPage />} />
-<<<<<<< HEAD
           <Route path="category" element={<CategoryPage />} />
           <Route path="comments" element={<CommentPage />} />
           <Route path="brands" element={<Brands />} />
           <Route path="brands/create" element={<BrandForm />} />
           <Route path="brands/edit/:id" element={<BrandForm />} />
-          <Route path="user" element={<UserPage />} />
-=======
-          <Route path="clients" element={<ClientPage />} />
-          <Route path="clients/create" element={<FormClient />} />
-          <Route path="clients/edit/:id" element={<FormClient />} />
-          <Route path="employees" element={<EmployeePage />} />
-          <Route path="employees/create" element={<FormEmployee />} />
-          <Route path="employees/edit/:id" element={<FormEmployee />} />
-
->>>>>>> 597b39cfaaeb4344fbc505f49f7445aaf9fd21f0
           <Route path="order" element={<OrderPage />} />
           <Route path="tags" element={<Tags />} />
           <Route path="tags/create" element={<FormTag />} />

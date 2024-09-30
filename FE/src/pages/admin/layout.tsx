@@ -9,10 +9,7 @@ import {
   UserOutlined,
   VideoCameraOutlined,
   TagsOutlined,
-<<<<<<< HEAD
   OrderedListOutlined
-=======
->>>>>>> 597b39cfaaeb4344fbc505f49f7445aaf9fd21f0
 } from "@ant-design/icons";
 import { Button, Layout, Menu } from "antd";
 import { NavLink, Outlet } from "react-router-dom";
