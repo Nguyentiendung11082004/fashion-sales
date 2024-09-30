@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\V1\Admin\BrandController;
 use App\Http\Controllers\Api\V1\Admin\CommentsController;
 use App\Http\Controllers\Api\V1\Admin\ProductController;
 use App\Http\Controllers\Api\V1\Admin\TagController;
+use App\Http\Controllers\Api\V1\Client\HomeProductController;
 use App\Http\Controllers\Api\V1\Client\ProductDetailController;
 use App\Http\Controllers\Api\V1\Admin\ClientController;
 use App\Http\Controllers\Api\V1\Admin\EmployeeController;
@@ -39,6 +40,7 @@ Route::prefix("v1/")->group(function () {
     Route::apiResource('attributeItem', AttributeItemController::class);
     Route::apiResource('category', CategoryController::class);
 
+    Route::get('product-home', [HomeProductController::class, "getHomeProducts"]);
     //  để tạm vậy rồi tôi sẽ chia các route admin và client ra sau.
     // client
     Route::get('product-detail/{product_id}', [ProductDetailController::class, "productdetail"]);
