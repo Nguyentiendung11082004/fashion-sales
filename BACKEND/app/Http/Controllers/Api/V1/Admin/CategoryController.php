@@ -19,8 +19,15 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $categories = Category::query()->latest('id')->get();
-        return response()->json($categories, 200);
+        try {
+            $categories = Category::query()->latest('id')->get();
+            return response()->json($categories, 200);
+        } catch (ModelNotFoundException $e) {
+            // Trả về lỗi 404 nếu không tìm thấy Category
+            return response()->json([
+                'message' => 'Thuộc tính Tồn Tại!'
+            ], 404);
+        }
     }
     /**
      * Store a newly created resource in storage.
@@ -63,7 +70,7 @@ class CategoryController extends Controller
             $category = Category::findOrFail($id);
             return response()->json($category, 200);
         } catch (ModelNotFoundException $e) {
-            // Trả về lỗi 404 nếu không tìm thấy attribute
+            // Trả về lỗi 404 nếu không tìm thấy Category
             return response()->json([
                 'message' => 'Thuộc tính Tồn Tại!'
             ], 404);

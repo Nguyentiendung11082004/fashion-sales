@@ -7,59 +7,39 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use App\Http\Helper\Product\GetUniqueAttribute;
 
 class ProductDetailController extends Controller
 {
     //
     public function productdetail(string $id)
     {
-        // dd($id);
         try {
+
             $product = Product::query()->with([
-                // "galleries",
-                // "brand",
-                // "category",
-                // "tags",
 
-                'variants.attributes' => function ($query) {
-                    dd($query->attributes);
-                    $query->with(['attributeitems' => function ($query) {
-                        // dd();
-                        $query->where('attribute_items.id','product_variant_has_attributes.attribute_item_id');
-                    }]);
-                },
-                // "attributes.attributeitems"
-                //  'variants.attributes.attributeitems'
-                
-                   
-              
-                
-
-
+                "brand",
+                "category",
+                "galleries",
+                "tags",
+                "comments",
+                "variants.attributes"
             ])->findOrFail($id);
-
+            $product->increment('views');
+            $getUniqueAttributes = new GetUniqueAttribute();
+            $productRelated = Product::query()->with(["variants.attributes"])->where('id', "<>", $product)->get()->toArray();
             
-            
-
-            // dd($product);
-            // $commentProduct = $product->comments->toArray();
-            // $variantProduct=$product->variants->toArray();
-            // dd($variantProduct);
-            // // $attributeItemProduct=$product->
-            // dd($commentProduct);
-
-
-
-            // $galleries=$product->load(["galleries"]);
-
-            // dd($product->toArray());
-            
-
-            return response()->json([
-                "message" => "lấy dữ liệu thành công",
-                "product" => $product,
-                // "galleries"=>$galleries
-            ]);
+            foreach ($productRelated as $key=> $item) {
+               
+                $productRelated[$key]["product_related_attributes"]=$getUniqueAttributes->getUniqueAttributes($item["variants"]);
+            }
+            return response()->json(
+                [
+                    'product' => $product,
+                    "getUniqueAttributes" => $getUniqueAttributes->getUniqueAttributes($product["variants"]),
+                    'productRelated'=>$productRelated,
+                ]
+            );
         } catch (\Exception $ex) {
             response()->json(
                 [

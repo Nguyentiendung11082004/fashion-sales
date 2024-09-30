@@ -28,15 +28,15 @@ class UserRequest extends FormRequest
         if ($this->isMethod('post')) {
             return [
                 'name'         => 'required|string|max:255',
-                'phone_number' => 'required|string|min:10|max:10|unique:users,phone_number',
+                'phone_number' => 'required|string|regex:/^[0-9]{10}$/|unique:users,phone_number',
                 'email'        => 'required|email|unique:users,email',
                 'address'      => 'required|string|max:255',
                 'avatar'       => 'nullable',
                 'password'     => 'required|min:8',
                 'birth_date'   => 'nullable|date',
                 'is_active'    => 'boolean',
-                'gender'       => 'nullable|in:male,female,other',
-                'role_id'      => 'required|exists:roles,id',
+                'gender'       => 'nullable|boolean',
+                'role_id'      => 'exists:roles,id',
             ];
         }
 
@@ -67,8 +67,8 @@ class UserRequest extends FormRequest
                 'password'     => 'nullable|min:8',
                 'birth_date'   => 'nullable|date',
                 'is_active'    => 'boolean',
-                'gender'       => 'nullable|in:male,female,other',
-                'role_id'      => 'required|exists:roles,id',
+                'gender'       => 'nullable|boolean',
+                'role_id'      => 'exists:roles,id',
             ];
         }
 

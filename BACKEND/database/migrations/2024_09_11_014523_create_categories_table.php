@@ -18,7 +18,6 @@ return new class extends Migration
             $table->text('description')->nullable(); // Mô tả, có thể nullable
             $table->string('img_thumbnail')->nullable(); // Đường dẫn ảnh thumbnail, nullable
             $table->foreignId('parent_id')->nullable()->constrained('categories')->onDelete('set null'); // Tham chiếu đến bảng categories
-            $table->boolean('status')->default(true)->comment('hoạt động|k hoạt động');
             $table->timestamps(); // Tạo trường created_at và updated_at
         });
     }

@@ -18,6 +18,7 @@ class BrandRequest extends FormRequest
 
     protected function failedValidation(Validator $validator)
     {
+
         throw new HttpResponseException(response()->json([
             'message' =>'Lỗi thêm brand',
             'status' => false,

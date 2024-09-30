@@ -33,29 +33,21 @@ class ClientController extends Controller
     public function store(UserRequest $request)
     {
         try {
+          
          
             $dataClient = [
-                'name'        => $request->name,
+                'name'         => $request->name,
                 'phone_number' => $request->phone_number,
-                'email'       => $request->email,
-                'address'     => $request->address,
-                'password'    => bcrypt($request->password),
-                'birth_date'  => $request->birth_date,
-                'is_active'   => $request->is_active ?? 1,
-                'gender'      => $request->gender,
-                'role_id'     => $request->role_id,
-                'avatar'      => $request->avatar
+                'email'        => $request->email,
+                'address'      => $request->address,
+                'password'     => bcrypt($request->password),
+                'birth_date'   => $request->birth_date,
+                'is_active'    => $request->is_active ?? 1,
+                'gender'       => $request->gender,
+                'role_id'      => $request->role_id ?? 1,
+                'avatar'       => $request->avatar
             ];
-       
-
-            // if ($request->hasFile('avatar')) {
-            //     // Lưu avatar vào thư mục avatars
-            //     $avatarPath = Storage::put('public/avatars', $request->file('avatar'));
-            //     // Tạo URL đầy đủ cho avatar
-                
-            //     $dataClient['avatar'] = url(Storage::url($avatarPath));
-
-            // }
+           
 
         $client = User::query()->create($dataClient);
         
@@ -117,27 +109,10 @@ class ClientController extends Controller
             'birth_date'   => $request->birth_date,
             'is_active'    => $request->is_active ?? $client->is_active,
             'gender'       => $request->gender,
-            'role_id'      => $request->role_id,
+            'role_id'      => $request->role_id ?? $client->role_id,
             'avatar'       => $request->avatar ?? $client->avatar //Kiểm tra avatar
         ];
 
-          // Kiểm tra nếu có file avatar mới
-        //   if ($request->hasFile('avatar')){
-        //     // Xóa ảnh cũ nếu có
-        //     if ($client->avatar) {
-        //         // Lấy đường dẫn tương đối của ảnh cũ từ URL đầy đủ
-        //         $avatarPathOld = str_replace(url('/') . '/', '', $client->avatar);
-        //         if (Storage::exists($avatarPathOld)) {
-        //             Storage::delete($avatarPathOld);
-        //         }
-        //     }
-
-            // Lưu ảnh mới và cập nhật đường dẫn mới
-        //     $avatarPath = Storage::put('avatars', $request->file('avatar'));
-        //     $dataClient['avatar'] = url($avatarPath);
-        // }
-
-        // Cập nhật dữ liệu vào cơ sở dữ liệu
         $client->update($dataClient);
 
         return response()->json([
@@ -169,17 +144,6 @@ class ClientController extends Controller
                 'message' => 'Client not found',
             ], 404);
         }
-    
-        // Kiểm tra và xóa ảnh nếu tồn tại
-        // if ($client->avatar) {
-        //     // Lấy đường dẫn tương đối đến ảnh
-        //     $avatarPath = str_replace(url('/') . '/', '', $client->avatar);
-            
-        //     // Xóa ảnh trong storage nếu tồn tại
-        //     if (Storage::exists($avatarPath)) {
-        //         Storage::delete($avatarPath);
-        //     }
-        // }
     
         // Xóa bản ghi nhân viên
         $client->delete();
