@@ -1,3 +1,4 @@
+import Loading from '@/common/Loading/Loading'
 import { Icategories } from '@/common/types/categories'
 import { IProductVariant, Iproduct } from '@/common/types/products'
 import { Itags } from '@/common/types/tags'
@@ -11,6 +12,10 @@ import { UploadProps } from 'antd/es/upload'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
+type ErrorResponse = {
+    [key: string]: string[];
+};
+
 const ProductForm = () => {
     const { id } = useParams();
     const [form] = Form.useForm();
@@ -29,7 +34,7 @@ const ProductForm = () => {
     const [isTableVisible, setIsTableVisible] = useState(false); // State điều khiển hiển thị bảng
     const [selectedValues, setSelectedValues] = useState<any>([]); // State lưu trữ giá trị đã chọn cho từng thuộc tính
     const [isColumnsVisible, setIsColumnsVisible] = useState(false); // state cột
-    const [error, setError] = useState(null)
+    const [error, setError] = useState<any>()
 
     const [variants, setVariants] = useState([
         { image: '', price_regular: '', price_sale: '', quantity: 0, sku: '' }
@@ -39,7 +44,7 @@ const ProductForm = () => {
         newVariants[index] = { ...newVariants[index], [field]: value };
         setVariants(newVariants);
     };
-    console.log("variants",variants)
+   
     const { data, isFetching } = useQuery({
         queryKey: ['productCreate'],
         queryFn: productCreate,
@@ -131,7 +136,7 @@ const ProductForm = () => {
         //     if (!record.includes(Number(attrId))) {
         //         updatedItems[attrId] = [];
         //         form.setFieldsValue({ [`size_${attrId}`]: [] });
-        //     }
+        //     }    
         // });
 
 
@@ -202,6 +207,32 @@ const ProductForm = () => {
             )
         }
     ];
+    const handleErrorResponse = (error: any) => {
+        console.log("error", error);
+        setIsLoading(false); // Đặt loading về false ngay lập tức
+    
+        if (error.response && error.response.data.errors) {
+            const errorFields: ErrorResponse = error.response.data.errors;
+    
+            // Thiết lập lỗi cho các trường có vấn đề
+            const fields = Object.keys(errorFields).map((key) => ({
+                name: key,
+                errors: errorFields[key],
+            }));
+            form.setFields(fields);
+    
+            // Reset lỗi cho các trường không có vấn đề
+            const allFieldNames = ['name', 'attribute_id', 'value']; // Thêm tất cả các trường có thể
+            allFieldNames.forEach((field) => {
+                if (!errorFields[field]) {
+                    form.setFields([{ name: field, errors: [] }]);
+                }
+            });
+        } else {
+            toast.error('Có lỗi xảy ra');
+        }
+    };
+    
     const createProductMutation = useMutation({
         mutationFn: productStore,
         onMutate: () => {
@@ -215,12 +246,11 @@ const ProductForm = () => {
             form.resetFields();
             navigate('/admin/products')
         },
-        onError: (error: any) => {
-            setError(error.response.data.message)
-            toast.error('Thêm sản phẩm thất bại');
-            setIsLoading(false)
-        }
+        onError: handleErrorResponse,
+
     });
+   
+
     const updateProductMutation = useMutation({
         mutationFn: (product: Iproduct) => productUpdate(Number(id), product),
         onMutate: () => {
@@ -234,11 +264,7 @@ const ProductForm = () => {
             form.resetFields();
             navigate('/admin/products')
         },
-        onError: (error: any) => {
-            setError(error.response.data.message)
-            toast.error('Sửa sản phẩm thất bại');
-            setIsLoading(false)
-        }
+        onError: handleErrorResponse,
     })
 
     useEffect(() => {
@@ -268,6 +294,11 @@ const ProductForm = () => {
         },
         enabled: !!id
     });
+    useEffect(() => {
+        if (productShow) {
+            form.setFieldsValue(productShow);
+        }
+    }, [productShow, form]);
 
     const propsImgThumbnail: UploadProps = {
         name: 'file',
@@ -413,6 +444,9 @@ const ProductForm = () => {
             }
         }
     };
+
+
+
     return (
         <div className="p-6 min-h-screen">
             <div className="flex items-center justify-between mb-6">
@@ -426,11 +460,11 @@ const ProductForm = () => {
                         <Form layout='vertical' className="grid grid-cols-1 md:grid-cols-3 gap-4"
                             onFinish={onFinish}
                             form={form}
-                            initialValues={productShow}
                         >
                             <Form.Item name="name" label="Tên sản phẩm" className="col-span-1"
                             >
                                 <Input />
+                                {error?.name && <div className='text-red-600'>{error.name.join(', ')}</div>}
                             </Form.Item>
                             <Form.Item name="tags" label="Tag" className="col-span-1">
                                 <Select
@@ -444,6 +478,12 @@ const ProductForm = () => {
 
                                     placeholder="Chọn tag"
                                     placement="bottomLeft" className='w-full' />
+                                {error &&
+                                    error.errors &&
+                                    error.errors.tags &&
+                                    error.errors.tags.length > 0 ? (
+                                    <div className="text-red-600">{error.errors.tags[0]}</div>
+                                ) : null}
                             </Form.Item>
                             <Form.Item name="brand_id" label="Thương hiệu" className="col-span-1">
                                 <Select
@@ -454,6 +494,12 @@ const ProductForm = () => {
 
                                     placeholder="Chọn thương hiệu"
                                     placement="bottomLeft" className='w-full' />
+                                {error &&
+                                    error.errors &&
+                                    error.errors.brand_id &&
+                                    error.errors.brand_id.length > 0 ? (
+                                    <div className="text-red-600">{error.errors.brand_id[0]}</div>
+                                ) : null}
                             </Form.Item>
                             <Form.Item name="category_id" label="Danh mục" className="col-span-1">
                                 <Select
@@ -464,12 +510,30 @@ const ProductForm = () => {
 
                                     placeholder="Chọn danh mục"
                                     placement="bottomLeft" className='w-full' />
+                                {error &&
+                                    error.errors &&
+                                    error.errors.category_id &&
+                                    error.errors.category_id.length > 0 ? (
+                                    <div className="text-red-600">{error.errors.category_id[0]}</div>
+                                ) : null}
                             </Form.Item>
                             <Form.Item name="slug" label="Slug" className="col-span-1">
                                 <Input />
+                                {error &&
+                                    error.errors &&
+                                    error.errors.slug &&
+                                    error.errors.slug.length > 0 ? (
+                                    <div className="text-red-600">{error.errors.slug[0]}</div>
+                                ) : null}
                             </Form.Item>
                             <Form.Item name="sku" label="SKU" className="col-span-1">
                                 <Input />
+                                {error &&
+                                    error.errors &&
+                                    error.errors.sku &&
+                                    error.errors.sku.length > 0 ? (
+                                    <div className="text-red-600">{error.errors.sku[0]}</div>
+                                ) : null}
                             </Form.Item>
                             <Form.Item name="img_thumbnail" label="Ảnh sản phẩm" >
                                 <Upload
@@ -477,6 +541,12 @@ const ProductForm = () => {
                                 >
                                     <Button icon={<UploadOutlined />}>Tải lên ảnh</Button>
                                 </Upload>
+                                {error &&
+                                    error.errors &&
+                                    error.errors.img_thumbnail &&
+                                    error.errors.img_thumbnail.length > 0 ? (
+                                    <div className="text-red-600">{error.errors.img_thumbnail[0]}</div>
+                                ) : null}
                             </Form.Item>
                             <Form.Item
                                 name="gallery"
@@ -489,20 +559,41 @@ const ProductForm = () => {
                                 >
                                     <Button icon={<UploadOutlined />}>Tải lên gallery</Button>
                                 </Upload>
+                                {error &&
+                                    error.errors &&
+                                    error.errors.gallery &&
+                                    error.errors.gallery.length > 0 ? (
+                                    <div className="text-red-600">{error.errors.gallery[0]}</div>
+                                ) : null}
                             </Form.Item>
                             {
                                 !attribute && <>
                                     <Form.Item name="price_regular" label="Price Regular" className="col-span-1">
                                         <InputNumber />
+                                        {error &&
+                                            error.errors &&
+                                            error.errors.price_regular &&
+                                            error.errors.price_regular.length > 0 ? (
+                                            <div className="text-red-600">{error.errors.price_regular[0]}</div>
+                                        ) : null}
                                     </Form.Item>
                                     <Form.Item name="price_sale" label="Price Sale" className="col-span-1">
                                         <InputNumber />
-                                    </Form.Item>
-                                    <Form.Item name="sku" label="SKU" className="col-span-1">
-                                        <Input />
+                                        {error &&
+                                            error.errors &&
+                                            error.errors.price_sale &&
+                                            error.errors.price_sale.length > 0 ? (
+                                            <div className="text-red-600">{error.errors.price_sale[0]}</div>
+                                        ) : null}
                                     </Form.Item>
                                     <Form.Item name="quantity" label="Số lượng" className="col-span-1">
                                         <InputNumber />
+                                        {error &&
+                                            error.errors &&
+                                            error.errors.quantity &&
+                                            error.errors.quantity.length > 0 ? (
+                                            <div className="text-red-600">{error.errors.quantity[0]}</div>
+                                        ) : null}
                                     </Form.Item>
 
                                 </>
@@ -522,6 +613,12 @@ const ProductForm = () => {
                                     onChange={handleChangeAttribute}
                                     placeholder="Chọn kiểu sản phẩm"
                                     placement="bottomLeft" className='w-full' />
+                                {error &&
+                                    error.errors &&
+                                    error.errors.type &&
+                                    error.errors.type.length > 0 ? (
+                                    <div className="text-red-600">{error.errors.type[0]}</div>
+                                ) : null}
                             </Form.Item>
                             <Form.Item className="col-span-3">
                                 {attribute && (
@@ -535,6 +632,7 @@ const ProductForm = () => {
                                             mode='multiple'
                                             onChange={handleChangeAttributeChildren}
                                         />
+
                                     </Form.Item>
                                 )}
                                 {selectedAttributeChildren.map(attrId => {
@@ -591,9 +689,21 @@ const ProductForm = () => {
 
                             <Form.Item name="description" label="Description" className="col-span-1">
                                 <TextArea />
+                                {error &&
+                                    error.errors &&
+                                    error.errors.description &&
+                                    error.errors.description.length > 0 ? (
+                                    <div className="text-red-600">{error.errors.description[0]}</div>
+                                ) : null}
                             </Form.Item>
                             <Form.Item name="description_title" label="Description Title" className="col-span-1">
                                 <Input />
+                                {error &&
+                                    error.errors &&
+                                    error.errors.description_title &&
+                                    error.errors.description_title.length > 0 ? (
+                                    <div className="text-red-600">{error.errors.description_title[0]}</div>
+                                ) : null}
                             </Form.Item>
                             <Form.Item name="status" label="Status" className="col-span-1" initialValue={'1'}>
                                 <div className="border border-gray-300 rounded-lg p-4 flex items-center space-x-4">

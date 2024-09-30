@@ -61,7 +61,8 @@ const CategoryForm = (props: Props) => {
             queryClient.setQueryData(['currentCategoryPage'], currentCategoryPage); 
             navigate('/admin/categories');
         },
-        onError: () => {
+        onError: (error:any) => {
+            setError(error?.response.data.message)
             setIsLoading(false)
             toast.error('Sửa thất bại');
         }
