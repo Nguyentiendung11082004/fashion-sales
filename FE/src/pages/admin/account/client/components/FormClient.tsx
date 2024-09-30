@@ -62,7 +62,7 @@ const FormClient = () => {
       queryClient.invalidateQueries({ queryKey: ["clients"] });
       toast.success("Thêm thành công");
       form.resetFields();
-      navigate("/admin/clients");
+      navigate(-1)
     },
     onError: (error: any) => {
       setErrors(error.response.data.errors);

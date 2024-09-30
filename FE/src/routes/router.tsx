@@ -28,7 +28,10 @@ import AttributeItem from "@/pages/admin/attribute/attribute-item/page";
 import AttributeItemValues from "@/pages/admin/attribute/attribute-item-values/page";
 import BrandForm from "@/pages/admin/brands/_components/BrandForm";
 import Brands from "@/pages/admin/brands/Brands";
-
+import ClientPage from "@/pages/admin/account/client/Client";
+import EmployeePage from "@/pages/admin/account/employee/Employee";
+import FormClient from "@/pages/admin/account/client/components/FormClient";
+import FormEmployee from "@/pages/admin/account/employee/components/FormEmployee";
 
 const Router = () => {
   return (
@@ -65,6 +68,11 @@ const Router = () => {
           <Route path="comment" element={<CommentPage />} />
           <Route path="category" element={<CategoryPage />} />
           <Route path="comments" element={<CommentPage />} />
+          <Route path="clients" element={<ClientPage />} />
+          <Route path="clients/create" element={<FormClient />} />
+          <Route path="employees" element={<EmployeePage />} />
+          <Route path="employees/create" element={<FormEmployee />} />
+          <Route path="employees/edit/:id" element={<FormEmployee />} />
           <Route path="brands" element={<Brands />} />
           <Route path="brands/create" element={<BrandForm />} />
           <Route path="brands/edit/:id" element={<BrandForm />} />
