@@ -14,11 +14,48 @@ class ProductShopController extends Controller
     // lấy ra tất cả product và biến thể của nó
     public function getAllProduct(Request $request)
     {
-        $search = $request->input('search');
+        $search = $request->input('search'); // Người dùng nhập từ khóa tìm kiếm
+        $colors = $request->input('colors'); // Người dùng truyền lên một mảng các màu
+        $sizes = $request->input('sizes'); // Người dùng truyền lên một mảng các kích thước
+        $minPrice = $request->input('min_price'); // Người dùng nhập giá tối thiểu
+        $maxPrice = $request->input('max_price'); // Người dùng nhập giá tối đa
         try {
             $products = Product::query()
                 ->when($search, function ($query, $search) {
-                    return $query->where('name', 'like', "%{$search}%"); // Tìm kiếm theo tên sản phẩm
+                    // Nếu có từ khóa tìm kiếm, lọc sản phẩm có tên chứa từ khóa
+                    return $query->where('name', 'like', "%{$search}%");
+                })
+                ->when($colors, function ($query, $colors) {
+                    // Lọc theo màu sắc
+                    return $query->whereHas('variants.attributes', function ($subQuery) use ($colors) {
+                        $subQuery->where('name', 'color')
+                            ->whereIn('product_variant_has_attributes.value', $colors); // Truy cập giá trị trực tiếp từ bảng trung gian
+                    });
+                })
+                ->when($sizes, function ($query, $sizes) {
+                    // Lọc theo kích thước
+                    return $query->whereHas('variants.attributes', function ($subQuery) use ($sizes) {
+                        $subQuery->where('name', 'size')
+                            ->whereIn('product_variant_has_attributes.value', $sizes); // Truy cập giá trị trực tiếp từ bảng trung gian
+                    });
+                })
+                ->when($minPrice || $maxPrice, function ($query) use ($minPrice, $maxPrice) {
+                    return $query->where(function ($subQuery) use ($minPrice, $maxPrice) {
+                        if (!is_null($minPrice)) {
+                            $subQuery->where(function ($q) use ($minPrice) {
+                                $q->whereHas('variants', function ($query) use ($minPrice) {
+                                    $query->where('price_sale', '>=', $minPrice);
+                                })->orWhere('price_sale', '>=', $minPrice);
+                            });
+                        }
+                        if (!is_null($maxPrice)) {
+                            $subQuery->where(function ($q) use ($maxPrice) {
+                                $q->whereHas('variants', function ($query) use ($maxPrice) {
+                                    $query->where('price_sale', '<=', $maxPrice);
+                                })->orWhere('price_sale', '<=', $maxPrice);
+                            });
+                        }
+                    });
                 })
                 ->with([
                     "brand",
@@ -46,7 +83,7 @@ class ProductShopController extends Controller
         } catch (ModelNotFoundException $e) {
             // Trả về lỗi 404 nếu không tìm thấy Category
             return response()->json([
-                'message' => 'Thuộc tính Tồn Tại!'
+                'message' => 'Sản Phẩm Không Tồn Tại!'
             ], 404);
         }
     }
