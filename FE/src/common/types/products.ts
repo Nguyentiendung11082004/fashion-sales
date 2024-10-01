@@ -4,6 +4,7 @@ export interface IProductVariant {
     price_sale: number;
     quantity: number;
     sku: string;
+    slug: string;
     image:string;
 }
 export interface Iproduct {

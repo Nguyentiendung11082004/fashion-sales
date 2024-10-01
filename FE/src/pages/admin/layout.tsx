@@ -40,7 +40,7 @@ const LayoutAdmin: React.FC = () => {
         <div className="flex items-center justify-center h-[25px] bg-[black]">
           <div className="demo-logo-vertical" />
         </div>
-        <div className="w-[150px] my-[-20px] m-auto">
+        <div className="w-[150px] my-[-10px] m-auto">
           <img src={LogoAdmin} alt="" className="" />
         </div>
         

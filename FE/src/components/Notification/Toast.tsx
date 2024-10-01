@@ -14,7 +14,6 @@ const Toast = {
         });
     },
 };
-
 export const ToastProvider = () => <ToastContainer />;
 
 export default Toast;
