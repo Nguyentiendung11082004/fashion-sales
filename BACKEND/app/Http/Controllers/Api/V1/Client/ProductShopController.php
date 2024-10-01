@@ -19,8 +19,18 @@ class ProductShopController extends Controller
         $sizes = $request->input('sizes'); // Người dùng truyền lên một mảng các kích thước
         $minPrice = $request->input('min_price'); // Người dùng nhập giá tối thiểu
         $maxPrice = $request->input('max_price'); // Người dùng nhập giá tối đa
+        $categories = $request->input('categorys'); 
+        $brands = $request->input('brands'); 
         try {
             $products = Product::query()
+            ->when($categories, function ($query) use ($categories) {
+                // Lọc theo danh mục
+                return $query->whereIn('category_id', $categories); // Giả sử trường lưu ID danh mục là category_id
+            })
+            ->when($brands, function ($query) use ($brands) {
+                // Lọc theo danh mục
+                return $query->whereIn('brand_id', $brands); // Giả sử trường lưu ID danh mục là category_id
+            })
                 ->when($search, function ($query, $search) {
                     // Nếu có từ khóa tìm kiếm, lọc sản phẩm có tên chứa từ khóa
                     return $query->where('name', 'like', "%{$search}%");
