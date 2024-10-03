@@ -28,6 +28,10 @@ import AttributeItem from "@/pages/admin/attribute/attribute-item/page";
 import AttributeItemValues from "@/pages/admin/attribute/attribute-item-values/page";
 import BrandForm from "@/pages/admin/brands/_components/BrandForm";
 import Brands from "@/pages/admin/brands/Brands";
+import ClientPage from "@/pages/admin/account/client/Client";
+import FormClient from "@/pages/admin/account/client/components/FormClient";
+import EmployeePage from "@/pages/admin/account/employee/Employee";
+import FormEmployee from "@/pages/admin/account/employee/components/FormEmployee";
 
 
 const Router = () => {
@@ -72,6 +76,11 @@ const Router = () => {
           <Route path="tags" element={<Tags />} />
           <Route path="tags/create" element={<FormTag />} />
           <Route path="tags/edit/:id" element={<FormTag />} />
+          <Route path="clients" element={<ClientPage />} />
+          <Route path="clients/create" element={<FormClient />} />
+          <Route path="employees" element={<EmployeePage />} />
+          <Route path="employees/create" element={<FormEmployee />} />
+          <Route path="employees/edit/:id" element={<FormEmployee />} />
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
