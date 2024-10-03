@@ -3,34 +3,50 @@
 namespace App\Http\Controllers\Api\V1\Client;
 
 use App\Models\Product;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Http\Helper\Product\GetUniqueAttribute;
+use App\Http\Requests\ProductShopRequest;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-
 
 class ProductShopController extends Controller
 {
     // lấy ra tất cả product và biến thể của nó
-    public function getAllProduct(Request $request)
+    public function getAllProduct(ProductShopRequest $request)
     {
         $search = $request->input('search'); // Người dùng nhập từ khóa tìm kiếm
         $colors = $request->input('colors'); // Người dùng truyền lên một mảng các màu
         $sizes = $request->input('sizes'); // Người dùng truyền lên một mảng các kích thước
         $minPrice = $request->input('min_price'); // Người dùng nhập giá tối thiểu
         $maxPrice = $request->input('max_price'); // Người dùng nhập giá tối đa
-        $categories = $request->input('categorys'); 
-        $brands = $request->input('brands'); 
+        $categories = $request->input('categorys');
+        $brands = $request->input('brands');
+        $sortPrice = $request->input('sortPrice');
+        $sortDirection = $request->input('sortDirection');
+        $sortAlphaOrder = $request->input('sortAlphaOrder');
+        $trend = $request->input('trend');
+        // Kiểm tra giá trị sortDirection
+        if ($sortDirection && !in_array(strtolower($sortDirection), ['asc', 'desc'])) {
+            throw new \InvalidArgumentException('Giá trị sortDirection chỉ có thể là "asc" hoặc "desc".');
+        }
+        // Kiểm tra giá trị sortAlphaOrder
+        if ($sortAlphaOrder && !in_array(strtolower($sortAlphaOrder), ['asc', 'desc'])) {
+            throw new \InvalidArgumentException('Giá trị sortAlphaOrder chỉ có thể là "asc" hoặc "desc".');
+        }
         try {
             $products = Product::query()
-            ->when($categories, function ($query) use ($categories) {
-                // Lọc theo danh mục
-                return $query->whereIn('category_id', $categories); // Giả sử trường lưu ID danh mục là category_id
-            })
-            ->when($brands, function ($query) use ($brands) {
-                // Lọc theo danh mục
-                return $query->whereIn('brand_id', $brands); // Giả sử trường lưu ID danh mục là category_id
-            })
+                ->when($trend, function ($query, $trend) {
+                    // Lọc sản phẩm hot trend
+                    return $query->where('trend', 1);
+                })
+                ->when($categories, function ($query) use ($categories) {
+                    // Lọc theo danh mục
+                    return $query->whereIn('category_id', $categories); // Giả sử trường lưu ID danh mục là category_id
+                })
+                ->when($brands, function ($query) use ($brands) {
+                    // Lọc theo danh mục
+                    return $query->whereIn('brand_id', $brands); // Giả sử trường lưu ID danh mục là category_id
+                })
                 ->when($search, function ($query, $search) {
                     // Nếu có từ khóa tìm kiếm, lọc sản phẩm có tên chứa từ khóa
                     return $query->where('name', 'like', "%{$search}%");
@@ -67,6 +83,25 @@ class ProductShopController extends Controller
                         }
                     });
                 })
+                ->when($sortPrice, function ($query) use ($sortPrice) {
+                    $query->leftJoin('product_variants', 'products.id', '=', 'product_variants.product_id')
+                        ->select('products.*', DB::raw('MAX(product_variants.price_sale) as variant_price_sale')) // Sử dụng hàm MAX()
+                        ->groupBy('products.id') // Nhóm theo product id
+                        ->orderByRaw("
+                            CASE
+                                WHEN products.type = 0 THEN products.price_sale
+                                WHEN products.type = 1 THEN variant_price_sale
+                            END $sortPrice
+                        ");
+                })
+                // Chỉ sắp xếp theo tên nếu có giá trị sortAlphaOrder
+                ->when($sortAlphaOrder, function ($query) use ($sortAlphaOrder) {
+                    return $query->orderBy('name', $sortAlphaOrder);
+                })
+                // Chỉ sắp xếp theo ID nếu có giá trị sortDirection
+                ->when($sortDirection, function ($query) use ($sortDirection) {
+                    return $query->orderBy('id', $sortDirection);
+                })
                 ->with([
                     "brand",
                     "category",
@@ -87,7 +122,6 @@ class ProductShopController extends Controller
                     'getUniqueAttributes' => $getUniqueAttributes->getUniqueAttributes($product["variants"]),
                 ];
             }
-
             // Trả về tất cả sản phẩm sau khi vòng lặp kết thúc
             return response()->json($allProducts);
         } catch (ModelNotFoundException $e) {

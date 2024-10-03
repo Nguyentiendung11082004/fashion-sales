@@ -43,6 +43,6 @@ Route::prefix("v1/")->group(function () {
     //  để tạm vậy rồi tôi sẽ chia các route admin và client ra sau.
     // client
     Route::get('product-detail/{product_id}', [ProductDetailController::class, "productdetail"]);
-    Route::get('product-shop', [ProductShopController::class, "getAllProduct"]);
+    Route::post('product-shop', [ProductShopController::class, "getAllProduct"]);
 
 });
