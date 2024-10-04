@@ -43,12 +43,12 @@ class TagController extends Controller
      */
     public function store(Request $request)
     {
-        
+
         try {
 
             $request->validate([
                 "name" => 'required|unique:tags,name'
-                
+
             ]);
             $tag = Tag::query()->create(
                 [
@@ -110,7 +110,7 @@ class TagController extends Controller
             $tag->update([
                 "name" => $request->input('name')
             ]);
-           
+
             return response()->json(
                 [
                     "message" => "cập nhật thành công",

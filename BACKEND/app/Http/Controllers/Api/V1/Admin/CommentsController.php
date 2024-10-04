@@ -25,12 +25,12 @@ class CommentsController extends Controller
                     'comments.*',
                     'users.name as user_name',
                     'users.email as user_email',
-                    'users.phone_number as user_phone',  
+                    'users.phone_number as user_phone',
                     'products.name as product_name'
                 )
                 ->orderBy('comments.id', 'desc') // Thêm sắp xếp theo ID giảm dần
                 ->get();
-    
+
             // Thay thế thông tin người dùng và sản phẩm nếu không tồn tại
             foreach ($comments as $comment) {
                 if (is_null($comment->user_name)) {
@@ -42,7 +42,7 @@ class CommentsController extends Controller
                     $comment->product_name = 'Sản phẩm đã bị xóa';
                 }
             }
-    
+
             // Kiểm tra dữ liệu
             if ($comments->isEmpty()) {
                 return response()->json([
@@ -51,7 +51,7 @@ class CommentsController extends Controller
                     'data' => []
                 ], Response::HTTP_OK);
             }
-    
+
             // Trả về dữ liệu với cấu trúc rõ ràng
             return response()->json([
                 'status' => true,
@@ -61,19 +61,19 @@ class CommentsController extends Controller
                     'comments' => $comments
                 ]
             ], Response::HTTP_OK);
-    
+
         } catch (\Exception $ex) {
             Log::error('API/V1/Admin/CommentsController@index: ', [$ex->getMessage()]);
-    
+
             return response()->json([
                 'status' => false,
                 'message' => 'Đã có lỗi nghiêm trọng xảy ra trong quá trình lấy dữ liệu.'
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-    
-    
-    
+
+
+
     /**
      * Store a newly created resource in storage.
      */
@@ -106,28 +106,28 @@ class CommentsController extends Controller
         try {
             // Tìm bình luận theo ID
             $comment = Comments::findOrFail($id);
-    
+
             // Nếu bình luận có hình ảnh liên quan, xóa hình ảnh
             if ($comment->image && Storage::disk('public')->exists($comment->image)) {
                 Storage::disk('public')->delete($comment->image);
             }
-    
+
             // Xóa bình luận
             $comment->delete();
-    
+
             return response()->json([
                 'status' => true,
                 'message' => "Xóa bình luận thành công."
             ], 200);
-    
+
         } catch (\Exception $ex) {
             Log::error('API/V1/Admin/CommentsController@destroy: ', [$ex->getMessage()]);
-    
+
             return response()->json([
                 'status' => false,
                 'message' => 'Đã có lỗi xảy ra trong quá trình xóa bình luận.'
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-    
+
 }

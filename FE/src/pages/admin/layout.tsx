@@ -8,6 +8,8 @@ import {
   UploadOutlined,
   UserOutlined,
   VideoCameraOutlined,
+  TagsOutlined,
+  OrderedListOutlined
 } from "@ant-design/icons";
 import { Button, Layout, Menu } from "antd";
 import { NavLink, Outlet } from "react-router-dom";
@@ -20,7 +22,7 @@ import {
   faShoppingBag,
   faTable,
 } from "@fortawesome/free-solid-svg-icons";
-import { Logo } from "@/components/icons";
+import { LogoAdmin } from "@/components/icons";
 
 const { Sider } = Layout;
 
@@ -38,7 +40,10 @@ const LayoutAdmin: React.FC = () => {
         <div className="flex items-center justify-center h-[25px] bg-[black]">
           <div className="demo-logo-vertical" />
         </div>
-        <img src={Logo} alt="" className="w-[80px] h-[80px] m-auto mb-4" />
+        <div className="w-[150px] my-[-20px] m-auto">
+          <img src={LogoAdmin} alt="" className="" />
+        </div>
+        
         <Menu
           theme="dark"
           mode="inline"
@@ -74,25 +79,72 @@ const LayoutAdmin: React.FC = () => {
               key: "3",
               icon: <UploadOutlined />,
               label: (
-                <NavLink className="text-white" to="/admin/category">
+                <NavLink className="text-white" to="/admin/categories">
                   Danh mục
                 </NavLink>
               ),
+
+            },
+            {
+              key: "8",
+              icon: <OrderedListOutlined />,
+              label: (
+                <NavLink className="text-white" to="/admin">
+                  Biến thể
+                </NavLink>
+              ),
+              children: [
+                {
+                  key: "10",
+                  label: (
+                    <NavLink className="text-white" to="/admin/attributes">
+                      Thuộc tính
+                    </NavLink>
+                  ),
+                },
+                {
+                  key: "11",
+                  label: (
+                    <NavLink className="text-white" to="/admin/attribute-values">
+                      Giá trị thuộc tính
+                    </NavLink>
+                  ),
+                },
+              ],
             },
             {
               key: "4",
               icon: <UserOutlined />,
               label: (
-                <NavLink className="text-white" to="/admin/user">
-                  Người dùng
+                <NavLink to={""} className="text-white">
+                  Tài khoản
                 </NavLink>
               ),
+              children: [
+                {
+                  key: "10",
+                  label: (
+                    <NavLink to="/admin/clients" className="text-white">
+                      Khách hàng
+                    </NavLink>
+                  ),
+                },
+                {
+                  key: "11",
+                  label: (
+                    <NavLink to="/admin/employees" className="text-white">
+                      Nhân viên
+                    </NavLink>
+                  ),
+                },
+              ],
             },
+
             {
               key: "5",
               icon: <CommentOutlined />,
               label: (
-                <NavLink className="text-white" to="/admin/comment">
+                <NavLink className="text-white" to="/admin/comments">
                   Bình luận
                 </NavLink>
               ),
@@ -103,6 +155,24 @@ const LayoutAdmin: React.FC = () => {
               label: (
                 <NavLink className="text-white" to="/admin/order">
                   Đơn hàng
+                </NavLink>
+              ),
+            },
+            {
+              key: "7",
+              icon: <TagsOutlined />,
+              label: (
+                <NavLink className="text-white" to="/admin/tags">
+                  Tags
+                </NavLink>
+              ),
+            },
+            {
+              key: "8",
+              icon: <TagsOutlined />,
+              label: (
+                <NavLink className="text-white" to="/admin/brands">
+                  Brands
                 </NavLink>
               ),
             },
