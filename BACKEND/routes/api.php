@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\V1\Admin\AttributeController;
 use App\Http\Controllers\Api\V1\Client\ProductShopController;
 use App\Http\Controllers\Api\V1\Admin\AttributeItemController;
 use App\Http\Controllers\Api\V1\Client\ProductDetailController;
+use App\Http\Controllers\Api\V1\Client\WishlistController;
 
 /*
 |--------------------------------------------------------------------------
@@ -44,5 +45,7 @@ Route::prefix("v1/")->group(function () {
     // client
     Route::get('product-detail/{product_id}', [ProductDetailController::class, "productdetail"]);
     Route::post('product-shop', [ProductShopController::class, "getAllProduct"]);
+    Route::apiResource('wishlist',WishlistController::class);
+
 
 });

@@ -6,7 +6,7 @@ use App\Models\Product;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Http\Helper\Product\GetUniqueAttribute;
-use App\Http\Requests\ProductShopRequest;
+use App\Http\Requests\Shop\ProductShopRequest;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class ProductShopController extends Controller
