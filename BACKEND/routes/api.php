@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\Admin\CategoryController;
 use App\Http\Controllers\Api\V1\Admin\AttributeController;
 use App\Http\Controllers\Api\V1\Admin\AttributeItemController;
+use App\Http\Controllers\Api\V1\Client\CommentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -49,10 +50,19 @@ Route::prefix("v1/")->group(function () {
     //  để tạm vậy rồi tôi sẽ chia các route admin và client ra sau.
     // client
     Route::get('product-detail/{product_id}', [ProductDetailController::class, "productdetail"]);
+  // Client routes cho bình luận (comments)
+  Route::get('comment', [CommentController::class, 'index']);
+  Route::middleware('auth:sanctum')->group(function () {
+  // Lấy danh sách bình luận
+    Route::post('comment', [CommentController::class, 'store']); // Thêm bình luận mới
+    Route::get('comment/{id}', [CommentController::class, 'show']); // Lấy chi tiết bình luận
+    Route::put('comment/{id}', [CommentController::class, 'update']); // Cập nhật bình luận
+    Route::delete('comment/{id}', [CommentController::class, 'destroy']); // Xóa bình luận
 });
-Route::post('login', [AuthController::class, 'login']);
-Route::post('register', [AuthController::class, 'register']);
+});
+    Route::post('login', [AuthController::class, 'login']);
+    Route::post('register', [AuthController::class, 'register']);
 
 
-Route::post('logout', [AuthController::class, 'logout'])
-    ->middleware('auth:sanctum');
+    Route::post('logout', [AuthController::class, 'logout'])
+        ->middleware('auth:sanctum');
