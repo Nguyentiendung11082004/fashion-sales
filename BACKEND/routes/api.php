@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\Admin\CategoryController;
 use App\Http\Controllers\Api\V1\Admin\AttributeController;
 use App\Http\Controllers\Api\V1\Admin\AttributeItemController;
+use App\Http\Controllers\Api\V1\Client\CartController;
 
 /*
 |--------------------------------------------------------------------------
@@ -49,7 +50,10 @@ Route::prefix("v1/")->group(function () {
     //  để tạm vậy rồi tôi sẽ chia các route admin và client ra sau.
     // client
     Route::get('product-detail/{product_id}', [ProductDetailController::class, "productdetail"]);
+    Route::apiResource('cart', CartController::class)->middleware('auth:sanctum');
+
 });
+
 Route::post('login', [AuthController::class, 'login']);
 Route::post('register', [AuthController::class, 'register']);
 
