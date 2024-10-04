@@ -16,8 +16,8 @@ class WishlistController extends Controller
     {
         try {
             // Lấy danh sách sản phẩm yêu thích của người dùng hiện tại
-            // $userId = auth()->id(); // Lấy id của người dùng hiện tại
-            $userId = 1;
+            $userId = auth()->id(); // Lấy id của người dùng hiện tại
+            // $userId = 1;
 
             // Query để lấy danh sách các sản phẩm yêu thích cùng với các quan hệ
             $wishlistItems = Wishlist::with([
@@ -62,8 +62,8 @@ class WishlistController extends Controller
                 'product_id' => 'required|exists:products,id',
             ]);
 
-            // $userId = auth()->id();  Lấy id người dùng hiện tại
-            $userId = 1;
+            $userId = auth()->id();  //Lấy id người dùng hiện tại
+            // $userId = 1;
             // Kiểm tra nếu sản phẩm đã có trong danh sách yêu thích
             $wishlistItem = Wishlist::where('user_id', $userId)
                 ->where('product_id', $request->product_id)
@@ -81,7 +81,7 @@ class WishlistController extends Controller
 
             return response()->json(['message' => 'Sản phẩm đã có trong danh sách yêu thích'], 200);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Không thể thêm sản phẩm vào danh sách yêu thích', 'message' => $e->getMessage()], 500);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
@@ -107,8 +107,8 @@ class WishlistController extends Controller
     public function destroy(string $id)
     {
         try {
-            // $userId = auth()->id();  Lấy id người dùng hiện tại
-            $userId = 1;
+            $userId = auth()->id();  //Lấy id người dùng hiện tại
+            // $userId = 1;
 
             // Tìm sản phẩm trong danh sách yêu thích theo ID của wishlist
             $wishlistItem = Wishlist::where('user_id', $userId)->where('id', $id)->first();
@@ -122,7 +122,7 @@ class WishlistController extends Controller
 
             return response()->json(['message' => 'Không tìm thấy sản phẩm trong danh sách yêu thích'], 404);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Không thể xóa sản phẩm khỏi danh sách yêu thích', 'message' => $e->getMessage()], 500);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 }
