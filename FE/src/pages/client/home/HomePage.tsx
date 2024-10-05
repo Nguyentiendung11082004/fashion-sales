@@ -4,10 +4,6 @@ import {
   Blog1,
   Blog2,
   Blog3,
-  CatoryAccess,
-  CatoryShore,
-  CatoryWatch,
-  CatoryWomen,
 } from "@/components/icons";
 import CartDetail from "@/components/icons/detail/CartDetail";
 import Eye from "@/components/icons/detail/Eye";
@@ -17,6 +13,7 @@ import { Link } from "react-router-dom";
 import Banner from "./Banner/Banner";
 import Slideshow from "./SampleSlider/SampleSlider";
 import axios from "axios";
+import CategoryCarousel from "./SampleSlider/CategorySlider";
 
 const HomePage = () => {
   const [trendProducts, setTrendProducts] = useState<any[]>([]);
@@ -64,64 +61,13 @@ const HomePage = () => {
     }
   };
 
-  // const calculateDiscountPercentage = (price_regular, price_sale) => {
-  //   if (!price_regular || !price_sale || price_regular === price_sale) return 0;
-  //   return Math.round(((price_regular - price_sale) / price_regular) * 100);
-  // };
-
   return (
     <>
       <div>
         <Banner />
+        
+        <CategoryCarousel/>
 
-        <section className="container grid lg:grid-cols-12 lg:gap-8 md:gap-2 md:grid-cols-12 gap-2  mb-10">
-          <div className="lg:col-span-6 md:col-span-6 col-span-12 overflow-hidden">
-            <Link to="" className="relative overflow-hidden">
-              <img
-                src={CatoryWomen}
-                className="h-[100%] hover:scale-110 transition-all duration-700 ease-in-out "
-              />
-              <button className="shadow-sm absolute bottom-[4%] left-[50%] -translate-x-[50%] lg:left-[50%] lg:-translate-x-[50%] bg-[#fff] text-[#000] hover:bg-[#000] hover:text-[#fff] transition ease-in duration-300 w-[150px] h-[40px] font-bold text-lg">
-                Phụ Nữ
-              </button>
-            </Link>
-          </div>
-          <div className="lg:col-span-3 md:col-span-3 col-span-6">
-            <div className="w-[100%] h-[50%] overflow-hidden">
-              <Link to="" className="relative  ">
-                <img
-                  src={CatoryAccess}
-                  className="h-full w-full hover:scale-110 transition-all duration-700 ease-in-out "
-                />
-                <button className="shadow-sm absolute bottom-[4%] left-[50%] -translate-x-[50%] lg:left-[50%] lg:-translate-x-[50%] md:left-[10%] bg-[#fff] text-[#000] hover:bg-[#000] hover:text-[#fff] transition ease-in duration-300 w-[150px] h-[40px] font-bold text-lg">
-                  Phụ Kiện
-                </button>
-              </Link>
-            </div>
-            <div className="w-[100%] h-[50%] overflow-hidden">
-              <Link to="" className="relative">
-                <img
-                  src={CatoryShore}
-                  className="h-[full] hover:scale-x-110 transition-all duration-700 ease-in-out mt-2 lg:mt-9"
-                />
-                <button className="shadow-sm absolute bottom-[15%] left-[50%] -translate-x-[50%] lg:left-[50%] lg:-translate-x-[50%] md:left-[10%] bg-[#fff] text-[#000] hover:bg-[#000] hover:text-[#fff] transition ease-in duration-300 w-[150px] h-[40px] font-bold text-lg">
-                  Giày Dép
-                </button>
-              </Link>
-            </div>
-          </div>
-          <div className="lg:col-span-3 md:col-span-3 md:relative lg:relative col-span-6 overflow-hidden">
-            <Link to="" className="relative ">
-              <img
-                src={CatoryWatch}
-                className="h-[100%] scale-x-[1.8] hover:scale-x-[1.9] hover:scale-y-[1.1]   transition-all duration-700 ease-in-out "
-              />
-              <button className="shadow-sm absolute bottom-[4%] left-[50%] -translate-x-[50%] lg:left-[50%] lg:-translate-x-[50%] bg-[#fff] text-[#000] hover:bg-[#000] hover:text-[#fff] transition ease-in duration-300 w-[150px] h-[40px] font-bold text-lg">
-                Đồng Hồ
-              </button>
-            </Link>
-          </div>
-        </section>
         <section className="container mt-28">
           <div className="custom-heading ">
             <div className="flex items-center mx-auto">
@@ -191,12 +137,19 @@ const HomePage = () => {
                       </ul>
                     </div>
 
-                    {product.price_regular && product.price_sale > 0 && product.price_sale < product.price_regular && (
-                      <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400">
-                        -{Math.round(((product.price_regular - product.price_sale) / product.price_regular) * 100)}%
-                      </div>
-                    )}
-
+                    {product.price_regular &&
+                      product.price_sale > 0 &&
+                      product.price_sale < product.price_regular && (
+                        <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400">
+                          -
+                          {Math.round(
+                            ((product.price_regular - product.price_sale) /
+                              product.price_regular) *
+                              100
+                          )}
+                          %
+                        </div>
+                      )}
                   </div>
                   <div>
                     <p className="text-sm text-black mb-1">{product.name}</p>
@@ -335,12 +288,19 @@ const HomePage = () => {
                       </div>
                     </div>
 
-                    {product.price_regular && product.price_sale > 0 && product.price_sale < product.price_regular && (
-                      <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400">
-                        -{Math.round(((product.price_regular - product.price_sale) / product.price_regular) * 100)}%
-                      </div>
-                    )}
-                    
+                    {product.price_regular &&
+                      product.price_sale > 0 &&
+                      product.price_sale < product.price_regular && (
+                        <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400">
+                          -
+                          {Math.round(
+                            ((product.price_regular - product.price_sale) /
+                              product.price_regular) *
+                              100
+                          )}
+                          %
+                        </div>
+                      )}
                   </div>
                   <div>
                     <p className="text-sm text-black mb-1">{product.name}</p>
