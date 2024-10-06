@@ -18,6 +18,30 @@ const Products = () => {
 
   const [products, setProducts] = useState<any[]>([]);
 
+  const [searchTerm, setSearchTerm] = useState('');
+
+  useEffect(() => {
+    const searchProducts = async () => {
+      if (searchTerm) {
+        try {
+          const response = await axios.post("http://127.0.0.1:8000/api/v1/product-shop", { search: searchTerm });
+          setProducts(response.data);
+        } catch (error) {
+          console.error("Có lỗi xảy ra khi tìm kiếm:", error);
+        }
+      }else{
+        try {
+          const response = await axios.post("http://127.0.0.1:8000/api/v1/product-shop");
+          setProducts(response.data);
+        } catch (error) {
+          console.error("Có lỗi xảy ra khi lấy sản phẩm:", error);
+        }
+      }
+    };
+
+    searchProducts();
+  }, [searchTerm]);
+
   useEffect(() => {
     axios
       .post("http://127.0.0.1:8000/api/v1/product-shop")
@@ -81,13 +105,15 @@ const Products = () => {
         {/* search */}
         <div className="container">
           <header className="max-w-2xl mx-auto -mt-5 flex flex-col lg:-mt-7 lg:pb-10">
-            <form className="relative w-full " method="post">
+            <form className="relative w-full " method="post" onSubmit={(e) => e.preventDefault()}>
               <label htmlFor="search-input" className="text-neutral-500 ">
                 <input
                   className="block w-full outline-0 border border-neutral-200 bg-white dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50 focus:border-neutral-200 rounded-full font-normal  pl-14 py-5 pr-5 md:pl-16 shadow-lg dark:border"
                   id="search-input"
                   placeholder="Nhập từ khóa của bạn"
                   type="search"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
                 />
                 <button
                   className="ttnc-ButtonCircle flex items-center justify-center rounded-full !leading-none disabled:bg-opacity-70 bg-slate-900 hd-all-hoverblue-btn
@@ -859,85 +885,6 @@ const Products = () => {
           <div className="border-l border-gray-200"></div>
 
           {/* products */}
-          {/* <div className="flex-1 ml-8">
-            <div className="flex-1 grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-3 gap-3 sm:mx-7 sm:gap-x-10 xl:gap-8 gap-y-8 ">
-              <div className="nc-ProductCard relative flex flex-col bg-transparent ">
-                <div className="lg:mb-[25px] mb-[20px]">
-                  <div className="lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] sm:h-[345px] overflow-hidden">
-                    <img
-                      className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover/image:opacity-0"
-                      src={Product}
-                    />
-                    <img
-                      className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover/image:opacity-100"
-                      src={ProductNext}
-                    />
-                    <div>
-                      <Link to="" className="absolute left-5 top-5">
-                        <HeartWhite />
-                      </Link>
-                    </div>
-                    <div className="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100">
-                      <Link to="" className="group/btn relative m-auto">
-                        <button className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]">
-                          <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                            Xem thêm
-                          </p>
-                          <Eye />
-                        </button>
-                      </Link>
-                      <Link to="" className="group/btn relative">
-                        <button className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]">
-                          <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                            Thêm vào giỏ hàng
-                          </p>
-                          <CartDetail />
-                        </button>
-                      </Link>
-                    </div>
-                    <div
-                      className="absolute bottom-2 left-[35%] text-white
-    -translate-y-7 transform 
-      transition-all duration-500 ease-in-out 
-      group-hover:translate-y-0
-      opacity-0
-      group-hover:opacity-100
-    "
-                    >
-                      <ul className="flex">
-                        <li>
-                          <Link to="">XS,</Link>
-                        </li>
-                        <li>
-                          <Link to="">S,</Link>
-                        </li>
-                        <li>
-                          <Link to="">M,</Link>
-                        </li>
-                        <li>
-                          <Link to="">L,</Link>
-                        </li>
-                        <li>
-                          <Link to="">XL</Link>
-                        </li>
-                      </ul>
-                    </div>
-                    <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400">
-                      -15%
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-sm text-black mb-1">
-                      Analogue Resin Strap
-                    </p>
-                    <del className="mr-1">12.000.000đ</del>
-                    <span className="text-[red]">776.000₫</span>
-                  </div>
-                </div>
-              </div>
-              
-            </div>
-          </div> */}
           <div className="flex-1 ml-8">
             <div className="flex-1 grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-3 gap-3 sm:mx-7 sm:gap-x-10 xl:gap-8 gap-y-8 ">
               {products.map(({product, getUniqueAttributes}) => (
