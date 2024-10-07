@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\Api\V1\Client;
 
+use App\Models\Brand;
 use App\Models\Product;
+use App\Models\Category;
+use App\Models\Attribute;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use App\Http\Helper\Product\GetUniqueAttribute;
 use App\Http\Requests\Shop\ProductShopRequest;
+use App\Http\Helper\Product\GetUniqueAttribute;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class ProductShopController extends Controller
@@ -14,6 +17,14 @@ class ProductShopController extends Controller
     // lấy ra tất cả product và biến thể của nó
     public function getAllProduct(ProductShopRequest $request)
     {
+        // Lấy tất danh mục 
+        $allCategory = Category::query()->latest('id')->get();
+        // Lấy tất cả brands
+        $allBrand = Brand::query()->latest('id')->get();
+        // lấy ra các thuộc tính
+        $allAttribute = Attribute::with('attributeitems')->get();
+       
+
         $search = $request->input('search'); // Người dùng nhập từ khóa tìm kiếm
         $colors = $request->input('colors'); // Người dùng truyền lên một mảng các màu
         $sizes = $request->input('sizes'); // Người dùng truyền lên một mảng các kích thước
@@ -123,7 +134,7 @@ class ProductShopController extends Controller
                 ];
             }
             // Trả về tất cả sản phẩm sau khi vòng lặp kết thúc
-            return response()->json($allProducts);
+            return response()->json([ $allBrand, $allAttribute, $allCategory,$allProducts]);
         } catch (ModelNotFoundException $e) {
             // Trả về lỗi 404 nếu không tìm thấy Category
             return response()->json([
