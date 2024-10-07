@@ -23,7 +23,7 @@ class ProductShopController extends Controller
         $allBrand = Brand::query()->latest('id')->get();
         // lấy ra các thuộc tính
         $allAttribute = Attribute::with('attributeitems')->get();
-       
+
 
         $search = $request->input('search'); // Người dùng nhập từ khóa tìm kiếm
         $colors = $request->input('colors'); // Người dùng truyền lên một mảng các màu
@@ -134,7 +134,12 @@ class ProductShopController extends Controller
                 ];
             }
             // Trả về tất cả sản phẩm sau khi vòng lặp kết thúc
-            return response()->json([ $allBrand, $allAttribute, $allCategory,$allProducts]);
+            return response()->json([
+                'brands' =>   $allBrand,
+                'attributes' =>  $allAttribute,
+                'categories' =>  $allCategory,
+                'products' => $allProducts
+            ]);
         } catch (ModelNotFoundException $e) {
             // Trả về lỗi 404 nếu không tìm thấy Category
             return response()->json([
