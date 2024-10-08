@@ -50,13 +50,16 @@ Route::prefix("v1/")->group(function () {
     //  để tạm vậy rồi tôi sẽ chia các route admin và client ra sau.
     // client
     Route::get('product-detail/{product_id}', [ProductDetailController::class, "productdetail"]);
-    Route::apiResource('cart', CartController::class)->middleware('auth:sanctum');
+    Route::get('find-variant/{product_id}', [ProductDetailController::class, "findvariant"]);
 
 });
 
 Route::post('login', [AuthController::class, 'login']);
 Route::post('register', [AuthController::class, 'register']);
 
+Route::middleware('auth:sanctum')->prefix('v1/')->group(function () {
+    Route::post('logout', [AuthController::class, 'logout']);
+    Route::apiResource('cart', CartController::class);
+    
 
-Route::post('logout', [AuthController::class, 'logout'])
-    ->middleware('auth:sanctum');
+});
