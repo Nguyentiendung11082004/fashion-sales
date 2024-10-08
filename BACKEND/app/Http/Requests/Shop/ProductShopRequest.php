@@ -22,6 +22,7 @@ class ProductShopRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'sale' => 'nullable|boolean', // Nếu có, phải là true hoặc false
             'search' => 'nullable|string|max:255',
             'colors' => 'nullable|array',
             'colors.*' => 'string|max:50',
