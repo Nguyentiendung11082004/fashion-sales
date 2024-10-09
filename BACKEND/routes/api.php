@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\Admin\CategoryController;
 use App\Http\Controllers\Api\V1\Admin\AttributeController;
 use App\Http\Controllers\Api\V1\Admin\AttributeItemController;
+use App\Http\Controllers\Api\V1\Admin\BannerController;
 use App\Http\Controllers\Api\V1\Client\CommentController;
 
 /*
@@ -45,7 +46,7 @@ Route::prefix("v1/")->group(function () {
     Route::apiResource('attribute', AttributeController::class);
     Route::apiResource('attributeItem', AttributeItemController::class);
     Route::apiResource('category', CategoryController::class);
-
+    Route::apiResource('banners', BannerController::class);
     Route::get('product-home', [HomeProductController::class, "getHomeProducts"]);
     //  để tạm vậy rồi tôi sẽ chia các route admin và client ra sau.
     // client
