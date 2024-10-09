@@ -59,6 +59,9 @@ class Product extends Model
     {
         return $this->belongsToMany(Tag::class, "product_tags");
     }
+    public function cartitems(){
+        return $this->hasMany(CartItem::class);
+    }
     protected $casts = [
         'type' => "boolean",
         "status" => "boolean",

@@ -22,8 +22,12 @@ class ProductShopController extends Controller
         // Lấy tất cả brands
         $allBrand = Brand::query()->latest('id')->get();
         // lấy ra các thuộc tính
-        $allAttribute = Attribute::with('attributeitems')->get();
-
+        $attributes = Attribute::with('attributeitems')->get();
+        $allAttribute = [];
+        // converte dữ liệu cho hằng dễ làm việc
+        foreach ($attributes as $attribute) {
+            $allAttribute[$attribute->name] = $attribute->attributeitems->toArray();
+        }
         $search = $request->input('search'); // Người dùng nhập từ khóa tìm kiếm
         $colors = $request->input('colors'); // Người dùng truyền lên một mảng các màu
         $sizes = $request->input('sizes'); // Người dùng truyền lên một mảng các kích thước
@@ -34,7 +38,7 @@ class ProductShopController extends Controller
         $sortPrice = $request->input('sortPrice');
         $sortDirection = $request->input('sortDirection');
         $sortAlphaOrder = $request->input('sortAlphaOrder');
-        $trend = $request->input('trend');
+        $new = $request->input('new');
         $sale = $request->input('sale');
 
         // Kiểm tra giá trị sortDirection
@@ -47,9 +51,9 @@ class ProductShopController extends Controller
         }
         try {
             $products = Product::query()
-                ->when($trend, function ($query, $trend) {
+                ->when($new, function ($query, $new) {
                     // Lọc sản phẩm hot trend
-                    return $query->where('trend', 1);
+                    return $query->where('is_new', 1);
                 })
                 ->when($sale, function ($query) {
                     return $query->where(function ($q) {
