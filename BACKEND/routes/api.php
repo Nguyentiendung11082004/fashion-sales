@@ -14,9 +14,11 @@ use App\Http\Controllers\Api\V1\Admin\EmployeeController;
 use App\Http\Controllers\Api\V1\Admin\AttributeController;
 use App\Http\Controllers\Api\V1\Client\ProductShopController;
 use App\Http\Controllers\Api\V1\Admin\AttributeItemController;
+use App\Http\Controllers\Api\V1\Client\CheckoutController;
 use App\Http\Controllers\Api\V1\Client\ProductDetailController;
 use App\Http\Controllers\Api\V1\Client\WishlistController;
 use App\Http\Controllers\Api\V1\Client\CommentController;
+use App\Http\Controllers\Api\V1\Client\OrderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -54,6 +56,10 @@ Route::prefix("v1/")->group(function () {
     Route::get('product-detail/{product_id}', [ProductDetailController::class, "productdetail"]);
     Route::post('product-shop', [ProductShopController::class, "getAllProduct"]);
     Route::apiResource('wishlist', WishlistController::class);
+    Route::apiResource('order', OrderController::class);
+    Route::post('checkout', [CheckoutController::class, "checkout"]);
+
+
     // Client routes cho bình luận (comments)
     Route::get('comment', [CommentController::class, 'index']);
     Route::middleware('auth:sanctum')->group(function () {

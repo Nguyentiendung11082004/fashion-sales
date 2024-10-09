@@ -25,7 +25,14 @@ class Order extends Model
         'ship_user_phonenumber',
         'ship_user_address'
     ];
-
+    protected static function boot()
+    {
+        parent::boot();
+        static::creating(function ($order) {
+            // Tạo mã order_code bao gồm chữ và số
+            $order->order_code = 'ORD-' . strtoupper(uniqid());
+        });
+    }
     // Quan hệ với model User (người dùng)
     public function user()
     {

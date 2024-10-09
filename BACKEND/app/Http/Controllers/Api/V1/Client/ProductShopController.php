@@ -53,20 +53,18 @@ class ProductShopController extends Controller
                 })
                 ->when($sale, function ($query) {
                     return $query->where(function ($q) {
-                        // Check if the product is a simple product (type = 0)
                         $q->where(function ($query) {
                             $query->where('type', 0)
-                                  ->whereNotNull('price_sale')
-                                  ->whereColumn('price_sale', '<', 'price_regular');
+                                ->whereNotNull('price_sale')
+                                ->orWhereColumn('price_sale', '<', 'price_regular'); // Để đảm bảo lọc bao gồm cả giá sale null
                         })
-                        ->orWhere(function ($query) {
-                            // Check if the product has variants (type = 1)
-                            $query->where('type', 1)
-                                  ->whereHas('variants', function ($query) {
-                                      $query->whereNotNull('price_sale')
-                                            ->whereColumn('price_sale', '<', 'price_regular');
-                                  });
-                        });
+                            ->orWhere(function ($query) {
+                                $query->where('type', 1)
+                                    ->whereHas('variants', function ($query) {
+                                        $query->whereNotNull('price_sale')
+                                            ->orWhereColumn('price_sale', '<', 'price_regular');
+                                    });
+                            });
                     });
                 })
                 ->when($categories, function ($query) use ($categories) {
