@@ -183,13 +183,14 @@ class CartController extends Controller
         try {
 
            return DB::transaction(function () use ($request, $id) {
-                    // $user_id=Auth::id();
-                    // $cart=Cart::query()->where('user_id',$user_id)->first()->toArray();
                     $request->validate([
-                        "quantity"=>"required|integer|min:1",
-                        "product_variant"=>"required|array"
+                        "quantity"=>"required|integer|min:1"
+                        // ,
+                        // "product_variant"=>"required|array"
                     ]);
                     $cart_item=CartItem::query()->findOrFail($id);
+                    $product=Product::query()->findOrFail($cart_item->product_id);
+
                     $cart_item->quantity=$request->input("quantity");
                     $cart_item->save();
                     $getUniqueAttributes=new GetUniqueAttribute();
