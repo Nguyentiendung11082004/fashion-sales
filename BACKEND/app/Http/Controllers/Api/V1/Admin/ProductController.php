@@ -138,6 +138,7 @@ class ProductController extends Controller
         try {
             // dd($id);
             $product = Product::query()->latest('id')->findOrFail($id)->load(["brand", "category", "attributes", "variants", "galleries", "tags"]);
+            // dd($product);
             foreach ($product->attributes as  $item) {
                 $item->pivot->attribute_item_ids = json_decode($item->pivot->attribute_item_ids);
             }
