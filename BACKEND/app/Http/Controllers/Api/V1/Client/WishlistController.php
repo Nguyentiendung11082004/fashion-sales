@@ -18,7 +18,6 @@ class WishlistController extends Controller
             // Lấy danh sách sản phẩm yêu thích của người dùng hiện tại
             $userId = auth()->id(); // Lấy id của người dùng hiện tại
             // $userId = 1;
-
             // Query để lấy danh sách các sản phẩm yêu thích cùng với các quan hệ
             $wishlistItems = Wishlist::with([
                 'product.galleries',
