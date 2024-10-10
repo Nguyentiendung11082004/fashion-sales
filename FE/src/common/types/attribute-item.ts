@@ -1,5 +1,5 @@
 export interface Iattributeitem {
-    id:number;
-    name: string;
-    values: string;
+  id: number;
+  name: string;
+  values: string;
 }

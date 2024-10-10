@@ -15,17 +15,15 @@ class ProductDetailController extends Controller
     public function productdetail(string $id)
     {
         try {
-
             $product = Product::query()->with([
-
                 "brand",
                 "category",
                 "galleries",
                 "tags",
                 "comments",
                 "variants.attributes"
-            ])->findOrFail($id);
-            $product->increment('views');
+                ])->findOrFail($id);
+                $product->increment('views');
             $getUniqueAttributes = new GetUniqueAttribute();
             $productRelated = Product::query()->with(["variants.attributes"])->where('id', "<>", $product)->get()->toArray();
             

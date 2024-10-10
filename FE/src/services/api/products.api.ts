@@ -2,25 +2,32 @@
 import { Iproduct } from "@/common/types/products";
 import instance from "@/configs/axios";
 
+const handleRequest = async (
+  method: "get" | "post" | "put" | "delete",
+  url: string,
+  value?: Iproduct
+) => {
+  try {
+    const { data } = await instance[method](url, value);
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
 
-const handleRequest = async (method: 'get' | 'post' | 'put' | 'delete',url: string,value?: Iproduct) => {
-    try {
-        const {data} = await instance[method](url,value);
-        return data;
-    } catch (error) {
-        throw(error)
-    }
-}
-
-export const productsIndex = () => handleRequest('get',`/products`); 
+export const productsIndex = () => handleRequest("get", `/products`);
 // getall
-export const productShow = (id:number) => handleRequest('get', `/products/${id}`)
+export const productShow = (id: number | string) =>
+  handleRequest("get", `/products/${id}`);
 // get id
-export const productCreate = () => handleRequest('get',`/products/create`);
+export const productCreate = () => handleRequest("get", `/products/create`);
 // get theo attribute
-export const productStore = (product:Iproduct) => handleRequest('post',`/products`, product)
+export const productStore = (product: Iproduct) =>
+  handleRequest("post", `/products`, product);
 /// add prouduct
-export const productUpdate = (id:number,product:Iproduct) => handleRequest('put', `/products/${id}`, product)
+export const productUpdate = (id: number, product: Iproduct) =>
+  handleRequest("put", `/products/${id}`, product);
 // update
-export const productDestroy = (id:number) => handleRequest(`delete`, `products/${id}`)
+export const productDestroy = (id: number) =>
+  handleRequest(`delete`, `products/${id}`);
 // delete

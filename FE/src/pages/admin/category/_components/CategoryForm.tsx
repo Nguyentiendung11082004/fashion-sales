@@ -1,7 +1,7 @@
 import Loading from '@/common/Loading/Loading'
 import { Icategories } from '@/common/types/categories'
 import instance from '@/configs/axios'
-import { categoriesCreate, categoriesShow, categoriesUpdate } from '@/services/api/categories'
+import { categoriesCreate, categoriesShow, categoriesUpdate } from '@/services/api/admin/categories'
 import { UploadOutlined } from '@ant-design/icons'
 import { useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Button, Form, Input, Radio, Upload, UploadProps, message } from 'antd'
