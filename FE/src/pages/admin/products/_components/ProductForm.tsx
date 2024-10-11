@@ -20,259 +20,21 @@ const ProductForm = () => {
     const { id } = useParams();
     const [form] = Form.useForm();
     const navigate = useNavigate();
-    const [valueHome, setValueHome] = useState(1);
-    const [valueTrend, setValueTrend] = useState(1);
-    const [valueNew, setValueNew] = useState(1);
-    const [valueStatus, setValueStatus] = useState(1);
     const [urlImage, setUrlImage] = useState<any>();
-    const [imageGallery, setImageGaller] = useState<any>([]);
-    const [attribute, setAttribute] = useState(false);
+    const [imageGallery, setImageGaller] = useState<any[]>([]);
+    const [attribute, setAttribute] = useState<number>(0);
     const [selectedAttributeChildren, setSelectedAttributeChildren] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const queryClient = useQueryClient();
-    const [selectedItems, setSelectedItems] = useState<any>([]); // giá trị khi lưu ở table
+    const [selectedItems, setSelectedItems] = useState<any>([]); // giá trị khi lưu ở table 
     const [isTableVisible, setIsTableVisible] = useState(false); // State điều khiển hiển thị bảng
     const [selectedValues, setSelectedValues] = useState<any>([]); // State lưu trữ giá trị đã chọn cho từng thuộc tính
     const [isColumnsVisible, setIsColumnsVisible] = useState(false); // state cột
     const [error, setError] = useState<any>()
-
-    const [variants, setVariants] = useState([
-        { image: '', price_regular: '', price_sale: '', quantity: 0, sku: '' }
-    ]);
-    const handleInputChange = (index: number, field: string, value: any) => {
-        const newVariants = [...variants];
-        newVariants[index] = { ...newVariants[index], [field]: value };
-        setVariants(newVariants);
-    };
-   
-    const { data, isFetching } = useQuery({
-        queryKey: ['productCreate'],
-        queryFn: productCreate,
-    })
-    const handleChangeAttribute = (value: number) => {
-        setAttribute(value === 1);
-        setSelectedAttributeChildren([])
-        setIsTableVisible(false)
-    };
-    const handleChangeAttributeChildren = (values: any) => {
-        setSelectedAttributeChildren(values);
-        const newSelectedValues = { ...selectedValues };
-        values.forEach((attrId: any) => {
-            if (!(attrId in newSelectedValues)) {
-                newSelectedValues[attrId] = [];
-            }
-        });
-        Object.keys(newSelectedValues).forEach(attrId => {
-            if (!values.includes(Number(attrId))) {
-                newSelectedValues[attrId] = [];
-                form.setFieldsValue({ [`size_${attrId}`]: [] });
-            }
-        });
-        setSelectedValues(newSelectedValues);
-        handleSaveAttributes();
-    };
-    const handleChangeAttributeItem = (attrId: number, values: any) => {
-        const newSelectedValues = {
-            ...selectedValues,
-            [attrId]: values,
-        };
-
-        if (values.length === 0) {
-            const { [attrId]: _, ...rest } = newSelectedValues;
-            setSelectedValues(rest);
-            setSelectedAttributeChildren(prev => {
-                let rs = [...prev.filter(id => id !== attrId)]
-                form.setFieldValue('attribute_id', rs)
-                return rs;
-            });
-            // form.setFieldsValue({ [`size_${attrId}`]: [] });
-            // const hasValues = Object.values(rest).some((val: any) => val.length > 0);
-            // setIsTableVisible(hasValues);
-        } else {
-            setSelectedValues(newSelectedValues);
-            setIsTableVisible(true);
-        }
-        handleSaveAttributes();
-    };
-
-
-    const handleSaveAttributes = () => {
-        const combinedItems: { [key: string]: string }[] = [];
-        const attributeNames = Object.keys(selectedValues).filter(attrId => selectedValues[attrId]?.length > 0);
-
-        const createCombinations = (index: number, currentCombination: { [key: string]: string }) => {
-            if (index === attributeNames.length) {
-                combinedItems.push({ ...currentCombination });
-                return;
-            }
-
-            const attrName = attributeNames[index];
-            const items = selectedValues[attrName] || [];
-            if (items.length === 0) return;
-
-            items.forEach((itemId: any) => {
-                const item = data?.attribute.find((attr: any) => attr.id === Number(attrName))?.attributeitems.find((i: any) => i.id === itemId);
-
-
-                if (itemId === 0) {
-                    delete currentCombination[attrName];
-                } else if (item) {
-                    const newCombination = { ...currentCombination, [attrName]: item.value };
-                    createCombinations(index + 1, newCombination);
-                }
-            });
-        };
-        createCombinations(0, {});
-        setSelectedItems(combinedItems);
-        setIsColumnsVisible(combinedItems.length > 0);
-    };
-
-
-    const handleRemoveAttributeValue = (record: any) => {
-        const updatedItems = selectedItems.filter((item: any) => item !== record);
-        setSelectedItems(updatedItems);
-
-        // Object.keys(updatedItems).forEach(attrId => {
-        //     if (!record.includes(Number(attrId))) {
-        //         updatedItems[attrId] = [];
-        //         form.setFieldsValue({ [`size_${attrId}`]: [] });
-        //     }    
-        // });
-
-
-
-        setIsTableVisible(updatedItems.length > 0);
-    };
-
-    const columns: any = [
-        {
-            title: 'STT',
-            render: (text: any, record: any, index: number) => <div>{index + 1}</div>,
-            key: 'Stt',
-        },
-        ...isColumnsVisible ? Object.keys(selectedValues).filter(attrId => selectedValues[attrId].length > 0).map(attrId => {
-            const attribute = data?.attribute.find((attr: any) => attr.id === Number(attrId));
-            return attribute ? {
-                title: attribute.name,
-                dataIndex: attrId,
-                key: attrId,
-                render: (text: any, record: any, index: number) => (
-                    <Input value={text} onChange={(e) => handleInputChange(index, attrId, e.target.value)} />
-                )
-            } : null;
-        }).filter(Boolean) : [],
-        {
-            title: 'Ảnh',
-            dataIndex: 'image',
-            render: (text: any, record: any, index: number) => (
-                <Upload
-                    {...getPropsImgThumbnail(index)}
-                >
-                    <Button icon={<UploadOutlined />}>Tải lên ảnh</Button>
-                </Upload>
-            )
-        },
-        {
-            title: 'Price Regular',
-            dataIndex: 'price_regular',
-            render: (text: any, record: any, index: number) => (
-                <Input value={text} onChange={(e) => handleInputChange(index, 'price_regular', e.target.value)} />
-            )
-        },
-        {
-            title: 'Price Sale',
-            dataIndex: 'price_sale',
-            render: (text: any, record: any, index: number) => (
-                <Input value={text} onChange={(e) => handleInputChange(index, 'price_sale', e.target.value)} />
-            )
-        },
-        {
-            title: 'Số lượng',
-            dataIndex: 'quantity',
-            render: (text: any, record: any, index: number) => (
-                <Input value={text} onChange={(e) => handleInputChange(index, 'quantity', e.target.value)} />
-            )
-        },
-        {
-            title: 'SKU',
-            dataIndex: 'sku',
-            render: (text: any, record: any, index: number) => (
-                <Input value={text} onChange={(e) => handleInputChange(index, 'sku', e.target.value)} />
-            )
-        },
-        {
-            title: 'Thao tác',
-            render: (record: any) => (
-                <Button onClick={() => handleRemoveAttributeValue(record)}>Xoá</Button>
-            )
-        }
-    ];
-    const handleErrorResponse = (error: any) => {
-        console.log("error", error);
-        setIsLoading(false); // Đặt loading về false ngay lập tức
-    
-        if (error.response && error.response.data.errors) {
-            const errorFields: ErrorResponse = error.response.data.errors;
-    
-            // Thiết lập lỗi cho các trường có vấn đề
-            const fields = Object.keys(errorFields).map((key) => ({
-                name: key,
-                errors: errorFields[key],
-            }));
-            form.setFields(fields);
-    
-            // Reset lỗi cho các trường không có vấn đề
-            const allFieldNames = ['name', 'attribute_id', 'value']; // Thêm tất cả các trường có thể
-            allFieldNames.forEach((field) => {
-                if (!errorFields[field]) {
-                    form.setFields([{ name: field, errors: [] }]);
-                }
-            });
-        } else {
-            toast.error('Có lỗi xảy ra');
-        }
-    };
-    
-    const createProductMutation = useMutation({
-        mutationFn: productStore,
-        onMutate: () => {
-            setIsLoading(true)
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ['products'],
-            })
-            toast.success('Thêm sản phẩm thành công');
-            form.resetFields();
-            navigate('/admin/products')
-        },
-        onError: handleErrorResponse,
-
-    });
-   
-
-    const updateProductMutation = useMutation({
-        mutationFn: (product: Iproduct) => productUpdate(Number(id), product),
-        onMutate: () => {
-            setIsLoading(true)
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ['products'],
-            })
-            toast.success('Sửa sản phẩm thành công');
-            form.resetFields();
-            navigate('/admin/products')
-        },
-        onError: handleErrorResponse,
-    })
-
-    useEffect(() => {
-        if (Object.keys(selectedValues).length > 0) {
-            handleSaveAttributes();
-        }
-    }, [selectedValues]);
-
+    const [valueHome, setValueHome] = useState(1);
+    const [valueTrend, setValueTrend] = useState(1);
+    const [valueNew, setValueNew] = useState(1);
+    const [valueStatus, setValueStatus] = useState(1);
     const onChangeHome = (e: RadioChangeEvent) => {
         setValueHome(e.target.value);
     };
@@ -285,49 +47,107 @@ const ProductForm = () => {
     const onChangeStatus = (e: RadioChangeEvent) => {
         setValueStatus(e.target.value);
     };
-    const { data: productShow } = useQuery({
-        queryKey: ['productShow', id],
-        queryFn: async () => {
-            if (!id) return null;
-            const response = await instance.get(`/products/${id}`);
-            return response.data.product;
-        },
-        enabled: !!id
+    const [checkedItems, setCheckedItems] = useState<any[]>([]);
+    const [variants, setVariants] = useState([
+        { image: '', price_regular: '', price_sale: '', quantity: '', sku: '' }
+    ]);
+    const handleInputChange = (index: number, field: string, value: any) => {
+        const newVariants = [...variants];
+        newVariants[index] = { ...newVariants[index], [field]: value };
+        setVariants(newVariants);
+    };
+
+    const { data, isFetching } = useQuery({
+        queryKey: ['productCreate'],
+        queryFn: productCreate,
     });
-    useEffect(() => {
-        if (productShow) {
-            form.setFieldsValue(productShow);
+
+    const handleChangeAttribute = (value: number) => {
+        setAttribute(value);
+        setSelectedAttributeChildren([]);
+        setIsTableVisible(false);
+        setSelectedValues({});
+        setSelectedItems([]);
+        const newCheckedItems = Array(variants.length).fill(false);
+        setCheckedItems(newCheckedItems);
+        if (value !== 0) {
+            const fieldsToReset = [...selectedAttributeChildren];
+            form.setFieldsValue(Object.fromEntries(fieldsToReset.map(field => [field, undefined])));
+            form.resetFields(['price_regular', 'price_sale', 'quantity']);
+            const fieldsToClear = selectedAttributeChildren.concat(['attribute_id']);
+            form.setFieldsValue(Object.fromEntries(fieldsToClear.map(field => [field, undefined])));
+        } else {
+            form.resetFields();
+            setSelectedValues({});
         }
-    }, [productShow, form]);
+    };
+    console.log("selectedValues",selectedValues)
+    const handleChangeAttributeChildren = (values: any) => {
+        setSelectedAttributeChildren(values);
+        const newSelectedValues = { ...selectedValues };
 
-    const propsImgThumbnail: UploadProps = {
-        name: 'file',
-        action: 'https://api.cloudinary.com/v1_1/dlvwxauhf/image/upload',
-        data: {
-            upload_preset: "fashion-sales",
-            folder: "fashion-sales"
-        },
-        onChange(info: any) {
-            if (info.file.status === "done") {
-                const isImage = /^image\//.test(info.file.type);
-                if (isImage) {
-                    const imageUrl = info.file.response.url; // Định nghĩa biến imageUrl ở đây
-                    setUrlImage(imageUrl); // Cập nhật URL
-                    message.open({
-                        type: 'success',
-                        content: 'Upload ảnh thành công',
-                    });
-
-
-                }
-            } else if (info.file.status === "error") {
-                message.error(`${info.file.name} file upload failed.`);
+        values.forEach((attrId: any) => {
+            if (!(attrId in newSelectedValues)) {
+                newSelectedValues[attrId] = [];
             }
-        },
+        });
+        // Object.keys(newSelectedValues).forEach(attrId => {
+        //     if (!values.includes(attrId)) {
+        //         delete newSelectedValues[attrId];
+        //     }
+        // });
+        setSelectedValues(newSelectedValues);
+        handleSaveAttributes();
+    };
+
+    const handleChangeAttributeItem = (attrId: number, values: any) => {
+        setSelectedValues((prevValues: any) => ({
+            ...prevValues,
+            [attrId]: values,
+        }));
+        // Nếu giá trị rỗng, xóa thuộc tính
+        if (values.length === 0) {
+            setSelectedAttributeChildren(prev => {
+                const newChildren = prev.filter(id => id !== attrId);
+                form.setFieldValue('attribute_id', newChildren);
+                return newChildren;
+            });
+        } else {
+            setIsTableVisible(true);
+        }
+
+        handleSaveAttributes();
     };
 
 
-    // Cập nhật propsImgThumbnail
+    const handleSaveAttributes = () => {
+        const combinedItems: { [key: string]: string }[] = [];
+        const attributeNames = Object.keys(selectedValues).filter(attrId => selectedValues[attrId]?.length > 0);
+        const createCombinations = (index: number, currentCombination: { [key: string]: string }) => {
+            if (index === attributeNames.length) {
+                if (Object.keys(currentCombination).length > 0) {
+                    combinedItems.push({ ...currentCombination });
+                }
+                return;
+            }
+            const attrName = attributeNames[index];
+            const items = selectedValues[attrName] || [];
+            if (items.length === 0) return;
+
+            items.forEach((itemId: any) => {
+                const item = data?.attribute.find((attr: any) => attr.id === Number(attrName))
+                    ?.attributeitems.find((i: any) => i.id === itemId);
+
+                if (item) {
+                    const newCombination = { ...currentCombination, [attrName]: item.value };
+                    createCombinations(index + 1, newCombination);
+                }
+            });
+        };
+        createCombinations(0, {});
+        setSelectedItems(combinedItems);
+        setIsColumnsVisible(combinedItems.length > 0);
+    };
     const getPropsImgThumbnail = (index: number): UploadProps => ({
         name: 'file',
         action: 'https://api.cloudinary.com/v1_1/dlvwxauhf/image/upload',
@@ -374,19 +194,251 @@ const ProductForm = () => {
             }
         },
     }
+    const propsImgThumbnail: UploadProps = {
+        name: 'file',
+        action: 'https://api.cloudinary.com/v1_1/dlvwxauhf/image/upload',
+        data: {
+            upload_preset: "fashion-sales",
+            folder: "fashion-sales"
+        },
+        onChange(info: any) {
+            if (info.file.status === "done") {
+                const isImage = /^image\//.test(info.file.type);
+                if (isImage) {
+                    const imageUrl = info.file.response.url;
+                    setUrlImage(imageUrl);
+                    message.open({
+                        type: 'success',
+                        content: 'Upload ảnh thành công',
+                    });
 
+
+                }
+            } else if (info.file.status === "error") {
+                message.error(`${info.file.name} file upload failed.`);
+            }
+        },
+    };
+    const columns: any = [
+        {
+            title: "Checkox",
+            render: (text: any, record: any, index: number) => (
+                <Input
+                    type="checkbox"
+                    checked={!!checkedItems[index]}
+                    onChange={() => handleCheckboxChange(index)}
+                />
+            ),
+        },
+        {
+            title: 'STT',
+            render: (text: any, record: any, index: number) => <div>{index + 1}</div>,
+            key: 'Stt',
+        },
+        ...isColumnsVisible ? Object.keys(selectedValues).filter(attrId => selectedValues[attrId].length > 0).map(attrId => {
+            const attribute = data?.attribute.find((attr: any) => attr.id === Number(attrId));
+            return attribute ? {
+                title: attribute.name,
+                dataIndex: attrId,
+                key: attrId,
+                render: (text: any, record: any) => (
+                    <Input value={record[attrId] || []} onChange={(e) => handleInputChange(record.key, attrId, e.target.value)} />
+                )
+            } : null;
+        }).filter(Boolean) : [],
+        {
+            title: 'Ảnh',
+            dataIndex: 'image',
+            render: (text: any, record: any, index: number) => (
+                <Upload {...getPropsImgThumbnail(index)}>
+                    <Button icon={<UploadOutlined />}>Tải lên ảnh</Button>
+                </Upload>
+            )
+        },
+        {
+            title: 'Price Regular',
+            dataIndex: 'price_regular',
+            render: (text: any, record: any, index: number) => (
+                <Input
+                    value={variants[index]?.price_regular || ''}
+                    onChange={(e) => handleInputChange(index, 'price_regular', e.target.value)}
+                />
+            )
+        },
+        {
+            title: 'Price Sale',
+            dataIndex: 'price_sale',
+            render: (text: any, record: any, index: number) => (
+                <Input
+                    value={variants[index]?.price_sale || ''}
+                    onChange={(e) => handleInputChange(index, 'price_sale', e.target.value)}
+                />
+            )
+        },
+        {
+            title: 'Số lượng',
+            dataIndex: 'quantity',
+            render: (text: any, record: any, index: number) => (
+                <Input
+                    value={variants[index]?.quantity || ''}
+                    onChange={(e) => handleInputChange(index, 'quantity', e.target.value)}
+                />
+            )
+        },
+        {
+            title: 'SKU',
+            dataIndex: 'sku',
+            render: (text: any, record: any, index: number) => (
+                <Input
+                    value={variants[index]?.sku || ''}
+                    onChange={(e) => handleInputChange(index, 'sku', e.target.value)}
+                />
+            )
+        }
+
+    ];
+
+    useEffect(() => {
+        if (Object.keys(selectedValues).length > 0) {
+            handleSaveAttributes();
+        }
+    }, [selectedValues]);
+    const { data: productShow } = useQuery({
+        queryKey: ['productShow', id],
+        queryFn: async () => {
+            if (!id) return null;
+            const response = await instance.get(`/products/${id}`);
+            return response.data.product;
+        },
+        enabled: !!id
+    });
+    const getProduct = (productShow: any) => {
+        const productTags = productShow.tags.map((tag: any) => tag.id);
+        const productType = productShow.type ? 1 : 0;
+        const productAttribute = productShow.attributes.map((attribute: any) => attribute.id);
+        const productAttributeValue = productShow.attributes.reduce((acc: any, attribute: any) => {
+            acc[attribute.id] = attribute.pivot.attribute_item_ids;
+            return acc;
+        }, {});
+
+        setAttribute(productType);
+        setSelectedAttributeChildren(productAttribute);
+        setSelectedValues(productAttributeValue);
+
+        // Khởi tạo initialItems với các thuộc tính từ productShow.variants
+        const initialItems = productShow.variants.map((item: any) => {
+            const itemAttributes = productAttribute.reduce((acc: any, attrId: any) => {
+                acc[attrId] = item[attrId] || [];
+                return acc;
+            }, {});
+
+            return {
+                price_regular: item.price_regular,
+                price_sale: item.price_sale,
+                quantity: item.quantity,
+                sku: item.sku,
+                ...itemAttributes
+            };
+        });
+
+        setSelectedItems(initialItems);
+        form.setFieldsValue({
+            ...productShow,
+            tags: productTags,
+            type: productType,
+            attribute_id: productAttribute,
+            ...productAttributeValue,
+        });
+        productAttribute.forEach((attrId: any) => {
+            const values = productAttributeValue[attrId] || [];
+            handleChangeAttributeItem(attrId, values);
+        });
+    };
+    useEffect(() => {
+        if (productShow) {
+            getProduct(productShow);
+        }
+    }, [productShow, form]);
+    const handleErrorResponse = (error: any) => {
+        setIsLoading(false);
+        if (error.response && error.response.data.errors) {
+            const errorFields: ErrorResponse = error.response.data.errors;
+            const fields = Object.keys(errorFields).map((key) => ({
+                name: key,
+                errors: errorFields[key],
+            }));
+            form.setFields(fields);
+            const allFieldNames = ['name', 'attribute_id', 'tags', 'brand_id', 'category_id', 'slug', 'sku', 'img_thumbnail', 'gallery', 'type', 'price_regular', 'price_sale', 'quantity', 'description', 'description_title'];
+            allFieldNames.forEach((field) => {
+                if (!errorFields[field]) {
+                    form.setFields([{ name: field, errors: [] }]);
+                }
+            });
+        } else {
+            toast.error('Có lỗi xảy ra');
+        }
+    };
+    const handleCheckboxChange = (index: number) => {
+        setCheckedItems(prev => {
+            const newCheckedItems = [...prev];
+            newCheckedItems[index] = !newCheckedItems[index];
+            if (!newCheckedItems[index]) {
+                setVariants(prev => {
+                    const newVariants = [...prev];
+                    newVariants[index] = {
+                        price_regular: '',
+                        price_sale: '',
+                        quantity: '',
+                        sku: '',
+                        image: '',
+                    };
+                    return newVariants;
+                });
+            }
+            return newCheckedItems;
+        });
+        console.log("variants", variants)
+    };
+    console.log("selectedItems", selectedItems)
+    const createProductMutation = useMutation({
+        mutationFn: productStore,
+        onMutate: () => {
+            setIsLoading(true)
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ['products'],
+            })
+            toast.success('Thêm sản phẩm thành công');
+            form.resetFields();
+            navigate('/admin/products')
+        },
+        onError: handleErrorResponse,
+    });
+    const updateProductMutation = useMutation({
+        mutationFn: (product: Iproduct) => productUpdate(Number(id), product),
+        onMutate: () => {
+            setIsLoading(true)
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ['products'],
+            })
+            toast.success('Sửa sản phẩm thành công');
+            form.resetFields();
+            navigate('/admin/products')
+        },
+        onError: handleErrorResponse,
+    })
     const onFinish = (values: Iproduct) => {
         const productVariantData: IProductVariant[] = [];
         const attributeData: { [key: string]: number[] } = {};
-
         selectedAttributeChildren.forEach(attrId => {
             const itemIds = selectedValues[attrId] || [];
             attributeData[attrId] = itemIds;
         });
-
         const attributeKeys = Object.keys(attributeData);
         const combinations: any[][] = [];
-
         const combine = (arr: any[], idx: number) => {
             if (idx === attributeKeys.length) {
                 combinations.push(arr);
@@ -400,13 +452,23 @@ const ProductForm = () => {
         combine([], 0);
         combinations.forEach((combination, index) => {
             const variant = variants[index % variants.length];
+
+            const attributeItemIds = combination.map((itemId, idx) => {
+                const attrId = attributeKeys[idx];
+                const item = data?.attribute.find((attr: any) => attr.id === Number(attrId))
+                    ?.attributeitems.find((i: any) => i.id === itemId);
+                return {
+                    id: itemId,
+                    value: item ? item.value : '',
+                };
+            });
             productVariantData.push({
-                attribute_item_id: combination,
+                attribute_item_id: attributeItemIds,
                 price_regular: Number(variant.price_regular),
                 price_sale: Number(variant.price_sale),
                 quantity: Number(variant.quantity),
-                sku: variant.sku,
                 image: variant.image,
+                sku: variant.sku,
             });
         });
 
@@ -425,22 +487,18 @@ const ProductForm = () => {
                 });
             }
         } else {
+            const filteredVariants = productVariantData.filter((_, index) => checkedItems[index]);
+            const productPayload = {
+                ...values,
+                img_thumbnail: urlImage,
+                gallery: imageGallery,
+                attribute_item_id: attributeData,
+                product_variant: filteredVariants,
+            };
             if (id) {
-                updateProductMutation.mutate({
-                    ...values,
-                    img_thumbnail: urlImage,
-                    attribute_item_id: attributeData,
-                    gallery: imageGallery,
-                    product_variant: productVariantData,
-                });
+                updateProductMutation.mutate(productPayload);
             } else {
-                createProductMutation.mutate({
-                    ...values,
-                    img_thumbnail: urlImage,
-                    attribute_item_id: attributeData,
-                    gallery: imageGallery,
-                    product_variant: productVariantData,
-                });
+                createProductMutation.mutate(productPayload);
             }
         }
     };
@@ -463,90 +521,88 @@ const ProductForm = () => {
                         >
                             <Form.Item name="name" label="Tên sản phẩm" className="col-span-1"
                             >
-                                <Input />
+                                <Input size='large' />
                                 {error?.name && <div className='text-red-600'>{error.name.join(', ')}</div>}
                             </Form.Item>
                             <Form.Item name="tags" label="Tag" className="col-span-1">
                                 <Select
+                                    size='large'
                                     mode='multiple'
                                     options={
                                         data?.tag.map((item: Itags) => ({
                                             value: item?.id,
                                             label: item?.name
-                                        }))
+                                        })) || []
                                     }
-
                                     placeholder="Chọn tag"
-                                    placement="bottomLeft" className='w-full' />
-                                {error &&
-                                    error.errors &&
-                                    error.errors.tags &&
-                                    error.errors.tags.length > 0 ? (
-                                    <div className="text-red-600">{error.errors.tags[0]}</div>
-                                ) : null}
+                                    placement="bottomLeft"
+                                    className='w-full'
+                                />
+
+                                {error?.tags && <div className='text-red-600'>{error.tags.join(', ')}</div>}
+
                             </Form.Item>
                             <Form.Item name="brand_id" label="Thương hiệu" className="col-span-1">
                                 <Select
-                                    options={data?.brand.map((item: Itags) => ({
+                                    size='large'
+                                    options={data?.brand.map((item: any) => ({
                                         value: item.id,
                                         label: item.name
                                     }))}
 
                                     placeholder="Chọn thương hiệu"
                                     placement="bottomLeft" className='w-full' />
-                                {error &&
-                                    error.errors &&
-                                    error.errors.brand_id &&
-                                    error.errors.brand_id.length > 0 ? (
-                                    <div className="text-red-600">{error.errors.brand_id[0]}</div>
-                                ) : null}
+                                {error?.brand_id && <div className='text-red-600'>{error.brand_id.join(', ')}</div>}
                             </Form.Item>
                             <Form.Item name="category_id" label="Danh mục" className="col-span-1">
                                 <Select
+                                    size='large'
                                     options={data?.category.map((item: Icategories) => ({
                                         value: item.id,
                                         label: item.name
                                     }))}
-
+                                    value={productShow?.tags.map((item: any) => item.id)}
                                     placeholder="Chọn danh mục"
                                     placement="bottomLeft" className='w-full' />
-                                {error &&
-                                    error.errors &&
-                                    error.errors.category_id &&
-                                    error.errors.category_id.length > 0 ? (
-                                    <div className="text-red-600">{error.errors.category_id[0]}</div>
-                                ) : null}
+                                {error?.category_id && <div className='text-red-600'>{error.category_id.join(', ')}</div>}
+
                             </Form.Item>
                             <Form.Item name="slug" label="Slug" className="col-span-1">
-                                <Input />
-                                {error &&
-                                    error.errors &&
-                                    error.errors.slug &&
-                                    error.errors.slug.length > 0 ? (
-                                    <div className="text-red-600">{error.errors.slug[0]}</div>
-                                ) : null}
+                                <Input size='large' />
+                                {error?.slug && <div className='text-red-600'>{error.slug.join(', ')}</div>}
+
                             </Form.Item>
                             <Form.Item name="sku" label="SKU" className="col-span-1">
-                                <Input />
-                                {error &&
-                                    error.errors &&
-                                    error.errors.sku &&
-                                    error.errors.sku.length > 0 ? (
-                                    <div className="text-red-600">{error.errors.sku[0]}</div>
-                                ) : null}
+                                <Input size='large' />
+                                {error?.sku && <div className='text-red-600'>{error.sku.join(', ')}</div>}
+
                             </Form.Item>
                             <Form.Item name="img_thumbnail" label="Ảnh sản phẩm" >
                                 <Upload
                                     {...propsImgThumbnail}
+                                    showUploadList={{
+                                        showPreviewIcon: false,
+                                        showRemoveIcon: true,
+                                    }}
+                                    onRemove={() => {
+                                        setUrlImage(null);
+                                    }}
                                 >
                                     <Button icon={<UploadOutlined />}>Tải lên ảnh</Button>
                                 </Upload>
-                                {error &&
-                                    error.errors &&
-                                    error.errors.img_thumbnail &&
-                                    error.errors.img_thumbnail.length > 0 ? (
-                                    <div className="text-red-600">{error.errors.img_thumbnail[0]}</div>
-                                ) : null}
+                                {urlImage ? (
+                                    <>
+                                        <img src={urlImage} alt="Uploaded" style={{ marginTop: 16, width: 100, marginBottom: '10px' }} />
+                                    </>
+                                ) : (
+                                    productShow?.img_thumbnail && (
+                                        <>
+                                            <img src={productShow.img_thumbnail} alt="Uploaded" style={{ marginTop: 16, width: 100, marginBottom: '10px' }} />
+                                        </>
+                                    )
+                                )}
+                                {error?.img_thumbnail && <div className='text-red-600'>{error.img_thumbnail.join(', ')}</div>}
+
                             </Form.Item>
                             <Form.Item
                                 name="gallery"
@@ -559,71 +615,29 @@ const ProductForm = () => {
                                 >
                                     <Button icon={<UploadOutlined />}>Tải lên gallery</Button>
                                 </Upload>
-                                {error &&
-                                    error.errors &&
-                                    error.errors.gallery &&
-                                    error.errors.gallery.length > 0 ? (
-                                    <div className="text-red-600">{error.errors.gallery[0]}</div>
-                                ) : null}
-                            </Form.Item>
-                            {
-                                !attribute && <>
-                                    <Form.Item name="price_regular" label="Price Regular" className="col-span-1">
-                                        <InputNumber />
-                                        {error &&
-                                            error.errors &&
-                                            error.errors.price_regular &&
-                                            error.errors.price_regular.length > 0 ? (
-                                            <div className="text-red-600">{error.errors.price_regular[0]}</div>
-                                        ) : null}
-                                    </Form.Item>
-                                    <Form.Item name="price_sale" label="Price Sale" className="col-span-1">
-                                        <InputNumber />
-                                        {error &&
-                                            error.errors &&
-                                            error.errors.price_sale &&
-                                            error.errors.price_sale.length > 0 ? (
-                                            <div className="text-red-600">{error.errors.price_sale[0]}</div>
-                                        ) : null}
-                                    </Form.Item>
-                                    <Form.Item name="quantity" label="Số lượng" className="col-span-1">
-                                        <InputNumber />
-                                        {error &&
-                                            error.errors &&
-                                            error.errors.quantity &&
-                                            error.errors.quantity.length > 0 ? (
-                                            <div className="text-red-600">{error.errors.quantity[0]}</div>
-                                        ) : null}
-                                    </Form.Item>
+                                {error?.gallery && <div className='text-red-600'>{error.gallery.join(', ')}</div>}
 
-                                </>
-                            }
+                            </Form.Item>
                             <Form.Item name="type" label="Kiểu sản phẩm" className="col-span-3">
                                 <Select
+                                    value={productShow?.type ? 1 : 0}
                                     options={[
-                                        {
-                                            value: 0 || false,
-                                            label: 'Sản phẩm đơn'
-                                        },
-                                        {
-                                            value: 1 || true,
-                                            label: 'Sản phẩm biến thể'
-                                        }
+                                        { value: 0, label: 'Sản phẩm đơn' },
+                                        { value: 1, label: 'Sản phẩm biến thể' },
                                     ]}
                                     onChange={handleChangeAttribute}
                                     placeholder="Chọn kiểu sản phẩm"
-                                    placement="bottomLeft" className='w-full' />
-                                {error &&
-                                    error.errors &&
-                                    error.errors.type &&
-                                    error.errors.type.length > 0 ? (
-                                    <div className="text-red-600">{error.errors.type[0]}</div>
-                                ) : null}
+                                    placement="bottomLeft" className='w-full'
+                                />
+                                {error?.type && <div className='text-red-600'>{error.type.join(', ')}</div>}
                             </Form.Item>
+
                             <Form.Item className="col-span-3">
-                                {attribute && (
+                                {attribute == 1 && (
                                     <Form.Item name="attribute_id" label="Chọn thuộc tính">
                                         <Select
+                                            size='large'
+                                            allowClear={false}
                                             value={selectedAttributeChildren}
                                             options={data?.attribute.map((item: any) => ({
                                                 value: item.id,
@@ -632,7 +646,6 @@ const ProductForm = () => {
                                             mode='multiple'
                                             onChange={handleChangeAttributeChildren}
                                         />
-
                                     </Form.Item>
                                 )}
                                 {selectedAttributeChildren.map(attrId => {
@@ -642,13 +655,15 @@ const ProductForm = () => {
                                             <div key={attrId}>
                                                 <Form.Item name={`${attrId}`} label={`Chọn ${attributeItem.name}`}>
                                                     <Select
+                                                        size='large'
+                                                        allowClear={false}
                                                         options={attributeItem && selectedValues && attributeItem.attributeitems.map((item: any) => ({
                                                             value: item.id,
                                                             label: item.value,
                                                         }))}
                                                         mode='multiple'
                                                         onChange={values => handleChangeAttributeItem(attrId, values)}
-                                                        value={selectedValues[attrId]}
+                                                        value={selectedValues[attrId] || []}
                                                     />
                                                 </Form.Item>
                                             </div>
@@ -656,22 +671,17 @@ const ProductForm = () => {
                                     );
                                 })
                                 }
+
                                 {/* {
-                                    attribute && (<Button type="primary" onClick={handleSaveAttributes}
-                                    >Lưu thuộc tính</Button>)
-                                } */}
-                                {
-                                    attribute && <Button type='default' onClick={() => {
+                                    attribute == 1 && <Button type='default' onClick={() => {
                                         setSelectedAttributeChildren([]);
                                         setSelectedValues({});
                                         setIsTableVisible(false);
-                                        setAttribute(false)
+                                        setAttribute(0)
                                         form.resetFields();
                                     }}>Hủy</Button>
-
-                                }
-
-                                {attribute && isTableVisible && (
+                                } */}
+                                {attribute == 1 && isTableVisible && (
                                     <Table
                                         className='w-full'
                                         dataSource={selectedItems}
@@ -680,30 +690,37 @@ const ProductForm = () => {
                                         pagination={false}
                                         key={JSON.stringify(selectedItems)}
                                     />
-
                                 )}
-
-
-
                             </Form.Item>
+                            {attribute === 0 && <>
+                                <Form.Item name="price_regular" label="Price Regular" className="col-span-1">
+                                    <InputNumber size='large' />
+                                    {error?.price_regular && <div className='text-red-600'>{error.price_regular.join(', ')}</div>}
+
+                                </Form.Item>
+                                <Form.Item name="price_sale" label="Price Sale" className="col-span-1">
+                                    <InputNumber size='large' />
+                                    {error?.price_sale && <div className='text-red-600'>{error.price_sale.join(', ')}</div>}
+
+                                </Form.Item>
+                                <Form.Item name="quantity" label="Số lượng" className="col-span-1">
+                                    <InputNumber size='large' />
+                                    {error?.quantity && <div className='text-red-600'>{error.quantity.join(', ')}</div>}
+
+                                </Form.Item>
+
+                            </>
+                            }
 
                             <Form.Item name="description" label="Description" className="col-span-1">
-                                <TextArea />
-                                {error &&
-                                    error.errors &&
-                                    error.errors.description &&
-                                    error.errors.description.length > 0 ? (
-                                    <div className="text-red-600">{error.errors.description[0]}</div>
-                                ) : null}
+                                <TextArea size='large' />
+                                {error?.description && <div className='text-red-600'>{error.description.join(', ')}</div>}
+
                             </Form.Item>
                             <Form.Item name="description_title" label="Description Title" className="col-span-1">
-                                <Input />
-                                {error &&
-                                    error.errors &&
-                                    error.errors.description_title &&
-                                    error.errors.description_title.length > 0 ? (
-                                    <div className="text-red-600">{error.errors.description_title[0]}</div>
-                                ) : null}
+                                <Input size='large' />
+                                {error?.description_title && <div className='text-red-600'>{error.description_title.join(', ')}</div>}
+
                             </Form.Item>
                             <Form.Item name="status" label="Status" className="col-span-1" initialValue={'1'}>
                                 <div className="border border-gray-300 rounded-lg p-4 flex items-center space-x-4">
@@ -791,3 +808,14 @@ const ProductForm = () => {
     )
 }
 export default ProductForm
+
+
+
+
+
+
+
+
+
+
+

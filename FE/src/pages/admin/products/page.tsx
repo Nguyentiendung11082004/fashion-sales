@@ -155,10 +155,6 @@ const ProductPageManager = () => {
       ...product
     }
   )) || [];
-  console.log("dataSource",dataSource)
-
-
-
   useEffect(() => {
     if (isError && !hasError) {
       toast.error('Có lỗi xảy ra');

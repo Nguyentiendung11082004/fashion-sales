@@ -1,3 +1,4 @@
+import { IProductVariant } from '@/common/types/products';
 import instance from '@/configs/axios';
 import { useQuery } from '@tanstack/react-query';
 import { Skeleton } from 'antd';
@@ -17,6 +18,7 @@ const ProductDetailAdmin = () => {
         enabled: !!id
     });
 
+    console.log("productShow",productShow)
     if (isFetching) return <Skeleton />;
 
     return (
@@ -57,10 +59,10 @@ const ProductDetailAdmin = () => {
                     <h2 className="text-2xl font-semibold text-gray-900">Tên sản phẩm : {productShow.name}</h2>
                     <p className="text-gray-600">SKU: <span className="font-medium">{productShow.sku}</span></p>
                     <p className="text-lg font-bold text-gray-800">
-                        Giá: <span className="text-gray-600 line-through">{productShow.price_regular} VNĐ</span>
+                        Giá: <span className="text-gray-600 line-through">{productShow?.variants?.map((e:IProductVariant)=> e.price_regular) || productShow.price_regular} VNĐ</span>
                     </p>
-                    <p className="text-lg font-bold text-red-500">Giá Sale: {productShow.price_sale} VNĐ</p>
-                    <p className="text-sm text-gray-500">Số lượng: {productShow.quantity}</p>
+                    <p className="text-lg font-bold text-red-500">Giá Sale: {productShow?.variants?.map((e:IProductVariant)=> e.price_sale) || productShow.price_sale} VNĐ</p>
+                    <p className="text-sm text-gray-500">Số lượng: {productShow?.variants?.map((e:IProductVariant)=> e.quantity) || productShow.quantity}</p>
                     <div className="mt-4">
                         <h3 className="text-lg font-semibold">Mô tả sản phẩm</h3>
                         <p className="mt-2 text-gray-800 font-medium">Tiêu đề mô tả:</p>

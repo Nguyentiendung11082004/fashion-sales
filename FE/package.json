@@ -48,6 +48,7 @@
     "fe": "file:",
     "install": "^0.13.0",
     "joi": "^17.12.2",
+    "jwt-decode": "^4.0.0",
     "lodash": "^4.17.21",
     "lucide-react": "^0.360.0",
     "npm": "^10.8.3",
@@ -64,12 +65,14 @@
     "styled-components": "^6.1.12",
     "tailwind-merge": "^2.2.2",
     "tailwindcss-animate": "^1.0.7",
+    "uuid": "^10.0.0",
     "vite-tsconfig-paths": "^4.3.2",
     "zod": "^3.22.4"
   },
   "devDependencies": {
     "@types/react": "^18.2.64",
     "@types/react-dom": "^18.2.21",
+    "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "^7.1.1",
     "@typescript-eslint/parser": "^7.1.1",
     "@vitejs/plugin-react": "^4.2.1",
