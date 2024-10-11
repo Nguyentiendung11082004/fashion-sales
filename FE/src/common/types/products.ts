@@ -15,7 +15,7 @@ export interface Iproduct {
     name: string;
     views: number;
     img_thumbnail: string;
-    image: string;
+    // image: string;
     gallery: string[];
     slug: string;
     price_regular: number;

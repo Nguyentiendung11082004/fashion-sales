@@ -53,101 +53,101 @@ const ProductDetail = () => {
         </div>
 
         <div className="container py-10 lg:flex">
-        <div className="w-full lg:w-[55%]">
-  <div className="lg:flex lg:gap-3">
-    <div className="lg:w-4/5 w-full lg:order-2">
-      {/* <Zomdetail /> */}
-      <div
-        className="group lg:w-full h-full relative overflow-hidden mb-[10px] "
-        onMouseMove={handleMouseMove}
-      >
-        <img
-          ref={imgRef}
-          alt="product detail 1"
-          loading="lazy"
-          decoding="async"
-          data-nimg="fill"
-          className="w-full lg:h-full object-cover transition-transform ease-in-out duration-300 group-hover:scale-150"
-          sizes=""
-          src={pro1}
-        />
-      </div>
-    </div>
-    <div
-      className="lg:order-1 hd-img-soft lg:w-1/5 w-full max-h-[394px] sm:max-h-[608px] xl:max-h-[688px] lg:max-h-[535px] overflow-x-auto lg:overflow-y-auto flex lg:flex-col flex-row"
-      onWheel={handleWheel}
-      ref={containerRef}
-      style={{ scrollbarWidth: "none", msOverflowStyle: "none" }} // Hide scrollbar for Firefox and IE/Edge
-    >
-      <style>
-        {`.hd-img-soft::-webkit-scrollbar {display: none;}`} {/* Hide scrollbar for Chrome, Safari, and Opera */}
-      </style>
-      <img
-        alt="product detail 1"
-        loading="lazy"
-        decoding="async"
-        data-nimg="fill"
-        className="w-24 lg:w-auto flex-shrink-0"
-        sizes=""
-        src={pro1}
-      />
-      <img
-        alt="product detail 1"
-        loading="lazy"
-        decoding="async"
-        data-nimg="fill"
-        className="w-24 lg:w-auto flex-shrink-0"
-        sizes=""
-        src={pro1}
-      />
-      <img
-        alt="product detail 1"
-        loading="lazy"
-        decoding="async"
-        data-nimg="fill"
-        className="w-24 lg:w-auto flex-shrink-0"
-        sizes=""
-        src={pro1}
-      />
-      <img
-        alt="product detail 1"
-        loading="lazy"
-        decoding="async"
-        data-nimg="fill"
-        className="w-24 lg:w-auto flex-shrink-0"
-        sizes=""
-        src={pro1}
-      />
-      <img
-        alt="product detail 1"
-        loading="lazy"
-        decoding="async"
-        data-nimg="fill"
-        className="w-24 lg:w-auto flex-shrink-0"
-        sizes=""
-        src={pro1}
-      />
-      <img
-        alt="product detail 1"
-        loading="lazy"
-        decoding="async"
-        data-nimg="fill"
-        className="w-24 lg:w-auto flex-shrink-0"
-        sizes=""
-        src={pro1}
-      />
-      <img
-        alt="product detail 1"
-        loading="lazy"
-        decoding="async"
-        data-nimg="fill"
-        className="w-24 lg:w-auto flex-shrink-0"
-        sizes=""
-        src={pro1}
-      />
-    </div>
-  </div>
-</div>
+          <div className="w-full lg:w-[55%]">
+            <div className="lg:flex lg:gap-3">
+              <div className="lg:w-4/5 w-full lg:order-2">
+                {/* <Zomdetail /> */}
+                <div
+                  className="group lg:w-full h-full relative overflow-hidden mb-[10px] "
+                  onMouseMove={handleMouseMove}
+                >
+                  <img
+                    ref={imgRef}
+                    alt="product detail 1"
+                    loading="lazy"
+                    decoding="async"
+                    data-nimg="fill"
+                    className="w-full lg:h-full object-cover transition-transform ease-in-out duration-300 group-hover:scale-150"
+                    sizes=""
+                    src={pro1}
+                  />
+                </div>
+              </div>
+              <div
+                className="lg:order-1 hd-img-soft lg:w-1/5 w-full max-h-[394px] sm:max-h-[608px] xl:max-h-[688px] lg:max-h-[535px] overflow-x-auto lg:overflow-y-auto flex lg:flex-col flex-row"
+                onWheel={handleWheel}
+                ref={containerRef}
+                style={{ scrollbarWidth: "none", msOverflowStyle: "none" }} // Hide scrollbar for Firefox and IE/Edge
+              >
+                <style>
+                  {`.hd-img-soft::-webkit-scrollbar {display: none;}`} {/* Hide scrollbar for Chrome, Safari, and Opera */}
+                </style>
+                <img
+                  alt="product detail 1"
+                  loading="lazy"
+                  decoding="async"
+                  data-nimg="fill"
+                  className="w-24 lg:w-auto flex-shrink-0"
+                  sizes=""
+                  src={pro1}
+                />
+                <img
+                  alt="product detail 1"
+                  loading="lazy"
+                  decoding="async"
+                  data-nimg="fill"
+                  className="w-24 lg:w-auto flex-shrink-0"
+                  sizes=""
+                  src={pro1}
+                />
+                <img
+                  alt="product detail 1"
+                  loading="lazy"
+                  decoding="async"
+                  data-nimg="fill"
+                  className="w-24 lg:w-auto flex-shrink-0"
+                  sizes=""
+                  src={pro1}
+                />
+                <img
+                  alt="product detail 1"
+                  loading="lazy"
+                  decoding="async"
+                  data-nimg="fill"
+                  className="w-24 lg:w-auto flex-shrink-0"
+                  sizes=""
+                  src={pro1}
+                />
+                <img
+                  alt="product detail 1"
+                  loading="lazy"
+                  decoding="async"
+                  data-nimg="fill"
+                  className="w-24 lg:w-auto flex-shrink-0"
+                  sizes=""
+                  src={pro1}
+                />
+                <img
+                  alt="product detail 1"
+                  loading="lazy"
+                  decoding="async"
+                  data-nimg="fill"
+                  className="w-24 lg:w-auto flex-shrink-0"
+                  sizes=""
+                  src={pro1}
+                />
+                <img
+                  alt="product detail 1"
+                  loading="lazy"
+                  decoding="async"
+                  data-nimg="fill"
+                  className="w-24 lg:w-auto flex-shrink-0"
+                  sizes=""
+                  src={pro1}
+                />
+              </div>
+            </div>
+          </div>
 
 
           <div className="w-full lg:w-[45%] pt-10 lg:pt-0 lg:pl-7 xl:pl-9 2xl:pl-10">
@@ -386,31 +386,28 @@ const ProductDetail = () => {
             <div className="w-[100%] text-center m-auto flex justify-center">
               <button
                 onClick={() => handleButtonClick("details")}
-                className={`${
-                  activeButton === "details"
+                className={`${activeButton === "details"
                     ? "border-black text-black border-2"
                     : " text-[#8e8e8e]"
-                } font-medium cursor-pointer lg:text-base text-[10px] lg:py-2 lg:px-6 px-2 py-2 rounded-full`}
+                  } font-medium cursor-pointer lg:text-base text-[10px] lg:py-2 lg:px-6 px-2 py-2 rounded-full`}
               >
                 Chi tiết sản phẩm
               </button>
               <button
                 onClick={() => handleButtonClick("reviews")}
-                className={`${
-                  activeButton === "reviews"
+                className={`${activeButton === "reviews"
                     ? "border-black text-black border-2"
                     : "border-black text-[#8e8e8e]"
-                } btn_cmt text-[10px] lg:text-base font-medium cursor-pointer lg:py-2 lg:px-6 px-2 py-2 rounded-full`}
+                  } btn_cmt text-[10px] lg:text-base font-medium cursor-pointer lg:py-2 lg:px-6 px-2 py-2 rounded-full`}
               >
                 Xem đánh giá sản phẩm
               </button>
               <button
                 onClick={() => handleButtonClick("comment")}
-                className={`${
-                  activeButton === "comment"
+                className={`${activeButton === "comment"
                     ? "border-black text-black border-2"
                     : "border-black text-[#8e8e8e]"
-                } btn_cmt text-[10px] lg:text-base font-medium cursor-pointer lg:py-2 lg:px-6 px-2 py-2 rounded-full`}
+                  } btn_cmt text-[10px] lg:text-base font-medium cursor-pointer lg:py-2 lg:px-6 px-2 py-2 rounded-full`}
               >
                 Viết bình luận
               </button>

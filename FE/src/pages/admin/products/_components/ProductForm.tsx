@@ -15,28 +15,41 @@ import { toast } from 'react-toastify'
 type ErrorResponse = {
     [key: string]: string[];
 };
+
 const ProductForm = () => {
     const { id } = useParams();
-    const queryClient = useQueryClient();
-    const [isLoading, setIsLoading] = useState(false);
     const [form] = Form.useForm();
     const navigate = useNavigate();
     const [urlImage, setUrlImage] = useState<any>();
-    const [imageGallery, setImageGaller] = useState<any>([]);
+    const [imageGallery, setImageGaller] = useState<any[]>([]);
+    const [attribute, setAttribute] = useState<number>(0);
+    const [selectedAttributeChildren, setSelectedAttributeChildren] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const queryClient = useQueryClient();
+    const [selectedItems, setSelectedItems] = useState<any>([]); // giá trị khi lưu ở table 
+    const [isTableVisible, setIsTableVisible] = useState(false); // State điều khiển hiển thị bảng
+    const [selectedValues, setSelectedValues] = useState<any>([]); // State lưu trữ giá trị đã chọn cho từng thuộc tính
+    const [isColumnsVisible, setIsColumnsVisible] = useState(false); // state cột
+    const [error, setError] = useState<any>()
     const [valueHome, setValueHome] = useState(1);
     const [valueTrend, setValueTrend] = useState(1);
     const [valueNew, setValueNew] = useState(1);
     const [valueStatus, setValueStatus] = useState(1);
-    const [attribute, setAttribute] = useState(false); // state chọn kiểu sản phẩm
-    const [selectedAttributeChildren, setSelectedAttributeChildren] = useState<any[]>([]); // state thuộc tính
-    const [selectedItems, setSelectedItems] = useState<any>([]); // giá trị khi lưu ở table
-    const [isTableVisible, setIsTableVisible] = useState(false); // State ẩn hiện bảng bảng
-    const [selectedValues, setSelectedValues] = useState<any>([]); // State giá trị thuộc tính
-    const [isColumnsVisible, setIsColumnsVisible] = useState(false); // state cột
-    const [error, setError] = useState<any>()
-
+    const onChangeHome = (e: RadioChangeEvent) => {
+        setValueHome(e.target.value);
+    };
+    const onChangeTrend = (e: RadioChangeEvent) => {
+        setValueTrend(e.target.value);
+    };
+    const onChangeNew = (e: RadioChangeEvent) => {
+        setValueNew(e.target.value);
+    };
+    const onChangeStatus = (e: RadioChangeEvent) => {
+        setValueStatus(e.target.value);
+    };
+    const [checkedItems, setCheckedItems] = useState<any[]>([]);
     const [variants, setVariants] = useState([
-        { image: '', price_regular: '', price_sale: '', quantity: 0, sku: '', slug: '' }
+        { image: '', price_regular: '', price_sale: '', quantity: '', sku: '' }
     ]);
     const handleInputChange = (index: number, field: string, value: any) => {
         const newVariants = [...variants];
@@ -47,8 +60,95 @@ const ProductForm = () => {
     const { data, isFetching } = useQuery({
         queryKey: ['productCreate'],
         queryFn: productCreate,
-    })
-    const propsImgThumbnail: UploadProps = {
+    });
+
+    const handleChangeAttribute = (value: number) => {
+        setAttribute(value);
+        setSelectedAttributeChildren([]);
+        setIsTableVisible(false);
+        setSelectedValues({});
+        setSelectedItems([]);
+        const newCheckedItems = Array(variants.length).fill(false);
+        setCheckedItems(newCheckedItems);
+        if (value !== 0) {
+            const fieldsToReset = [...selectedAttributeChildren];
+            form.setFieldsValue(Object.fromEntries(fieldsToReset.map(field => [field, undefined])));
+            form.resetFields(['price_regular', 'price_sale', 'quantity']);
+            const fieldsToClear = selectedAttributeChildren.concat(['attribute_id']);
+            form.setFieldsValue(Object.fromEntries(fieldsToClear.map(field => [field, undefined])));
+        } else {
+            form.resetFields();
+            setSelectedValues({});
+        }
+    };
+    console.log("selectedValues",selectedValues)
+    const handleChangeAttributeChildren = (values: any) => {
+        setSelectedAttributeChildren(values);
+        const newSelectedValues = { ...selectedValues };
+
+        values.forEach((attrId: any) => {
+            if (!(attrId in newSelectedValues)) {
+                newSelectedValues[attrId] = [];
+            }
+        });
+        // Object.keys(newSelectedValues).forEach(attrId => {
+        //     if (!values.includes(attrId)) {
+        //         delete newSelectedValues[attrId];
+        //     }
+        // });
+        setSelectedValues(newSelectedValues);
+        handleSaveAttributes();
+    };
+
+    const handleChangeAttributeItem = (attrId: number, values: any) => {
+        setSelectedValues((prevValues: any) => ({
+            ...prevValues,
+            [attrId]: values,
+        }));
+        // Nếu giá trị rỗng, xóa thuộc tính
+        if (values.length === 0) {
+            setSelectedAttributeChildren(prev => {
+                const newChildren = prev.filter(id => id !== attrId);
+                form.setFieldValue('attribute_id', newChildren);
+                return newChildren;
+            });
+        } else {
+            setIsTableVisible(true);
+        }
+
+        handleSaveAttributes();
+    };
+
+
+    const handleSaveAttributes = () => {
+        const combinedItems: { [key: string]: string }[] = [];
+        const attributeNames = Object.keys(selectedValues).filter(attrId => selectedValues[attrId]?.length > 0);
+        const createCombinations = (index: number, currentCombination: { [key: string]: string }) => {
+            if (index === attributeNames.length) {
+                if (Object.keys(currentCombination).length > 0) {
+                    combinedItems.push({ ...currentCombination });
+                }
+                return;
+            }
+            const attrName = attributeNames[index];
+            const items = selectedValues[attrName] || [];
+            if (items.length === 0) return;
+
+            items.forEach((itemId: any) => {
+                const item = data?.attribute.find((attr: any) => attr.id === Number(attrName))
+                    ?.attributeitems.find((i: any) => i.id === itemId);
+
+                if (item) {
+                    const newCombination = { ...currentCombination, [attrName]: item.value };
+                    createCombinations(index + 1, newCombination);
+                }
+            });
+        };
+        createCombinations(0, {});
+        setSelectedItems(combinedItems);
+        setIsColumnsVisible(combinedItems.length > 0);
+    };
+    const getPropsImgThumbnail = (index: number): UploadProps => ({
         name: 'file',
         action: 'https://api.cloudinary.com/v1_1/dlvwxauhf/image/upload',
         data: {
@@ -59,20 +159,18 @@ const ProductForm = () => {
             if (info.file.status === "done") {
                 const isImage = /^image\//.test(info.file.type);
                 if (isImage) {
-                    const imageUrl = info.file.response.url; // Định nghĩa biến imageUrl ở đây
-                    setUrlImage(imageUrl); // Cập nhật URL
-                    message.open({
-                        type: 'success',
-                        content: 'Upload ảnh thành công',
-                    });
-
-
+                    const imageUrl = info.file.response.url;
+                    const newVariants = [...variants];
+                    newVariants[index] = { ...newVariants[index], image: imageUrl };
+                    setVariants(newVariants);
+                    message.open({ type: 'success', content: 'Upload ảnh thành công' });
                 }
             } else if (info.file.status === "error") {
                 message.error(`${info.file.name} file upload failed.`);
             }
         },
-    };
+    });
+
     const propsGallery: UploadProps = {
         name: 'file',
         action: 'https://api.cloudinary.com/v1_1/dlvwxauhf/image/upload',
@@ -96,147 +194,42 @@ const ProductForm = () => {
             }
         },
     }
-    const onChangeHome = (e: RadioChangeEvent) => {
-        setValueHome(e.target.value);
-    };
-    const onChangeTrend = (e: RadioChangeEvent) => {
-        setValueTrend(e.target.value);
-    };
-    const onChangeNew = (e: RadioChangeEvent) => {
-        setValueNew(e.target.value);
-    };
-    const onChangeStatus = (e: RadioChangeEvent) => {
-        setValueStatus(e.target.value);
-    };
-    // hàm đổi type sản phẩm
-    const handleChangeAttribute = (value: number) => {
-        setAttribute(value == 1);
-        setSelectedAttributeChildren([])
-        setSelectedValues({});
-        form.setFieldsValue({ image: '', price_regular: null, price_sale: null, quantity: 0, sku: '' });
-        setIsTableVisible(false);
+    const propsImgThumbnail: UploadProps = {
+        name: 'file',
+        action: 'https://api.cloudinary.com/v1_1/dlvwxauhf/image/upload',
+        data: {
+            upload_preset: "fashion-sales",
+            folder: "fashion-sales"
+        },
+        onChange(info: any) {
+            if (info.file.status === "done") {
+                const isImage = /^image\//.test(info.file.type);
+                if (isImage) {
+                    const imageUrl = info.file.response.url;
+                    setUrlImage(imageUrl);
+                    message.open({
+                        type: 'success',
+                        content: 'Upload ảnh thành công',
+                    });
 
 
-    };
-    const handleChangeAttributeChildren = (values: any) => {
-        setSelectedAttributeChildren(values);
-        const newSelectedValues = { ...selectedValues };
-        values.forEach((attrId: any) => {
-            if (!(attrId in newSelectedValues)) {
-                newSelectedValues[attrId] = [];
-            }
-        });
-
-        Object.keys(newSelectedValues).forEach(attrId => {
-            if (!values.includes(Number(attrId))) {
-                delete newSelectedValues[attrId];
-                form.setFieldValue(attrId, []);
-            }
-        });
-
-        setSelectedValues(newSelectedValues);
-        handleSaveAttributes();
-    };
-
-    const handleChangeAttributeItem = (attrId: number, values: any) => {
-        const newSelectedValues = {
-            ...selectedValues,
-            [attrId]: values,
-        };
-        if (values.length === 0) {
-            const { [attrId]: _, ...rest } = newSelectedValues;
-            setSelectedValues(rest);
-            setSelectedAttributeChildren(prev => {
-                let rs = [...prev.filter(id => id !== attrId)]
-                form.setFieldValue('attribute_id', rs)
-                return rs;
-            });
-            // form.setFieldsValue({ [`size_${attrId}`]: [] });
-            // const hasValues = Object.values(rest).some((val: any) => val.length > 0);
-            // setIsTableVisible(hasValues);
-        } else {
-            setSelectedValues(newSelectedValues);
-            setIsTableVisible(true);
-        }
-        handleSaveAttributes();
-    };
-    const handleSaveAttributes = () => {
-        const combinedItems: { [key: string]: string }[] = [];
-        const attributeNames = Object.keys(selectedValues).filter(attrId => selectedValues[attrId]?.length > 0);
-        console.log("attributeNames", attributeNames)
-        if (attributeNames.length == 0) {
-            setSelectedItems([]);
-            setIsTableVisible(false);
-        }
-        console.log("isTableVisible", isTableVisible)
-        const createCombinations = (index: number, currentCombination: { [key: string]: string }) => {
-            if (index === attributeNames.length) {
-                combinedItems.push({ ...currentCombination });
-                return;
-            }
-
-            const attrName = attributeNames[index];
-            const items = selectedValues[attrName] || [];
-            if (items.length === 0) return;
-            items.forEach((itemId: any) => {
-                const item = data?.attribute.find((attr: any) => attr.id === Number(attrName))?.attributeitems.find((i: any) => i.id === itemId);
-                if (itemId === 0) {
-                    delete currentCombination[attrName];
-                } else if (item) {
-                    const newCombination = { ...currentCombination, [attrName]: item.value };
-                    createCombinations(index + 1, newCombination);
                 }
-            });
-        };
-        createCombinations(0, {});
-        setSelectedItems(combinedItems);
-        setIsColumnsVisible(combinedItems.length > 0);
+            } else if (info.file.status === "error") {
+                message.error(`${info.file.name} file upload failed.`);
+            }
+        },
     };
-    const handleRemoveAttributeValue = (record: any) => {
-        const updatedItems = selectedItems.filter((item: any) => item !== record);
-        setSelectedItems(updatedItems);
-        setIsTableVisible(updatedItems.length > 0);
-
-        // Cập nhật selectedValues
-        const updatedSelectedValues = { ...selectedValues };
-
-        // Kiểm tra nếu attribute_item_id tồn tại và là mảng
-        if (Array.isArray(record.attribute_item_id)) {
-            record.attribute_item_id.forEach((attrId: number) => {
-                if (updatedSelectedValues[attrId]) {
-                    // Lọc ra các giá trị còn lại cho attrId
-                    updatedSelectedValues[attrId] = updatedSelectedValues[attrId].filter((id: number) => !record.attribute_item_id.includes(id));
-
-                    // Nếu không còn giá trị nào cho attrId, xóa nó khỏi selectedValues và selectedAttributeChildren
-                    if (updatedSelectedValues[attrId].length === 0) {
-                        delete updatedSelectedValues[attrId];
-                        setSelectedAttributeChildren(prev => prev.filter(id => id !== attrId));
-                        form.setFieldValue(attrId, []); // Reset giá trị trên ô select
-                    }
-                }
-            });
-        }
-
-        // Cập nhật lại selectedValues
-        setSelectedValues(updatedSelectedValues);
-    };
-
-    useEffect(() => {
-
-        const emptyAttrIds = Object.keys(selectedValues).filter(attrId => selectedValues[attrId].length === 0);
-
-        console.log("emptyAttrIds", emptyAttrIds)
-        if (emptyAttrIds.length > 0) {
-
-            setSelectedAttributeChildren(prev => prev.filter(id => !emptyAttrIds.includes(id)));
-        }
-    }, [selectedValues]);
-
-
-
-
-
     const columns: any = [
+        {
+            title: "Checkox",
+            render: (text: any, record: any, index: number) => (
+                <Input
+                    type="checkbox"
+                    checked={!!checkedItems[index]}
+                    onChange={() => handleCheckboxChange(index)}
+                />
+            ),
+        },
         {
             title: 'STT',
             render: (text: any, record: any, index: number) => <div>{index + 1}</div>,
@@ -248,8 +241,8 @@ const ProductForm = () => {
                 title: attribute.name,
                 dataIndex: attrId,
                 key: attrId,
-                render: (text: any, record: any, index: number) => (
-                    <Input value={text} onChange={(e) => handleInputChange(index, attrId, e.target.value)} />
+                render: (text: any, record: any) => (
+                    <Input value={record[attrId] || []} onChange={(e) => handleInputChange(record.key, attrId, e.target.value)} />
                 )
             } : null;
         }).filter(Boolean) : [],
@@ -257,9 +250,7 @@ const ProductForm = () => {
             title: 'Ảnh',
             dataIndex: 'image',
             render: (text: any, record: any, index: number) => (
-                <Upload
-                    {...getPropsImgThumbnail(index)}
-                >
+                <Upload {...getPropsImgThumbnail(index)}>
                     <Button icon={<UploadOutlined />}>Tải lên ảnh</Button>
                 </Upload>
             )
@@ -268,44 +259,106 @@ const ProductForm = () => {
             title: 'Price Regular',
             dataIndex: 'price_regular',
             render: (text: any, record: any, index: number) => (
-                <Input value={text} onChange={(e) => handleInputChange(index, 'price_regular', e.target.value)} />
+                <Input
+                    value={variants[index]?.price_regular || ''}
+                    onChange={(e) => handleInputChange(index, 'price_regular', e.target.value)}
+                />
             )
         },
         {
             title: 'Price Sale',
             dataIndex: 'price_sale',
             render: (text: any, record: any, index: number) => (
-                <Input value={text} onChange={(e) => handleInputChange(index, 'price_sale', e.target.value)} />
+                <Input
+                    value={variants[index]?.price_sale || ''}
+                    onChange={(e) => handleInputChange(index, 'price_sale', e.target.value)}
+                />
             )
         },
         {
             title: 'Số lượng',
             dataIndex: 'quantity',
             render: (text: any, record: any, index: number) => (
-                <Input value={text} onChange={(e) => handleInputChange(index, 'quantity', e.target.value)} />
+                <Input
+                    value={variants[index]?.quantity || ''}
+                    onChange={(e) => handleInputChange(index, 'quantity', e.target.value)}
+                />
             )
         },
         {
             title: 'SKU',
             dataIndex: 'sku',
             render: (text: any, record: any, index: number) => (
-                <Input value={text} onChange={(e) => handleInputChange(index, 'sku', e.target.value)} />
-            )
-        },
-        {
-            title: 'SLUG',
-            dataIndex: 'slug',
-            render: (text: any, record: any, index: number) => (
-                <Input value={text} onChange={(e) => handleInputChange(index, 'slug', e.target.value)} />
-            )
-        },
-        {
-            title: 'Thao tác',
-            render: (record: any) => (
-                <Button onClick={() => handleRemoveAttributeValue(record)}>Xoá</Button>
+                <Input
+                    value={variants[index]?.sku || ''}
+                    onChange={(e) => handleInputChange(index, 'sku', e.target.value)}
+                />
             )
         }
+
     ];
+
+    useEffect(() => {
+        if (Object.keys(selectedValues).length > 0) {
+            handleSaveAttributes();
+        }
+    }, [selectedValues]);
+    const { data: productShow } = useQuery({
+        queryKey: ['productShow', id],
+        queryFn: async () => {
+            if (!id) return null;
+            const response = await instance.get(`/products/${id}`);
+            return response.data.product;
+        },
+        enabled: !!id
+    });
+    const getProduct = (productShow: any) => {
+        const productTags = productShow.tags.map((tag: any) => tag.id);
+        const productType = productShow.type ? 1 : 0;
+        const productAttribute = productShow.attributes.map((attribute: any) => attribute.id);
+        const productAttributeValue = productShow.attributes.reduce((acc: any, attribute: any) => {
+            acc[attribute.id] = attribute.pivot.attribute_item_ids;
+            return acc;
+        }, {});
+
+        setAttribute(productType);
+        setSelectedAttributeChildren(productAttribute);
+        setSelectedValues(productAttributeValue);
+
+        // Khởi tạo initialItems với các thuộc tính từ productShow.variants
+        const initialItems = productShow.variants.map((item: any) => {
+            const itemAttributes = productAttribute.reduce((acc: any, attrId: any) => {
+                acc[attrId] = item[attrId] || [];
+                return acc;
+            }, {});
+
+            return {
+                price_regular: item.price_regular,
+                price_sale: item.price_sale,
+                quantity: item.quantity,
+                sku: item.sku,
+                ...itemAttributes
+            };
+        });
+
+        setSelectedItems(initialItems);
+        form.setFieldsValue({
+            ...productShow,
+            tags: productTags,
+            type: productType,
+            attribute_id: productAttribute,
+            ...productAttributeValue,
+        });
+        productAttribute.forEach((attrId: any) => {
+            const values = productAttributeValue[attrId] || [];
+            handleChangeAttributeItem(attrId, values);
+        });
+    };
+    useEffect(() => {
+        if (productShow) {
+            getProduct(productShow);
+        }
+    }, [productShow, form]);
     const handleErrorResponse = (error: any) => {
         setIsLoading(false);
         if (error.response && error.response.data.errors) {
@@ -315,7 +368,7 @@ const ProductForm = () => {
                 errors: errorFields[key],
             }));
             form.setFields(fields);
-            const allFieldNames = ['name', 'attribute_id', 'value']; // Thêm tất cả các trường có thể
+            const allFieldNames = ['name', 'attribute_id', 'tags', 'brand_id', 'category_id', 'slug', 'sku', 'img_thumbnail', 'gallery', 'type', 'price_regular', 'price_sale', 'quantity', 'description', 'description_title'];
             allFieldNames.forEach((field) => {
                 if (!errorFields[field]) {
                     form.setFields([{ name: field, errors: [] }]);
@@ -325,7 +378,28 @@ const ProductForm = () => {
             toast.error('Có lỗi xảy ra');
         }
     };
-
+    const handleCheckboxChange = (index: number) => {
+        setCheckedItems(prev => {
+            const newCheckedItems = [...prev];
+            newCheckedItems[index] = !newCheckedItems[index];
+            if (!newCheckedItems[index]) {
+                setVariants(prev => {
+                    const newVariants = [...prev];
+                    newVariants[index] = {
+                        price_regular: '',
+                        price_sale: '',
+                        quantity: '',
+                        sku: '',
+                        image: '',
+                    };
+                    return newVariants;
+                });
+            }
+            return newCheckedItems;
+        });
+        console.log("variants", variants)
+    };
+    console.log("selectedItems", selectedItems)
     const createProductMutation = useMutation({
         mutationFn: productStore,
         onMutate: () => {
@@ -340,7 +414,6 @@ const ProductForm = () => {
             navigate('/admin/products')
         },
         onError: handleErrorResponse,
-
     });
     const updateProductMutation = useMutation({
         mutationFn: (product: Iproduct) => productUpdate(Number(id), product),
@@ -357,63 +430,15 @@ const ProductForm = () => {
         },
         onError: handleErrorResponse,
     })
-    useEffect(() => {
-        if (Object.keys(selectedValues).length > 0) {
-            handleSaveAttributes();
-        }
-    }, [selectedValues]);
-
-
-    const { data: productShow } = useQuery({
-        queryKey: ['productShow', id],
-        queryFn: async () => {
-            if (!id) return null;
-            const response = await instance.get(`/products/${id}`);
-            return response.data.product;
-        },
-        enabled: !!id
-    });
-    useEffect(() => {
-        if (productShow) {
-            form.setFieldsValue(productShow);
-        }
-    }, [productShow, form]);
-    // Cập nhật propsImgThumbnail
-    const getPropsImgThumbnail = (index: number): UploadProps => ({
-        name: 'file',
-        action: 'https://api.cloudinary.com/v1_1/dlvwxauhf/image/upload',
-        data: {
-            upload_preset: "fashion-sales",
-            folder: "fashion-sales"
-        },
-        onChange(info: any) {
-            if (info.file.status === "done") {
-                const isImage = /^image\//.test(info.file.type);
-                if (isImage) {
-                    const imageUrl = info.file.response.url;
-                    const newVariants = [...variants];
-                    newVariants[index] = { ...newVariants[index], image: imageUrl };
-                    setVariants(newVariants);
-                    message.open({ type: 'success', content: 'Upload ảnh thành công' });
-                }
-            } else if (info.file.status === "error") {
-                message.error(`${info.file.name} file upload failed.`);
-            }
-        },
-    });
     const onFinish = (values: Iproduct) => {
         const productVariantData: IProductVariant[] = [];
         const attributeData: { [key: string]: number[] } = {};
-
-        // Lấy dữ liệu từ selectedAttributeChildren và selectedValues
         selectedAttributeChildren.forEach(attrId => {
             const itemIds = selectedValues[attrId] || [];
             attributeData[attrId] = itemIds;
         });
-
         const attributeKeys = Object.keys(attributeData);
         const combinations: any[][] = [];
-
         const combine = (arr: any[], idx: number) => {
             if (idx === attributeKeys.length) {
                 combinations.push(arr);
@@ -425,44 +450,60 @@ const ProductForm = () => {
             });
         };
         combine([], 0);
-
         combinations.forEach((combination, index) => {
             const variant = variants[index % variants.length];
 
-            const attributeItems = combination.map(itemId => {
-                const attributeId = Object.keys(selectedValues).find(key => selectedValues[key].includes(itemId));
-                const value = selectedValues[itemId]; // Đảm bảo rằng bạn lấy được giá trị tương ứng
+            const attributeItemIds = combination.map((itemId, idx) => {
+                const attrId = attributeKeys[idx];
+                const item = data?.attribute.find((attr: any) => attr.id === Number(attrId))
+                    ?.attributeitems.find((i: any) => i.id === itemId);
                 return {
-                    id: Number(attributeId), // Convert thành số nếu cần
-                    value: String(value) // Chuyển thành chuỗi
+                    id: itemId,
+                    value: item ? item.value : '',
                 };
             });
-
             productVariantData.push({
-                attribute_item_id: attributeItems,
+                attribute_item_id: attributeItemIds,
                 price_regular: Number(variant.price_regular),
                 price_sale: Number(variant.price_sale),
                 quantity: Number(variant.quantity),
-                sku: variant.sku,
                 image: variant.image,
-                slug: variant.slug
+                sku: variant.sku,
+                slug: ''
             });
         });
 
-        const productData = {
-            ...values,
-            img_thumbnail: urlImage,
-            gallery: imageGallery,
-            attribute_item_id: attributeData,
-            product_variant: productVariantData,
-        };
-
-        if (id) {
-            updateProductMutation.mutate(productData);
+        if (!attribute) {
+            if (id) {
+                updateProductMutation.mutate({
+                    ...values,
+                    img_thumbnail: urlImage,
+                    gallery: imageGallery,
+                })
+            } else {
+                createProductMutation.mutate({
+                    ...values,
+                    img_thumbnail: urlImage,
+                    gallery: imageGallery,
+                });
+            }
         } else {
-            createProductMutation.mutate(productData);
+            const filteredVariants = productVariantData.filter((_, index) => checkedItems[index]);
+            const productPayload = {
+                ...values,
+                img_thumbnail: urlImage,
+                gallery: imageGallery,
+                attribute_item_id: attributeData,
+                product_variant: filteredVariants,
+            };
+            if (id) {
+                updateProductMutation.mutate(productPayload);
+            } else {
+                createProductMutation.mutate(productPayload);
+            }
         }
     };
+
 
 
     return (
@@ -481,146 +522,31 @@ const ProductForm = () => {
                         >
                             <Form.Item name="name" label="Tên sản phẩm" className="col-span-1"
                             >
-                                <Input />
+                                <Input size='large' />
                                 {error?.name && <div className='text-red-600'>{error.name.join(', ')}</div>}
                             </Form.Item>
-                            <Form.Item name="category_id" label="Danh mục" className="col-span-1">
-                                <Select
-                                    options={data?.category.map((item: Icategories) => ({
-                                        value: item.id,
-                                        label: item.name
-                                    }))}
-
-                                    placeholder="Chọn danh mục"
-                                    placement="bottomLeft" className='w-full' />
-                                {error &&
-                                    error.errors &&
-                                    error.errors.category_id &&
-                                    error.errors.category_id.length > 0 ? (
-                                    <div className="text-red-600">{error.errors.category_id[0]}</div>
-                                ) : null}
-                            </Form.Item>
-                            <Form.Item name="slug" label="Slug" className="col-span-1">
-                                <Input />
-                                {error?.slug && <div className='text-red-600'>{error.slug.join(', ')}</div>}
-                            </Form.Item>
-                            <Form.Item name="type" label="Kiểu sản phẩm" className="col-span-3">
-                                <Select
-                                    options={[
-                                        {
-                                            value: 0 || false,
-                                            label: 'Sản phẩm đơn'
-                                        },
-                                        {
-                                            value: 1 || true,
-                                            label: 'Sản phẩm biến thể'
-                                        }
-                                    ]}
-                                    onChange={handleChangeAttribute}
-                                    placeholder="Chọn kiểu sản phẩm"
-                                    placement="bottomLeft" className='w-full' />
-                                {error?.type && <div className='text-red-600'>{error.type.join(', ')}</div>}
-                            </Form.Item>
-                            {
-                                !attribute && <>
-                                    <Form.Item name="price_regular" label="Price Regular" className="col-span-1">
-                                        <InputNumber />
-                                        {error?.price_regular && <div className='text-red-600'>{error.price_regular.join(', ')}</div>}
-                                    </Form.Item>
-                                    <Form.Item name="price_sale" label="Price Sale" className="col-span-1">
-                                        <InputNumber />
-                                        {error?.price_sale && <div className='text-red-600'>{error.price_sale.join(', ')}</div>}
-                                    </Form.Item>
-                                    <Form.Item name="quantity" label="Số lượng" className="col-span-1">
-                                        <InputNumber />
-                                        {error?.quantity && <div className='text-red-600'>{error.quantity.join(', ')}</div>}
-                                    </Form.Item>
-
-                                </>
-                            }
-
-                            <Form.Item className="col-span-3">
-                                {attribute && (
-                                    <Form.Item name="attribute_id" label="Chọn thuộc tính">
-                                        <Select
-                                            value={selectedAttributeChildren}
-                                            options={data?.attribute.map((item: any) => ({
-                                                value: item.id,
-                                                label: item.name,
-                                            })) || []}
-                                            mode='multiple'
-                                            onChange={handleChangeAttributeChildren}
-                                        />
-
-                                    </Form.Item>
-                                )}
-                                {selectedAttributeChildren.map(attrId => {
-                                    const attributeItem = data?.attribute.find((item: any) => item?.id === attrId);
-
-                                    if (!attributeItem) return null; // Kiểm tra nếu thuộc tính không tồn tại
-
-                                    return (
-                                        <div key={attrId}>
-                                            <Form.Item name={`${attrId}`} label={`Chọn ${attributeItem.name}`}>
-                                                <Select
-                                                    options={attributeItem.attributeitems.map((item: any) => ({
-                                                        value: item.id,
-                                                        label: item.value,
-                                                    }))}
-                                                    mode='multiple'
-                                                    onChange={values => handleChangeAttributeItem(attrId, values)}
-                                                    value={selectedValues[attrId] || []} // Đảm bảo ô select có giá trị mặc định
-                                                />
-                                            </Form.Item>
-                                        </div>
-                                    );
-                                })}
-
-
-                                {
-                                    attribute && <Button type='default' onClick={() => {
-                                        setSelectedAttributeChildren([]);
-                                        setSelectedValues({});
-                                        setIsTableVisible(false);
-                                        setAttribute(false)
-                                        form.resetFields();
-                                    }}>Hủy</Button>
-
-                                }
-
-                                {attribute && isTableVisible && (
-                                    <Table
-                                        className='w-full'
-                                        dataSource={selectedItems}
-                                        columns={columns}
-                                        rowKey={(record) => record.id || record.value}
-                                        pagination={false}
-                                        key={JSON.stringify(selectedItems)}
-                                    />
-
-                                )}
-
-
-
-                            </Form.Item>
-
                             <Form.Item name="tags" label="Tag" className="col-span-1">
                                 <Select
+                                    size='large'
                                     mode='multiple'
                                     options={
                                         data?.tag.map((item: Itags) => ({
                                             value: item?.id,
                                             label: item?.name
-                                        }))
+                                        })) || []
                                     }
-
                                     placeholder="Chọn tag"
-                                    placement="bottomLeft" className='w-full' />
-                                {error?.tag && <div className='text-red-600'>{error.tag.join(', ')}</div>}
+                                    placement="bottomLeft"
+                                    className='w-full'
+                                />
+
+                                {error?.tags && <div className='text-red-600'>{error.tags.join(', ')}</div>}
+
                             </Form.Item>
                             <Form.Item name="brand_id" label="Thương hiệu" className="col-span-1">
                                 <Select
-                                    options={data?.brand.map((item: Itags) => ({
+                                    size='large'
+                                    options={data?.brand.map((item: any) => ({
                                         value: item.id,
                                         label: item.name
                                     }))}
@@ -629,19 +555,55 @@ const ProductForm = () => {
                                     placement="bottomLeft" className='w-full' />
                                 {error?.brand_id && <div className='text-red-600'>{error.brand_id.join(', ')}</div>}
                             </Form.Item>
+                            <Form.Item name="category_id" label="Danh mục" className="col-span-1">
+                                <Select
+                                    size='large'
+                                    options={data?.category.map((item: Icategories) => ({
+                                        value: item.id,
+                                        label: item.name
+                                    }))}
+                                    value={productShow?.tags.map((item: any) => item.id)}
+                                    placeholder="Chọn danh mục"
+                                    placement="bottomLeft" className='w-full' />
+                                {error?.category_id && <div className='text-red-600'>{error.category_id.join(', ')}</div>}
 
+                            </Form.Item>
+                            <Form.Item name="slug" label="Slug" className="col-span-1">
+                                <Input size='large' />
+                                {error?.slug && <div className='text-red-600'>{error.slug.join(', ')}</div>}
 
+                            </Form.Item>
                             <Form.Item name="sku" label="SKU" className="col-span-1">
-                                <Input />
+                                <Input size='large' />
                                 {error?.sku && <div className='text-red-600'>{error.sku.join(', ')}</div>}
+
                             </Form.Item>
                             <Form.Item name="img_thumbnail" label="Ảnh sản phẩm" >
                                 <Upload
                                     {...propsImgThumbnail}
+                                    showUploadList={{
+                                        showPreviewIcon: false,
+                                        showRemoveIcon: true,
+                                    }}
+                                    onRemove={() => {
+                                        setUrlImage(null);
+                                    }}
                                 >
                                     <Button icon={<UploadOutlined />}>Tải lên ảnh</Button>
                                 </Upload>
-                                {error?.img_thumbail && <div className='text-red-600'>{error.img_thumbail.join(', ')}</div>}
+                                {urlImage ? (
+                                    <>
+                                        <img src={urlImage} alt="Uploaded" style={{ marginTop: 16, width: 100, marginBottom: '10px' }} />
+                                    </>
+                                ) : (
+                                    productShow?.img_thumbnail && (
+                                        <>
+                                            <img src={productShow.img_thumbnail} alt="Uploaded" style={{ marginTop: 16, width: 100, marginBottom: '10px' }} />
+                                        </>
+                                    )
+                                )}
+                                {error?.img_thumbnail && <div className='text-red-600'>{error.img_thumbnail.join(', ')}</div>}
+
                             </Form.Item>
                             <Form.Item
                                 name="gallery"
@@ -655,15 +617,111 @@ const ProductForm = () => {
                                     <Button icon={<UploadOutlined />}>Tải lên gallery</Button>
                                 </Upload>
                                 {error?.gallery && <div className='text-red-600'>{error.gallery.join(', ')}</div>}
+
+                            </Form.Item>
+                            <Form.Item name="type" label="Kiểu sản phẩm" className="col-span-3">
+                                <Select
+                                    value={productShow?.type ? 1 : 0}
+                                    options={[
+                                        { value: 0, label: 'Sản phẩm đơn' },
+                                        { value: 1, label: 'Sản phẩm biến thể' },
+                                    ]}
+                                    onChange={handleChangeAttribute}
+                                    placeholder="Chọn kiểu sản phẩm"
+                                    placement="bottomLeft" className='w-full'
+                                />
+                                {error?.type && <div className='text-red-600'>{error.type.join(', ')}</div>}
                             </Form.Item>
 
+                            <Form.Item className="col-span-3">
+                                {attribute == 1 && (
+                                    <Form.Item name="attribute_id" label="Chọn thuộc tính">
+                                        <Select
+                                            size='large'
+                                            allowClear={false}
+                                            value={selectedAttributeChildren}
+                                            options={data?.attribute.map((item: any) => ({
+                                                value: item.id,
+                                                label: item.name,
+                                            })) || []}
+                                            mode='multiple'
+                                            onChange={handleChangeAttributeChildren}
+                                        />
+                                    </Form.Item>
+                                )}
+                                {selectedAttributeChildren.map(attrId => {
+                                    const attributeItem = data?.attribute.find((item: any) => item?.id === attrId);
+                                    return (
+                                        attributeItem && (
+                                            <div key={attrId}>
+                                                <Form.Item name={`${attrId}`} label={`Chọn ${attributeItem.name}`}>
+                                                    <Select
+                                                        size='large'
+                                                        allowClear={false}
+                                                        options={attributeItem && selectedValues && attributeItem.attributeitems.map((item: any) => ({
+                                                            value: item.id,
+                                                            label: item.value,
+                                                        }))}
+                                                        mode='multiple'
+                                                        onChange={values => handleChangeAttributeItem(attrId, values)}
+                                                        value={selectedValues[attrId] || []}
+                                                    />
+                                                </Form.Item>
+                                            </div>
+                                        )
+                                    );
+                                })
+                                }
+
+                                {/* {
+                                    attribute == 1 && <Button type='default' onClick={() => {
+                                        setSelectedAttributeChildren([]);
+                                        setSelectedValues({});
+                                        setIsTableVisible(false);
+                                        setAttribute(0)
+                                        form.resetFields();
+                                    }}>Hủy</Button>
+                                } */}
+                                {attribute == 1 && isTableVisible && (
+                                    <Table
+                                        className='w-full'
+                                        dataSource={selectedItems}
+                                        columns={columns}
+                                        rowKey={(record) => record.id || record.value}
+                                        pagination={false}
+                                        key={JSON.stringify(selectedItems)}
+                                    />
+                                )}
+                            </Form.Item>
+                            {attribute === 0 && <>
+                                <Form.Item name="price_regular" label="Price Regular" className="col-span-1">
+                                    <InputNumber size='large' />
+                                    {error?.price_regular && <div className='text-red-600'>{error.price_regular.join(', ')}</div>}
+
+                                </Form.Item>
+                                <Form.Item name="price_sale" label="Price Sale" className="col-span-1">
+                                    <InputNumber size='large' />
+                                    {error?.price_sale && <div className='text-red-600'>{error.price_sale.join(', ')}</div>}
+
+                                </Form.Item>
+                                <Form.Item name="quantity" label="Số lượng" className="col-span-1">
+                                    <InputNumber size='large' />
+                                    {error?.quantity && <div className='text-red-600'>{error.quantity.join(', ')}</div>}
+
+                                </Form.Item>
+
+                            </>
+                            }
+
                             <Form.Item name="description" label="Description" className="col-span-1">
-                                <TextArea />
+                                <TextArea size='large' />
                                 {error?.description && <div className='text-red-600'>{error.description.join(', ')}</div>}
+
                             </Form.Item>
                             <Form.Item name="description_title" label="Description Title" className="col-span-1">
-                                <Input />
+                                <Input size='large' />
                                 {error?.description_title && <div className='text-red-600'>{error.description_title.join(', ')}</div>}
+
                             </Form.Item>
                             <Form.Item name="status" label="Status" className="col-span-1" initialValue={'1'}>
                                 <div className="border border-gray-300 rounded-lg p-4 flex items-center space-x-4">
@@ -751,3 +809,14 @@ const ProductForm = () => {
     )
 }
 export default ProductForm
+
+
+
+
+
+
+
+
+
+
+
