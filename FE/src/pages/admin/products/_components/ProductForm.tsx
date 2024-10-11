@@ -66,22 +66,22 @@ const ProductForm = () => {
         setAttribute(value);
         setSelectedAttributeChildren([]);
         setIsTableVisible(false);
-        setSelectedValues({});
         setSelectedItems([]);
+    
+        // Reset giá trị đã chọn
         const newCheckedItems = Array(variants.length).fill(false);
         setCheckedItems(newCheckedItems);
-        if (value !== 0) {
-            const fieldsToReset = [...selectedAttributeChildren];
-            form.setFieldsValue(Object.fromEntries(fieldsToReset.map(field => [field, undefined])));
+    
+        if (value === 0) {
             form.resetFields(['price_regular', 'price_sale', 'quantity']);
             const fieldsToClear = selectedAttributeChildren.concat(['attribute_id']);
             form.setFieldsValue(Object.fromEntries(fieldsToClear.map(field => [field, undefined])));
+            setSelectedValues({}); // Reset selectedValues nếu cần
         } else {
-            form.resetFields();
-            setSelectedValues({});
+            const fieldsToReset = [...selectedAttributeChildren];
+            form.setFieldsValue(Object.fromEntries(fieldsToReset.map(field => [field, undefined])));
         }
     };
-    console.log("selectedValues",selectedValues)
     const handleChangeAttributeChildren = (values: any) => {
         setSelectedAttributeChildren(values);
         const newSelectedValues = { ...selectedValues };
@@ -99,7 +99,6 @@ const ProductForm = () => {
         setSelectedValues(newSelectedValues);
         handleSaveAttributes();
     };
-
     const handleChangeAttributeItem = (attrId: number, values: any) => {
         setSelectedValues((prevValues: any) => ({
             ...prevValues,
@@ -397,7 +396,6 @@ const ProductForm = () => {
             }
             return newCheckedItems;
         });
-        console.log("variants", variants)
     };
     console.log("selectedItems", selectedItems)
     const createProductMutation = useMutation({

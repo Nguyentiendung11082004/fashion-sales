@@ -17,7 +17,6 @@ const Login = () => {
   const navigator = useNavigate();
   const [form] = Form.useForm();
   const { login ,token} = useAuth();
-  console.log("token",token)
   const { mutate } = useMutation({
     mutationFn: async (user) => {
       const {data}  = await axios.post('http://127.0.0.1:8000/api/login', user);
