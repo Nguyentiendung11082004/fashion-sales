@@ -1,4 +1,4 @@
-import { useAuth } from "@/common/context/Auth/AuthContext";
+// import { useAuth } from "@/common/context/Auth/AuthContext";
 import { Product3 } from "@/components/icons";
 import AddCount from "@/components/icons/cart/AddCount";
 
@@ -7,24 +7,33 @@ import Delete from "@/components/icons/cart/Delete";
 import Gift from "@/components/icons/cart/Gift";
 import Note from "@/components/icons/cart/Note";
 import ReduceProduct from "@/components/icons/cart/ReducrPro";
-import { getCart } from "@/services/api/client/cart";
+// import { getCart } from "@/services/api/client/cart";
 import { useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "antd";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import ModalCart from "./_components/Modal";
+import instance from "@/configs/axios";
+import { useAuth } from "@/common/context/Auth/AuthContext";
 
 const Cart = () => {
-  const [visiable,setVisible]= useState(false);
+  const [visiable, setVisible] = useState(false);
   const closeModal = () => {
     setVisible(false)
   }
-  // const {data,isLoading,isError} = useQuery({
-  //   queryKey:['cart'],
-  //   queryFn: getCart
-  // })
-  // if(isLoading) return <div>Loading...</div>
-  // console.log("data",data)
+  const {token} = useAuth();
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['cart'],
+    queryFn: async () => {
+      const res = await instance.get('/cart',{
+        headers: {
+          Authorization: `Bearer ${token}`
+      }
+      })
+      return res;
+    }
+  })
+  if (isLoading) return <div>Loading...</div>
   return (
     <>
       <main
@@ -101,7 +110,7 @@ const Cart = () => {
                             </p>
                           </div>
                           <div className="hd-infor-text-tools mt-[10px]">
-                            <Button  onClick={()=> setVisible(true)} className="inline-flex me-[10px]">
+                            <Button onClick={() => setVisible(true)} className="inline-flex me-[10px]">
                               <Note />
                             </Button>
                             <Link to="" className="inline-flex me-[10px]">

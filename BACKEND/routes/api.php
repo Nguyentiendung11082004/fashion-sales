@@ -58,9 +58,9 @@ Route::prefix("v1/")->group(function () {
     Route::get('comment', [CommentController::class, 'index']);
 
     Route::get('find-variant/{product_id}', [ProductDetailController::class, "findvariant"]);
-
-Route::post('login', [AuthController::class, 'login']);
-Route::post('register', [AuthController::class, 'register']);
+    
+    Route::post('login', [AuthController::class, 'login']);
+    Route::post('register', [AuthController::class, 'register']);
 });
 
 

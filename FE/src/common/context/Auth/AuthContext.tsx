@@ -1,10 +1,9 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { useLocalStorage } from '../../hooks/useStogare';
 
-// Định nghĩa kiểu cho context
 interface AuthContextType {
     isAuth: boolean;
-    token: string | null;
+    token: string;
     login: (userData: any) => void;
     logout: () => void;
 }
