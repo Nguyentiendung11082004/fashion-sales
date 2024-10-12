@@ -1,6 +1,6 @@
 import { Ibrands } from "@/common/types/brands";
 import instance from "@/configs/axios";
-import { createBrand, updateBrand } from "@/services/api/brands.api";
+import { createBrand, updateBrand } from "@/services/api/admin/brands.api";
 import { UploadOutlined } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button, Form, Input, message, Skeleton, Upload } from "antd";

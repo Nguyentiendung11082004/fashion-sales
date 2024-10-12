@@ -1,6 +1,6 @@
 import Loading from "@/common/Loading/Loading";
 import { Ibrands } from "@/common/types/brands";
-import { deleteBrand, getBrands } from "@/services/api/brands.api";
+import { deleteBrand, getBrands } from "@/services/api/admin/brands.api";
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button, Modal, Pagination } from "antd";

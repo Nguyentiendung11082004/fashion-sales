@@ -1,6 +1,6 @@
 import Loading from "@/common/Loading/Loading";
 import { Iattribute } from '@/common/types/attribute';
-import { deleteAttributes, getAttributes } from '@/services/api/attribute';
+import { deleteAttributes, getAttributes } from '@/services/api/admin/attribute';
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button, Modal, Pagination, Table } from 'antd';

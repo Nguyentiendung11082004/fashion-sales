@@ -6,6 +6,7 @@ export interface IProductVariant {
   quantity: number;
   sku: string;
   image: string;
+  id: number;
 }
 export interface IProductGalleries {
   id: number;
@@ -25,6 +26,7 @@ export interface Iproduct {
   price_regular: number;
   price_sale: number;
   sku: string;
+  rate: number;
   description: string;
   description_title: string;
   status: boolean;

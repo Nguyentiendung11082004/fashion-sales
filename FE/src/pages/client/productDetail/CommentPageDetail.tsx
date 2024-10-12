@@ -1,52 +1,73 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Icomments } from "@/common/types/comments";
 import { productShow_client } from "@/services/api/client/productClient.api";
 import { Skeleton } from "antd";
 
 const CommentPageDetail = ({ productId }: { productId: number }) => {
-  const [comments, setComments] = useState<Icomments[]>([]);
+  const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const commentsPerPage = 3;
 
   useEffect(() => {
-    const fetchComments = async () => {
+    const fetchProductAndComments = async () => {
       setLoading(true);
       try {
         const response = await productShow_client(productId);
-        setComments(response.product.comments || []);
+        setProduct(response.product);
       } catch (error) {
-        console.error("Failed to fetch comments:", error);
+        console.error("Call api thất bại", error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchComments();
+    fetchProductAndComments();
   }, [productId]);
 
   if (loading) {
     return <Skeleton />;
   }
 
+  const comments = product?.comments || [];
+  const totalComments = comments.length;
+  const totalPages = Math.ceil(totalComments / commentsPerPage);
+  const indexOfLastComment = currentPage * commentsPerPage;
+  const indexOfFirstComment = indexOfLastComment - commentsPerPage;
+  const currentComments = comments.slice(
+    indexOfFirstComment,
+    indexOfLastComment
+  );
+
+  const handleNext = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handlePrev = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
   return (
     <div className="w-full">
-      {comments.length === 0 ? (
+      {currentComments.length === 0 ? (
         <p>Chưa có bình luận nào.</p>
       ) : (
-        comments.map((comment) => (
+        currentComments.map((comment: Icomments) => (
           <div className="border py-4 mb-4" key={comment.id}>
             <div className="flex items-center">
               <img
                 className="w-[60px] h-[60px] rounded-full mr-4"
                 alt="avatar-user"
-                src={
-                  (comment.user_id as any)?.user?.image ??
-                  "https://via.placeholder.com/60"
-                }
+                src={comment.user?.avatar ?? "https://via.placeholder.com/60"}
               />
               <div>
                 <span className="font-semibold">
-                  {(comment.user_id as any)?.user?.name || "Người dùng"}
+                  {comment.user?.name ?? "Người dùng"}
                 </span>
                 <div className="mt-2 flex">
                   {[...Array(comment.rating || 0)].map((_, index) => (
@@ -55,7 +76,9 @@ const CommentPageDetail = ({ productId }: { productId: number }) => {
                     </span>
                   ))}
                 </div>
-                <p className="text-xs mt-2">2024-01-01</p>
+                <p className="text-xs mt-2">
+                  {comment.created_at ?? "DD-MM-YYYY"}
+                </p>
               </div>
             </div>
             <div className="mt-4 ml-[75px]">
@@ -70,6 +93,39 @@ const CommentPageDetail = ({ productId }: { productId: number }) => {
             </div>
           </div>
         ))
+      )}
+
+      {totalComments > 0 && (
+        <div className="container text-center mt-[20px] text-gray-500 lg:text-sm text-xs">
+          <button
+            onClick={handlePrev}
+            disabled={currentPage === 1}
+            className={`hover:text-[red] px-4 ${currentPage === 1 ? "text-gray-300" : ""}`}
+          >
+            Pre
+          </button>
+
+          {[...Array(totalPages)].map((_, index) => (
+            <button
+              key={index + 1}
+              onClick={() => setCurrentPage(index + 1)}
+              className={`mx-1 px-4 py-2 border border-gray-400 
+              ${currentPage === index + 1 ? "bg-gray-200 font-bold" : ""}
+              hover:bg-gray-100 hover:text-red-500 transition-all`}
+              style={{ width: "40px", height: "40px", borderRadius: "4px" }}
+            >
+              {index + 1}
+            </button>
+          ))}
+
+          <button
+            onClick={handleNext}
+            disabled={currentPage === totalPages}
+            className={`hover:text-[red] px-4 ${currentPage === totalPages ? "text-gray-300" : ""}`}
+          >
+            Next
+          </button>
+        </div>
       )}
     </div>
   );

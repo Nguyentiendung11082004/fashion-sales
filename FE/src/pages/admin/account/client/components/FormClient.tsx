@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { IUser } from "@/common/types/users";
 import instance from "@/configs/axios";
-import { createClient, updateClient } from "@/services/api/clients";
+import { createClient, updateClient } from "@/services/api/admin/clients";
 import { UploadOutlined } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {

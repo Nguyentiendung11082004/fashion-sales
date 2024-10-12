@@ -2,7 +2,7 @@
 import Less from "../../../components/icons/detail/Less";
 import { Link, useParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import { Iproduct, IProductVariant } from "@/common/types/products";
+import { Iproduct } from "@/common/types/products";
 import { useQuery } from "@tanstack/react-query";
 import { productShow } from "@/services/api/admin/products.api";
 import RelatedProducts from "./RelatedProducts";
@@ -19,7 +19,7 @@ const ProductDetail = () => {
   const [selectedImage, setSelectedImage] = useState<string | undefined>(
     undefined
   );
-  const [productVariant, setProductVariant] = useState<IProductVariant>();
+  const [productVariant, setProductVariant] = useState<object>({});
 
   const {
     data: productData,
@@ -36,11 +36,9 @@ const ProductDetail = () => {
       }
     },
   });
-
   console.log("data : ", productData);
   const getUniqueAttributes = productData?.getUniqueAttributes;
-  // console.log("getUnique", getUniqueAttributes);
-
+  console.log("getUnique", getUniqueAttributes);
   useEffect(() => {
     if (productData && productData.product) {
       setProduct(productData.product);
@@ -114,7 +112,6 @@ const ProductDetail = () => {
   const [selectedAttributes, setSelectedAttributes] = useState<{
     [key: string]: string | number;
   }>({});
-
   const handleAttributeSelect = (key: string, valueId: string | number) => {
     setSelectedAttributes((prev) => {
       const updatedAttributes = { ...prev };
@@ -130,39 +127,11 @@ const ProductDetail = () => {
   };
 
   useEffect(() => {
-    if (
-      productVariant?.image &&
-      !galleryImages.some((img) => img.image === productVariant.image)
-    ) {
-      setProduct((prevProduct) => {
-        if (!prevProduct) return prevProduct;
-        return {
-          ...prevProduct,
-          galleries: [
-            ...prevProduct.galleries,
-            { id: -1, image: productVariant.image },
-          ],
-        };
-      });
-    }
-  }, [productVariant, galleryImages]);
-
-  useEffect(() => {
     const fetchProductVariant = async () => {
       try {
-        const productVariant = {
-          product_variant: {
-            size: 1,
-            color: 6,
-          },
-        };
-        const variant = await findProductVariant(productId, productVariant);
-        console.log("log", selectedAttributes);
-        console.log("variant", productVariant);
-        const responseData = variant?.findProductVariant;
-        console.log("Product variant:", responseData);
-        setProductVariant(responseData);
-
+        const variant = await findProductVariant(productId, selectedAttributes);
+        console.log("Product variant:", variant);
+        setProductVariant(variant);
         // console.log(setProductVariant);
       } catch (error) {
         console.log("Call api thất bại", error);
@@ -195,11 +164,9 @@ const ProductDetail = () => {
         </div>
 
         <div className="container py-10 lg:flex">
-          {/* left */}
           <div className="w-full lg:w-[55%] ">
             <div className="lg:flex lg:gap-3">
               <div className="lg:w-4/5 h-full w-full lg:order-2">
-                {/* image sản phẩm */}
                 <div
                   className="group lg:w-[550px] lg:h-[600px] h-full relative overflow-hidden"
                   onMouseMove={handleMouseMove}
@@ -209,16 +176,15 @@ const ProductDetail = () => {
                     alt="product detail"
                     loading="lazy"
                     decoding="async"
+                    data-nimg="fill"
                     className="w-full lg:h-[100%] h-full lg:w-[550px] object-cover transition-transform ease-in-out duration-300 group-hover:scale-150"
-                    src={
-                      productVariant && productVariant.image
-                        ? productVariant.image
-                        : selectedImage
-                    }
+                    sizes=""
+                    src={selectedImage}
                   />
                 </div>
               </div>
 
+              {/* galleries */}
               <div
                 className="lg:order-1 hd-img-soft lg:w-1/5 w-full lg:h-[600px] max-h-[600px] overflow-x-auto lg:overflow-y-auto flex lg:flex-col flex-row"
                 onWheel={handleWheel}
@@ -247,10 +213,10 @@ const ProductDetail = () => {
               {/* end galleries */}
             </div>
           </div>
-          {/* right */}
 
           <div className="w-full lg:w-[45%] pt-10 lg:pt-0 lg:pl-7 xl:pl-9 2xl:pl-10 ">
             <div className="h-full">
+              {/* {productVariant&&productVariant.map((index,value)=>{})} */}
               <div>
                 <h2 className="text-[16px] xl:text-start sm:text-center sm:text-3xl font-bold mb-3 ">
                   {product?.name}
@@ -258,10 +224,7 @@ const ProductDetail = () => {
                 <div className="flex items-center mt-5 lg:mx-[15%] sm:mx-[42%] xl:mx-0 sm:mt-2 space-x-4">
                   <div className="">
                     <span className="lg:text-xl  sm:text-[25px] text-lg text-[#747474] my-2">
-                      {productVariant
-                        ? productVariant.price_sale
-                        : product?.price_sale}
-                      VNĐ
+                      {product?.price_regular} VNĐ
                     </span>
                   </div>
                   <div className="h-7 border-l border-slate-300 dark:border-slate-700 lg:block xl:block block sm:hidden"></div>
@@ -285,7 +248,7 @@ const ProductDetail = () => {
                         ></path>
                       </svg>
                       <div className="ml-1.5 flex">
-                        <span>{product?.rate}</span>
+                        <span>4</span>
                         <span className="block mx-2">·</span>
                       </div>
                     </Link>
@@ -317,8 +280,8 @@ const ProductDetail = () => {
                                   key={valueId}
                                   className={`relative flex-1 max-w-[60px] h-8 sm:h-9 rounded-full cursor-pointer flex items-center justify-center ${
                                     selectedAttributes[key] === valueId
-                                      ? "border-gray-400 border-4"
-                                      : "border-gray-200 border-2"
+                                      ? "border-gray-400 border-4" // Đường viền đậm khi được chọn
+                                      : "border-gray-200 border-2" // Đường viền nhẹ khi không được chọn
                                   }`}
                                   style={{
                                     backgroundColor:
