@@ -158,6 +158,7 @@ const ProductForm = () => {
             if (info.file.status === "done") {
                 const isImage = /^image\//.test(info.file.type);
                 if (isImage) {
+                    console.log("isImage",isImage)
                     const imageUrl = info.file.response.url;
                     const newVariants = [...variants];
                     newVariants[index] = { ...newVariants[index], image: imageUrl };
@@ -169,7 +170,6 @@ const ProductForm = () => {
             }
         },
     });
-
     const propsGallery: UploadProps = {
         name: 'file',
         action: 'https://api.cloudinary.com/v1_1/dlvwxauhf/image/upload',
@@ -397,7 +397,6 @@ const ProductForm = () => {
             return newCheckedItems;
         });
     };
-    console.log("selectedItems", selectedItems)
     const createProductMutation = useMutation({
         mutationFn: productStore,
         onMutate: () => {
@@ -429,6 +428,7 @@ const ProductForm = () => {
         onError: handleErrorResponse,
     })
     const onFinish = (values: Iproduct) => {
+        console.log("values",values)
         const productVariantData: IProductVariant[] = [];
         const attributeData: { [key: string]: number[] } = {};
         selectedAttributeChildren.forEach(attrId => {

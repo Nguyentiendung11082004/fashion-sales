@@ -6,7 +6,8 @@ import App from "./App.tsx";
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import './index.css'
 import { StyleProvider } from "@ant-design/cssinjs";
-import { AuthProvider } from "./common/hooks/Auth/AuthContext.tsx";
+import { AuthProvider } from "./common/context/Auth/AuthContext.tsx";
+import { UserProvider } from "./common/context/User/UserContext.tsx";
 const queryClient = new QueryClient({
     defaultOptions: {
         queries: {
@@ -20,7 +21,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         <BrowserRouter>
             <StyleProvider layer>
                 <AuthProvider>
-                    <App />
+                    <UserProvider>
+                        <App />
+                    </UserProvider>
                 </AuthProvider>
                 <ReactQueryDevtools initialIsOpen={false} />
             </StyleProvider>

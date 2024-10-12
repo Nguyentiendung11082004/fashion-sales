@@ -1,4 +1,5 @@
 import { LogoClient } from "@/components/icons";
+import instance from "@/configs/axios";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Button, Form, Input } from "antd";
 import axios from "axios";
@@ -10,7 +11,7 @@ const Register = () => {
   const [error, setError] = useState<any>('')
   const { mutate } = useMutation({
     mutationFn: async (user: any) => {
-      const { data } = await axios.post(`http://127.0.0.1:8000/api/register`, user);
+      const { data } = await instance.post(`/register`, user);
       return data;
     },
     onSuccess: (data) => {

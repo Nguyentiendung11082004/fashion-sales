@@ -387,8 +387,8 @@ const ProductDetail = () => {
               <button
                 onClick={() => handleButtonClick("details")}
                 className={`${activeButton === "details"
-                    ? "border-black text-black border-2"
-                    : " text-[#8e8e8e]"
+                  ? "border-black text-black border-2"
+                  : " text-[#8e8e8e]"
                   } font-medium cursor-pointer lg:text-base text-[10px] lg:py-2 lg:px-6 px-2 py-2 rounded-full`}
               >
                 Chi tiết sản phẩm
@@ -396,8 +396,8 @@ const ProductDetail = () => {
               <button
                 onClick={() => handleButtonClick("reviews")}
                 className={`${activeButton === "reviews"
-                    ? "border-black text-black border-2"
-                    : "border-black text-[#8e8e8e]"
+                  ? "border-black text-black border-2"
+                  : "border-black text-[#8e8e8e]"
                   } btn_cmt text-[10px] lg:text-base font-medium cursor-pointer lg:py-2 lg:px-6 px-2 py-2 rounded-full`}
               >
                 Xem đánh giá sản phẩm
@@ -405,8 +405,8 @@ const ProductDetail = () => {
               <button
                 onClick={() => handleButtonClick("comment")}
                 className={`${activeButton === "comment"
-                    ? "border-black text-black border-2"
-                    : "border-black text-[#8e8e8e]"
+                  ? "border-black text-black border-2"
+                  : "border-black text-[#8e8e8e]"
                   } btn_cmt text-[10px] lg:text-base font-medium cursor-pointer lg:py-2 lg:px-6 px-2 py-2 rounded-full`}
               >
                 Viết bình luận

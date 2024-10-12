@@ -7,19 +7,19 @@ import { Button, Form, Input } from "antd";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { useAuth } from "@/common/hooks/Auth/AuthContext";
+import { useAuth } from "@/common/context/Auth/AuthContext";
+import instance from "@/configs/axios";
 
 
 const Login = () => {
   const [loading,setLoading] = useState<boolean>(false)
   const [error, setError] = useState<any>('');
-
   const navigator = useNavigate();
   const [form] = Form.useForm();
   const { login ,token} = useAuth();
   const { mutate } = useMutation({
     mutationFn: async (user) => {
-      const {data}  = await axios.post('http://127.0.0.1:8000/api/login', user);
+      const {data}  = await instance.post('/login', user)
       return data;
     },
     onMutate: () => {

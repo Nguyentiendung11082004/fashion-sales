@@ -6,28 +6,12 @@ import Email from "@/components/icons/account/Email";
 import DateBirth from "@/components/icons/account/DateBirdth";
 import Address from "@/components/icons/account/Address";
 import Phone from "@/components/icons/account/Phone";
-import { useAuth } from "@/common/hooks/Auth/AuthContext";
 import axios from "axios";
+import { useAuth } from "@/common/context/Auth/AuthContext";
+import { useUser } from "@/common/context/User/UserContext";
 const Account = () => {
-  const { token } = useAuth();
-  const [user, setUser] = useState<any>(null)
-  const getUser = async () => {
-    try {
-      const response = await axios.get('http://127.0.0.1:8000/api/user', {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      setUser(response.data);
-    } catch (error) {
-      console.error("Lỗi khi lấy thông tin người dùng", error);
-    }
-  }
-  useEffect(() => {
-    getUser()
-  }, [token])
-  console.log("user", user)
-
+  const { user } = useUser();
+  
   return (
     <main
       id="main-content"
@@ -113,7 +97,7 @@ const Account = () => {
                   >
                     Họ &amp; tên
                   </label>
-                  
+
                   <input
                     className="block w-full outline-0 border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50 focus:border-neutral-200 rounded-2xl font-normal h-11 px-4 py-3 mt-1.5"
                     type="text"
@@ -157,6 +141,7 @@ const Account = () => {
                     <input
                       className="block w-full outline-0 border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50 rounded-2xl font-normal h-11 px-4 py-3 !rounded-l-none"
                       type="date"
+                      value={user?.birth_date}
                     />
                   </div>
                 </div>
