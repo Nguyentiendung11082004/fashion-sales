@@ -32,6 +32,7 @@ import ClientPage from "@/pages/admin/account/client/Client";
 import FormClient from "@/pages/admin/account/client/components/FormClient";
 import EmployeePage from "@/pages/admin/account/employee/Employee";
 import FormEmployee from "@/pages/admin/account/employee/components/FormEmployee";
+import Wishlist from "@/pages/client/wishlist/Wishlist";
 
 
 const Router = () => {
@@ -45,6 +46,7 @@ const Router = () => {
           <Route path="about" element={<About />} />
           <Route path="cart" element={<Cart />} />
           <Route path="account" element={<Account />} />
+          <Route path="wishlist" element={<Wishlist />} />
           <Route
             path="account/:id/forgotpassword"
             element={<ForgotPassword />}

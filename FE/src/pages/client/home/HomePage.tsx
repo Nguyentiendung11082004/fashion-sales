@@ -26,10 +26,6 @@ const HomePage = () => {
       .then((response) => {
         setTrendProducts(response.data.trend_products);
         setHomeProducts(response.data.home_show_products);
-
-        // response.data.home_show_products.forEach((productt:any) => {
-        //   console.log(productt.unique_attributes);
-        // });
       })
       .catch((error) => {
         console.error("Có lỗi xảy ra khi lấy sản phẩm", error);
@@ -60,7 +56,7 @@ const HomePage = () => {
             {trendProducts.map((product) => (
               <div key={product.id} className="product-item">
                 <div className="lg:mb-[25px] mb-[20px]">
-                  <div className="lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] sm:h-[345px] overflow-hidden">
+                  <div className="cursor-pointer lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] sm:h-[345px] overflow-hidden">
                     <img
                       className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover/image:opacity-0 object-cover "
                       src={product.img_thumbnail}
@@ -69,6 +65,7 @@ const HomePage = () => {
                       className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover/image:opacity-100 object-cover"
                       src={product.img_thumbnail}
                     />
+                    <div className="absolute inset-0 bg-black opacity-0 transition-opacity duration-300 ease-in-out group-hover:opacity-10"></div>
                     <div>
                       <Link to="" className="absolute left-5 top-5">
                         <HeartWhite />
@@ -92,44 +89,80 @@ const HomePage = () => {
                         </button>
                       </Link>
                     </div>
-                    <div
-                      className="absolute text-white
-   -translate-y-7 transform 
-    transition-all duration-500 ease-in-out 
-    group-hover:translate-y-0
-    opacity-0
-    group-hover:opacity-100
-  "
-                    >
-                      <ul className="flex">
-                        {product.unique_attributes.size && (
-                          <li>
-                            {Object.values(product.unique_attributes.size).join(
-                              ", "
-                            )}
-                          </li>
-                        )}
-                      </ul>
-                    </div>
-
-                    {product.price_regular &&
-                      product.price_sale > 0 &&
-                      product.price_sale < product.price_regular && (
-                        <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400">
-                          -
-                          {Math.round(
-                            ((product.price_regular - product.price_sale) /
-                              product.price_regular) *
-                              100
+                    <div className="flex justify-center">
+                      <div
+                        className="absolute bottom-2 text-center text-white
+    -translate-y-7 transform 
+      transition-all duration-500 ease-in-out 
+      group-hover:translate-y-0
+      opacity-0
+      group-hover:opacity-100
+    "
+                      >
+                        <ul className="flex">
+                          {product.unique_attributes.size && (
+                            <li>
+                              {Object.values(
+                                product.unique_attributes.size
+                              ).join(", ")}
+                            </li>
                           )}
-                          %
-                        </div>
-                      )}
+                        </ul>
+                      </div>
+                    </div>
+                    {product.price_regular && (
+                      <div>
+                        {product.price_sale > 0 &&
+                        product.price_sale < product.price_regular ? (
+                          <>
+                            <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400">
+                              -
+                              {Math.round(
+                                ((product.price_regular - product.price_sale) /
+                                  product.price_regular) *
+                                  100
+                              )}
+                              %
+                            </div>
+                          </>
+                        ) : (
+                          <div></div>
+                        )}
+                      </div>
+                    )}
                   </div>
                   <div>
-                    <p className="text-sm text-black mb-1">{product.name}</p>
-                    <del className="mr-1">{product.price_regular}₫</del>
-                    <span className="text-[red]">{product.price_sale}₫</span>
+                    <p className="text-base font-medium text-black mb-1 cursor-pointer hd-all-hover-bluelight">
+                      {product.name.charAt(0).toUpperCase() + product.name.slice(1).toLowerCase()}
+                    </p>
+                    {product.price_regular && (
+                      <div>
+                        {product.price_sale > 0 &&
+                        product.price_sale < product.price_regular ? (
+                          <>
+                            <del className="mr-1">
+                              {new Intl.NumberFormat("vi-VN").format(
+                                product.price_regular
+                              )}
+                              ₫{/* Dạng tiền tệ VN */}
+                            </del>
+                            <span className="text-[red]">
+                              {new Intl.NumberFormat("vi-VN").format(
+                                product.price_sale
+                              )}
+                              ₫
+                            </span>
+                          </>
+                        ) : (
+                          <span className="">
+                            {new Intl.NumberFormat("vi-VN").format(
+                              product.price_regular
+                            )}
+                            ₫
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   <div className="t4s-product-colors flex">
@@ -209,7 +242,7 @@ const HomePage = () => {
             {homeProducts.map((product) => (
               <div key={product.id} className="product-item">
                 <div className="lg:mb-[25px] mb-[20px]">
-                  <div className="lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] sm:h-[345px] overflow-hidden">
+                  <div className="cursor-pointer lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] sm:h-[345px] overflow-hidden">
                     <img
                       className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover/image:opacity-0 object-cover "
                       src={product.img_thumbnail}
@@ -218,6 +251,7 @@ const HomePage = () => {
                       className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover/image:opacity-100 object-cover"
                       src={product.img_thumbnail}
                     />
+                    <div className="absolute inset-0 bg-black opacity-0 transition-opacity duration-300 ease-in-out group-hover:opacity-10"></div>
                     <div>
                       <Link to="" className="absolute left-5 top-5">
                         <HeartWhite />
@@ -263,24 +297,59 @@ const HomePage = () => {
                       </div>
                     </div>
 
-                    {product.price_regular &&
-                      product.price_sale > 0 &&
-                      product.price_sale < product.price_regular && (
-                        <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400">
-                          -
-                          {Math.round(
-                            ((product.price_regular - product.price_sale) /
-                              product.price_regular) *
-                              100
-                          )}
-                          %
-                        </div>
-                      )}
+                    {product.price_regular && (
+                      <div>
+                        {product.price_sale > 0 &&
+                        product.price_sale < product.price_regular ? (
+                          <>
+                            <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400">
+                              -
+                              {Math.round(
+                                ((product.price_regular - product.price_sale) /
+                                  product.price_regular) *
+                                  100
+                              )}
+                              %
+                            </div>
+                          </>
+                        ) : (
+                          <div></div>
+                        )}
+                      </div>
+                    )}
                   </div>
                   <div>
-                    <p className="text-sm text-black mb-1">{product.name}</p>
-                    <del className="mr-1">{product.price_regular}₫</del>
-                    <span className="text-[red]">{product.price_sale}₫</span>
+                    <p className="text-base font-medium text-black mb-1 cursor-pointer hd-all-hover-bluelight">
+                      {product.name.charAt(0).toUpperCase() + product.name.slice(1).toLowerCase()}
+                    </p>
+                    {product.price_regular && (
+                      <div>
+                        {product.price_sale > 0 &&
+                        product.price_sale < product.price_regular ? (
+                          <>
+                            <del className="mr-1">
+                              {new Intl.NumberFormat("vi-VN").format(
+                                product.price_regular
+                              )}
+                              ₫{/* Dạng tiền tệ VN */}
+                            </del>
+                            <span className="text-[red]">
+                              {new Intl.NumberFormat("vi-VN").format(
+                                product.price_sale
+                              )}
+                              ₫
+                            </span>
+                          </>
+                        ) : (
+                          <span className="">
+                            {new Intl.NumberFormat("vi-VN").format(
+                              product.price_regular
+                            )}
+                            ₫
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   <div className="t4s-product-colors flex">

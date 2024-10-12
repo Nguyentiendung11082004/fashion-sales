@@ -17,13 +17,17 @@ class ProductShopController extends Controller
     // lấy ra tất cả product và biến thể của nó
     public function getAllProduct(ProductShopRequest $request)
     {
-        // Lấy tất danh mục 
+        // Lấy tất danh mục
         $allCategory = Category::whereNull('parent_id')->latest('id')->get();
         // Lấy tất cả brands
         $allBrand = Brand::query()->latest('id')->get();
         // lấy ra các thuộc tính
-        $allAttribute = Attribute::with('attributeitems')->get();
-
+        $attributes = Attribute::with('attributeitems')->get();
+        $allAttribute = [];
+        // converte dữ liệu cho hằng dễ làm việc
+        foreach ($attributes as $attribute) {
+            $allAttribute[$attribute->name] = $attribute->attributeitems->toArray();
+        }
         $search = $request->input('search'); // Người dùng nhập từ khóa tìm kiếm
         $colors = $request->input('colors'); // Người dùng truyền lên một mảng các màu
         $sizes = $request->input('sizes'); // Người dùng truyền lên một mảng các kích thước
@@ -31,11 +35,15 @@ class ProductShopController extends Controller
         $maxPrice = $request->input('max_price'); // Người dùng nhập giá tối đa
         $categories = $request->input('categorys');
         $brands = $request->input('brands');
-        $sortPrice = $request->input('sortPrice');
-        $sortDirection = $request->input('sortDirection');
-        $sortAlphaOrder = $request->input('sortAlphaOrder');
-        $trend = $request->input('trend');
         $sale = $request->input('sale');
+        $new = $request->input('new');
+
+        $trend = $request->input('trend');
+        $sortDirection = $request->input('sortDirection');
+        $sortPrice = $request->input('sortPrice');
+        $sortAlphaOrder = $request->input('sortAlphaOrder');
+
+
 
         // Kiểm tra giá trị sortDirection
         if ($sortDirection && !in_array(strtolower($sortDirection), ['asc', 'desc'])) {
@@ -47,26 +55,28 @@ class ProductShopController extends Controller
         }
         try {
             $products = Product::query()
-                ->when($trend, function ($query, $trend) {
+                ->when($new, function ($query, $new) {
+                    // Lọc sản phẩm new
+                    return $query->where('is_new', 1);
+                })
+                ->when($trend, function ($query, $new) {
                     // Lọc sản phẩm hot trend
                     return $query->where('trend', 1);
                 })
                 ->when($sale, function ($query) {
                     return $query->where(function ($q) {
-                        // Check if the product is a simple product (type = 0)
                         $q->where(function ($query) {
                             $query->where('type', 0)
-                                  ->whereNotNull('price_sale')
-                                  ->whereColumn('price_sale', '<', 'price_regular');
+                                ->whereNotNull('price_sale')
+                                ->whereColumn('price_sale', '<', 'price_regular'); // Để đảm bảo lọc bao gồm cả giá sale null
                         })
-                        ->orWhere(function ($query) {
-                            // Check if the product has variants (type = 1)
-                            $query->where('type', 1)
-                                  ->whereHas('variants', function ($query) {
-                                      $query->whereNotNull('price_sale')
+                            ->orWhere(function ($query) {
+                                $query->where('type', 1)
+                                    ->whereHas('variants', function ($query) {
+                                        $query->whereNotNull('price_sale')
                                             ->whereColumn('price_sale', '<', 'price_regular');
-                                  });
-                        });
+                                    });
+                            });
                     });
                 })
                 ->when($categories, function ($query) use ($categories) {
