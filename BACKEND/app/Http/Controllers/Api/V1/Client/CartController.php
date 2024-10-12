@@ -9,7 +9,6 @@ use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
-use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -30,8 +29,14 @@ class CartController extends Controller
 
                 "cartitems.product",
                 "cartitems.productvariant.attributes"
-            ])->first()->toArray();
-
+            ])->first();
+            if (!$cart) {
+                return response()->json([
+                    "message"=>"Chưa có sản phẩm nào trong giỏ hàng."
+                ],Response::HTTP_OK);
+            }else{
+                $cart->toArray();
+            }
             $sub_total = 0;
             foreach ($cart["cartitems"] as  $key =>  $cartitem) {
                 $quantity = $cartitem["quantity"];
@@ -159,9 +164,9 @@ class CartController extends Controller
                 )->toArray();
                 // dd($cart_item);
 
-                $product_variant = Product::query()->findOrFail($cart_item['product']['type']? $cart_item["productvariant"]["product_id"]:$cart_item['product']['id'])->load(["variants.attributes"])->toArray();
+                $product_variant = Product::query()->findOrFail($cart_item['product']['type'] ? $cart_item["productvariant"]["product_id"] : $cart_item['product']['id'])->load(["variants.attributes"])->toArray();
                 $getUniqueAttributes = new GetUniqueAttribute();
-            
+
                 return response()->json([
                     "getuniqueattributes" => $getUniqueAttributes->getUniqueAttributes($product_variant["variants"]),
                     "cart_item" => $cart_item
@@ -182,26 +187,44 @@ class CartController extends Controller
         //
         try {
 
-           return DB::transaction(function () use ($request, $id) {
+            return DB::transaction(function () use ($request, $id) {
+                $request->validate([
+                    "quantity" => "required|integer|min:1"
+                ]);
+                $cart_item = CartItem::query()->findOrFail($id);
+                $product = Product::query()->findOrFail($cart_item->product_id);
+                if ($product->quantity < $request->input('quantity') && !$cart_item->product_variant_id) {
+                    return response()->json([
+                        "message" => "Số lượng bạn cập nhật đã vượt quá số lượng sản phẩm tồn kho",
+
+                    ], Response::HTTP_INTERNAL_SERVER_ERROR);
+                }
+
+                if ($cart_item->product_variant_id) {
                     $request->validate([
-                        "quantity"=>"required|integer|min:1"
-                        // ,
-                        // "product_variant"=>"required|array"
+                        "product_variant" => "required|array",
+                        "product_variant.*"=>"integer|min:1"
                     ]);
-                    $cart_item=CartItem::query()->findOrFail($id);
-                    $product=Product::query()->findOrFail($cart_item->product_id);
+                    $getUniqueAttributes = new GetUniqueAttribute();
+                    $product_variant = Product::query()->findOrFail($cart_item->product_id)->load(["variants", "variants.attributes"])->toArray();
 
-                    $cart_item->quantity=$request->input("quantity");
-                    $cart_item->save();
-                    $getUniqueAttributes=new GetUniqueAttribute();
-                    if ($cart_item->product_variant_id) {
-                        $product_variant=Product::query()->findOrFail($cart_item->product_id)->load(["variants","variants.attributes"])->toArray();
-                        $findVariant= $getUniqueAttributes->findVariantByAttributes($product_variant["variants"],$request->input('product_variant'));
-                        $cart_item->product_variant_id=$findVariant["id"];
-                        $cart_item->save();
+                    $findVariant = $getUniqueAttributes->findVariantByAttributes($product_variant["variants"], $request->input('product_variant'));
+                    if ($findVariant["quantity"] < $request->input('quantity')) {
+                        return response()->json([
+                            "message" => "Số lượng bạn cập nhật đã vượt quá số lượng sản phẩm tồn kho",
+    
+                        ], Response::HTTP_INTERNAL_SERVER_ERROR);
                     }
-                    return response()->json(["message"=>"cập nhật giỏ hàng thành công."],Response::HTTP_OK);
+                    $cart_item->product_variant_id = $findVariant["id"];
+                    $cart_item->quantity=$request->input("quantity");
+                    
 
+                } else {
+                    $cart_item->quantity = $request->input("quantity");
+                }
+                $cart_item->save();
+
+                return response()->json(["message" => "cập nhật giỏ hàng thành công."], Response::HTTP_OK);
             });
         } catch (\Exception $ex) {
             return response()->json([

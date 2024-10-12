@@ -31,7 +31,6 @@ class ProductDetailController extends Controller
 
                 "variants.attributes"
             ])->findOrFail($id);
-            dd($product->toArray());
             $product->increment('views');
 
             $productRelated = Product::query()->with(["variants.attributes"])->where([
