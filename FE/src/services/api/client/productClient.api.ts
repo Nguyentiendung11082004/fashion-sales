@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import instance from "@/configs/axios";
 
 // Hàm xử lý yêu cầu cho cả GET và POST
@@ -22,10 +23,30 @@ export const productShow_client = (id: number | string) =>
 // // Hàm để tìm biến thể sản phẩm
 export const findProductVariant = async (
   productId: number,
-  productVariant: object
+  productVariant: any
 ) => {
   const url = `find-variant/${productId}`;
-  return await handleRequest("get", url, { product_variant: productVariant });
+  return await handleRequest("get", url, productVariant);
 };
+
+// // Hàm tìm biến thể sản phẩm
+// export const findProductVariant = async (
+//   productId: number,
+//   productVariant: { product_variant: { [key: string]: string | number } }
+// ) => {
+//   return handleRequest("post", `find-variant/${productId}`, productVariant);
+// };
+
+// // Hàm tìm biến thể sản phẩm
+// export const findProductVariant = async (
+//   productId: number,
+//   productVariant: { product_variant: { [key: string]: number } }
+// ) => {
+//   const url = `find-variant/${productId}`;
+
+//   return await handleRequest("post", url, productVariant);
+// };
+
+// Hàm tìm kiếm sản phẩm theo ID
 export const findProduct_id = (id: string | undefined | number) =>
   handleRequest("get", `/product_variant/${id}`);

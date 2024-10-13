@@ -17,7 +17,6 @@ const CategoryPage = () => {
   
   const initialPage = queryClient.getQueryData(['currentCategoryPage']) || 1;
   const [currentCategoryPage, setcurrentCategoryPage] = useState(Number(initialPage));
-  console.log("currentCategoryPage",currentCategoryPage)
   const [visiable, setVisiable] = useState(false);
   const [currentId, setCurrentId] = useState<number | null>(null);
   const { data, isFetching, isError } = useQuery({

@@ -68,7 +68,6 @@ class ProductController extends Controller
      */
     public function store(StoreProduct $request)
     {
-// dd($request->all());
         try {
 
             $respone = DB::transaction(function () use ($request) {

@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export interface Icomments {
-  [x: string]: any;
-  id: number;
+  id: number|string
   user_id: number;
   product_id: number;
   content: string;

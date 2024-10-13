@@ -2,7 +2,7 @@
 import Less from "../../../components/icons/detail/Less";
 import { Link, useParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import { Iproduct, IProductVariant } from "@/common/types/products";
+import { Iproduct } from "@/common/types/products";
 import { useQuery } from "@tanstack/react-query";
 import { productShow } from "@/services/api/admin/products.api";
 import RelatedProducts from "./RelatedProducts";
@@ -10,6 +10,7 @@ import { categoriesShow } from "@/services/api/admin/categories";
 import CommentPageDetail from "./CommentPageDetail";
 import { Skeleton } from "antd";
 import { findProductVariant } from "@/services/api/client/productClient.api";
+import CommentProduct from "./CommentProduct";
 
 const ProductDetail = () => {
   // console.log("detail", productVariant);
@@ -19,7 +20,7 @@ const ProductDetail = () => {
   const [selectedImage, setSelectedImage] = useState<string | undefined>(
     undefined
   );
-  const [productVariant, setProductVariant] = useState<IProductVariant>();
+  const [productVariant, setProductVariant] = useState<object>({});
 
   const {
     data: productData,
@@ -36,11 +37,9 @@ const ProductDetail = () => {
       }
     },
   });
-
   console.log("data : ", productData);
   const getUniqueAttributes = productData?.getUniqueAttributes;
-  // console.log("getUnique", getUniqueAttributes);
-
+  console.log("getUnique", getUniqueAttributes);
   useEffect(() => {
     if (productData && productData.product) {
       setProduct(productData.product);
@@ -114,7 +113,6 @@ const ProductDetail = () => {
   const [selectedAttributes, setSelectedAttributes] = useState<{
     [key: string]: string | number;
   }>({});
-
   const handleAttributeSelect = (key: string, valueId: string | number) => {
     setSelectedAttributes((prev) => {
       const updatedAttributes = { ...prev };
@@ -130,39 +128,11 @@ const ProductDetail = () => {
   };
 
   useEffect(() => {
-    if (
-      productVariant?.image &&
-      !galleryImages.some((img) => img.image === productVariant.image)
-    ) {
-      setProduct((prevProduct) => {
-        if (!prevProduct) return prevProduct;
-        return {
-          ...prevProduct,
-          galleries: [
-            ...prevProduct.galleries,
-            { id: -1, image: productVariant.image },
-          ],
-        };
-      });
-    }
-  }, [productVariant, galleryImages]);
-
-  useEffect(() => {
     const fetchProductVariant = async () => {
       try {
-        const productVariant = {
-          product_variant: {
-            size: 1,
-            color: 6,
-          },
-        };
-        const variant = await findProductVariant(productId, productVariant);
-        console.log("log", selectedAttributes);
-        console.log("variant", productVariant);
-        const responseData = variant?.findProductVariant;
-        console.log("Product variant:", responseData);
-        setProductVariant(responseData);
-
+        const variant = await findProductVariant(productId, selectedAttributes);
+        console.log("Product variant:", variant);
+        setProductVariant(variant);
         // console.log(setProductVariant);
       } catch (error) {
         console.log("Call api thất bại", error);
@@ -195,11 +165,9 @@ const ProductDetail = () => {
         </div>
 
         <div className="container py-10 lg:flex">
-          {/* left */}
           <div className="w-full lg:w-[55%] ">
             <div className="lg:flex lg:gap-3">
               <div className="lg:w-4/5 h-full w-full lg:order-2">
-                {/* image sản phẩm */}
                 <div
                   className="group lg:w-[550px] lg:h-[600px] h-full relative overflow-hidden"
                   onMouseMove={handleMouseMove}
@@ -209,16 +177,15 @@ const ProductDetail = () => {
                     alt="product detail"
                     loading="lazy"
                     decoding="async"
+                    data-nimg="fill"
                     className="w-full lg:h-[100%] h-full lg:w-[550px] object-cover transition-transform ease-in-out duration-300 group-hover:scale-150"
-                    src={
-                      productVariant && productVariant.image
-                        ? productVariant.image
-                        : selectedImage
-                    }
+                    sizes=""
+                    src={selectedImage}
                   />
                 </div>
               </div>
 
+              {/* galleries */}
               <div
                 className="lg:order-1 hd-img-soft lg:w-1/5 w-full lg:h-[600px] max-h-[600px] overflow-x-auto lg:overflow-y-auto flex lg:flex-col flex-row"
                 onWheel={handleWheel}
@@ -247,10 +214,10 @@ const ProductDetail = () => {
               {/* end galleries */}
             </div>
           </div>
-          {/* right */}
 
           <div className="w-full lg:w-[45%] pt-10 lg:pt-0 lg:pl-7 xl:pl-9 2xl:pl-10 ">
             <div className="h-full">
+              {/* {productVariant&&productVariant.map((index,value)=>{})} */}
               <div>
                 <h2 className="text-[16px] xl:text-start sm:text-center sm:text-3xl font-bold mb-3 ">
                   {product?.name}
@@ -258,10 +225,7 @@ const ProductDetail = () => {
                 <div className="flex items-center mt-5 lg:mx-[15%] sm:mx-[42%] xl:mx-0 sm:mt-2 space-x-4">
                   <div className="">
                     <span className="lg:text-xl  sm:text-[25px] text-lg text-[#747474] my-2">
-                      {productVariant
-                        ? productVariant.price_sale
-                        : product?.price_sale}
-                      VNĐ
+                      {product?.price_regular} VNĐ
                     </span>
                   </div>
                   <div className="h-7 border-l border-slate-300 dark:border-slate-700 lg:block xl:block block sm:hidden"></div>
@@ -285,7 +249,7 @@ const ProductDetail = () => {
                         ></path>
                       </svg>
                       <div className="ml-1.5 flex">
-                        <span>{product?.rate}</span>
+                        <span>4</span>
                         <span className="block mx-2">·</span>
                       </div>
                     </Link>
@@ -317,8 +281,8 @@ const ProductDetail = () => {
                                   key={valueId}
                                   className={`relative flex-1 max-w-[60px] h-8 sm:h-9 rounded-full cursor-pointer flex items-center justify-center ${
                                     selectedAttributes[key] === valueId
-                                      ? "border-gray-400 border-4"
-                                      : "border-gray-200 border-2"
+                                      ? "border-gray-400 border-4" // Đường viền đậm khi được chọn
+                                      : "border-gray-200 border-2" // Đường viền nhẹ khi không được chọn
                                   }`}
                                   style={{
                                     backgroundColor:
@@ -546,128 +510,7 @@ const ProductDetail = () => {
                   </div>
                 </div>
               )}
-              {activeButton === "comment" && (
-                <form className="m-auto w-full max-w-lg p-6 bg-white shadow-lg rounded-lg">
-                  <h1 className="font-semibold lg:text-2xl text-base mb-4 text-center">
-                    Đánh giá sản phẩm
-                  </h1>
-
-                  <div className="mb-4">
-                    <label
-                      className="block lg:text-sm text-[10px] font-medium text-gray-700"
-                      htmlFor="rating"
-                    >
-                      Chất lượng sản phẩm:
-                    </label>
-                    <div className="flex items-center mt-2">
-                      <input
-                        type="radio"
-                        id="star5"
-                        name="rating"
-                        value="5"
-                        className="hidden"
-                      />
-                      <label
-                        htmlFor="star5"
-                        className="cursor-pointer text-yellow-500"
-                      >
-                        ★
-                      </label>
-                      <input
-                        type="radio"
-                        id="star4"
-                        name="rating"
-                        value="4"
-                        className="hidden"
-                      />
-                      <label
-                        htmlFor="star4"
-                        className="cursor-pointer text-yellow-500"
-                      >
-                        ★
-                      </label>
-                      <input
-                        type="radio"
-                        id="star3"
-                        name="rating"
-                        value="3"
-                        className="hidden"
-                      />
-                      <label
-                        htmlFor="star3"
-                        className="cursor-pointer text-yellow-500"
-                      >
-                        ★
-                      </label>
-                      <input
-                        type="radio"
-                        id="star2"
-                        name="rating"
-                        value="2"
-                        className="hidden"
-                      />
-                      <label
-                        htmlFor="star2"
-                        className="cursor-pointer text-yellow-500"
-                      >
-                        ★
-                      </label>
-                      <input
-                        type="radio"
-                        id="star1"
-                        name="rating"
-                        value="1"
-                        className="hidden"
-                      />
-                      <label
-                        htmlFor="star1"
-                        className="cursor-pointer text-yellow-500"
-                      >
-                        ★
-                      </label>
-                    </div>
-                  </div>
-
-                  <div className="mb-4">
-                    <label
-                      className="block lg:text-sm text-[10px] font-medium text-gray-700"
-                      htmlFor="review"
-                    >
-                      Nhận xét:
-                    </label>
-                    <textarea
-                      id="review"
-                      rows={4}
-                      className="px-2 py-2 placeholder:lg:text-sm text-[10px] mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                      placeholder="Nhập nhận xét của bạn"
-                    ></textarea>
-                  </div>
-
-                  <div className="mb-4">
-                    <label
-                      className="block lg:text-sm text-[10px] font-medium text-gray-700"
-                      htmlFor="image"
-                    >
-                      Tải hình ảnh lên:
-                    </label>
-                    <input
-                      id="image"
-                      type="file"
-                      accept="image/*"
-                      className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border file:border-gray-300 file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100"
-                    />
-                  </div>
-
-                  <div className="text-center">
-                    <button
-                      type="submit"
-                      className="inline-flex items-center px-4 py-2 border border-transparent lg:text-base text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                    >
-                      Gửi đánh giá
-                    </button>
-                  </div>
-                </form>
-              )}
+              {activeButton === "comment" && <CommentProduct />}
             </div>
           </div>
         </div>

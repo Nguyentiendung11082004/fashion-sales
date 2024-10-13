@@ -151,10 +151,9 @@ const ProductPageManager = () => {
   const dataSource =
     data?.data?.map((product: Iproduct) => ({
       key: product.id,
-      ...product,
-    })) || [];
-  console.log("dataSource", dataSource);
-
+      ...product
+    }
+  )) || [];
   useEffect(() => {
     if (isError && !hasError) {
       toast.error("Có lỗi xảy ra");

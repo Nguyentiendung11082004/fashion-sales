@@ -1,19 +1,26 @@
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React from "react";
-import { Link } from "react-router-dom";
+import { useUser } from "@/common/context/User/UserContext";
+import { Link, useNavigate } from "react-router-dom";
 import { Flag, LogoClient } from "../icons";
-import PhoneHome from "../icons/headerWebsite/PhoneHome";
+import CartHome from "../icons/headerWebsite/CartHome";
 import EmailHome from "../icons/headerWebsite/EmailHome";
+import HeartHome from "../icons/headerWebsite/HeartHome";
 import MapHome from "../icons/headerWebsite/MapHome";
 import MenuHome from "../icons/headerWebsite/MenuHome";
+import PhoneHome from "../icons/headerWebsite/PhoneHome";
 import UserHome from "../icons/headerWebsite/UserHome";
-import HeartHome from "../icons/headerWebsite/HeartHome";
-import CartHome from "../icons/headerWebsite/CartHome";
-
+import { useAuth } from "@/common/context/Auth/AuthContext";
+import { Button } from "antd";
 type Props = {};
-
 const Header = (props: Props) => {
+  const navigator = useNavigate();
+  const { user } = useUser();
+  const { logout } = useAuth();
+  const logoutUser = () => {
+    logout();
+    navigator("/login")
+  }
   return (
     <>
       <div>
@@ -60,7 +67,7 @@ const Header = (props: Props) => {
         <div className="w-[100%] bg-[#fff] sticky top-0 left-0 right-0  z-20 ">
           <header className="lg:mx-10 bg-[#fff] h-[70px] grid grid-cols-12 gap-4 ">
             <div className="lg:col-span-2 col-span-4 flex justify-center items-center md:items-center md:justify-center lg:justify-start  order-2 lg:order-1">
-                <img src={LogoClient} alt="" className="h-[40px]" />
+              <img src={LogoClient} alt="" className="h-[40px]" />
             </div>
             <div className="col-span-4 flex items-center justify-start md:items-center md:justify-start lg:hidden  order-1  ">
               <MenuHome />
@@ -104,9 +111,32 @@ const Header = (props: Props) => {
             </div>
             <div className="lg:col-span-2 col-span-4 flex items-center justify-end order-3">
               <div className="flex items-center space-x-4">
-                <Link to="">
-                  <UserHome />
-                </Link>
+                <div className="relative group">
+                  <Link to="">
+                    {
+                      user ? (<img src={`${user?.avatar}`} className="h-10 w-10 rounded-full object-cover" alt={`${user?.name}`} />) : <UserHome />
+                    }
+                  </Link>
+                  <div className="absolute left-[-20px] hidden group-hover:flex mt-0 space-x-2">
+                    {
+                      user ? (
+                        <Button onClick={() => logoutUser()} className="w-32 px-4 py-2 text-white bg-black rounded hover:bg-gray-800">
+                          Đăng Xuất
+                        </Button>
+                      ) : (
+                        <div className="flex space-x-2">
+                          <Link to="/signup" className="w-24 px-4 py-2 text-white bg-black rounded hover:bg-gray-800">
+                            Đăng Ký
+                          </Link>
+                          <Link to="/login" className="w-32 px-4 py-2 text-white bg-black rounded hover:bg-gray-800">
+                            Đăng Nhập
+                          </Link>
+                        </div>
+                      )
+                    }
+                  </div>
+
+                </div>
                 <Link to="" className="relative">
                   <span className="absolute text-xs right-[-5px] top-[-5px] bg-[#000] text-white px-1 rounded-full">
                     0
