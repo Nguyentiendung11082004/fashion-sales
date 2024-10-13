@@ -1,7 +1,6 @@
 import { LogoClient } from "@/components/icons";
 import BackgroundLogin from "@/components/icons/login/Background";
 import LoginIcon1 from "@/components/icons/login/LoginIcon1";
-import axios from "axios";
 import { useMutation } from "@tanstack/react-query";
 import { Button, Form, Input } from "antd";
 import { useState } from "react";
