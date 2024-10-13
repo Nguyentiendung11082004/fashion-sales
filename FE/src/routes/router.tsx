@@ -7,13 +7,13 @@ import Account from "@/pages/client/account/Account";
 import Cart from "@/pages/client/cart/Cart";
 import Checkout from "@/pages/client/checkout/Checkout";
 import Contact from "@/pages/client/contact/Contact";
-import ForgotPassword from "@/pages/client/forgotpassword/ForgotPassword";
+import ForgotPassword from "@/pages/client/auth/forgotpassword/ForgotPassword";
 import HistoryOrder from "@/pages/client/historyOrder/HistoryOrder";
-import Login from "@/pages/client/login/Login";
+import Login from "@/pages/client/auth/login/Login";
 import NotFound from "@/pages/client/notfound/NotFound";
 import ProductDetail from "@/pages/client/productDetail/ProductDetail";
 import Products from "@/pages/client/products/Products";
-import Register from "@/pages/client/register/Register";
+import Register from "@/pages/client/auth/register/Register";
 import { Route, Routes } from "react-router-dom";
 import HomePage from "../pages/client/home/HomePage";
 import LayoutWebsite from "../pages/client/layout";
@@ -68,9 +68,18 @@ const Router = () => {
           <Route path="categories/edit/:id" element={<CategoryForm />} />
           <Route path="attributes" element={<AttributeItem />} />
           <Route path="attribute-values" element={<AttributeItemValues />} />
-          <Route path="comment" element={<CommentPage />} />
+          <Route path="clients" element={<ClientPage />} />
+          <Route path="clients/create" element={<FormClient />} />
+          <Route path="employees" element={<EmployeePage />} />
+          <Route path="employees/create" element={<FormEmployee />} />
+          <Route path="employees/edit/:id" element={<FormEmployee />} />
           <Route path="category" element={<CategoryPage />} />
           <Route path="comments" element={<CommentPage />} />
+          <Route path="clients" element={<ClientPage />} />
+          <Route path="clients/create" element={<FormClient />} />
+          <Route path="employees" element={<EmployeePage />} />
+          <Route path="employees/create" element={<FormEmployee />} />
+          <Route path="employees/edit/:id" element={<FormEmployee />} />
           <Route path="brands" element={<Brands />} />
           <Route path="brands/create" element={<BrandForm />} />
           <Route path="brands/edit/:id" element={<BrandForm />} />

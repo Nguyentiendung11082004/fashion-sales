@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import slide1 from "@/assets/images/slider1.png";
 import slide2 from "@/assets/images/slider2.png";
 import slide3 from "@/assets/images/slider3.png"; 
+import { Skeleton } from "antd";
 
 
 const slides = [
@@ -53,7 +54,7 @@ const Banner = () => {
   }, [currentIndex]);
 
   return (
-    <div className="relative">
+    <div className="relative skeleton-banner">
       <div className="hd-slider-wrapper relative mx-auto">
         <div
           ref={sliderRef}

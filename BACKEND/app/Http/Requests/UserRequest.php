@@ -36,7 +36,7 @@ class UserRequest extends FormRequest
                 'birth_date'   => 'nullable|date',
                 'is_active'    => 'boolean',
                 'gender'       => 'nullable|boolean',
-                'role_id'      => 'required|exists:roles,id',
+                'role_id'      => 'exists:roles,id',
             ];
         }
 

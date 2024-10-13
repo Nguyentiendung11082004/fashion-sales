@@ -4,6 +4,7 @@ export interface IProductVariant {
     price_sale: number;
     quantity: number;
     sku: string;
+    slug: string;
     image:string;
 }
 export interface Iproduct {
@@ -14,7 +15,7 @@ export interface Iproduct {
     name: string;
     views: number;
     img_thumbnail: string;
-    image: string;
+    // image: string;
     gallery: string[];
     slug: string;
     price_regular: number;

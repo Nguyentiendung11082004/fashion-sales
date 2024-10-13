@@ -40,7 +40,7 @@ const LayoutAdmin: React.FC = () => {
         <div className="flex items-center justify-center h-[25px] bg-[black]">
           <div className="demo-logo-vertical" />
         </div>
-        <div className="w-[150px] my-[-20px] m-auto">
+        <div className="w-[150px] my-[-10px] m-auto">
           <img src={LogoAdmin} alt="" className="" />
         </div>
         
@@ -86,7 +86,7 @@ const LayoutAdmin: React.FC = () => {
 
             },
             {
-              key: "8",
+              key: "4",
               icon: <OrderedListOutlined />,
               label: (
                 <NavLink className="text-white" to="/admin">
@@ -95,7 +95,7 @@ const LayoutAdmin: React.FC = () => {
               ),
               children: [
                 {
-                  key: "10",
+                  key: "5",
                   label: (
                     <NavLink className="text-white" to="/admin/attributes">
                       Thuộc tính
@@ -103,7 +103,7 @@ const LayoutAdmin: React.FC = () => {
                   ),
                 },
                 {
-                  key: "11",
+                  key: "6",
                   label: (
                     <NavLink className="text-white" to="/admin/attribute-values">
                       Giá trị thuộc tính
@@ -113,7 +113,7 @@ const LayoutAdmin: React.FC = () => {
               ],
             },
             {
-              key: "4",
+              key: "7",
               icon: <UserOutlined />,
               label: (
                 <NavLink to={""} className="text-white">
@@ -122,7 +122,7 @@ const LayoutAdmin: React.FC = () => {
               ),
               children: [
                 {
-                  key: "10",
+                  key: "8",
                   label: (
                     <NavLink to="/admin/clients" className="text-white">
                       Khách hàng
@@ -130,7 +130,7 @@ const LayoutAdmin: React.FC = () => {
                   ),
                 },
                 {
-                  key: "11",
+                  key: "9",
                   label: (
                     <NavLink to="/admin/employees" className="text-white">
                       Nhân viên
@@ -141,7 +141,7 @@ const LayoutAdmin: React.FC = () => {
             },
 
             {
-              key: "5",
+              key: "10",
               icon: <CommentOutlined />,
               label: (
                 <NavLink className="text-white" to="/admin/comments">
@@ -150,7 +150,7 @@ const LayoutAdmin: React.FC = () => {
               ),
             },
             {
-              key: "6",
+              key: "11",
               icon: <ShoppingCartOutlined />,
               label: (
                 <NavLink className="text-white" to="/admin/order">
@@ -159,7 +159,7 @@ const LayoutAdmin: React.FC = () => {
               ),
             },
             {
-              key: "7",
+              key: "12",
               icon: <TagsOutlined />,
               label: (
                 <NavLink className="text-white" to="/admin/tags">
@@ -168,7 +168,7 @@ const LayoutAdmin: React.FC = () => {
               ),
             },
             {
-              key: "8",
+              key: "13",
               icon: <TagsOutlined />,
               label: (
                 <NavLink className="text-white" to="/admin/brands">

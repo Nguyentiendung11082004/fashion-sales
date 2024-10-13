@@ -41,7 +41,6 @@ const CategoryForm = (props: Props) => {
             navigate('/admin/categories')
         },
         onError: (error: any) => {
-            console.log(error?.response)
             setError(error?.response.data.message)
             toast.error('Thất bại');
             setIsLoading(false)
