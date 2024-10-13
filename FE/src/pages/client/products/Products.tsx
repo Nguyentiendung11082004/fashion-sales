@@ -1009,9 +1009,9 @@ const Products = () => {
                   Array(pro?.products?.length || 6).fill(0).map((_, index) => (
                     <div
                       key={index}
-                      className="animate-pulse flex flex-col space-y-4 bg-gray-200 rounded-lg p-4"
+                      className="animate-pulse flex flex-col space-y-4 bg-gray-200 w-[290px] rounded-lg p-4"
                     >
-                      <div className="bg-gray-300 h-[250px] w-full lg:h-[345px] lg:w-[230px] sm:h-[345px]"></div>
+                      <div className="bg-gray-300 h-[250px] w-full lg:h-[330px] lg:w-[260px] sm:h-[345px]"></div>
                       <div className="bg-gray-300 h-6 w-3/4"></div>
                       <div className="bg-gray-300 h-6 w-1/2"></div>
                     </div>
