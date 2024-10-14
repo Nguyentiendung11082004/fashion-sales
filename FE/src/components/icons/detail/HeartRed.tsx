@@ -4,11 +4,11 @@ const HeartRed = () => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      fill="red" // Lấp đầy trái tim bằng màu đỏ
+      fill="#f43f5e" // Lấp đầy trái tim bằng màu đỏ
       viewBox="0 0 24 24"
       strokeWidth="1.5"
-      stroke="red" // Đặt viền cùng màu đỏ
-      className="h-6 w-6 transition-all duration-300 ease-in-out"
+      stroke="#f43f5e" // Đặt viền cùng màu đỏ
+      className="h-6 w-6 hover:animate-bounce-scale transition-all duration-300 ease-in-out"
     >
       <path
         strokeLinecap="round"

@@ -15,10 +15,13 @@ import Slideshow from "./SampleSlider/SampleSlider";
 import axios from "axios";
 import CategoryCarousel from "./SampleSlider/CategorySlider";
 import { convertColorNameToClass } from "@/common/colors/colorUtils";
+import { useWishlist } from "../wishlist/WishlistContext";
+import HeartRed from "@/components/icons/detail/HeartRed";
 
 const HomePage = () => {
   const [trendProducts, setTrendProducts] = useState<any[]>([]);
   const [homeProducts, setHomeProducts] = useState<any[]>([]);
+  const { handleAddToWishlist, isInWishlist } = useWishlist();
 
   useEffect(() => {
     axios
@@ -67,9 +70,11 @@ const HomePage = () => {
                     />
                     <div className="absolute inset-0 bg-black opacity-0 transition-opacity duration-300 ease-in-out group-hover:opacity-10"></div>
                     <div>
-                      <Link to="" className="absolute left-5 top-5">
-                        <HeartWhite />
-                      </Link>
+                    <button className="absolute left-5 top-5 cursor-pointer"
+                                    onClick={() =>handleAddToWishlist(product)}          
+                            >
+                              {isInWishlist(product.id) ? <HeartRed /> : <HeartWhite />}
+                            </button>
                     </div>
                     <div className="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100">
                       <Link to="" className="group/btn relative m-auto">

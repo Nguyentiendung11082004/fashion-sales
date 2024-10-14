@@ -11,6 +11,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import NoDatasIcon from "@/components/icons/products/NoDataIcon";
 import { ResponseData } from "@/common/types/responseDataFilter";
 import unorm from 'unorm';
+import HeartRed from "@/components/icons/detail/HeartRed";
+import { useWishlist } from "../wishlist/WishlistContext";
 
 const Products = () => {
   const [growboxDropdownOpen, setGrowboxDropdownOpen] = useState(false);
@@ -19,6 +21,7 @@ const Products = () => {
   const toepfeRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
   const [noProductsMessage, setNoProductsMessage] = useState<React.ReactNode>(null);
+  const { handleAddToWishlist, isInWishlist } = useWishlist();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [suggestions, setSuggestions] = useState<string[]>([]);
@@ -46,7 +49,9 @@ const Products = () => {
 
   const {mutate} = useMutation({
     mutationFn: async (filters: any) => {
-      const response = await instance.post("/product-shop", filters);
+      const response = await instance.post("/product-shop", filters, {
+        timeout: 5000,
+      });
       return response.data;
     },
     onSuccess: (data) => {
@@ -115,7 +120,7 @@ const Products = () => {
     setToepfeDropdownOpen(false);
   };
 
-  const handleCheckboxChange = (name: string, value:string) => {
+  const handleCheckboxChange = (name: string, value: any) => {
     console.log(`Checkbox changed: ${name} -> ${value}`);
     switch (name) {
       case "categories":
@@ -173,7 +178,7 @@ const Products = () => {
   const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchTerm(value);
-    if (value === "") {
+    if (value.trim() === "") {
       setSuggestions([]);
       setNoProductsMessage(null);
       queryClient.invalidateQueries({ queryKey: ["productsData"] });
@@ -193,11 +198,11 @@ const Products = () => {
           return normalizedSuggestion.startsWith(normalizedValue); // So sánh
         });
   
-        if (filteredSuggestions.length > 0) {
+        // if (filteredSuggestions.length > 0) {
             setSuggestions(filteredSuggestions);
-        } else {
-            setSuggestions([]);
-        }
+        // } else {
+        //     setSuggestions([]);
+        // }
       };
       fetchSuggestions();
     }
@@ -1004,9 +1009,8 @@ const Products = () => {
             )}
             <div className="flex-1 ml-8">
               <div className="flex-1 grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-3 gap-3 sm:mx-7 sm:gap-x-10 xl:gap-8 gap-y-8 ">
-                {isFetching ? (
-                // Hiển thị Skeleton khi đang load dữ liệu
-                  Array(pro?.products?.length || 6).fill(0).map((_, index) => (
+                {/* {isFetching ? (
+                  Array(6).fill(0).map((_, index) => (
                     <div
                       key={index}
                       className="animate-pulse flex flex-col space-y-4 bg-gray-200 w-[290px] rounded-lg p-4"
@@ -1016,8 +1020,8 @@ const Products = () => {
                       <div className="bg-gray-300 h-6 w-1/2"></div>
                     </div>
                   ))
-                ) : (
-                  pro?.products?.map(({ product, getUniqueAttributes }) => (
+                ) : ( */}
+                  {pro?.products?.map(({ product, getUniqueAttributes }) => (
                     <div
                       className="nc-ProductCard relative flex flex-col bg-transparent"
                       key={product.id}
@@ -1034,9 +1038,11 @@ const Products = () => {
                           />
                           <div className="absolute inset-0 bg-black opacity-0 transition-opacity duration-300 ease-in-out group-hover:opacity-10"></div>
                           <div>
-                            <Link to="" className="absolute left-5 top-5">
-                              <HeartWhite />
-                            </Link>
+                            <button className="absolute left-5 top-5 cursor-pointer"
+                                    onClick={() =>handleAddToWishlist(product)}          
+                            >
+                              {isInWishlist(product.id) ? <HeartRed /> : <HeartWhite />}
+                            </button>
                           </div>
                           <div className="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100">
                             <Link to="" className="group/btn relative m-auto">
@@ -1153,8 +1159,8 @@ const Products = () => {
                         </div>
                       </div>
                     </div>
-                  ))
-                )}
+                  ))}
+                {/* )} */}
                 
               </div>
             </div>

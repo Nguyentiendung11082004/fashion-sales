@@ -9,3 +9,9 @@ export interface ResponseData {
     attributes: { size: Iattributeitem[], color: Iattributeitem[]};
     categories: Icategories[];
 }
+
+export interface ResponseWishlist {
+    wishlist_id: number;
+    product: Iproduct
+    getUniqueAttributes: any;
+}
