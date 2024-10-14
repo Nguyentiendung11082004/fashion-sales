@@ -19,9 +19,13 @@ import { FormatMoney } from "@/common/utils/utils";
 
 const Cart = () => {
   const [visiable, setVisible] = useState(false);
+  const [idCart, setIdCart] = useState<any>('');
+  const [updatedAttributes, setUpdatedAttributes] = useState<any>({});
   const closeModal = () => {
+    setIdCart('')
     setVisible(false)
   }
+  console.log("updatedAttributes",updatedAttributes)
   const { token } = useAuth();
   const { data, isLoading, isError } = useQuery({
     queryKey: ['cart'],
@@ -34,6 +38,23 @@ const Cart = () => {
       return res.data;
     }
   })
+
+  const handleAttribute = (idCart: any, variants: any) => {
+    setIdCart(idCart);
+    setVisible(true);
+    setUpdatedAttributes((prev: any) => ({
+      ...prev,
+      [idCart]: variants,
+    }));
+  };
+
+
+  const handleUpdateAttributes = (idCart: any, attributes: any) => {
+    setUpdatedAttributes((prev: any) => ({
+      ...prev,
+      [idCart]: attributes,
+    }));
+  };
   if (isLoading) return <div>Loading...</div>
   const carts = data?.cart?.cartitems;
 
@@ -78,7 +99,7 @@ const Cart = () => {
               <div className="hd-pagecart-items">
                 <div className="hd-item relative overflow-hidden">
                   {
-                    carts ? (carts?.map((e: any) => {
+                    carts && carts.length > 0 ? (carts?.map((e: any) => {
                       return <>
                         <div className="hd-item-row lg:py-[2rem] py-[1rem] !items-center flex flex-wrap border-solid border-b-2">
                           <div className="hd-infor-item lg:w-5/12 w-full hd-col-item">
@@ -96,42 +117,44 @@ const Cart = () => {
                                 >
                                   {e?.product?.name}
                                 </Link>
-                                <div className="hd-price-item mb-[5px] !text-center w-3/12 hd-col-item lg:hidden block">
-                                  <div className="hs-prices">
-                                    <div className="hd-text-price flex">
-                                      <del className="text-[#696969]">1.551.000₫</del>
-                                      <ins className="ms-[6px] no-underline text-[#ec0101]">
-                                        1.163.000₫
-                                      </ins>
-                                    </div>
-                                  </div>
-                                </div>
+
                                 {/*end hd-price-item*/}
                                 {
-                                  e?.productvariant?.attributes?.map((item: any) => {
-                                    return <>
-                                      <div className="hd-infor-text-meta text-[13px] text-[#878787]">
-
+                                  Array.isArray(updatedAttributes[e.id])
+                                    ? updatedAttributes[e.id].map((item: any) => (
+                                      <div className="hd-infor-text-meta text-[13px] text-[#878787]" key={item.id}>
+                                        <p className="mb-[5px]">
+                                          {item?.name} : <strong>{item?.pivot?.value || item?.value}</strong>
+                                        </p>
+                                      </div>
+                                    ))
+                                    : e?.productvariant?.attributes?.map((item: any) => (
+                                      <div className="hd-infor-text-meta text-[13px] text-[#878787]" key={item.id}>
                                         <p className="mb-[5px]">
                                           {item?.name} : <strong>{item?.pivot?.value}</strong>
                                         </p>
-
                                       </div>
-                                    </>
-                                  })
+                                    ))
                                 }
 
+
+
+
+
                                 <div className="hd-infor-text-tools mt-[10px]">
-                                  <Button onClick={() => setVisible(true)} className="inline-flex me-[10px]">
-                                    <Note />
-                                  </Button>
+                                  {
+                                    e?.productvariant && <Button onClick={() => handleAttribute(e?.id, e?.productvariant?.attributes)} className="inline-flex me-[10px] border-none">
+                                      <Note />
+                                    </Button>
+                                  }
+
                                   <Link to="" className="inline-flex me-[10px]">
                                     <Delete />
                                   </Link>
                                 </div>
                               </div>
                             </div>
-                            <ModalCart open={visiable} onClose={closeModal} />
+                            <ModalCart open={visiable} onClose={closeModal} idCart={idCart} onUpdateAttributes={handleUpdateAttributes} attributes={updatedAttributes[idCart]} />
                             <div className="hd-qty-total block lg:hidden">
                               <div className="flex items-center justify-between border-2 border-slate-200 rounded-full py-[10px] px-[10px]">
                                 <div className="hd-quantity-item relative hd-col-item">
@@ -166,12 +189,7 @@ const Cart = () => {
                                     </button>
                                   </div>
                                 </div>
-                                {/*end hd-quantity-item*/}
-                                <div className="hd-total-item hd-col-item flex">
-                                  <p className="mr-3">Tổng:</p>
-                                  <span className="font-medium">1.163.000₫</span>
-                                </div>
-                                {/*end hd-total-item*/}
+
                               </div>
                             </div>
                           </div>
@@ -179,10 +197,10 @@ const Cart = () => {
                           <div className="hd-price-item !text-center w-3/12 hd-col-item lg:block hidden">
                             <div className="hs-prices">
                               <div className="hd-text-price">
-                                <del className="text-[#696969]">{FormatMoney(e?.productvariant?.price_regular)}</del>
+                                {/* <del className="text-[#696969]">{FormatMoney(e?.productvariant?.price_regular )}</del>
                                 <ins className="ms-[6px] no-underline text-[#ec0101]">
                                   {FormatMoney(e?.productvariant?.price_sale)}
-                                </ins>
+                                </ins> */}
                               </div>
                             </div>
                           </div>
@@ -226,7 +244,7 @@ const Cart = () => {
                           {/*end hd-total-item*/}
                         </div>
                       </>
-                    })) : <p className="text-center mt-12">Giỏ hàng trống</p>
+                    })) : <p className="text-center mt-12 text-base">Giỏ hàng trống</p>
                   }
 
 
