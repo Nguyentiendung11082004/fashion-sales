@@ -49,20 +49,13 @@ class PostController extends Controller
     {
         try {
             $data = $request->all();
-            // Tạo slug 
             $data['slug'] = $this->generateUniqueSlug($data['post_name']);
-            // Lấy user_id
             $data['user_id'] = Auth::id();
-           // Làm sạch nội dung HTML trước khi lưu
             $purifier = new HTMLPurifier();
             $data['post_content'] = $purifier->purify($data['post_content']);
-
-            // Nếu có nhiều hình ảnh, mã hóa mảng ảnh thành chuỗi JSON để lưu
             if ($request->has('img_thumbnail')) {
-                $data['img_thumbnail'] = json_encode($request->img_thumbnail);
+                $data['img_thumbnail'] = $request->img_thumbnail; 
             }
-
-            // Tạo bài viết mới
             $post = Post::create($data);
 
             return response()->json([
@@ -85,8 +78,6 @@ class PostController extends Controller
     {
         try {
             $post = Post::findOrFail($id);
-       // Giải mã img_thumbnail từ chuỗi JSON thành mảng
-            $post->img_thumbnail = json_decode($post->img_thumbnail);
 
             return response()->json([
                 'message' => 'Lấy bài viết thành công!',
@@ -107,27 +98,18 @@ class PostController extends Controller
         try {
             $post = Post::findOrFail($id);
             $data = $request->all();
-    
-            // Kiểm tra xem 'post_name' có thay đổi không, nếu có thì tạo slug mới
             if ($data['post_name'] !== $post->post_name) {
                 $data['slug'] = $this->generateUniqueSlug($data['post_name'], $id);
             } else {
-                $data['slug'] = $post->slug; // Nếu không thay đổi giữ nguyên slug
+                $data['slug'] = $post->slug; 
             }
-
-            // Làm sạch nội dung HTML trước khi lưu
             $purifier = new HTMLPurifier();
             $data['post_content'] = $purifier->purify($data['post_content']);
-    
-            // Nếu có hình ảnh mới, mã hóa mảng hình ảnh thành chuỗi JSON
             if ($request->has('img_thumbnail')) {
-                $data['img_thumbnail'] = json_encode($request->img_thumbnail);
+                $data['img_thumbnail'] = $request->img_thumbnail; 
             } else {
-                // Nếu không có hình ảnh mới, giữ lại ảnh cũ
-                $data['img_thumbnail'] = $post->img_thumbnail; // Giữ nguyên ảnh cũ
+                $data['img_thumbnail'] = $post->img_thumbnail; 
             }
-    
-            // Cập nhật bài viết
             $post->update($data);
     
             return response()->json([
@@ -150,7 +132,6 @@ class PostController extends Controller
     public function destroy($id)
     {
         try {
-            // Tìm và xóa bài viết
             $post = Post::findOrFail($id);
             $post->delete();
 
@@ -171,14 +152,9 @@ class PostController extends Controller
      */
     private function generateUniqueSlug($value, $id = null)
     {
-        // Tạo slug từ 'value'
         $slug = Str::slug($value, '-');
-
-        // Kiểm tra slug trùng lặp, bỏ qua chính bản ghi đang được cập nhật (nếu có id)
         $original_slug = $slug;
         $count = 1;
-
-        // Vòng lặp kiểm tra slug có trùng lặp không, nếu có thì thêm số
         while (Post::where('slug', $slug)->where('id', '!=', $id)->exists()) {
             $slug = $original_slug . '-' . $count;
             $count++;
@@ -186,48 +162,11 @@ class PostController extends Controller
 
         return $slug;
     }
-    // public function getPostsGroupedByCategory()
-    // {
-    //     try {
-    //         $categories = Category::with('posts')->get();
-    //         $data = [];
-    //         foreach ($categories as $category) {
-    //             $data[$category->name] = $category->posts->map(function ($post) {
-    //                 return [
-    //                     'title' => $post->post_name,
-    //                 ];
-    //             });
-    //         }
 
-    //         $uncategorizedPosts = Post::whereNull('category_id')->get();
-            
-    //         // 5. Thêm bài viết không có danh mục vào mảng
-    //         $data['Không có danh mục'] = $uncategorizedPosts->map(function ($post) {
-    //             return [
-    //                 'title' => $post->post_name,
-    //             ];
-    //         });
-
-    //         // 6. Trả về JSON response
-    //         return response()->json([
-    //             'status' => true,
-    //             'message' => 'Danh sách bài viết theo danh mục và không có danh mục',
-    //             'data' => $data
-    //         ], 200);
-
-    //     } catch (\Exception $e) {
-    //         return response()->json([
-    //             'status' => false,
-    //             'message' => 'Không thể lấy danh sách bài viết',
-    //             'error' => $e->getMessage()
-    //         ], 500);
-    //     }
-    // }
     public function getPostsGroupedByCategory(Request $request)
     {
         try {
-            // Kiểm tra tham số fields để xác định có trả về tất cả các trường hay chỉ các trường cụ thể
-            $fields = $request->query('fields', 'id_post_name_img_user_date'); // Mặc định là id, post_name, img_thumbnail, user_name, và created_at
+            $fields = $request->query('fields', 'id_post_name_img_user_date'); 
     
             // 1. Lấy tất cả các danh mục và bài viết thuộc danh mục
             $categories = Category::with('posts.user')->get(); // Lấy cả thông tin người đăng qua mối quan hệ 'user'
@@ -252,16 +191,13 @@ class PostController extends Controller
                             ];
                         });
                     } else {
-                        // Trả về tất cả các trường
                         $data[$category->name] = $category->posts;
                     }
                 }
             }
     
-            // 4. Lấy các bài viết không có danh mục (category_id = null)
-            $uncategorizedPosts = Post::whereNull('category_id')->with('user')->get(); // Lấy thông tin người đăng
+            $uncategorizedPosts = Post::whereNull('category_id')->with('user')->get(); 
     
-            // Nếu có bài viết không thuộc danh mục
             if ($uncategorizedPosts->count() > 0) {
                 if ($fields === 'id_post_name_img_user_date') {
                     $data['Không có danh mục'] = $uncategorizedPosts->map(function ($post) {
@@ -269,8 +205,8 @@ class PostController extends Controller
                             'id' => $post->id,
                             'post_name' => $post->post_name,
                             'img_thumbnail' => $post->img_thumbnail,
-                            'user_name' => $post->user->name, // Lấy tên người đăng từ quan hệ user
-                            'created_at' => $post->created_at->format('Y-m-d'), // Định dạng ngày đăng
+                            'user_name' => $post->user->name, 
+                            'created_at' => $post->created_at->format('Y-m-d'), 
                             'slug' => $post->slug,
                         ];
                     });
@@ -278,8 +214,6 @@ class PostController extends Controller
                     $data['Không có danh mục'] = $uncategorizedPosts;
                 }
             }
-    
-            // 5. Trả về JSON response
             return response()->json([
                 'status' => true,
                 'message' => 'Danh sách bài viết theo danh mục và không có danh mục',
@@ -294,7 +228,5 @@ class PostController extends Controller
             ], 500);
         }
     }
-    
-    
-    
 }
+

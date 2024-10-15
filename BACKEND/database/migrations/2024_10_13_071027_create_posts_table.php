@@ -18,7 +18,7 @@ return new class extends Migration
             $table->integer('post_view')->default(0);
             $table->string('slug')->unique();
             $table->string('img_thumbnail')->nullable();
-            $table->text('description')->nullable();
+            // $table->text('description')->nullable();
             $table->boolean('status')->default(true);
             $table->timestamps();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');

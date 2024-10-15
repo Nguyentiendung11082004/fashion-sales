@@ -40,14 +40,14 @@ class StorePostRequest extends FormRequest
             'post_content' => 'required|string|min:10',      
             'post_view' => 'nullable|integer|min:0',         
             'slug' => 'nullable|string|max:255|unique:posts,slug', 
-            'img_thumbnail' => 'nullable|array',             
-            'img_thumbnail.*' => 'string',                   
-            'description' => 'nullable|string|max:500',      
+            'img_thumbnail' => 'nullable|string|max:255',  // Thay đổi từ array thành chuỗi ký tự
+            // 'description' => 'nullable|string|max:500',      
             'status' => 'required|boolean',                  
             
             'category_id' => 'nullable|exists:categories,id',
             'featured' => 'nullable|boolean',                
         ];
-    }
+        
 }
 
+}
