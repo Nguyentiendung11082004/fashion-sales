@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\V1\Admin\CategoryController;
 use App\Http\Controllers\Api\V1\Admin\AttributeController;
 use App\Http\Controllers\Api\V1\Admin\AttributeItemController;
 use App\Http\Controllers\Api\V1\Admin\BannerController;
+use App\Http\Controllers\Api\V1\Admin\PostController;
 use App\Http\Controllers\Api\V1\Client\CommentController;
 
 /*
@@ -47,18 +48,30 @@ Route::prefix("v1/")->group(function () {
     Route::apiResource('attributeItem', AttributeItemController::class);
     Route::apiResource('category', CategoryController::class);
     Route::apiResource('banners', BannerController::class);
+    Route::get('check-banner-validity', [BannerController::class, 'checkBannerValidity']);
+    Route::get('check-banner-validity/{id}', [BannerController::class, 'checkBannerValidity']);
+  
+    Route::get('/posts-by-category', [PostController::class, 'getPostsGroupedByCategory']);
+
+    
+
     Route::get('product-home', [HomeProductController::class, "getHomeProducts"]);
     //  để tạm vậy rồi tôi sẽ chia các route admin và client ra sau.
     // client
     Route::get('product-detail/{product_id}', [ProductDetailController::class, "productdetail"]);
   // Client routes cho bình luận (comments)
   Route::get('comment', [CommentController::class, 'index']);
+  Route::get('/posts', [PostController::class, 'index']);
   Route::middleware('auth:sanctum')->group(function () {
   // Lấy danh sách bình luận
     Route::post('comment', [CommentController::class, 'store']); // Thêm bình luận mới
     Route::get('comment/{id}', [CommentController::class, 'show']); // Lấy chi tiết bình luận
     Route::put('comment/{id}', [CommentController::class, 'update']); // Cập nhật bình luận
     Route::delete('comment/{id}', [CommentController::class, 'destroy']); // Xóa bình luận
+    Route::get('/posts/{id}', [PostController::class, 'show']);
+    Route::post('/posts', [PostController::class, 'store']);
+    Route::put('/posts/{id}', [PostController::class, 'update']);
+    Route::delete('/posts/{id}', [PostController::class, 'destroy']);
 });
 });
     Route::post('login', [AuthController::class, 'login']);

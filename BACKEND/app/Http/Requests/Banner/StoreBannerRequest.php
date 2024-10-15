@@ -36,12 +36,12 @@ class StoreBannerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'reuired|string|min:3|max:255',  // Tiêu đề có thể null
-            'image' => 'required|string',                // Bắt buộc phải có ảnh (image URL hoặc path)
-            'link' => 'required|url|max:255',            // URL hợp lệ cho liên kết
-            'start_date' => 'required|date|before_or_equal:end_date', // Ngày bắt đầu bắt buộc, phải trước hoặc bằng ngày kết thúc
-            'end_date' => 'required|date|after_or_equal:start_date',  // Ngày kết thúc bắt buộc, phải sau hoặc bằng ngày bắt đầu
-          'status' => 'required|in:0,1'
+            'title' => 'nullable|string|min:3|max:255',  
+            'image' => 'required|string',               
+            'link' => 'nullable|url|max:255',          
+            'start_date' => 'required|date|before_or_equal:end_date',
+            'end_date' => 'required|date|after_or_equal:start_date',  
+            'status' => 'required|boolean' // Chấp nhận cả true/false hoặc 0/1
         ];
     }
 }

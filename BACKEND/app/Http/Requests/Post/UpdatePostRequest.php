@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Requests\Banner;
+namespace App\Http\Requests\Post;
 
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class UpdateBannerRequest extends FormRequest
+class UpdatePostRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,7 +22,7 @@ class UpdateBannerRequest extends FormRequest
     protected function failedValidation(Validator $validator)
     {
         throw new HttpResponseException(response()->json([
-            'message' => 'Lỗi cập nhật banner',
+            'message' => 'Lỗi cập nhật bài viết',
             'status' => false,
             'errors' => $validator->errors()
         ], 400));
@@ -36,12 +36,15 @@ class UpdateBannerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'nullable|string|min:3|max:255',  
-            'image' => 'nullable|string',                
-            'link' => 'nullable|url|max:255',            
-            'start_date' => 'nullable|date|before_or_equal:end_date', 
-            'end_date' => 'nullable|date|after_or_equal:start_date',  
-            'status' => 'required|boolean'        
+            'post_name' => 'required|string|min:3|max:255',   
+            'post_content' => 'required|string|min:10',       
+            'post_view' => 'nullable|integer|min:0',          
+            'slug' => 'nullable|string|max:255|unique:posts,slug,' . $this->route('id'), 
+            'img_thumbnail' => 'nullable|array',              
+            'img_thumbnail.*' => 'string',                   
+            'description' => 'nullable|string|max:500',     
+            'status' => 'required|boolean',                   
+            'category_id' => 'nullable|exists:categories,id', 
         ];
     }
 }

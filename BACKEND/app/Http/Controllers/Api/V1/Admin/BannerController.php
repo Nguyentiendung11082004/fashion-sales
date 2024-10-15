@@ -8,6 +8,7 @@ use App\Http\Requests\Banner\StoreBannerRequest;
 use App\Http\Requests\Banner\UpdateBannerRequest;
 use App\Http\Resources\BannerResource;
 use App\Models\Banner;
+use App\Models\Category;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -103,32 +104,38 @@ class BannerController extends Controller
     public function update(UpdateBannerRequest $request, string $id)
     {
         try {
-            $data = $request->except('image');
-            
             $banner = Banner::findOrFail($id);
-
-            
+    
+           
             if (!$this->isValidDates($request->input('start_date'), $request->input('end_date'))) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Ngày bắt đầu phải nhỏ hơn hoặc bằng ngày kết thúc, và ngày kết thúc không được nằm trong quá khứ.'
                 ], 400);
             }
-
-            if ($request->filled('image')) {
-                $data['image'] = $request->input('image');
-            } else {
-                $data['image'] = $banner->image;
+    
+       
+            if ($request->has('image') && !empty($request->input('image'))) {
+                $banner->image = $request->input('image');  
             }
-
-            $banner->update($data);
-
+    
+           
+            $banner->title = $request->input('title');
+            $banner->link = $request->input('link');
+            $banner->start_date = $request->input('start_date');
+            $banner->end_date = $request->input('end_date');
+            $banner->status = $request->input('status');
+    
+       
+            $banner->save();
+    
+          
             return response()->json([
                 'data' => new BannerResource($banner),
                 'success' => true,
                 'message' => 'Banner đã được sửa thành công'
             ], 200);
-            
+    
         } catch (ModelNotFoundException $e) {
             return response()->json([
                 'message' => 'Banner không tồn tại!'
@@ -141,6 +148,8 @@ class BannerController extends Controller
             ], 500);
         }
     }
+    
+    
 
     /**
      * Remove the specified resource from storage.
@@ -171,4 +180,70 @@ class BannerController extends Controller
        
         return $start->lessThanOrEqualTo($end) && $end->greaterThanOrEqualTo(Carbon::now());
     }
+    public function checkBannerValidity(Request $request)
+{
+    $currentDate = Carbon::now();  // Lấy ngày hiện tại
+
+    $banners = Banner::query()
+                ->where('start_date', '<=', $currentDate)
+                ->where('end_date', '>=', $currentDate)
+                ->get();  // Lấy tất cả các banners đang hoạt động
+
+    if ($banners->isEmpty()) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Không có banner đang hoạt động.',
+            'data' => []
+        ], Response::HTTP_OK);
+    }
+
+    return response()->json([
+        'status' => true,
+        'message' => 'Các banners đang hoạt động trong khoảng thời gian hợp lệ.',
+        'data' => $banners
+    ], Response::HTTP_OK);
+}
+public function getPostsByCategory($id)
+{
+    try {
+        // Lấy danh mục cùng với các bài viết thuộc danh mục đó
+        $category = Category::with('posts')->findOrFail($id);
+
+        // Trả về JSON response
+        return response()->json([
+            'status' => true,
+            'message' => 'Danh sách bài viết theo danh mục',
+            'data' => $category->posts
+        ], 200);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Không tìm thấy danh mục',
+            'error' => $e->getMessage()
+        ], 404);
+    }
+}
+public function getUncategorizedPosts()
+{
+    try {
+        // Lấy các bài viết không thuộc danh mục nào (category_id = null)
+        $posts = Post::whereNull('category_id')->get();
+
+        // Trả về JSON response
+        return response()->json([
+            'status' => true,
+            'message' => 'Danh sách bài viết không thuộc danh mục',
+            'data' => $posts
+        ], 200);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Không thể lấy danh sách bài viết không thuộc danh mục',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
+
 }

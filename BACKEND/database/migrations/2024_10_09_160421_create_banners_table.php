@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();            
             $table->string('title')->nullable(); 
             $table->string('image'); 
-            $table->string('link'); 
+            $table->string('link')->nullable();
             $table->date('start_date'); 
             $table->date('end_date'); 
             $table->boolean('status')->default(true); 
