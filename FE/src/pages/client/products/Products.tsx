@@ -23,6 +23,7 @@ const Products = () => {
   const [noProductsMessage, setNoProductsMessage] = useState<React.ReactNode>(null);
   const { handleAddToWishlist, isInWishlist } = useWishlist();
 
+  const [allproducts, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -178,14 +179,17 @@ const Products = () => {
   const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchTerm(value);
-    if (value.trim() === "") {
+
+    const trimmedValue = value.trimStart(); // Loại bỏ khoảng trắng đầu
+    
+    if (trimmedValue === "") {
       setSuggestions([]);
       setNoProductsMessage(null);
       queryClient.invalidateQueries({ queryKey: ["productsData"] });
     } else {
       const fetchSuggestions = async () => {
         const response = await instance.post("/product-shop", {
-          search: value,
+          search: trimmedValue, // Gửi giá trị đã loại bỏ khoảng trắng đầu
         });
         const suggestionsData = response.data.products.map(
           (item: any) => item.product.name
@@ -194,15 +198,11 @@ const Products = () => {
         // Lọc gợi ý chỉ hiển thị những từ khóa bắt đầu bằng searchTerm (có phân biệt dấu)
         const filteredSuggestions = suggestionsData.filter((suggestion: string) => {
           const normalizedSuggestion = unorm.nfkd(suggestion.toLowerCase()); // Chuẩn hóa gợi ý
-          const normalizedValue = unorm.nfkd(value.toLowerCase()); // Chuẩn hóa giá trị tìm kiếm
+          const normalizedValue = unorm.nfkd(trimmedValue.toLowerCase()); // Chuẩn hóa giá trị tìm kiếm
           return normalizedSuggestion.startsWith(normalizedValue); // So sánh
         });
   
-        // if (filteredSuggestions.length > 0) {
-            setSuggestions(filteredSuggestions);
-        // } else {
-        //     setSuggestions([]);
-        // }
+        setSuggestions(filteredSuggestions);
       };
       fetchSuggestions();
     }
