@@ -57,8 +57,8 @@ Route::prefix("v1/")->group(function () {
     Route::get('product-detail/{product_id}', [ProductDetailController::class, "productdetail"]);
     Route::post('product-shop', [ProductShopController::class, "getAllProduct"]);
     Route::apiResource('wishlist', WishlistController::class);
-    Route::apiResource('order', OrderController::class);
-    Route::post('checkout', [CheckoutController::class, "checkout"]);
+    Route::resource('order', OrderController::class);
+    Route::resource('checkout', CheckoutController::class);
 
 
     // Client routes cho bình luận (comments)
@@ -78,4 +78,5 @@ Route::post('register', [AuthController::class, 'register']);
 Route::middleware('auth:sanctum')->prefix('v1/')->group(function () {
     Route::post('logout', [AuthController::class, 'logout']);
     Route::apiResource('cart', CartController::class);
+    Route::apiResource('wishlist', WishlistController::class);
 });
