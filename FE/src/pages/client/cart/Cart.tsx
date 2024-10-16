@@ -7,10 +7,9 @@ import Delete from "@/components/icons/cart/Delete";
 import Gift from "@/components/icons/cart/Gift";
 import Note from "@/components/icons/cart/Note";
 import ReduceProduct from "@/components/icons/cart/ReducrPro";
-// import { getCart } from "@/services/api/client/cart";
-import { useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Button } from "antd";
-import React, { useState } from "react";
+import { useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Button, Skeleton } from "antd";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import ModalCart from "./_components/Modal";
 import instance from "@/configs/axios";
@@ -21,23 +20,24 @@ const Cart = () => {
   const [visiable, setVisible] = useState(false);
   const [idCart, setIdCart] = useState<any>('');
   const [updatedAttributes, setUpdatedAttributes] = useState<any>({});
+  const queryClient = useQueryClient();
   const closeModal = () => {
-    setIdCart('')
-    setVisible(false)
-  }
-  console.log("updatedAttributes",updatedAttributes)
+    setIdCart('');
+    setVisible(false);
+  };
+
   const { token } = useAuth();
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ['cart'],
     queryFn: async () => {
       const res = await instance.get('/cart', {
         headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
+          Authorization: `Bearer ${token}`,
+        },
+      });
       return res.data;
-    }
-  })
+    },
+  });
 
   const handleAttribute = (idCart: any, variants: any) => {
     setIdCart(idCart);
@@ -48,14 +48,14 @@ const Cart = () => {
     }));
   };
 
-
   const handleUpdateAttributes = (idCart: any, attributes: any) => {
-    setUpdatedAttributes((prev: any) => ({
-      ...prev,
-      [idCart]: attributes,
-    }));
+    setUpdatedAttributes({
+      ...updatedAttributes,
+      [idCart]: attributes, // Thay thế hoàn toàn giá trị cũ bằng giá trị mới
+    });
   };
-  if (isLoading) return <div>Loading...</div>
+
+
   const carts = data?.cart?.cartitems;
 
   return (
@@ -96,161 +96,164 @@ const Cart = () => {
                 </div>
               </div>
               {/*end hd-pagecart-header*/}
-              <div className="hd-pagecart-items">
-                <div className="hd-item relative overflow-hidden">
-                  {
-                    carts && carts.length > 0 ? (carts?.map((e: any) => {
-                      return <>
-                        <div className="hd-item-row lg:py-[2rem] py-[1rem] !items-center flex flex-wrap border-solid border-b-2">
-                          <div className="hd-infor-item lg:w-5/12 w-full hd-col-item">
-                            <div className="hd-infor !items-center !flex">
-                              <Link
-                                to=""
-                                className="min-w-[120px] max-w-[120px] block overflow-hidden relative w-full touch-manipulation pb-[10px] lg:pb-0"
-                              >
-                                <img src={`${e?.product?.img_thumbnail}`}></img>
-                              </Link>
-                              <div className="hd-infor-text ms-4">
+              <div className="hd-pagecart-items mt-4">
+                {
+                  isLoading ? <Skeleton /> : <div className="hd-item relative overflow-hidden">
+                    {
+                      carts && carts.length > 0 ? (carts?.map((e: any) => {
+                        return <>
+                          <div className="hd-item-row lg:py-[2rem] py-[1rem] !items-center flex flex-wrap border-solid border-b-2">
+                            <div className="hd-infor-item lg:w-5/12 w-full hd-col-item">
+                              <div className="hd-infor !items-center !flex">
                                 <Link
                                   to=""
-                                  className="text-sm font-semibold block mb-[5px] touch-manipulation hd-all-hover-bluelight"
+                                  className="min-w-[120px] max-w-[120px] block overflow-hidden relative w-full touch-manipulation pb-[10px] lg:pb-0"
                                 >
-                                  {e?.product?.name}
+                                  <img src={`${e?.product?.img_thumbnail}`}></img>
                                 </Link>
+                                <div className="hd-infor-text ms-4">
+                                  <Link
+                                    to=""
+                                    className="text-sm font-semibold block mb-[5px] touch-manipulation hd-all-hover-bluelight"
+                                  >
+                                    {e?.product?.name}
+                                  </Link>
 
-                                {/*end hd-price-item*/}
-                                {
-                                  Array.isArray(updatedAttributes[e.id])
-                                    ? updatedAttributes[e.id].map((item: any) => (
-                                      <div className="hd-infor-text-meta text-[13px] text-[#878787]" key={item.id}>
-                                        <p className="mb-[5px]">
-                                          {item?.name} : <strong>{item?.pivot?.value || item?.value}</strong>
-                                        </p>
-                                      </div>
-                                    ))
-                                    : e?.productvariant?.attributes?.map((item: any) => (
-                                      <div className="hd-infor-text-meta text-[13px] text-[#878787]" key={item.id}>
-                                        <p className="mb-[5px]">
-                                          {item?.name} : <strong>{item?.pivot?.value}</strong>
-                                        </p>
-                                      </div>
-                                    ))
-                                }
-
-
-
-
-
-                                <div className="hd-infor-text-tools mt-[10px]">
+                                  {/*end hd-price-item*/}
                                   {
-                                    e?.productvariant && <Button onClick={() => handleAttribute(e?.id, e?.productvariant?.attributes)} className="inline-flex me-[10px] border-none">
-                                      <Note />
-                                    </Button>
+                                    updatedAttributes && updatedAttributes.length > 0
+                                      ? updatedAttributes.map((item: any) => (
+                                        <div className="hd-infor-text-meta text-[13px] text-[#878787]" key={item.id}>
+                                          <p>{item?.name} : <strong>{item?.pivot?.value || item?.value}</strong></p>
+                                        </div>
+                                      ))
+                                      : e?.productvariant?.attributes?.map((item: any) => (
+                                        <div className="hd-infor-text-meta text-[13px] text-[#878787]" key={item.id}>
+                                          <p>{item?.name} : <strong>{item?.pivot?.value}</strong></p>
+                                        </div>
+                                      ))
                                   }
 
-                                  <Link to="" className="inline-flex me-[10px]">
-                                    <Delete />
-                                  </Link>
-                                </div>
-                              </div>
-                            </div>
-                            <ModalCart open={visiable} onClose={closeModal} idCart={idCart} onUpdateAttributes={handleUpdateAttributes} attributes={updatedAttributes[idCart]} />
-                            <div className="hd-qty-total block lg:hidden">
-                              <div className="flex items-center justify-between border-2 border-slate-200 rounded-full py-[10px] px-[10px]">
-                                <div className="hd-quantity-item relative hd-col-item">
-                                  <div className="hd-quantity relative block min-w-[100px] w-[100px] h-8 mx-auto hd-all-btn">
-                                    <button
-                                      type="button"
-                                      className="hd-btn-item left-0 text-left pl-[15px] pb-[10px] text-sm cursor-pointer shadow-none transform-none touch-manipulation"
-                                    >
-                                      <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        strokeWidth={2}
-                                        stroke="currentColor"
-                                        className="size-3 hd-all-hover-bluelight"
-                                      >
-                                        <path
-                                          strokeLinecap="round"
-                                          strokeLinejoin="round"
-                                          d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
-                                        />
-                                      </svg>
-                                    </button>
-                                    <span className="select-none leading-8 cursor-text font-semibold text-sm">
-                                      1
-                                    </span>
-                                    <button
-                                      type="button"
-                                      className="hd-btn-item pb-[10px] right-0 text-right pr-[15px] p-0 top-0 text-sm cursor-pointer shadow-none transform-none touch-manipulation"
-                                    >
-                                      <AddCount />
-                                    </button>
+                                  <div className="hd-infor-text-tools mt-[10px]">
+                                    {
+                                      e.productvariant.attributes.length > 0 && <Button onClick={() => handleAttribute(e?.id, e?.productvariant?.attributes)} className="inline-flex me-[10px] border-none">
+                                        <Note />
+                                      </Button>
+                                    }
+
+                                    <Link to="" className="inline-flex me-[10px]">
+                                      <Delete />
+                                    </Link>
                                   </div>
                                 </div>
+                              </div>
+                              <ModalCart
+                                open={visiable}
+                                onClose={closeModal}
+                                idCart={idCart}
+                                onUpdateAttributes={handleUpdateAttributes}
+                                attributes={updatedAttributes[idCart] || []} // Cung cấp các thuộc tính hiện tại
+                              />
+                              <div className="hd-qty-total block lg:hidden">
+                                <div className="flex items-center justify-between border-2 border-slate-200 rounded-full py-[10px] px-[10px]">
+                                  <div className="hd-quantity-item relative hd-col-item">
+                                    <div className="hd-quantity relative block min-w-[100px] w-[100px] h-8 mx-auto hd-all-btn">
+                                      <button
+                                        type="button"
+                                        className="hd-btn-item left-0 text-left pl-[15px] pb-[10px] text-sm cursor-pointer shadow-none transform-none touch-manipulation"
+                                      >
+                                        <svg
+                                          xmlns="http://www.w3.org/2000/svg"
+                                          fill="none"
+                                          viewBox="0 0 24 24"
+                                          strokeWidth={2}
+                                          stroke="currentColor"
+                                          className="size-3 hd-all-hover-bluelight"
+                                        >
+                                          <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
+                                          />
+                                        </svg>
+                                      </button>
+                                      <span className="select-none leading-8 cursor-text font-semibold text-sm">
+                                        1
+                                      </span>
+                                      <button
+                                        type="button"
+                                        className="hd-btn-item pb-[10px] right-0 text-right pr-[15px] p-0 top-0 text-sm cursor-pointer shadow-none transform-none touch-manipulation"
+                                      >
+                                        <AddCount />
+                                      </button>
+                                    </div>
+                                  </div>
 
+                                </div>
                               </div>
                             </div>
-                          </div>
-                          {/*end hd-infor-item*/}
-                          <div className="hd-price-item !text-center w-3/12 hd-col-item lg:block hidden">
-                            <div className="hs-prices">
-                              <div className="hd-text-price">
-                                {/* <del className="text-[#696969]">{FormatMoney(e?.productvariant?.price_regular )}</del>
-                                <ins className="ms-[6px] no-underline text-[#ec0101]">
-                                  {FormatMoney(e?.productvariant?.price_sale)}
-                                </ins> */}
+                            {/*end hd-infor-item*/}
+                            <div className="hd-price-item !text-center w-3/12 hd-col-item lg:block hidden">
+                              <div className="hs-prices">
+                                <div className="hd-text-price">
+                                  <del className="text-[#696969]">{FormatMoney(e?.productvariant?.price_regular)}</del>
+                                  <ins className="ms-[6px] no-underline text-[#ec0101]">
+                                    {FormatMoney(e?.productvariant?.price_sale)}
+                                  </ins>
+                                </div>
                               </div>
                             </div>
-                          </div>
-                          {/*end hd-price-item*/}
-                          <div className="hd-quantity-item !text-center w-2/12 hd-col-item lg:block hidden">
-                            <div className="hd-quantity relative block min-w-[120px] w-[120px] h-10 mx-auto hd-all-btn">
-                              <button
+                            {/*end hd-price-item*/}
+                            <div className="hd-quantity-item !text-center w-2/12 hd-col-item lg:block hidden">
+                              <div className="hd-quantity relative block min-w-[120px] w-[120px] h-10 mx-auto hd-all-btn">
+                                {/* <button
                                 type="button"
                                 className="hd-btn-item left-0 text-left pl-[15px] p-0 top-0 text-sm cursor-pointer shadow-none transform-none touch-manipulation"
+                                onClick={() => handleDecrease(e?.id, e?.quantity)}
                               >
                                 <ReduceProduct />
-                              </button>
-                              <span className="select-none leading-9 cursor-text font-semibold text-base">
-                                {e?.quantity}
-                              </span>
-                              <button
-                                type="button"
-                                className="hd-btn-item right-0 text-right pr-[15px] p-0 top-0 text-sm cursor-pointer shadow-none transform-none touch-manipulation"
-                              >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  strokeWidth={2}
-                                  stroke="currentColor"
-                                  className="size-3 hd-all-hover-bluelight"
+                              </button> */}
+                                <span className="select-none leading-9 cursor-text font-semibold text-base">
+                                  {e?.quantity}
+                                </span>
+                                <button
+                                  // onClick={() => handleIncrease(e?.id, e?.quantity)}
+                                  type="button"
+                                  className="hd-btn-item right-0 text-right pr-[15px] p-0 top-0 text-sm cursor-pointer shadow-none transform-none touch-manipulation"
                                 >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M12 4.5v15m7.5-7.5h-15"
-                                  />
-                                </svg>
-                              </button>
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    strokeWidth={2}
+                                    stroke="currentColor"
+                                    className="size-3 hd-all-hover-bluelight"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      d="M12 4.5v15m7.5-7.5h-15"
+                                    />
+                                  </svg>
+                                </button>
+                              </div>
                             </div>
+                            {/*end hd-quantity-item*/}
+                            <div className="hd-total-item hd-col-item text-end w-2/12 lg:block hidden">
+                              <span className="font-medium">{FormatMoney(e?.total_price)}</span>
+                            </div>
+                            {/*end hd-total-item*/}
                           </div>
-                          {/*end hd-quantity-item*/}
-                          <div className="hd-total-item hd-col-item text-end w-2/12 lg:block hidden">
-                            <span className="font-medium">{FormatMoney(e?.total_price)}</span>
-                          </div>
-                          {/*end hd-total-item*/}
-                        </div>
-                      </>
-                    })) : <p className="text-center mt-12 text-base">Giỏ hàng trống</p>
-                  }
+                        </>
+                      })) : <p className="text-center mt-12 text-base">Giỏ hàng trống</p>
+                    }
 
 
 
-                  {/*end-item-1*/}
-                </div>
+                    {/*end-item-1*/}
+                  </div>
+                }
+
               </div>
               {/*end hd-pagecart-items*/}
               <div className="hd-pagecart-footer lg:my-[60px]">
@@ -285,7 +288,7 @@ const Cart = () => {
                     </label>
                     <textarea
                       className="min-h-28 px-3 py-2 resize-none !w-full hd-cart-note"
-                      placeholder="Chúng tôi có thể giúp bạn?"
+                      placeholder="Chúng tôi có thể giúp bạn?" ơ43uuuiyuiiuyuiijjhghgfghjjhyuyythg0-090909090oopoioopo00pooooo
                       defaultValue={""}
                     />
                     <label className="mt-5 mb-3 !block"> Mã giảm giá: </label>
@@ -376,3 +379,30 @@ const Cart = () => {
 };
 
 export default Cart;
+
+
+// const updateQuantity = useMutation({
+//   mutationFn: async ({ idCart, newQuantity }) => {
+//     await instance.put(`/cart/${idCart}`, {
+//       quantity: newQuantity,
+//     }, {
+//       headers: {
+//         Authorization: `Bearer ${token}`,
+//       }
+//     });
+//   },
+//   onSuccess: (data, variables) => {
+//     queryClient.invalidateQueries({
+//       queryKey: ['cart'],
+//     });
+//   }
+// });
+
+// const handleIncrease = (idCart: any, currentQuantity: any) => {
+//   const newQuantity = currentQuantity + 1;
+//   updateQuantity.mutate({ idCart, newQuantity });
+// };
+// const handleDecrease = (productId, currentQuantity) => {
+//   const newQuantity = Math.max(currentQuantity - 1, 0); // Không cho phép số lượng âm
+//   updateQuantity.mutate({ productId, newQuantity });
+// };

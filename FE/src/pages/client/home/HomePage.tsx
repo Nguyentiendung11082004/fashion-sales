@@ -4,75 +4,44 @@ import {
   Blog1,
   Blog2,
   Blog3,
-  CatoryAccess,
-  CatoryShore,
-  CatoryWatch,
-  CatoryWomen,
-  Product,
-  ProductNext,
 } from "@/components/icons";
 import CartDetail from "@/components/icons/detail/CartDetail";
 import Eye from "@/components/icons/detail/Eye";
 import HeartWhite from "@/components/icons/detail/HeartWhite";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Banner from "./Banner/Banner";
 import Slideshow from "./SampleSlider/SampleSlider";
+import axios from "axios";
+import CategoryCarousel from "./SampleSlider/CategorySlider";
+import { convertColorNameToClass } from "@/common/colors/colorUtils";
+import { useWishlist } from "../wishlist/WishlistContext";
+import HeartRed from "@/components/icons/detail/HeartRed";
 
 const HomePage = () => {
+  const [trendProducts, setTrendProducts] = useState<any[]>([]);
+  const [homeProducts, setHomeProducts] = useState<any[]>([]);
+  const { handleAddToWishlist, isInWishlist } = useWishlist();
+
+  useEffect(() => {
+    axios
+      .get("http://127.0.0.1:8000/api/v1/product-home")
+      .then((response) => {
+        setTrendProducts(response.data.trend_products);
+        setHomeProducts(response.data.home_show_products);
+      })
+      .catch((error) => {
+        console.error("Có lỗi xảy ra khi lấy sản phẩm", error);
+      });
+  }, []);
+
   return (
     <>
       <div>
         <Banner />
 
-        <section className="container grid lg:grid-cols-12 lg:gap-8 md:gap-2 md:grid-cols-12 gap-2  mb-10">
-          <div className="lg:col-span-6 md:col-span-6 col-span-12 overflow-hidden">
-            <Link to="" className="relative overflow-hidden">
-              <img
-                src={CatoryWomen}
-                className="h-[100%] hover:scale-110 transition-all duration-700 ease-in-out "
-              />
-              <button className="shadow-sm absolute bottom-[4%] left-[50%] -translate-x-[50%] lg:left-[50%] lg:-translate-x-[50%] bg-[#fff] text-[#000] hover:bg-[#000] hover:text-[#fff] transition ease-in duration-300 w-[150px] h-[40px] font-bold text-lg">
-                Phụ Nữ
-              </button>
-            </Link>
-          </div>
-          <div className="lg:col-span-3 md:col-span-3 col-span-6">
-            <div className="w-[100%] h-[50%] overflow-hidden">
-              <Link to="" className="relative  ">
-                <img
-                  src={CatoryAccess}
-                  className="h-full w-full hover:scale-110 transition-all duration-700 ease-in-out "
-                />
-                <button className="shadow-sm absolute bottom-[4%] left-[50%] -translate-x-[50%] lg:left-[50%] lg:-translate-x-[50%] md:left-[10%] bg-[#fff] text-[#000] hover:bg-[#000] hover:text-[#fff] transition ease-in duration-300 w-[150px] h-[40px] font-bold text-lg">
-                  Phụ Kiện
-                </button>
-              </Link>
-            </div>
-            <div className="w-[100%] h-[50%] overflow-hidden">
-              <Link to="" className="relative">
-                <img
-                  src={CatoryShore}
-                  className="h-[full] hover:scale-x-110 transition-all duration-700 ease-in-out mt-2 lg:mt-9"
-                />
-                <button className="shadow-sm absolute bottom-[15%] left-[50%] -translate-x-[50%] lg:left-[50%] lg:-translate-x-[50%] md:left-[10%] bg-[#fff] text-[#000] hover:bg-[#000] hover:text-[#fff] transition ease-in duration-300 w-[150px] h-[40px] font-bold text-lg">
-                  Giày Dép
-                </button>
-              </Link>
-            </div>
-          </div>
-          <div className="lg:col-span-3 md:col-span-3 md:relative lg:relative col-span-6 overflow-hidden">
-            <Link to="" className="relative ">
-              <img
-                src={CatoryWatch}
-                className="h-[100%] scale-x-[1.8] hover:scale-x-[1.9] hover:scale-y-[1.1]   transition-all duration-700 ease-in-out "
-              />
-              <button className="shadow-sm absolute bottom-[4%] left-[50%] -translate-x-[50%] lg:left-[50%] lg:-translate-x-[50%] bg-[#fff] text-[#000] hover:bg-[#000] hover:text-[#fff] transition ease-in duration-300 w-[150px] h-[40px] font-bold text-lg">
-                Đồng Hồ
-              </button>
-            </Link>
-          </div>
-        </section>
+        <CategoryCarousel />
+
         <section className="container mt-28">
           <div className="custom-heading ">
             <div className="flex items-center mx-auto">
@@ -84,576 +53,151 @@ const HomePage = () => {
             </div>
           </div>
           <div className="text-center mx-auto italic mt-2 custom-heading-sub mb-10">
-            <i>Lượt xem hàng đầu trong tuần này</i>
+            <i>Sản phẩm xu hướng hiện nay</i>
           </div>
           <div className="grid grid-cols-2 gap-4 lg:ml-2.5 lg:grid-cols-3 xl:grid-cols-4 lg:gap-8 xl:gap-8 md:grid-cols-3 md:gap-6 mx-auto">
-            <div className="lg:mb-[25px] mb-[20px]">
-              <div className="lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] sm:h-[345px] overflow-hidden">
-                <img
-                  className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover/image:opacity-0"
-                  src={Product}
-                />
-                <img
-                  className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover/image:opacity-100"
-                  src={ProductNext}
-                />
-                <div>
-                  <Link to="" className="absolute left-5 top-5">
-                    <HeartWhite />
-                  </Link>
-                </div>
-                <div className="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100">
-                  <Link to="" className="group/btn relative m-auto">
-                    <button className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]">
-                      <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                        Xem thêm
-                      </p>
-                      <Eye />
-                    </button>
-                  </Link>
-                  <Link to="" className="group/btn relative">
-                    <button className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]">
-                      <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                        Thêm vào giỏ hàng
-                      </p>
-                      <CartDetail />
-                    </button>
-                  </Link>
-                </div>
-                <div
-                  className="absolute bottom-2 left-[35%] text-white
-   -translate-y-7 transform 
-    transition-all duration-500 ease-in-out 
-    group-hover:translate-y-0
-    opacity-0
-    group-hover:opacity-100
-  "
-                >
-                  <ul className="flex">
-                    <li>
-                      <Link to="">XS,</Link>
-                    </li>
-                    <li>
-                      <Link to="">S,</Link>
-                    </li>
-                    <li>
-                      <Link to="">M,</Link>
-                    </li>
-                    <li>
-                      <Link to="">L,</Link>
-                    </li>
-                    <li>
-                      <Link to="">XL</Link>
-                    </li>
-                  </ul>
-                </div>
-                <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400">
-                  -15%
-                </div>
-              </div>
-              <div>
-                <p className="text-sm text-black mb-1">Analogue Resin Strap</p>
-                <del className="mr-1">12.000.000đ</del>
-                <span className="text-[red]">776.000₫</span>
-              </div>
-            </div>
-            <div className="lg:mb-[25px] mb-[20px]">
-              <div className="lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] sm:h-[345px] overflow-hidden">
-                <img
-                  className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover/image:opacity-0"
-                  src={Product}
-                />
-                <img
-                  className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover/image:opacity-100"
-                  src={ProductNext}
-                />
-                <div>
-                  <Link to="" className="absolute left-5 top-5">
-                    <HeartWhite />
-                  </Link>
-                </div>
-                <div className="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100">
-                  <Link to="" className="group/btn relative m-auto">
-                    <button className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]">
-                      <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                        Xem thêm
-                      </p>
-                      <Eye />
-                    </button>
-                  </Link>
-                  <Link to="" className="group/btn relative">
-                    <button className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]">
-                      <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                        Thêm vào giỏ hàng
-                      </p>
-                      <CartDetail />
-                    </button>
-                  </Link>
-                </div>
-                <div
-                  className="absolute bottom-2 left-[35%] text-white
-   -translate-y-7 transform 
-    transition-all duration-500 ease-in-out 
-    group-hover:translate-y-0
-    opacity-0
-    group-hover:opacity-100
-  "
-                >
-                  <ul className="flex">
-                    <li>
-                      <Link to="">XS,</Link>
-                    </li>
-                    <li>
-                      <Link to="">S,</Link>
-                    </li>
-                    <li>
-                      <Link to="">M,</Link>
-                    </li>
-                    <li>
-                      <Link to="">L,</Link>
-                    </li>
-                    <li>
-                      <Link to="">XL</Link>
-                    </li>
-                  </ul>
-                </div>
-                <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400">
-                  -15%
+            {trendProducts.map((product) => (
+              <div key={product.id} className="product-item">
+                <div className="lg:mb-[25px] mb-[20px]">
+                  <div className="cursor-pointer lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] sm:h-[345px] overflow-hidden">
+                    <img
+                      className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover/image:opacity-0 object-cover "
+                      src={product.img_thumbnail}
+                    />
+                    <img
+                      className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover/image:opacity-100 object-cover"
+                      src={product.img_thumbnail}
+                    />
+                    <div className="absolute inset-0 bg-black opacity-0 transition-opacity duration-300 ease-in-out group-hover:opacity-10"></div>
+                    <div>
+                    <button className="absolute left-5 top-5 cursor-pointer"
+                                    onClick={() =>handleAddToWishlist(product)}          
+                            >
+                              {isInWishlist(product.id) ? <HeartRed /> : <HeartWhite />}
+                            </button>
+                    </div>
+                    <div className="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100">
+                      <Link to="" className="group/btn relative m-auto">
+                        <button className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]">
+                          <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
+                            Xem thêm
+                          </p>
+                          <Eye />
+                        </button>
+                      </Link>
+                      <Link to="" className="group/btn relative">
+                        <button className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]">
+                          <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
+                            Thêm vào giỏ hàng
+                          </p>
+                          <CartDetail />
+                        </button>
+                      </Link>
+                    </div>
+                    <div className="flex justify-center">
+                      <div
+                        className="absolute bottom-2 text-center text-white
+    -translate-y-7 transform 
+      transition-all duration-500 ease-in-out 
+      group-hover:translate-y-0
+      opacity-0
+      group-hover:opacity-100
+    "
+                      >
+                        <ul className="flex">
+                          {product.unique_attributes.size && (
+                            <li>
+                              {Object.values(
+                                product.unique_attributes.size
+                              ).join(", ")}
+                            </li>
+                          )}
+                        </ul>
+                      </div>
+                    </div>
+                    {product.price_regular && (
+                      <div>
+                        {product.price_sale > 0 &&
+                        product.price_sale < product.price_regular ? (
+                          <>
+                            <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400">
+                              -
+                              {Math.round(
+                                ((product.price_regular - product.price_sale) /
+                                  product.price_regular) *
+                                  100
+                              )}
+                              %
+                            </div>
+                          </>
+                        ) : (
+                          <div></div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <p className="text-base font-medium text-black mb-1 cursor-pointer hd-all-hover-bluelight">
+                      {product.name.charAt(0).toUpperCase() + product.name.slice(1).toLowerCase()}
+                    </p>
+                    {product.price_regular && (
+                      <div>
+                        {product.price_sale > 0 &&
+                        product.price_sale < product.price_regular ? (
+                          <>
+                            <del className="mr-1">
+                              {new Intl.NumberFormat("vi-VN").format(
+                                product.price_regular
+                              )}
+                              ₫{/* Dạng tiền tệ VN */}
+                            </del>
+                            <span className="text-[red]">
+                              {new Intl.NumberFormat("vi-VN").format(
+                                product.price_sale
+                              )}
+                              ₫
+                            </span>
+                          </>
+                        ) : (
+                          <span className="">
+                            {new Intl.NumberFormat("vi-VN").format(
+                              product.price_regular
+                            )}
+                            ₫
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="t4s-product-colors flex">
+                    {product.unique_attributes.color &&
+                      Object.values(product.unique_attributes.color)
+                        .filter((color) => typeof color === "string")
+                        .map((color, index) => (
+                          <div key={index} className="mr-2 mt-1">
+                            <span className="t4s-pr-color__item flex flex-col items-center cursor-pointer">
+                              <span className="t4s-pr-color__value border border-gray-400 w-5 h-5 hover:border-black hover:border-2 rounded-full">
+                                <div
+                                  className={`w-[17px] h-[17px] rounded-full mt-[1px] ml-[0.5px] lg:mt-[0.5px] lg:hover:mt-[-0.5px] lg:hover:ml-[-0.25px] ${convertColorNameToClass(color)}`}
+                                ></div>
+                              </span>
+                            </span>
+                          </div>
+                        ))}
+                  </div>
                 </div>
               </div>
-              <div>
-                <p className="text-sm text-black mb-1">Analogue Resin Strap</p>
-                <del className="mr-1">12.000.000đ</del>
-                <span className="text-[red]">776.000₫</span>
-              </div>
-            </div>
-            <div className="lg:mb-[25px] mb-[20px]">
-              <div className="lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] sm:h-[345px] overflow-hidden">
-                <img
-                  className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover/image:opacity-0"
-                  src={Product}
-                />
-                <img
-                  className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover/image:opacity-100"
-                  src={ProductNext}
-                />
-                <div>
-                  <Link to="" className="absolute left-5 top-5">
-                    <HeartWhite />
-                  </Link>
-                </div>
-                <div className="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100">
-                  <Link to="" className="group/btn relative m-auto">
-                    <button className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]">
-                      <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                        Xem thêm
-                      </p>
-                      <Eye />
-                    </button>
-                  </Link>
-                  <Link to="" className="group/btn relative">
-                    <button className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]">
-                      <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                        Thêm vào giỏ hàng
-                      </p>
-                      <CartDetail />
-                    </button>
-                  </Link>
-                </div>
-                <div
-                  className="absolute bottom-2 left-[35%] text-white
-   -translate-y-7 transform 
-    transition-all duration-500 ease-in-out 
-    group-hover:translate-y-0
-    opacity-0
-    group-hover:opacity-100
-  "
-                >
-                  <ul className="flex">
-                    <li>
-                      <Link to="">XS,</Link>
-                    </li>
-                    <li>
-                      <Link to="">S,</Link>
-                    </li>
-                    <li>
-                      <Link to="">M,</Link>
-                    </li>
-                    <li>
-                      <Link to="">L,</Link>
-                    </li>
-                    <li>
-                      <Link to="">XL</Link>
-                    </li>
-                  </ul>
-                </div>
-                <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400">
-                  -15%
-                </div>
-              </div>
-              <div>
-                <p className="text-sm text-black mb-1">Analogue Resin Strap</p>
-                <del className="mr-1">12.000.000đ</del>
-                <span className="text-[red]">776.000₫</span>
-              </div>
-            </div>
-            <div className="lg:mb-[25px] mb-[20px]">
-              <div className="lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] sm:h-[345px] overflow-hidden">
-                <img
-                  className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover/image:opacity-0"
-                  src={Product}
-                />
-                <img
-                  className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover/image:opacity-100"
-                  src={ProductNext}
-                />
-                <div>
-                  <Link to="" className="absolute left-5 top-5">
-                    <HeartWhite />
-                  </Link>
-                </div>
-                <div className="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100">
-                  <Link to="" className="group/btn relative m-auto">
-                    <button className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]">
-                      <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                        Xem thêm
-                      </p>
-                      <Eye />
-                    </button>
-                  </Link>
-                  <Link to="" className="group/btn relative">
-                    <button className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]">
-                      <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                        Thêm vào giỏ hàng
-                      </p>
-                      <CartDetail />
-                    </button>
-                  </Link>
-                </div>
-                <div
-                  className="absolute bottom-2 left-[35%] text-white
-   -translate-y-7 transform 
-    transition-all duration-500 ease-in-out 
-    group-hover:translate-y-0
-    opacity-0
-    group-hover:opacity-100
-  "
-                >
-                  <ul className="flex">
-                    <li>
-                      <Link to="">XS,</Link>
-                    </li>
-                    <li>
-                      <Link to="">S,</Link>
-                    </li>
-                    <li>
-                      <Link to="">M,</Link>
-                    </li>
-                    <li>
-                      <Link to="">L,</Link>
-                    </li>
-                    <li>
-                      <Link to="">XL</Link>
-                    </li>
-                  </ul>
-                </div>
-                <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400">
-                  -15%
-                </div>
-              </div>
-              <div>
-                <p className="text-sm text-black mb-1">Analogue Resin Strap</p>
-                <del className="mr-1">12.000.000đ</del>
-                <span className="text-[red]">776.000₫</span>
-              </div>
-            </div>
-            <div className="lg:mb-[25px] mb-[20px]">
-              <div className="lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] sm:h-[345px] overflow-hidden">
-                <img
-                  className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover/image:opacity-0"
-                  src={Product}
-                />
-                <img
-                  className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover/image:opacity-100"
-                  src={ProductNext}
-                />
-                <div>
-                  <Link to="" className="absolute left-5 top-5">
-                    <HeartWhite />
-                  </Link>
-                </div>
-                <div className="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100">
-                  <Link to="" className="group/btn relative m-auto">
-                    <button className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]">
-                      <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                        Xem thêm
-                      </p>
-                      <Eye />
-                    </button>
-                  </Link>
-                  <Link to="" className="group/btn relative">
-                    <button className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]">
-                      <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                        Thêm vào giỏ hàng
-                      </p>
-                      <CartDetail />
-                    </button>
-                  </Link>
-                </div>
-                <div
-                  className="absolute bottom-2 left-[35%] text-white
-   -translate-y-7 transform 
-    transition-all duration-500 ease-in-out 
-    group-hover:translate-y-0
-    opacity-0
-    group-hover:opacity-100
-  "
-                >
-                  <ul className="flex">
-                    <li>
-                      <Link to="">XS,</Link>
-                    </li>
-                    <li>
-                      <Link to="">S,</Link>
-                    </li>
-                    <li>
-                      <Link to="">M,</Link>
-                    </li>
-                    <li>
-                      <Link to="">L,</Link>
-                    </li>
-                    <li>
-                      <Link to="">XL</Link>
-                    </li>
-                  </ul>
-                </div>
-                <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400">
-                  -15%
-                </div>
-              </div>
-              <div>
-                <p className="text-sm text-black mb-1">Analogue Resin Strap</p>
-                <del className="mr-1">12.000.000đ</del>
-                <span className="text-[red]">776.000₫</span>
-              </div>
-            </div>
-            <div className="lg:mb-[25px] mb-[20px]">
-              <div className="lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] sm:h-[345px] overflow-hidden">
-                <img
-                  className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover/image:opacity-0"
-                  src={Product}
-                />
-                <img
-                  className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover/image:opacity-100"
-                  src={ProductNext}
-                />
-                <div>
-                  <Link to="" className="absolute left-5 top-5">
-                    <HeartWhite />
-                  </Link>
-                </div>
-                <div className="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100">
-                  <Link to="" className="group/btn relative m-auto">
-                    <button className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]">
-                      <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                        Xem thêm
-                      </p>
-                      <Eye />
-                    </button>
-                  </Link>
-                  <Link to="" className="group/btn relative">
-                    <button className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]">
-                      <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                        Thêm vào giỏ hàng
-                      </p>
-                      <CartDetail />
-                    </button>
-                  </Link>
-                </div>
-                <div
-                  className="absolute bottom-2 left-[35%] text-white
-   -translate-y-7 transform 
-    transition-all duration-500 ease-in-out 
-    group-hover:translate-y-0
-    opacity-0
-    group-hover:opacity-100
-  "
-                >
-                  <ul className="flex">
-                    <li>
-                      <Link to="">XS,</Link>
-                    </li>
-                    <li>
-                      <Link to="">S,</Link>
-                    </li>
-                    <li>
-                      <Link to="">M,</Link>
-                    </li>
-                    <li>
-                      <Link to="">L,</Link>
-                    </li>
-                    <li>
-                      <Link to="">XL</Link>
-                    </li>
-                  </ul>
-                </div>
-                <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400">
-                  -15%
-                </div>
-              </div>
-              <div>
-                <p className="text-sm text-black mb-1">Analogue Resin Strap</p>
-                <del className="mr-1">12.000.000đ</del>
-                <span className="text-[red]">776.000₫</span>
-              </div>
-            </div>
-            <div className="lg:mb-[25px] mb-[20px]">
-              <div className="lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] sm:h-[345px] overflow-hidden">
-                <img
-                  className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover/image:opacity-0"
-                  src={Product}
-                />
-                <img
-                  className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover/image:opacity-100"
-                  src={ProductNext}
-                />
-                <div>
-                  <Link to="" className="absolute left-5 top-5">
-                    <HeartWhite />
-                  </Link>
-                </div>
-                <div className="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100">
-                  <Link to="" className="group/btn relative m-auto">
-                    <button className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]">
-                      <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                        Xem thêm
-                      </p>
-                      <Eye />
-                    </button>
-                  </Link>
-                  <Link to="" className="group/btn relative">
-                    <button className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]">
-                      <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                        Thêm vào giỏ hàng
-                      </p>
-                      <CartDetail />
-                    </button>
-                  </Link>
-                </div>
-                <div
-                  className="absolute bottom-2 left-[35%] text-white
-   -translate-y-7 transform 
-    transition-all duration-500 ease-in-out 
-    group-hover:translate-y-0
-    opacity-0
-    group-hover:opacity-100
-  "
-                >
-                  <ul className="flex">
-                    <li>
-                      <Link to="">XS,</Link>
-                    </li>
-                    <li>
-                      <Link to="">S,</Link>
-                    </li>
-                    <li>
-                      <Link to="">M,</Link>
-                    </li>
-                    <li>
-                      <Link to="">L,</Link>
-                    </li>
-                    <li>
-                      <Link to="">XL</Link>
-                    </li>
-                  </ul>
-                </div>
-                <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400">
-                  -15%
-                </div>
-              </div>
-              <div>
-                <p className="text-sm text-black mb-1">Analogue Resin Strap</p>
-                <del className="mr-1">12.000.000đ</del>
-                <span className="text-[red]">776.000₫</span>
-              </div>
-            </div>
-            <div className="lg:mb-[25px] mb-[20px]">
-              <div className="lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] sm:h-[345px] overflow-hidden">
-                <img
-                  className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover/image:opacity-0"
-                  src={Product}
-                />
-                <img
-                  className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover/image:opacity-100"
-                  src={ProductNext}
-                />
-                <div>
-                  <Link to="" className="absolute left-5 top-5">
-                    <HeartWhite />
-                  </Link>
-                </div>
-                <div className="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100">
-                  <Link to="" className="group/btn relative m-auto">
-                    <button className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]">
-                      <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                        Xem thêm
-                      </p>
-                      <Eye />
-                    </button>
-                  </Link>
-                  <Link to="" className="group/btn relative">
-                    <button className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]">
-                      <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                        Thêm vào giỏ hàng
-                      </p>
-                      <CartDetail />
-                    </button>
-                  </Link>
-                </div>
-                <div
-                  className="absolute bottom-2 left-[35%] text-white
-   -translate-y-7 transform 
-    transition-all duration-500 ease-in-out 
-    group-hover:translate-y-0
-    opacity-0
-    group-hover:opacity-100
-  "
-                >
-                  <ul className="flex">
-                    <li>
-                      <Link to="">XS,</Link>
-                    </li>
-                    <li>
-                      <Link to="">S,</Link>
-                    </li>
-                    <li>
-                      <Link to="">M,</Link>
-                    </li>
-                    <li>
-                      <Link to="">L,</Link>
-                    </li>
-                    <li>
-                      <Link to="">XL</Link>
-                    </li>
-                  </ul>
-                </div>
-                <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400">
-                  -15%
-                </div>
-              </div>
-              <div>
-                <p className="text-sm text-black mb-1">Analogue Resin Strap</p>
-                <del className="mr-1">12.000.000đ</del>
-                <span className="text-[red]">776.000₫</span>
-              </div>
-            </div>
+            ))}
           </div>
         </section>
+
         <section className="container my-16 text-center">
           <Link to="">
             <button className="btn-load">Tải Thêm</button>
           </Link>
         </section>
+
         <section className="container">
           <div className="grid lg:grid-cols-2 md:grid-cols-2 md:gap-4 lg:gap-8 ">
             <div className="w-[100%] relative overflow-hidden">
@@ -691,575 +235,147 @@ const HomePage = () => {
             <div className="flex items-center mx-auto">
               <hr className="flex-auto h-0.5 bg-gray-400 " />
               <div className="mx-4 text-2xl font-bold text-gray-900">
-                Sản phẩm đang SALE
+                NỔI BẬT
               </div>
               <hr className="flex-auto h-0.5 bg-gray-400 w-2" />
             </div>
           </div>
           <div className="text-center mx-auto italic mt-2 custom-heading-sub mb-10">
-            <i>Bán chạy nhất trong tuần này</i>
+            <i>Sản phẩm nổi bật </i>
           </div>
           <div className="grid grid-cols-2 gap-4 lg:ml-2.5 lg:grid-cols-3 xl:grid-cols-4 lg:gap-8 xl:gap-8 md:grid-cols-3 md:gap-6 mx-auto">
-            <div className="lg:mb-[25px] mb-[20px]">
-              <div className="lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] sm:h-[345px] overflow-hidden">
-                <img
-                  className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover/image:opacity-0"
-                  src={Product}
-                />
-                <img
-                  className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover/image:opacity-100"
-                  src={ProductNext}
-                />
-                <div>
-                  <Link to="" className="absolute left-5 top-5">
-                    <HeartWhite />
-                  </Link>
-                </div>
-                <div className="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100">
-                  <Link to="" className="group/btn relative m-auto">
-                    <button className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]">
-                      <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                        Xem thêm
-                      </p>
-                      <Eye />
-                    </button>
-                  </Link>
-                  <Link to="" className="group/btn relative">
-                    <button className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]">
-                      <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                        Thêm vào giỏ hàng
-                      </p>
-                      <CartDetail />
-                    </button>
-                  </Link>
-                </div>
-                <div
-                  className="absolute bottom-2 left-[35%] text-white
-   -translate-y-7 transform 
-    transition-all duration-500 ease-in-out 
-    group-hover:translate-y-0
-    opacity-0
-    group-hover:opacity-100
-  "
-                >
-                  <ul className="flex">
-                    <li>
-                      <Link to="">XS,</Link>
-                    </li>
-                    <li>
-                      <Link to="">S,</Link>
-                    </li>
-                    <li>
-                      <Link to="">M,</Link>
-                    </li>
-                    <li>
-                      <Link to="">L,</Link>
-                    </li>
-                    <li>
-                      <Link to="">XL</Link>
-                    </li>
-                  </ul>
-                </div>
-                <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400">
-                  -15%
-                </div>
-              </div>
-              <div>
-                <p className="text-sm text-black mb-1">Analogue Resin Strap</p>
-                <del className="mr-1">12.000.000đ</del>
-                <span className="text-[red]">776.000₫</span>
-              </div>
-            </div>
-            <div className="lg:mb-[25px] mb-[20px]">
-              <div className="lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] sm:h-[345px] overflow-hidden">
-                <img
-                  className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover/image:opacity-0"
-                  src={Product}
-                />
-                <img
-                  className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover/image:opacity-100"
-                  src={ProductNext}
-                />
-                <div>
-                  <Link to="" className="absolute left-5 top-5">
-                    <HeartWhite />
-                  </Link>
-                </div>
-                <div className="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100">
-                  <Link to="" className="group/btn relative m-auto">
-                    <button className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]">
-                      <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                        Xem thêm
-                      </p>
-                      <Eye />
-                    </button>
-                  </Link>
-                  <Link to="" className="group/btn relative">
-                    <button className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]">
-                      <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                        Thêm vào giỏ hàng
-                      </p>
-                      <CartDetail />
-                    </button>
-                  </Link>
-                </div>
-                <div
-                  className="absolute bottom-2 left-[35%] text-white
-   -translate-y-7 transform 
-    transition-all duration-500 ease-in-out 
-    group-hover:translate-y-0
-    opacity-0
-    group-hover:opacity-100
-  "
-                >
-                  <ul className="flex">
-                    <li>
-                      <Link to="">XS,</Link>
-                    </li>
-                    <li>
-                      <Link to="">S,</Link>
-                    </li>
-                    <li>
-                      <Link to="">M,</Link>
-                    </li>
-                    <li>
-                      <Link to="">L,</Link>
-                    </li>
-                    <li>
-                      <Link to="">XL</Link>
-                    </li>
-                  </ul>
-                </div>
-                <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400">
-                  -15%
+            {homeProducts.map((product) => (
+              <div key={product.id} className="product-item">
+                <div className="lg:mb-[25px] mb-[20px]">
+                  <div className="cursor-pointer lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] sm:h-[345px] overflow-hidden">
+                    <img
+                      className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover/image:opacity-0 object-cover "
+                      src={product.img_thumbnail}
+                    />
+                    <img
+                      className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover/image:opacity-100 object-cover"
+                      src={product.img_thumbnail}
+                    />
+                    <div className="absolute inset-0 bg-black opacity-0 transition-opacity duration-300 ease-in-out group-hover:opacity-10"></div>
+                    <div>
+                      <Link to="" className="absolute left-5 top-5">
+                        <HeartWhite />
+                      </Link>
+                    </div>
+                    <div className="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100">
+                      <Link to="" className="group/btn relative m-auto">
+                        <button className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]">
+                          <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
+                            Xem thêm
+                          </p>
+                          <Eye />
+                        </button>
+                      </Link>
+                      <Link to="" className="group/btn relative">
+                        <button className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]">
+                          <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
+                            Thêm vào giỏ hàng
+                          </p>
+                          <CartDetail />
+                        </button>
+                      </Link>
+                    </div>
+                    <div className="flex justify-center">
+                      <div
+                        className="absolute bottom-2 text-center text-white
+    -translate-y-7 transform 
+      transition-all duration-500 ease-in-out 
+      group-hover:translate-y-0
+      opacity-0
+      group-hover:opacity-100
+    "
+                      >
+                        <ul className="flex">
+                          {product.unique_attributes.size && (
+                            <li>
+                              {Object.values(
+                                product.unique_attributes.size
+                              ).join(", ")}
+                            </li>
+                          )}
+                        </ul>
+                      </div>
+                    </div>
+
+                    {product.price_regular && (
+                      <div>
+                        {product.price_sale > 0 &&
+                        product.price_sale < product.price_regular ? (
+                          <>
+                            <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400">
+                              -
+                              {Math.round(
+                                ((product.price_regular - product.price_sale) /
+                                  product.price_regular) *
+                                  100
+                              )}
+                              %
+                            </div>
+                          </>
+                        ) : (
+                          <div></div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <p className="text-base font-medium text-black mb-1 cursor-pointer hd-all-hover-bluelight">
+                      {product.name.charAt(0).toUpperCase() + product.name.slice(1).toLowerCase()}
+                    </p>
+                    {product.price_regular && (
+                      <div>
+                        {product.price_sale > 0 &&
+                        product.price_sale < product.price_regular ? (
+                          <>
+                            <del className="mr-1">
+                              {new Intl.NumberFormat("vi-VN").format(
+                                product.price_regular
+                              )}
+                              ₫{/* Dạng tiền tệ VN */}
+                            </del>
+                            <span className="text-[red]">
+                              {new Intl.NumberFormat("vi-VN").format(
+                                product.price_sale
+                              )}
+                              ₫
+                            </span>
+                          </>
+                        ) : (
+                          <span className="">
+                            {new Intl.NumberFormat("vi-VN").format(
+                              product.price_regular
+                            )}
+                            ₫
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="t4s-product-colors flex">
+                    {product.unique_attributes.color &&
+                      Object.values(product.unique_attributes.color)
+                        .filter((color) => typeof color === "string")
+                        .map((color, index) => (
+                          <div key={index} className="mr-2 mt-1">
+                            <span className="t4s-pr-color__item flex flex-col items-center cursor-pointer">
+                              <span className="t4s-pr-color__value border border-gray-400 w-5 h-5 hover:border-black hover:border-2 rounded-full">
+                                <div
+                                  className={`w-[17px] h-[17px] rounded-full mt-[1px] ml-[0.5px] lg:mt-[0.5px] lg:hover:mt-[-0.5px] lg:hover:ml-[-0.25px] ${convertColorNameToClass(color)}`}
+                                ></div>
+                              </span>
+                            </span>
+                          </div>
+                        ))}
+                  </div>
                 </div>
               </div>
-              <div>
-                <p className="text-sm text-black mb-1">Analogue Resin Strap</p>
-                <del className="mr-1">12.000.000đ</del>
-                <span className="text-[red]">776.000₫</span>
-              </div>
-            </div>
-            <div className="lg:mb-[25px] mb-[20px]">
-              <div className="lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] sm:h-[345px] overflow-hidden">
-                <img
-                  className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover/image:opacity-0"
-                  src={Product}
-                />
-                <img
-                  className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover/image:opacity-100"
-                  src={ProductNext}
-                />
-                <div>
-                  <Link to="" className="absolute left-5 top-5">
-                    <HeartWhite />
-                  </Link>
-                </div>
-                <div className="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100">
-                  <Link to="" className="group/btn relative m-auto">
-                    <button className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]">
-                      <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                        Xem thêm
-                      </p>
-                      <Eye />
-                    </button>
-                  </Link>
-                  <Link to="" className="group/btn relative">
-                    <button className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]">
-                      <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                        Thêm vào giỏ hàng
-                      </p>
-                      <CartDetail />
-                    </button>
-                  </Link>
-                </div>
-                <div
-                  className="absolute bottom-2 left-[35%] text-white
-   -translate-y-7 transform 
-    transition-all duration-500 ease-in-out 
-    group-hover:translate-y-0
-    opacity-0
-    group-hover:opacity-100
-  "
-                >
-                  <ul className="flex">
-                    <li>
-                      <Link to="">XS,</Link>
-                    </li>
-                    <li>
-                      <Link to="">S,</Link>
-                    </li>
-                    <li>
-                      <Link to="">M,</Link>
-                    </li>
-                    <li>
-                      <Link to="">L,</Link>
-                    </li>
-                    <li>
-                      <Link to="">XL</Link>
-                    </li>
-                  </ul>
-                </div>
-                <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400">
-                  -15%
-                </div>
-              </div>
-              <div>
-                <p className="text-sm text-black mb-1">Analogue Resin Strap</p>
-                <del className="mr-1">12.000.000đ</del>
-                <span className="text-[red]">776.000₫</span>
-              </div>
-            </div>
-            <div className="lg:mb-[25px] mb-[20px]">
-              <div className="lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] sm:h-[345px] overflow-hidden">
-                <img
-                  className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover/image:opacity-0"
-                  src={Product}
-                />
-                <img
-                  className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover/image:opacity-100"
-                  src={ProductNext}
-                />
-                <div>
-                  <Link to="" className="absolute left-5 top-5">
-                    <HeartWhite />
-                  </Link>
-                </div>
-                <div className="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100">
-                  <Link to="" className="group/btn relative m-auto">
-                    <button className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]">
-                      <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                        Xem thêm
-                      </p>
-                      <Eye />
-                    </button>
-                  </Link>
-                  <Link to="" className="group/btn relative">
-                    <button className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]">
-                      <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                        Thêm vào giỏ hàng
-                      </p>
-                      <CartDetail />
-                    </button>
-                  </Link>
-                </div>
-                <div
-                  className="absolute bottom-2 left-[35%] text-white
-   -translate-y-7 transform 
-    transition-all duration-500 ease-in-out 
-    group-hover:translate-y-0
-    opacity-0
-    group-hover:opacity-100
-  "
-                >
-                  <ul className="flex">
-                    <li>
-                      <Link to="">XS,</Link>
-                    </li>
-                    <li>
-                      <Link to="">S,</Link>
-                    </li>
-                    <li>
-                      <Link to="">M,</Link>
-                    </li>
-                    <li>
-                      <Link to="">L,</Link>
-                    </li>
-                    <li>
-                      <Link to="">XL</Link>
-                    </li>
-                  </ul>
-                </div>
-                <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400">
-                  -15%
-                </div>
-              </div>
-              <div>
-                <p className="text-sm text-black mb-1">Analogue Resin Strap</p>
-                <del className="mr-1">12.000.000đ</del>
-                <span className="text-[red]">776.000₫</span>
-              </div>
-            </div>
-            <div className="lg:mb-[25px] mb-[20px]">
-              <div className="lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] sm:h-[345px] overflow-hidden">
-                <img
-                  className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover/image:opacity-0"
-                  src={Product}
-                />
-                <img
-                  className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover/image:opacity-100"
-                  src={ProductNext}
-                />
-                <div>
-                  <Link to="" className="absolute left-5 top-5">
-                    <HeartWhite />
-                  </Link>
-                </div>
-                <div className="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100">
-                  <Link to="" className="group/btn relative m-auto">
-                    <button className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]">
-                      <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                        Xem thêm
-                      </p>
-                      <Eye />
-                    </button>
-                  </Link>
-                  <Link to="" className="group/btn relative">
-                    <button className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]">
-                      <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                        Thêm vào giỏ hàng
-                      </p>
-                      <CartDetail />
-                    </button>
-                  </Link>
-                </div>
-                <div
-                  className="absolute bottom-2 left-[35%] text-white
-   -translate-y-7 transform 
-    transition-all duration-500 ease-in-out 
-    group-hover:translate-y-0
-    opacity-0
-    group-hover:opacity-100
-  "
-                >
-                  <ul className="flex">
-                    <li>
-                      <Link to="">XS,</Link>
-                    </li>
-                    <li>
-                      <Link to="">S,</Link>
-                    </li>
-                    <li>
-                      <Link to="">M,</Link>
-                    </li>
-                    <li>
-                      <Link to="">L,</Link>
-                    </li>
-                    <li>
-                      <Link to="">XL</Link>
-                    </li>
-                  </ul>
-                </div>
-                <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400">
-                  -15%
-                </div>
-              </div>
-              <div>
-                <p className="text-sm text-black mb-1">Analogue Resin Strap</p>
-                <del className="mr-1">12.000.000đ</del>
-                <span className="text-[red]">776.000₫</span>
-              </div>
-            </div>
-            <div className="lg:mb-[25px] mb-[20px]">
-              <div className="lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] sm:h-[345px] overflow-hidden">
-                <img
-                  className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover/image:opacity-0"
-                  src={Product}
-                />
-                <img
-                  className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover/image:opacity-100"
-                  src={ProductNext}
-                />
-                <div>
-                  <Link to="" className="absolute left-5 top-5">
-                    <HeartWhite />
-                  </Link>
-                </div>
-                <div className="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100">
-                  <Link to="" className="group/btn relative m-auto">
-                    <button className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]">
-                      <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                        Xem thêm
-                      </p>
-                      <Eye />
-                    </button>
-                  </Link>
-                  <Link to="" className="group/btn relative">
-                    <button className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]">
-                      <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                        Thêm vào giỏ hàng
-                      </p>
-                      <CartDetail />
-                    </button>
-                  </Link>
-                </div>
-                <div
-                  className="absolute bottom-2 left-[35%] text-white
-   -translate-y-7 transform 
-    transition-all duration-500 ease-in-out 
-    group-hover:translate-y-0
-    opacity-0
-    group-hover:opacity-100
-  "
-                >
-                  <ul className="flex">
-                    <li>
-                      <Link to="">XS,</Link>
-                    </li>
-                    <li>
-                      <Link to="">S,</Link>
-                    </li>
-                    <li>
-                      <Link to="">M,</Link>
-                    </li>
-                    <li>
-                      <Link to="">L,</Link>
-                    </li>
-                    <li>
-                      <Link to="">XL</Link>
-                    </li>
-                  </ul>
-                </div>
-                <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400">
-                  -15%
-                </div>
-              </div>
-              <div>
-                <p className="text-sm text-black mb-1">Analogue Resin Strap</p>
-                <del className="mr-1">12.000.000đ</del>
-                <span className="text-[red]">776.000₫</span>
-              </div>
-            </div>
-            <div className="lg:mb-[25px] mb-[20px]">
-              <div className="lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] sm:h-[345px] overflow-hidden">
-                <img
-                  className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover/image:opacity-0"
-                  src={Product}
-                />
-                <img
-                  className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover/image:opacity-100"
-                  src={ProductNext}
-                />
-                <div>
-                  <Link to="" className="absolute left-5 top-5">
-                    <HeartWhite />
-                  </Link>
-                </div>
-                <div className="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100">
-                  <Link to="" className="group/btn relative m-auto">
-                    <button className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]">
-                      <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                        Xem thêm
-                      </p>
-                      <Eye />
-                    </button>
-                  </Link>
-                  <Link to="" className="group/btn relative">
-                    <button className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]">
-                      <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                        Thêm vào giỏ hàng
-                      </p>
-                      <CartDetail />
-                    </button>
-                  </Link>
-                </div>
-                <div
-                  className="absolute bottom-2 left-[35%] text-white
-   -translate-y-7 transform 
-    transition-all duration-500 ease-in-out 
-    group-hover:translate-y-0
-    opacity-0
-    group-hover:opacity-100
-  "
-                >
-                  <ul className="flex">
-                    <li>
-                      <Link to="">XS,</Link>
-                    </li>
-                    <li>
-                      <Link to="">S,</Link>
-                    </li>
-                    <li>
-                      <Link to="">M,</Link>
-                    </li>
-                    <li>
-                      <Link to="">L,</Link>
-                    </li>
-                    <li>
-                      <Link to="">XL</Link>
-                    </li>
-                  </ul>
-                </div>
-                <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400">
-                  -15%
-                </div>
-              </div>
-              <div>
-                <p className="text-sm text-black mb-1">Analogue Resin Strap</p>
-                <del className="mr-1">12.000.000đ</del>
-                <span className="text-[red]">776.000₫</span>
-              </div>
-            </div>
-            <div className="lg:mb-[25px] mb-[20px]">
-              <div className="lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] sm:h-[345px] overflow-hidden">
-                <img
-                  className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover/image:opacity-0"
-                  src={Product}
-                />
-                <img
-                  className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover/image:opacity-100"
-                  src={ProductNext}
-                />
-                <div>
-                  <Link to="" className="absolute left-5 top-5">
-                    <HeartWhite />
-                  </Link>
-                </div>
-                <div className="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100">
-                  <Link to="" className="group/btn relative m-auto">
-                    <button className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]">
-                      <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                        Xem thêm
-                      </p>
-                      <Eye />
-                    </button>
-                  </Link>
-                  <Link to="" className="group/btn relative">
-                    <button className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]">
-                      <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                        Thêm vào giỏ hàng
-                      </p>
-                      <CartDetail />
-                    </button>
-                  </Link>
-                </div>
-                <div
-                  className="absolute bottom-2 left-[35%] text-white
-   -translate-y-7 transform 
-    transition-all duration-500 ease-in-out 
-    group-hover:translate-y-0
-    opacity-0
-    group-hover:opacity-100
-  "
-                >
-                  <ul className="flex">
-                    <li>
-                      <Link to="">XS,</Link>
-                    </li>
-                    <li>
-                      <Link to="">S,</Link>
-                    </li>
-                    <li>
-                      <Link to="">M,</Link>
-                    </li>
-                    <li>
-                      <Link to="">L,</Link>
-                    </li>
-                    <li>
-                      <Link to="">XL</Link>
-                    </li>
-                  </ul>
-                </div>
-                <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400">
-                  -15%
-                </div>
-              </div>
-              <div>
-                <p className="text-sm text-black mb-1">Analogue Resin Strap</p>
-                <del className="mr-1">12.000.000đ</del>
-                <span className="text-[red]">776.000₫</span>
-              </div>
-            </div>
+            ))}
           </div>
         </section>
         <section className="container mt-28">
@@ -1352,9 +468,6 @@ const HomePage = () => {
             </div>
 
             <div className="flex gap-6">
-              {/* <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 mx-auto mb-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 7l9-5-9-5-9 5 9 5z" />
-                    </svg> */}
               <svg
                 className="w-[90px] h-[45px] hover:origin-bottom-left hover:-rotate-12 hover:scale-105 transition-all ease-in-out duration-300"
                 viewBox="0 0 32 32"
