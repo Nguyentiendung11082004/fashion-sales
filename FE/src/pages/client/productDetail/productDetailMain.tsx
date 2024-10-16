@@ -12,6 +12,7 @@ import { categoriesShow } from "@/services/api/admin/categories";
 import CommentPageDetail from "./CommentPageDetail";
 import { Skeleton } from "antd";
 import { findProductVariant } from "@/services/api/client/productClient.api";
+import { updateAttributes } from "@/services/api/admin/attribute";
 interface IinitialAttributes {
   [key: string]: string;
 }
@@ -28,6 +29,7 @@ const ProductDetail = () => {
         return await productShow(`${id}`);
       } catch (error) {
         throw new Error("Không có sản phẩm nào phù hợp");
+        console.log("Call product thất bại");
       }
     },
   });
@@ -152,11 +154,16 @@ const ProductDetail = () => {
     return attributeObj;
   });
 
+  // console.log("Dữ liệu truyền vào:", selectedAttributes.product_variant[key]);
+  console.log("Dữ liệu truyền vào:", selectedAttributes);
+  // Lấy keys từ product_variant
   let keySelectedAttributes = Object.keys(selectedAttributes.product_variant);
 
   console.log("Dữ liệu truyền vào:", selectedAttributes);
   console.log("key dữ liệu truyền vào:", keySelectedAttributes);
 
+  // Kiểm tra và lấy keys theo yêu cầu
+  //  let keySelectedAttributes;
   if (keySelectedAttributes.length === 0) {
     keySelectedAttributes = [];
   } else if (keySelectedAttributes.length === 1) {
@@ -175,17 +182,18 @@ const ProductDetail = () => {
 
     // Kiểm tra số lượng thuộc tính
     if (variantKeys.length === 0) {
-      return true;
+      return true; // Tất cả sản phẩm được giữ lại
     }
 
     // Nếu có từ 2 thuộc tính trở lên, loại bỏ thuộc tính cuối cùng
     const attributesToCompare =
       variantKeys.length > 1
         ? variantKeys.slice(0, variantKeys.length - 1) // Bỏ qua thuộc tính cuối cùng
-        : variantKeys; 
+        : variantKeys; // Nếu chỉ có 1 thuộc tính, giữ lại
 
     return attributesToCompare.every((key) => {
-      return objectVariant[key] == data[key]; 
+      // Chuyển đổi giá trị để so sánh
+      return objectVariant[key] == data[key]; // So sánh
     });
   });
 
@@ -255,14 +263,19 @@ const ProductDetail = () => {
   console.log("log disable:", disableIdAttribute);
 
   // const detructeringMatchedPivotes=
-  const handleAttributeSelect = (key: string, valueId: string | number) => {
-    if (disableIdAttribute.includes(valueId)) {
-      return; // Prevent selecting a disabled attribute
-    }
 
+  const handleAttributeSelect = (key: string, valueId: string | number) => {
+    console.log("1111");
     setSelectedAttributes((prev) => {
       const updatedAttributes = { ...prev.product_variant };
 
+      console.log("updatedAtturbute", updatedAttributes);
+      // if(valueId == value[matchedPivots[key]])
+      disableIdAttribute.map((value: any) => {
+        console.log("value274", value);
+        // if (value == valueId) {
+        // }
+      });
       if (updatedAttributes[key] === valueId) {
         delete updatedAttributes[key];
       } else {
@@ -272,6 +285,7 @@ const ProductDetail = () => {
       return { product_variant: updatedAttributes };
     });
   };
+
   useEffect(() => {
     const fetchProductVariant = async () => {
       try {
@@ -459,30 +473,26 @@ const ProductDetail = () => {
                             {Object.keys(value).map((valueId) => {
                               const valueName = value[valueId];
 
-                              const isDisabled =
-                                disableIdAttribute.includes(valueId);
-
                               return (
                                 <div
                                   key={valueId}
-                                  className={`relative flex-1 max-w-[60px] h-8 sm:h-9 rounded-full cursor-pointer flex items-center justify-center ${
+                                  className={`   relative flex-1 max-w-[60px] h-8 sm:h-9 rounded-full cursor-pointer flex items-center justify-center ${
                                     selectedAttributes.product_variant[key] ===
                                     valueId
                                       ? "border-gray-700 border-4"
                                       : "border-gray-200 border-2"
-                                  } ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
-                                  style={{
-                                    backgroundColor:
-                                      key === "color"
-                                        ? valueName
-                                        : "transparent",
-                                  }}
+                                  } `}
+                                  // style={{
+                                  //   backgroundColor:
+                                  //     key === "color"
+                                  //       ? valueName
+                                  //       : "transparent",
+                                  // }}
                                   onClick={() =>
-                                    !isDisabled &&
                                     handleAttributeSelect(key, valueId)
                                   }
                                 >
-                                  {key !== "color" && (
+                                  {/* {key !== "color" && (
                                     <div className="absolute inset-0 rounded-full flex items-center justify-center overflow-hidden z-0 bg-gray-300 text-sm md:text-base text-center">
                                       {valueName}
                                     </div>
@@ -491,7 +501,7 @@ const ProductDetail = () => {
                                     <div className="absolute inset-0 rounded-full overflow-hidden z-0 object-cover bg-cover border-2 border-gray-200">
                                       <span className="text-sm md:text-base text-center"></span>
                                     </div>
-                                  )}
+                                  )} */}
                                 </div>
                               );
                             })}

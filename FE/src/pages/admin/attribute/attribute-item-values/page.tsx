@@ -7,7 +7,7 @@ import { Button, Modal, Pagination, Table } from 'antd';
 import React, { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import ModalActon from './_components/Modal';
-import { deleteAttributesItem, getAttributesItem } from "@/services/api/attribute-item";
+import { deleteAttributesItem, getAttributesItem } from "@/services/api/admin/attribute-item";
 import { Iattributeitem } from "@/common/types/attribute-item";
 
 const AttributeItemValues: React.FC = () => {

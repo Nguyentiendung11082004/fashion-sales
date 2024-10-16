@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Loading from "@/common/Loading/Loading";
 import { IUser } from "@/common/types/users";
-import { deleteClient, getClients } from "@/services/api/clients";
+import { deleteClient, getClients } from "@/services/api/admin/clients";
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button, Image, Modal, Pagination } from "antd";

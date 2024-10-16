@@ -1,7 +1,7 @@
 import { Iattribute } from '@/common/types/attribute';
 import { Iattributeitem } from '@/common/types/attribute-item';
-import { getAttributes } from '@/services/api/attribute';
-import { createAttributesItem, getAttributeItem, updateAttributesItem } from '@/services/api/attribute-item';
+import { getAttributes } from '@/services/api/admin/attribute';
+import { createAttributesItem, getAttributeItem, updateAttributesItem } from '@/services/api/admin/attribute-item';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Modal as AntModal, Button, Form, Input, Select, Skeleton } from 'antd';
 import { useEffect, useState } from 'react';
