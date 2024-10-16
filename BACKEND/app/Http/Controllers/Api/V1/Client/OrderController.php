@@ -252,7 +252,7 @@ class OrderController extends Controller
                     }
                     // Cập nhật tổng số lượng và tổng tiền cho đơn hàng
                     $order->update([
-                        'total_quantity' => $totalQuantity,
+                        'total_quantity' => $order->orderDetails()->count(),
                         'total' => $totalPrice,
                     ]);
 
@@ -344,8 +344,28 @@ class OrderController extends Controller
                 if (empty($user_note)) {
                     return response()->json(['message' => 'Ghi chú là bắt buộc khi hủy đơn hàng.'], 400);
                 }
+    
                 // Cập nhật lý do hủy
                 $order->user_note = $user_note;
+    
+                // Trả lại số lượng sản phẩm về kho
+                foreach ($order->orderDetails as $detail) {
+                    // Kiểm tra nếu là sản phẩm có biến thể
+                    if ($detail->product_variant_id) {
+                        $variant = ProductVariant::find($detail->product_variant_id);
+                        if ($variant) {
+                            $variant->quantity += $detail->quantity; // Cộng lại số lượng vào biến thể
+                            $variant->save();
+                        }
+                    } else {
+                        // Nếu là sản phẩm đơn
+                        $product = Product::find($detail->product_id);
+                        if ($product) {
+                            $product->quantity += $detail->quantity; // Cộng lại số lượng vào sản phẩm
+                            $product->save();
+                        }
+                    }
+                }
             } else {
                 // Nếu không hủy, cho phép cập nhật ghi chú
                 if (!empty($user_note)) {
@@ -366,6 +386,7 @@ class OrderController extends Controller
     
         return response()->json(['message' => 'Không có quyền truy cập'], 403);
     }
+    
     /**
      * Remove the specified resource from storage.
      */
