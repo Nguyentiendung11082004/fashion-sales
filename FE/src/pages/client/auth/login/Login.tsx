@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// import { LogoClient } from "@/components/icons";
-// import BackgroundLogin from "@/components/icons/login/Background";
+import { LogoClient } from "@/components/icons";
+import BackgroundLogin from "@/components/icons/login/Background";
+import LoginIcon1 from "@/components/icons/login/LoginIcon1";
 import { useMutation } from "@tanstack/react-query";
 import { Button, Form, Input } from "antd";
 import { useState } from "react";
@@ -50,10 +51,10 @@ const Login = () => {
     <>
       <div>
         <div>
-          {/* <BackgroundLogin /> */}
+          <BackgroundLogin />
         </div>
         <img
-          // src={LogoClient}
+          src={LogoClient}
           className="absolute h-10 z-10 lg:ml-[140px] mt-[30px] mx-auto"
           alt="Logo"
         />
@@ -63,7 +64,7 @@ const Login = () => {
             <p className="text-xl text-gray-600 text-center">Chào mừng trở lại</p>
             <Link to="" className="flex items-center justify-center mt-4 bg-white rounded-lg shadow-md hover:bg-gray-100">
               <div className="px-1 py-3">
-                {/* <LoginIcon1 /> */}
+                <LoginIcon1 />
               </div>
               <h1 className="px-4 py-3 w-5/6 text-center text-gray-600 font-bold">Đăng nhập với google</h1>
             </Link>

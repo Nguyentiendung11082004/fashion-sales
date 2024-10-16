@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable no-useless-catch */
 import { Icomments } from "@/common/types/comments";
 import instance from "@/configs/axios";
@@ -5,6 +7,7 @@ import instance from "@/configs/axios";
 const handleRequest = async (
   method: "get" | "post" | "put" | "delete",
   url: string,
+
   value?: Icomments
 ) => {
   try {
@@ -14,9 +17,6 @@ const handleRequest = async (
     throw error;
   }
 };
-// post comment
-export const postComment = (data: Icomments) =>
-  handleRequest("post", `/comment`, data);
 
 // sửa
 export const commentUpdate = (id: number, comment: Icomments) =>

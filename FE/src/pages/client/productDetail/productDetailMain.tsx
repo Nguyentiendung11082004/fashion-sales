@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/ban-types */
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Less from "../../../components/icons/detail/Less";
 import { Link, useParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import { Iproduct } from "@/common/types/products";
 import { useQuery } from "@tanstack/react-query";
 import { productShow } from "@/services/api/admin/products.api";
 import RelatedProducts from "./RelatedProducts";
@@ -10,48 +12,43 @@ import { categoriesShow } from "@/services/api/admin/categories";
 import CommentPageDetail from "./CommentPageDetail";
 import { Skeleton } from "antd";
 import { findProductVariant } from "@/services/api/client/productClient.api";
-
+import { updateAttributes } from "@/services/api/admin/attribute";
+interface IinitialAttributes {
+  [key: string]: string;
+}
 const ProductDetail = () => {
-  // console.log("detail", productVariant);
   const { id } = useParams<{ id: string }>();
   const productId = Number(id);
-  const [product, setProduct] = useState<Iproduct>();
-  const [selectedImage, setSelectedImage] = useState<string | undefined>(
-    undefined
-  );
-  const [productVariant, setProductVariant] = useState<object>({});
+  const [product, setProduct] = useState<any>();
+  const [selectedImage, setSelectedImage] = useState<string>();
 
-  const {
-    data: productData,
-    isLoading,
-    isError,
-    error,
-  } = useQuery({
+  const { data, isLoading, isError, error } = useQuery({
     queryKey: ["product", id],
     queryFn: async () => {
       try {
         return await productShow(`${id}`);
       } catch (error) {
-        throw new Error("Failed to fetch product details.");
+        throw new Error("Không có sản phẩm nào phù hợp");
+        console.log("Call product thất bại");
       }
     },
   });
-  console.log("data : ", productData);
-  const getUniqueAttributes = productData?.getUniqueAttributes;
-  console.log("getUnique", getUniqueAttributes);
+
+  console.log("data detail : ", data);
+
+  const getUniqueAttributes = data?.getUniqueAttributes;
   useEffect(() => {
-    if (productData && productData.product) {
-      setProduct(productData.product);
-      setSelectedImage(productData.product.img_thumbnail);
+    if (data && data.product) {
+      setProduct(data.product);
     }
-  }, [productData]);
+  }, [data]);
 
   const categoryId = product?.category_id;
 
   const { data: categoryData } = useQuery({
     queryKey: ["category", categoryId],
     queryFn: async () => {
-      if (!categoryId) return null;
+      if (!categoryId) return "";
       return await categoriesShow(`${categoryId}`);
     },
   });
@@ -87,16 +84,22 @@ const ProductDetail = () => {
     setActiveButton(buttonName);
   };
 
-  const handleGalleryClick = (image: string) => {
-    setSelectedImage(image);
-  };
+  const [mainImage, setMainImage] = useState<string | undefined>(undefined);
 
   const galleryImages = product?.galleries || [];
-  const mainImage = product?.img_thumbnail;
+  const imgPr = product?.img_thumbnail;
 
-  if (mainImage && !galleryImages.some((img) => img.image === mainImage)) {
-    galleryImages.push({ id: 0, image: mainImage });
-  }
+  useEffect(() => {
+    if (imgPr) {
+      setMainImage(imgPr);
+    }
+  }, [imgPr, galleryImages]);
+
+  const handleGalleryClick = (image: string) => {
+    setSelectedImage(image);
+    setMainImage(image);
+    // setPriceProduct({ priceMax: undefined, priceMin: undefined });
+  };
 
   // thêm vào giỏ hàng
   const [quantity, setQuantity] = useState<number>(1);
@@ -110,19 +113,176 @@ const ProductDetail = () => {
   };
 
   const [selectedAttributes, setSelectedAttributes] = useState<{
-    [key: string]: string | number;
-  }>({});
-  const handleAttributeSelect = (key: string, valueId: string | number) => {
-    setSelectedAttributes((prev) => {
-      const updatedAttributes = { ...prev };
+    product_variant: Record<string, string | number>;
+  }>({
+    product_variant: {},
+  });
 
+  // const priceRegulars: number[] =
+  //   product?.variants.map((variant: any) => variant.price_regular) || [];
+  // const [priceProduct, setPriceProduct] = useState<{
+  //   priceMin: number | undefined;
+  //   priceMax: number | undefined;
+  // } | null>(null);
+  // useEffect(() => {
+  //   if (product?.variants && product.variants.length > 0) {
+  //     const priceRegulars: number[] = product.variants.map(
+  //       (variant: any) => variant.price_regular
+  //     );
+
+  //     if (priceRegulars.length > 0) {
+  //       const priceMin = Math.min(...priceRegulars);
+  //       const priceMax = Math.max(...priceRegulars);
+  //       setPriceProduct({ priceMin, priceMax });
+  //     }
+  //   }
+  // }, [product]);
+
+  const result = product?.variants.map((variant: any) => {
+    if (!variant.attributes) {
+      return {};
+    }
+
+    const attributeObj = variant.attributes.reduce(
+      (acc: { [key: string]: number }, attribute: any) => {
+        acc[attribute.name] = attribute.pivot.attribute_item_id;
+        return acc;
+      },
+      {}
+    );
+
+    return attributeObj;
+  });
+
+  // console.log("Dữ liệu truyền vào:", selectedAttributes.product_variant[key]);
+  console.log("Dữ liệu truyền vào:", selectedAttributes);
+  // Lấy keys từ product_variant
+  let keySelectedAttributes = Object.keys(selectedAttributes.product_variant);
+
+  console.log("Dữ liệu truyền vào:", selectedAttributes);
+  console.log("key dữ liệu truyền vào:", keySelectedAttributes);
+
+  // Kiểm tra và lấy keys theo yêu cầu
+  //  let keySelectedAttributes;
+  if (keySelectedAttributes.length === 0) {
+    keySelectedAttributes = [];
+  } else if (keySelectedAttributes.length === 1) {
+    keySelectedAttributes = [keySelectedAttributes[0]];
+  } else {
+    keySelectedAttributes = keySelectedAttributes.slice(0, -1);
+  }
+
+  console.log("Các key đã chọn:", keySelectedAttributes);
+
+  console.log("Các sản phẩm liên quan:", result);
+
+  const matchedPivots = result?.filter((data: any) => {
+    const objectVariant = selectedAttributes?.product_variant || {};
+    const variantKeys = Object.keys(objectVariant);
+
+    // Kiểm tra số lượng thuộc tính
+    if (variantKeys.length === 0) {
+      return true; // Tất cả sản phẩm được giữ lại
+    }
+
+    // Nếu có từ 2 thuộc tính trở lên, loại bỏ thuộc tính cuối cùng
+    const attributesToCompare =
+      variantKeys.length > 1
+        ? variantKeys.slice(0, variantKeys.length - 1) // Bỏ qua thuộc tính cuối cùng
+        : variantKeys; // Nếu chỉ có 1 thuộc tính, giữ lại
+
+    return attributesToCompare.every((key) => {
+      // Chuyển đổi giá trị để so sánh
+      return objectVariant[key] == data[key]; // So sánh
+    });
+  });
+
+  console.log("Trả về các sản phẩm khớp:", matchedPivots);
+  // Kiểm tra xem matchedPivots có phải là mảng và không rỗng
+
+  const valuesArrayNumber = Array.isArray(matchedPivots)
+    ? matchedPivots.flatMap((pivot) => Object.values(pivot))
+    : [];
+
+  // Chuyển đổi các giá trị trong mảng về kiểu chuỗi
+  const valuesArray = valuesArrayNumber.map((value) => String(value));
+
+  console.log("Mảng giá trị valueArray", valuesArray);
+
+  // console.log("log disable trước khi click: ", disableIdAttribute);
+  const disableIdAttribute: any[] = [];
+  const combinedValuesArray: any[] = [];
+  keySelectedAttributes.map((value: any) => {
+    const keyGetUniqueAttribute = Object.keys(getUniqueAttributes);
+    console.log("keyGetUniqueAttribute", keyGetUniqueAttribute);
+    const getIDAttribute: any = [];
+    keyGetUniqueAttribute.map((valueKeysGetAttribute: any) => {
+      if (value === valueKeysGetAttribute) {
+        const objectGetAttribute: object =
+          getUniqueAttributes?.[valueKeysGetAttribute];
+        console.log("objectGetAttribute", objectGetAttribute);
+        getIDAttribute.push(objectGetAttribute);
+
+        // Lấy các khóa từ objectGetAttribute và chuyển đổi thành chuỗi nếu cần
+        const newAttributes = Object.keys(objectGetAttribute);
+
+        // Kết hợp valuesArray với newAttributes, chỉ thêm những giá trị chưa có
+        const combinedValuesArray = valuesArray.concat(
+          newAttributes.filter((id) => !valuesArray.includes(String(id))) // Chuyển id sang chuỗi
+        );
+
+        // Loại bỏ các giá trị trùng lặp nếu cần
+        const uniqueCombinedValuesArray = [...new Set(combinedValuesArray)];
+
+        console.log("Mảng giá trị đã kết hợp:", uniqueCombinedValuesArray);
+
+        console.log("getIDAttribute", getIDAttribute);
+      } else {
+        const keyRemaining = getUniqueAttributes?.[valueKeysGetAttribute];
+        console.log("keyRemaining", keyRemaining);
+
+        const idAttributeRemaining = Object.keys(keyRemaining);
+        console.log("idAttributeRemaining", idAttributeRemaining);
+        // valuesArray.push(idAttributeRemaining);
+        // Hoặc sử dụng toán tử spread
+        // const combinedValuesArray = [...valuesArray, ...idAttributeRemaining];
+
+        // Lặp qua từng idAttributeRemaining để kiểm tra
+        idAttributeRemaining.map((idValue: any) => {
+          // Kiểm tra nếu idValue không có trong valuesArray
+          const isDisabled = !valuesArray.includes(idValue);
+          if (isDisabled) {
+            disableIdAttribute.push(idValue); // Chỉ thêm nếu không nằm trong valuesArray
+          }
+        });
+      }
+    });
+  });
+
+  // In ra giá trị disable
+  console.log("log disable:", disableIdAttribute);
+
+  // const detructeringMatchedPivotes=
+
+  const handleAttributeSelect = (key: string, valueId: string | number) => {
+    console.log("1111");
+    setSelectedAttributes((prev) => {
+      const updatedAttributes = { ...prev.product_variant };
+
+      console.log("updatedAtturbute", updatedAttributes);
+      // if(valueId == value[matchedPivots[key]])
+      disableIdAttribute.map((value: any) => {
+        console.log("value274", value);
+        // if (value == valueId) {
+        // }
+      });
       if (updatedAttributes[key] === valueId) {
         delete updatedAttributes[key];
       } else {
         updatedAttributes[key] = valueId;
       }
 
-      return updatedAttributes;
+      return { product_variant: updatedAttributes };
     });
   };
 
@@ -130,23 +290,51 @@ const ProductDetail = () => {
     const fetchProductVariant = async () => {
       try {
         const variant = await findProductVariant(productId, selectedAttributes);
-        console.log("Product variant:", variant);
-        setProductVariant(variant);
-        // console.log(setProductVariant);
+
+        if (variant.findProductVariant) {
+          // Nếu tìm thấy variant
+          setProduct((prevProduct: any) => ({
+            ...prevProduct,
+            ...variant.findProductVariant,
+          }));
+
+          if (variant.findProductVariant.image) {
+            setMainImage(variant.findProductVariant.image);
+          }
+        } else {
+          setMainImage(product?.img_thumbnail);
+        }
       } catch (error) {
         console.log("Call api thất bại", error);
       }
     };
 
-    if (Object.keys(selectedAttributes).length > 0 && !isNaN(productId)) {
-      fetchProductVariant();
-    }
-  }, [selectedAttributes, productId]);
+    fetchProductVariant();
+  }, [selectedAttributes]);
 
-  // const findProductVariant= setProduct(findProductVariant)
+  useEffect(() => {
+    if (getUniqueAttributes) {
+      const initialAttributes: IinitialAttributes = {};
+
+      const keys = Object.keys(getUniqueAttributes);
+
+      keys.forEach((key) => {
+        const value = getUniqueAttributes[key];
+        const firstValueId = Object.keys(value)[0];
+
+        if (firstValueId) {
+          initialAttributes[key] = firstValueId;
+        }
+      });
+
+      setSelectedAttributes({ product_variant: initialAttributes });
+    }
+  }, [getUniqueAttributes]);
 
   if (isLoading) return <Skeleton className="container py-10 lg:flex" />;
   if (isError) return <p>{error.message}</p>;
+
+  console.log("kiểm tra getUnique", getUniqueAttributes);
 
   return (
     <>
@@ -174,12 +362,9 @@ const ProductDetail = () => {
                   <img
                     ref={imgRef}
                     alt="product detail"
-                    loading="lazy"
-                    decoding="async"
                     data-nimg="fill"
                     className="w-full lg:h-[100%] h-full lg:w-[550px] object-cover transition-transform ease-in-out duration-300 group-hover:scale-150"
-                    sizes=""
-                    src={selectedImage}
+                    src={mainImage || selectedImage}
                   />
                 </div>
               </div>
@@ -195,12 +380,10 @@ const ProductDetail = () => {
                   {`.hd-img-soft::-webkit-scrollbar {display: none;}`}
                 </style>
                 {galleryImages.length > 0 ? (
-                  galleryImages.map((value) => (
+                  galleryImages.map((value: any) => (
                     <img
                       key={value.id}
                       alt={`Gallery image ${value.id}`}
-                      loading="lazy"
-                      decoding="async"
                       className="w-24 h-[150px] lg:w-auto flex-shrink-0 cursor-pointer"
                       src={value.image}
                       onClick={() => handleGalleryClick(value.image)}
@@ -216,17 +399,26 @@ const ProductDetail = () => {
 
           <div className="w-full lg:w-[45%] pt-10 lg:pt-0 lg:pl-7 xl:pl-9 2xl:pl-10 ">
             <div className="h-full">
-              {/* {productVariant&&productVariant.map((index,value)=>{})} */}
               <div>
                 <h2 className="text-[16px] xl:text-start sm:text-center sm:text-3xl font-bold mb-3 ">
                   {product?.name}
                 </h2>
                 <div className="flex items-center mt-5 lg:mx-[15%] sm:mx-[42%] xl:mx-0 sm:mt-2 space-x-4">
                   <div className="">
-                    <span className="lg:text-xl  sm:text-[25px] text-lg text-[#747474] my-2">
-                      {product?.price_regular} VNĐ
+                    <span className="lg:text-xl sm:text-[25px] text-lg text-[#747474] my-2">
+                      {/* {priceProduct &&
+                      priceProduct.priceMin !== undefined &&
+                      priceProduct.priceMax !== undefined ? (
+                        <>
+                          {priceProduct.priceMin} - {priceProduct.priceMax} VNĐ
+                        </>
+                      ) : (
+                        <>{product?.price_regular} VNĐ</>
+                      )} */}
+                      {product?.price_sale} VNĐ
                     </span>
                   </div>
+
                   <div className="h-7 border-l border-slate-300 dark:border-slate-700 lg:block xl:block block sm:hidden"></div>
                   <div className="flex items-center lg:block xl:block sm:hidden">
                     <Link
@@ -249,7 +441,7 @@ const ProductDetail = () => {
                       </svg>
                       <div className="ml-1.5 flex">
                         <span>4</span>
-                        <span className="block mx-2">·</span>
+                        <span className="block mx-2">.</span>
                       </div>
                     </Link>
                   </div>
@@ -261,39 +453,46 @@ const ProductDetail = () => {
               <div>
                 {getUniqueAttributes && (
                   <div className="mt-2">
-                    {Object.entries(getUniqueAttributes).map(
-                      ([key, values]) => (
+                    {Object.keys(getUniqueAttributes).map((key) => {
+                      const value = getUniqueAttributes[key];
+
+                      return (
                         <div key={key} className="mb-4">
                           <label className="flex items-center">
                             <span className="font-medium">{key}:</span>
-                            {/* Hiển thị giá trị đã chọn bên cạnh key */}
-                            {selectedAttributes[key] && (
-                              <span className="ml-2 font-bold">
-                                {values[selectedAttributes[key]]}
+                            {selectedAttributes.product_variant[key] !==
+                              undefined && (
+                              <span className="ml-2">
+                                {value[
+                                  selectedAttributes.product_variant[key]
+                                ].toLowerCase()}
                               </span>
                             )}
                           </label>
                           <div className="flex mt-3 gap-2">
-                            {Object.entries(values).map(
-                              ([valueId, valueName]) => (
+                            {Object.keys(value).map((valueId) => {
+                              const valueName = value[valueId];
+
+                              return (
                                 <div
                                   key={valueId}
-                                  className={`relative flex-1 max-w-[60px] h-8 sm:h-9 rounded-full cursor-pointer flex items-center justify-center ${
-                                    selectedAttributes[key] === valueId
-                                      ? "border-gray-400 border-4" // Đường viền đậm khi được chọn
-                                      : "border-gray-200 border-2" // Đường viền nhẹ khi không được chọn
-                                  }`}
-                                  style={{
-                                    backgroundColor:
-                                      key === "color"
-                                        ? valueName
-                                        : "transparent",
-                                  }}
+                                  className={`   relative flex-1 max-w-[60px] h-8 sm:h-9 rounded-full cursor-pointer flex items-center justify-center ${
+                                    selectedAttributes.product_variant[key] ===
+                                    valueId
+                                      ? "border-gray-700 border-4"
+                                      : "border-gray-200 border-2"
+                                  } `}
+                                  // style={{
+                                  //   backgroundColor:
+                                  //     key === "color"
+                                  //       ? valueName
+                                  //       : "transparent",
+                                  // }}
                                   onClick={() =>
                                     handleAttributeSelect(key, valueId)
                                   }
                                 >
-                                  {key !== "color" && (
+                                  {/* {key !== "color" && (
                                     <div className="absolute inset-0 rounded-full flex items-center justify-center overflow-hidden z-0 bg-gray-300 text-sm md:text-base text-center">
                                       {valueName}
                                     </div>
@@ -302,19 +501,18 @@ const ProductDetail = () => {
                                     <div className="absolute inset-0 rounded-full overflow-hidden z-0 object-cover bg-cover border-2 border-gray-200">
                                       <span className="text-sm md:text-base text-center"></span>
                                     </div>
-                                  )}
+                                  )} */}
                                 </div>
-                              )
-                            )}
+                              );
+                            })}
                           </div>
                         </div>
-                      )
-                    )}
+                      );
+                    })}
                   </div>
                 )}
               </div>
 
-              {/* <ProductAtributes product={productData} /> */}
               <div className="font-medium mt-2 mb-2">số lượng: </div>
 
               <div className="flex space-x-3.5 items-center lg:ml-0 sm:ml-[40px]">
@@ -322,7 +520,7 @@ const ProductDetail = () => {
                   <div className="nc-NcInputNumber flex items-center justify-between space-x-3 w-full border border-black px-2 py-2 rounded-full">
                     <div className="nc-NcInputNumber__content flex items-center justify-between w-[104px] sm:w-28 ">
                       <button
-                        className="flex items-center justify-center bg-slate-100/70 focus:outline-none hover:border-neutral-700 dark:hover:border-neutral-400 disabled:hover:border-neutral-400 dark:disabled:hover:border-neutral-500 disabled:opacity-50 disabled:cursor-default"
+                        className="flex items-center justify-center bg-slate-100/70 focus:outline-none hover:border-neutral-700 dark:hover:border-neutral-400 "
                         type="button"
                         onClick={decreaseQuantity}
                       >
@@ -510,126 +708,9 @@ const ProductDetail = () => {
                 </div>
               )}
               {activeButton === "comment" && (
-                <form className="m-auto w-full max-w-lg p-6 bg-white shadow-lg rounded-lg">
-                  <h1 className="font-semibold lg:text-2xl text-base mb-4 text-center">
-                    Đánh giá sản phẩm
-                  </h1>
-
-                  <div className="mb-4">
-                    <label
-                      className="block lg:text-sm text-[10px] font-medium text-gray-700"
-                      htmlFor="rating"
-                    >
-                      Chất lượng sản phẩm:
-                    </label>
-                    <div className="flex items-center mt-2">
-                      <input
-                        type="radio"
-                        id="star5"
-                        name="rating"
-                        value="5"
-                        className="hidden"
-                      />
-                      <label
-                        htmlFor="star5"
-                        className="cursor-pointer text-yellow-500"
-                      >
-                        ★
-                      </label>
-                      <input
-                        type="radio"
-                        id="star4"
-                        name="rating"
-                        value="4"
-                        className="hidden"
-                      />
-                      <label
-                        htmlFor="star4"
-                        className="cursor-pointer text-yellow-500"
-                      >
-                        ★
-                      </label>
-                      <input
-                        type="radio"
-                        id="star3"
-                        name="rating"
-                        value="3"
-                        className="hidden"
-                      />
-                      <label
-                        htmlFor="star3"
-                        className="cursor-pointer text-yellow-500"
-                      >
-                        ★
-                      </label>
-                      <input
-                        type="radio"
-                        id="star2"
-                        name="rating"
-                        value="2"
-                        className="hidden"
-                      />
-                      <label
-                        htmlFor="star2"
-                        className="cursor-pointer text-yellow-500"
-                      >
-                        ★
-                      </label>
-                      <input
-                        type="radio"
-                        id="star1"
-                        name="rating"
-                        value="1"
-                        className="hidden"
-                      />
-                      <label
-                        htmlFor="star1"
-                        className="cursor-pointer text-yellow-500"
-                      >
-                        ★
-                      </label>
-                    </div>
-                  </div>
-
-                  <div className="mb-4">
-                    <label
-                      className="block lg:text-sm text-[10px] font-medium text-gray-700"
-                      htmlFor="review"
-                    >
-                      Nhận xét:
-                    </label>
-                    <textarea
-                      id="review"
-                      rows={4}
-                      className="px-2 py-2 placeholder:lg:text-sm text-[10px] mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                      placeholder="Nhập nhận xét của bạn"
-                    ></textarea>
-                  </div>
-
-                  <div className="mb-4">
-                    <label
-                      className="block lg:text-sm text-[10px] font-medium text-gray-700"
-                      htmlFor="image"
-                    >
-                      Tải hình ảnh lên:
-                    </label>
-                    <input
-                      id="image"
-                      type="file"
-                      accept="image/*"
-                      className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border file:border-gray-300 file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100"
-                    />
-                  </div>
-
-                  <div className="text-center">
-                    <button
-                      type="submit"
-                      className="inline-flex items-center px-4 py-2 border border-transparent lg:text-base text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                    >
-                      Gửi đánh giá
-                    </button>
-                  </div>
-                </form>
+                // bình luận sản phẩm
+                //  <CommentProduct />
+                <div></div>
               )}
             </div>
           </div>

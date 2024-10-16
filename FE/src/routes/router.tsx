@@ -30,8 +30,8 @@ import ClientPage from "@/pages/admin/account/client/Client";
 import FormClient from "@/pages/admin/account/client/components/FormClient";
 import EmployeePage from "@/pages/admin/account/employee/Employee";
 import FormEmployee from "@/pages/admin/account/employee/components/FormEmployee";
-import { Login } from "@/components/icons";
 import Register from "@/pages/client/auth/register/Register";
+import Login from "@/pages/client/auth/login/Login";
 
 
 const Router = () => {

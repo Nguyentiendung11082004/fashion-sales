@@ -28,6 +28,7 @@ const ProductDetail = () => {
         return await productShow(`${id}`);
       } catch (error) {
         throw new Error("Không có sản phẩm nào phù hợp");
+        console.log("Call product thất bại");
       }
     },
   });
@@ -152,11 +153,16 @@ const ProductDetail = () => {
     return attributeObj;
   });
 
+  // console.log("Dữ liệu truyền vào:", selectedAttributes.product_variant[key]);
+  console.log("Dữ liệu truyền vào:", selectedAttributes);
+  // Lấy keys từ product_variant
   let keySelectedAttributes = Object.keys(selectedAttributes.product_variant);
 
   console.log("Dữ liệu truyền vào:", selectedAttributes);
   console.log("key dữ liệu truyền vào:", keySelectedAttributes);
 
+  // Kiểm tra và lấy keys theo yêu cầu
+  //  let keySelectedAttributes;
   if (keySelectedAttributes.length === 0) {
     keySelectedAttributes = [];
   } else if (keySelectedAttributes.length === 1) {
@@ -175,17 +181,18 @@ const ProductDetail = () => {
 
     // Kiểm tra số lượng thuộc tính
     if (variantKeys.length === 0) {
-      return true;
+      return true; // Tất cả sản phẩm được giữ lại
     }
 
     // Nếu có từ 2 thuộc tính trở lên, loại bỏ thuộc tính cuối cùng
     const attributesToCompare =
       variantKeys.length > 1
         ? variantKeys.slice(0, variantKeys.length - 1) // Bỏ qua thuộc tính cuối cùng
-        : variantKeys; 
+        : variantKeys; // Nếu chỉ có 1 thuộc tính, giữ lại
 
     return attributesToCompare.every((key) => {
-      return objectVariant[key] == data[key]; 
+      // Chuyển đổi giá trị để so sánh
+      return objectVariant[key] == data[key]; // So sánh
     });
   });
 
@@ -199,69 +206,47 @@ const ProductDetail = () => {
   // Chuyển đổi các giá trị trong mảng về kiểu chuỗi
   const valuesArray = valuesArrayNumber.map((value) => String(value));
 
-  console.log("Mảng giá trị valueArray", valuesArray);
+  console.log("Mảng giá trị (chuỗi):", valuesArray);
 
-  // console.log("log disable trước khi click: ", disableIdAttribute);
   const disableIdAttribute: any[] = [];
-  const combinedValuesArray: any[] = [];
+  console.log("log disable trước khi click: ", disableIdAttribute);
+
   keySelectedAttributes.map((value: any) => {
     const keyGetUniqueAttribute = Object.keys(getUniqueAttributes);
     console.log("keyGetUniqueAttribute", keyGetUniqueAttribute);
-    const getIDAttribute: any = [];
+    // const objectGetAttribute = {};
     keyGetUniqueAttribute.map((valueKeysGetAttribute: any) => {
       if (value === valueKeysGetAttribute) {
         const objectGetAttribute: object =
           getUniqueAttributes?.[valueKeysGetAttribute];
         console.log("objectGetAttribute", objectGetAttribute);
-        getIDAttribute.push(objectGetAttribute);
-
-        // Lấy các khóa từ objectGetAttribute và chuyển đổi thành chuỗi nếu cần
-        const newAttributes = Object.keys(objectGetAttribute);
-
-        // Kết hợp valuesArray với newAttributes, chỉ thêm những giá trị chưa có
-        const combinedValuesArray = valuesArray.concat(
-          newAttributes.filter((id) => !valuesArray.includes(String(id))) // Chuyển id sang chuỗi
-        );
-
-        // Loại bỏ các giá trị trùng lặp nếu cần
-        const uniqueCombinedValuesArray = [...new Set(combinedValuesArray)];
-
-        console.log("Mảng giá trị đã kết hợp:", uniqueCombinedValuesArray);
-
-        console.log("getIDAttribute", getIDAttribute);
       } else {
         const keyRemaining = getUniqueAttributes?.[valueKeysGetAttribute];
         console.log("keyRemaining", keyRemaining);
 
         const idAttributeRemaining = Object.keys(keyRemaining);
         console.log("idAttributeRemaining", idAttributeRemaining);
-        // valuesArray.push(idAttributeRemaining);
-        // Hoặc sử dụng toán tử spread
-        // const combinedValuesArray = [...valuesArray, ...idAttributeRemaining];
-
-        // Lặp qua từng idAttributeRemaining để kiểm tra
-        idAttributeRemaining.map((idValue: any) => {
-          // Kiểm tra nếu idValue không có trong valuesArray
-          const isDisabled = !valuesArray.includes(idValue);
-          if (isDisabled) {
-            disableIdAttribute.push(idValue); // Chỉ thêm nếu không nằm trong valuesArray
-          }
+        idAttributeRemaining.map((value: any) => {
+          valuesArray.map((data: any) => {
+            if (value !== data) {
+              disableIdAttribute.push(value);
+            }
+          });
         });
       }
     });
   });
 
-  // In ra giá trị disable
-  console.log("log disable:", disableIdAttribute);
+  console.log("log disable: ", disableIdAttribute);
 
   // const detructeringMatchedPivotes=
-  const handleAttributeSelect = (key: string, valueId: string | number) => {
-    if (disableIdAttribute.includes(valueId)) {
-      return; // Prevent selecting a disabled attribute
-    }
 
+  const handleAttributeSelect = (key: string, valueId: string | number) => {
     setSelectedAttributes((prev) => {
       const updatedAttributes = { ...prev.product_variant };
+
+      console.log("updatedAtturbute", updatedAttributes);
+      // if(valueId == value[matchedPivots[key]])
 
       if (updatedAttributes[key] === valueId) {
         delete updatedAttributes[key];
@@ -272,6 +257,7 @@ const ProductDetail = () => {
       return { product_variant: updatedAttributes };
     });
   };
+
   useEffect(() => {
     const fetchProductVariant = async () => {
       try {
@@ -441,7 +427,9 @@ const ProductDetail = () => {
                   <div className="mt-2">
                     {Object.keys(getUniqueAttributes).map((key) => {
                       const value = getUniqueAttributes[key];
+                      // console.log("Kiểm tra matched: ", matchedPivots);
 
+                      // console.log("Kiểm tra value click: ", value);
                       return (
                         <div key={key} className="mb-4">
                           <label className="flex items-center">
@@ -459,18 +447,15 @@ const ProductDetail = () => {
                             {Object.keys(value).map((valueId) => {
                               const valueName = value[valueId];
 
-                              const isDisabled =
-                                disableIdAttribute.includes(valueId);
-
                               return (
                                 <div
                                   key={valueId}
-                                  className={`relative flex-1 max-w-[60px] h-8 sm:h-9 rounded-full cursor-pointer flex items-center justify-center ${
+                                  className={`   relative flex-1 max-w-[60px] h-8 sm:h-9 rounded-full cursor-pointer flex items-center justify-center ${
                                     selectedAttributes.product_variant[key] ===
                                     valueId
                                       ? "border-gray-700 border-4"
                                       : "border-gray-200 border-2"
-                                  } ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
+                                  } `}
                                   style={{
                                     backgroundColor:
                                       key === "color"
@@ -478,7 +463,6 @@ const ProductDetail = () => {
                                         : "transparent",
                                   }}
                                   onClick={() =>
-                                    !isDisabled &&
                                     handleAttributeSelect(key, valueId)
                                   }
                                 >

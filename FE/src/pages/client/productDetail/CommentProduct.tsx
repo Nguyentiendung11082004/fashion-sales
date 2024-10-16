@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { useAuth } from "@/common/context/Auth/AuthContext";
 import { Icomments } from "@/common/types/comments";
+import instance from "@/configs/axios";
 import { postComment } from "@/services/api/client/commentClient.api";
 import { UploadOutlined } from "@ant-design/icons";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -19,8 +21,15 @@ const CommentProduct = () => {
     setRating(value);
   };
 
+  const { token } = useAuth();
   const postCommentProduct = useMutation({
-    mutationFn: postComment,
+    mutationFn: async () => {
+      await instance.post(`/comment`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    },
     onMutate: () => {
       setIsLoading(true);
     },
@@ -28,9 +37,9 @@ const CommentProduct = () => {
       queryClient.invalidateQueries({ queryKey: ["comment"] });
       toast.success("Bình luận thành công");
       form.resetFields();
-    //   setIsLoading(false);
-    //   setRating(0);
-    //   setUrlImage(null);
+      //   setIsLoading(false);
+      //   setRating(0);
+      //   setUrlImage(null);
     },
     onError: (error: any) => {
       setError(error.response.data.message);
@@ -59,19 +68,20 @@ const CommentProduct = () => {
     },
   };
 
-  const onFinish = (data: { content: string }) => {
-    const commentData: Icomments = {
-      rating,
-      content: data.content,
-      image: urlImage || "",
-      id: "",
-      user_id: 0,
-      product_id: 0,
-      status: 0,
-    };
+  const onFinish = (data: any) => {
+    // const commentData: any = {
+    //   rating,
+    //   content: data.content,
+    //   image: urlImage || "",
+    //   id: "",
+    //   user_id: 0,
+    //   product_id: 0,
+    //   status: 0,
+    // };
 
-    postCommentProduct.mutate(commentData);
-    console.log("Submitting comment:", commentData);
+    postCommentProduct.mutate(data);
+    // console.log("sadfas", data);
+    // console.log("Submitting comment:", commentData);
   };
 
   return (
