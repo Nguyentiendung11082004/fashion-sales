@@ -23,4 +23,13 @@ class Comments extends Model
     public function user(){
         return $this->belongsTo(User::class);
     }
+    public function parent()
+    {
+        return $this->belongsTo(Comments::class, 'parent_id');
+    }
+
+    public function children()
+    {
+        return $this->hasMany(Comments::class, 'parent_id');
+    }
 }
