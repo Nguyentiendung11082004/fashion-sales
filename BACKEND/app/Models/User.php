@@ -60,4 +60,10 @@ class User extends Authenticatable
     public function carts(){
         return $this->hasMany(Cart::class);
     }
+    public function messages(){
+        return $this->hasMany(Message::class);
+    }
+    public function conversations(){
+        return $this->belongsToMany(Conversation::class,"conversation_users","user_id","conversation_id");
+    }
 }

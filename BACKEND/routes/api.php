@@ -15,6 +15,8 @@ use App\Http\Controllers\Api\V1\Admin\CategoryController;
 use App\Http\Controllers\Api\V1\Admin\AttributeController;
 use App\Http\Controllers\Api\V1\Admin\AttributeItemController;
 use App\Http\Controllers\Api\V1\Client\CartController;
+use App\Http\Controllers\Api\V1\Client\ConversationController;
+use App\Http\Controllers\Api\V1\Client\MessageController;
 
 /*
 |--------------------------------------------------------------------------
@@ -60,4 +62,17 @@ Route::prefix("v1/")->group(function () {
 Route::middleware('auth:sanctum')->prefix('v1/')->group(function () {
     Route::post('logout', [AuthController::class, 'logout']);
     Route::apiResource('cart', CartController::class);
+
+
+    // Tạo hoặc lấy cuộc trò chuyện giữa hai người dùng
+    Route::post('conversations', [ConversationController::class, 'store']);
+
+    // Lấy tất cả các cuộc trò chuyện của người dùng
+    Route::get('conversations', [ConversationController::class, 'index']);
+
+    // Lấy tin nhắn trong một cuộc trò chuyện
+    Route::get('conversations/messages/{conversation}', [MessageController::class, 'index']);
+
+    // Gửi tin nhắn trong một cuộc trò chuyện
+    Route::post('conversations/messages/{conversation}', [MessageController::class, 'store']);
 });
