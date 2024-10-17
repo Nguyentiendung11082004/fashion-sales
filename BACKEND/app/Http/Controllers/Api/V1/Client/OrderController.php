@@ -62,6 +62,10 @@ class OrderController extends Controller
             if (auth('sanctum')->check()) {
                 $user_id = auth('sanctum')->id();
             } else {
+                // Kiểm tra xem request có trường ship_user_email không
+                if (!isset($data['ship_user_email'])) {
+                    return response()->json(['message' => 'Vui lòng cung cấp email giao hàng'], Response::HTTP_BAD_REQUEST);
+                }
                 // Nếu người dùng chưa đăng nhập, tạo tài khoản cho khách hàng
                 // Kiểm tra email có tồn tại không
                 $existingUser = User::where('email', $data['ship_user_email'])->first();
@@ -169,7 +173,7 @@ class OrderController extends Controller
                     }
                     // Cập nhật tổng số lượng và tổng tiền cho đơn hàng mua ngay
                     $order->update([
-                        'total_quantity' => $totalQuantity,
+                        'total_quantity' => $order->orderDetails()->count(),
                         'total' => $totalPrice,
                     ]);
                 }
@@ -302,8 +306,8 @@ class OrderController extends Controller
     public function edit(Order $order)
     {
         try {
-            if (Auth::check()) {
-                $user_id = Auth::id();
+            if (auth('sanctum')->check()) {
+                $user_id = auth('sanctum')->id();
 
                 // Get all orders for the authenticated user, including order details
                 $orders = Order::query()
@@ -329,25 +333,25 @@ class OrderController extends Controller
             if ($order->user_id !== $user_id) {
                 return response()->json(['message' => 'Không có quyền truy cập'], 403);
             }
-    
+
             // Kiểm tra trạng thái đơn hàng
             if ($order->order_status === 'Hủy') {
                 return response()->json(['message' => 'Đơn hàng đã được hủy.'], 400);
             }
-    
+
             // Lấy trạng thái mới và ghi chú từ request
             $order_status = $request->input('order_status');
             $user_note = $request->input('user_note');
-    
+
             // Kiểm tra nếu yêu cầu hủy đơn hàng
             if ($order_status === 'Hủy') {
                 if (empty($user_note)) {
                     return response()->json(['message' => 'Ghi chú là bắt buộc khi hủy đơn hàng.'], 400);
                 }
-    
+
                 // Cập nhật lý do hủy
                 $order->user_note = $user_note;
-    
+
                 // Trả lại số lượng sản phẩm về kho
                 foreach ($order->orderDetails as $detail) {
                     // Kiểm tra nếu là sản phẩm có biến thể
@@ -372,26 +376,18 @@ class OrderController extends Controller
                     $order->user_note = $user_note;
                 }
             }
-    
+
             // Cập nhật trạng thái đơn hàng
             $order->order_status = $order_status;
             $order->save();
-    
+
             // Trả về thông báo cập nhật thành công
             return response()->json([
                 'message' => 'Trạng thái đơn hàng đã được cập nhật thành công.',
                 'order' => $order->load('orderDetails'),
             ]);
         }
-    
+
         return response()->json(['message' => 'Không có quyền truy cập'], 403);
-    }
-    
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Order $order)
-    {
-        //
     }
 }
