@@ -2,22 +2,25 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\V1\Client\HomeProductController;
-use App\Http\Controllers\Api\V1\Client\AuthController;
 use App\Http\Controllers\Api\V1\Admin\TagController;
 use App\Http\Controllers\Api\V1\Admin\BrandController;
+use App\Http\Controllers\Api\V1\Client\AuthController;
+use App\Http\Controllers\Api\V1\Client\CartController;
 use App\Http\Controllers\Api\V1\Admin\ClientController;
+use App\Http\Controllers\Api\V1\Client\OrderController;
 use App\Http\Controllers\Api\V1\Admin\ProductController;
 use App\Http\Controllers\Api\V1\Admin\CategoryController;
 use App\Http\Controllers\Api\V1\Admin\CommentsController;
 use App\Http\Controllers\Api\V1\Admin\EmployeeController;
+use App\Http\Controllers\Api\V1\Client\CommentController;
 use App\Http\Controllers\Api\V1\Admin\AttributeController;
+use App\Http\Controllers\Api\V1\Client\CheckoutController;
+use App\Http\Controllers\Api\V1\Client\WishlistController;
+use App\Http\Controllers\Api\V1\Client\HomeProductController;
 use App\Http\Controllers\Api\V1\Client\ProductShopController;
 use App\Http\Controllers\Api\V1\Admin\AttributeItemController;
 use App\Http\Controllers\Api\V1\Client\ProductDetailController;
-use App\Http\Controllers\Api\V1\Client\WishlistController;
-use App\Http\Controllers\Api\V1\Client\CommentController;
-use App\Http\Controllers\Api\V1\Client\CartController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -61,6 +64,10 @@ Route::prefix("v1/")->group(function () {
     
     Route::post('login', [AuthController::class, 'login']);
     Route::post('register', [AuthController::class, 'register']);
+    Route::resource('order', OrderController::class);
+    Route::resource('checkout', CheckoutController::class);
+
+    
 });
 
 
@@ -74,4 +81,5 @@ Route::middleware('auth:sanctum')->prefix('v1/')->group(function () {
     Route::delete('comment/{id}', [CommentController::class, 'destroy']); // Xóa bình luận
 
 
+    Route::apiResource('wishlist', WishlistController::class);
 });

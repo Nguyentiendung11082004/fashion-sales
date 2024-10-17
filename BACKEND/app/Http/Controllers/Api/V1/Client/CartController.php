@@ -26,7 +26,6 @@ class CartController extends Controller
             $user_id = Auth::id();
             $cart = Cart::query()->where('user_id', $user_id)->with([
                 "cartitems",
-
                 "cartitems.product",
                 "cartitems.productvariant.attributes"
             ])->first();

@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\Api\V1\Client;
 
+use App\Models\Brand;
 use App\Models\Product;
+use App\Models\Category;
+use App\Models\Attribute;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use App\Http\Helper\Product\GetUniqueAttribute;
 use App\Http\Requests\Shop\ProductShopRequest;
+use App\Http\Helper\Product\GetUniqueAttribute;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class ProductShopController extends Controller
@@ -14,6 +17,17 @@ class ProductShopController extends Controller
     // lấy ra tất cả product và biến thể của nó
     public function getAllProduct(ProductShopRequest $request)
     {
+        // Lấy tất danh mục 
+        $allCategory = Category::whereNull('parent_id')->latest('id')->get();
+        // Lấy tất cả brands
+        $allBrand = Brand::query()->latest('id')->get();
+        // lấy ra các thuộc tính
+        $attributes = Attribute::with('attributeitems')->get();
+        $allAttribute = [];
+        // converte dữ liệu cho hằng dễ làm việc
+        foreach ($attributes as $attribute) {
+            $allAttribute[$attribute->name] = $attribute->attributeitems->toArray();
+        }
         $search = $request->input('search'); // Người dùng nhập từ khóa tìm kiếm
         $colors = $request->input('colors'); // Người dùng truyền lên một mảng các màu
         $sizes = $request->input('sizes'); // Người dùng truyền lên một mảng các kích thước
@@ -24,7 +38,9 @@ class ProductShopController extends Controller
         $sortPrice = $request->input('sortPrice');
         $sortDirection = $request->input('sortDirection');
         $sortAlphaOrder = $request->input('sortAlphaOrder');
-        $trend = $request->input('trend');
+        $new = $request->input('new');
+        $sale = $request->input('sale');
+
         // Kiểm tra giá trị sortDirection
         if ($sortDirection && !in_array(strtolower($sortDirection), ['asc', 'desc'])) {
             throw new \InvalidArgumentException('Giá trị sortDirection chỉ có thể là "asc" hoặc "desc".');
@@ -35,17 +51,43 @@ class ProductShopController extends Controller
         }
         try {
             $products = Product::query()
-                ->when($trend, function ($query, $trend) {
+                ->when($new, function ($query, $new) {
                     // Lọc sản phẩm hot trend
-                    return $query->where('trend', 1);
+                    return $query->where('is_new', 1);
+                })
+                ->when($sale, function ($query) {
+                    return $query->where(function ($q) {
+                        $q->where(function ($query) {
+                            $query->where('type', 0)
+                                ->whereNotNull('price_sale')
+                                ->WhereColumn('price_sale', '<', 'price_regular');
+                        })
+                            ->orWhere(function ($query) {
+                                $query->where('type', 1)
+                                    ->whereHas('variants', function ($query) {
+                                        $query->whereNotNull('price_sale')
+                                            ->WhereColumn('price_sale', '<', 'price_regular');
+                                    });
+                            });
+                    });
                 })
                 ->when($categories, function ($query) use ($categories) {
-                    // Lọc theo danh mục
-                    return $query->whereIn('category_id', $categories); // Giả sử trường lưu ID danh mục là category_id
+                    // Lấy tất cả ID danh mục cha và con
+                    $categoryIds = Category::whereIn('id', $categories)
+                        ->with('allChildren') // Lấy tất cả danh mục con
+                        ->get()
+                        ->pluck('id') // Lấy ID của các danh mục cha
+                        ->toArray();
+                    // Gộp các ID danh mục con vào danh sách
+                    $subCategoryIds = Category::whereIn('parent_id', $categoryIds)->pluck('id')->toArray();
+                    $categoryIds = array_merge($categoryIds, $subCategoryIds);
+
+                    // Lọc sản phẩm theo danh mục
+                    return $query->whereIn('category_id', $categoryIds);
                 })
                 ->when($brands, function ($query) use ($brands) {
                     // Lọc theo danh mục
-                    return $query->whereIn('brand_id', $brands); // Giả sử trường lưu ID danh mục là category_id
+                    return $query->whereIn('brand_id', $brands);
                 })
                 ->when($search, function ($query, $search) {
                     // Nếu có từ khóa tìm kiếm, lọc sản phẩm có tên chứa từ khóa
@@ -65,6 +107,7 @@ class ProductShopController extends Controller
                             ->whereIn('product_variant_has_attributes.value', $sizes); // Truy cập giá trị trực tiếp từ bảng trung gian
                     });
                 })
+                // khoảng giá
                 ->when($minPrice || $maxPrice, function ($query) use ($minPrice, $maxPrice) {
                     return $query->where(function ($subQuery) use ($minPrice, $maxPrice) {
                         if (!is_null($minPrice)) {
@@ -123,7 +166,12 @@ class ProductShopController extends Controller
                 ];
             }
             // Trả về tất cả sản phẩm sau khi vòng lặp kết thúc
-            return response()->json($allProducts);
+            return response()->json([
+                'products' => $allProducts,
+                'brands' =>   $allBrand,
+                'attributes' =>  $allAttribute,
+                'categories' =>  $allCategory,
+            ]);
         } catch (ModelNotFoundException $e) {
             // Trả về lỗi 404 nếu không tìm thấy Category
             return response()->json([
