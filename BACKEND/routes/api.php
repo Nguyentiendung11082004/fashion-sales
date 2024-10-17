@@ -8,11 +8,11 @@ use App\Http\Controllers\Api\V1\Client\ProductDetailController;
 use App\Http\Controllers\Api\V1\Admin\ClientController;
 use App\Http\Controllers\Api\V1\Admin\EmployeeController;
 use App\Http\Controllers\Api\V1\Client\AuthController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\Admin\CategoryController;
 use App\Http\Controllers\Api\V1\Admin\AttributeController;
 use App\Http\Controllers\Api\V1\Admin\AttributeItemController;
+use App\Http\Controllers\Api\V1\Client\InforUserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,20 +25,6 @@ use App\Http\Controllers\Api\V1\Admin\AttributeItemController;
 |
 */
 
-
-Route::middleware('auth:sanctum')->get('/user', 
-function (Request $request) {
-    return $request->user();
-});
-
-Route::post('login', [AuthController::class, 'login']);
-Route::post('register', [AuthController::class, 'register']);
-  
-
-Route::post('logout', [AuthController::class, 'logout'])  
-->middleware('auth:sanctum');
-
-
 Route::prefix("v1/")->group(function () {
     Route::resource("products", ProductController::class);
     Route::resource("comments", CommentsController::class);
@@ -50,7 +36,39 @@ Route::prefix("v1/")->group(function () {
     Route::apiResource('attributeItem', AttributeItemController::class);
     Route::apiResource('category', CategoryController::class);
 
+    Route::middleware('auth:sanctum')->get('/user', [InforUserController::class, 'getInforUser']);
+    Route::middleware('auth:sanctum')->put('/user/update', [InforUserController::class, 'updateInforUser']);
+
+    Route::post('login', [AuthController::class, 'login']);
+    Route::post('register', [AuthController::class, 'register']);
+
+    //Gửi mail
+    Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
+        ->middleware(['signed'])->name('verification.verify');
+
+    // Resend Mail
+    Route::post('/email/verification-notification', [AuthController::class, 'resendVerifyEmail'])
+        ->middleware(['throttle:6,1'])->name('verification.send');
+
+    Route::post('password/forgot', [AuthController::class, 'sendResetPassWordMail']);
+
+    Route::get('password/reset/{token}', [AuthController::class, 'showResetForm'])
+    ->name('password.reset');
+
+    Route::post('password/reset', [AuthController::class, 'reset']);
+
+   
     //  để tạm vậy rồi tôi sẽ chia các route admin và client ra sau.
     // client
     Route::get('product-detail/{product_id}', [ProductDetailController::class, "productdetail"]);
 });
+
+
+
+
+Route::middleware('auth:sanctum')->prefix('v1/')->group(function () {
+    Route::post('logout', [AuthController::class, 'logout']);
+    
+
+});
+
