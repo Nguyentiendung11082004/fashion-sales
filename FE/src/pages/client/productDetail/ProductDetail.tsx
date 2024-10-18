@@ -154,8 +154,7 @@ const ProductDetail = () => {
 
   let keySelectedAttributes = Object.keys(selectedAttributes.product_variant);
 
-  console.log("Dữ liệu truyền vào:", selectedAttributes);
-  console.log("key dữ liệu truyền vào:", keySelectedAttributes);
+
 
   if (keySelectedAttributes.length === 0) {
     keySelectedAttributes = [];
@@ -165,32 +164,28 @@ const ProductDetail = () => {
     keySelectedAttributes = keySelectedAttributes.slice(0, -1);
   }
 
-  console.log("Các key đã chọn:", keySelectedAttributes);
 
-  console.log("Các sản phẩm liên quan:", result);
 
   const matchedPivots = result?.filter((data: any) => {
     const objectVariant = selectedAttributes?.product_variant || {};
     const variantKeys = Object.keys(objectVariant);
 
-    // Kiểm tra số lượng thuộc tính
     if (variantKeys.length === 0) {
       return true;
     }
 
-    // Nếu có từ 2 thuộc tính trở lên, loại bỏ thuộc tính cuối cùng
     const attributesToCompare =
       variantKeys.length > 1
-        ? variantKeys.slice(0, variantKeys.length - 1) // Bỏ qua thuộc tính cuối cùng
-        : variantKeys; 
+        ? variantKeys.slice(0, variantKeys.length - 1)
+        : variantKeys;
 
     return attributesToCompare.every((key) => {
-      return objectVariant[key] == data[key]; 
+      return objectVariant[key] == data[key];
     });
   });
 
   console.log("Trả về các sản phẩm khớp:", matchedPivots);
-  // Kiểm tra xem matchedPivots có phải là mảng và không rỗng
+
 
   const valuesArrayNumber = Array.isArray(matchedPivots)
     ? matchedPivots.flatMap((pivot) => Object.values(pivot))
@@ -256,6 +251,7 @@ const ProductDetail = () => {
 
   // const detructeringMatchedPivotes=
   const handleAttributeSelect = (key: string, valueId: string | number) => {
+    console.log("254",key,valueId)
     if (disableIdAttribute.includes(valueId)) {
       return; // Prevent selecting a disabled attribute
     }
@@ -448,12 +444,12 @@ const ProductDetail = () => {
                             <span className="font-medium">{key}:</span>
                             {selectedAttributes.product_variant[key] !==
                               undefined && (
-                              <span className="ml-2">
-                                {value[
-                                  selectedAttributes.product_variant[key]
-                                ].toLowerCase()}
-                              </span>
-                            )}
+                                <span className="ml-2">
+                                  {value[
+                                    selectedAttributes.product_variant[key]
+                                  ].toLowerCase()}
+                                </span>
+                              )}
                           </label>
                           <div className="flex mt-3 gap-2">
                             {Object.keys(value).map((valueId) => {
@@ -465,12 +461,11 @@ const ProductDetail = () => {
                               return (
                                 <div
                                   key={valueId}
-                                  className={`relative flex-1 max-w-[60px] h-8 sm:h-9 rounded-full cursor-pointer flex items-center justify-center ${
-                                    selectedAttributes.product_variant[key] ===
-                                    valueId
+                                  className={`relative flex-1 max-w-[60px] h-8 sm:h-9 rounded-full cursor-pointer flex items-center justify-center ${selectedAttributes.product_variant[key] ===
+                                      valueId
                                       ? "border-gray-700 border-4"
                                       : "border-gray-200 border-2"
-                                  } ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
+                                    } ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
                                   style={{
                                     backgroundColor:
                                       key === "color"
@@ -612,31 +607,28 @@ const ProductDetail = () => {
             <div className="w-[100%] text-center m-auto flex justify-center">
               <button
                 onClick={() => handleButtonClick("details")}
-                className={`${
-                  activeButton === "details"
+                className={`${activeButton === "details"
                     ? "border-black text-black border-2"
                     : " text-[#8e8e8e]"
-                } font-medium cursor-pointer lg:text-base text-[10px] lg:py-2 lg:px-6 px-2 py-2 rounded-full`}
+                  } font-medium cursor-pointer lg:text-base text-[10px] lg:py-2 lg:px-6 px-2 py-2 rounded-full`}
               >
                 Chi tiết sản phẩm
               </button>
               <button
                 onClick={() => handleButtonClick("reviews")}
-                className={`${
-                  activeButton === "reviews"
+                className={`${activeButton === "reviews"
                     ? "border-black text-black border-2"
                     : "border-black text-[#8e8e8e]"
-                } btn_cmt text-[10px] lg:text-base font-medium cursor-pointer lg:py-2 lg:px-6 px-2 py-2 rounded-full`}
+                  } btn_cmt text-[10px] lg:text-base font-medium cursor-pointer lg:py-2 lg:px-6 px-2 py-2 rounded-full`}
               >
                 Xem đánh giá sản phẩm
               </button>
               <button
                 onClick={() => handleButtonClick("comment")}
-                className={`${
-                  activeButton === "comment"
+                className={`${activeButton === "comment"
                     ? "border-black text-black border-2"
                     : "border-black text-[#8e8e8e]"
-                } btn_cmt text-[10px] lg:text-base font-medium cursor-pointer lg:py-2 lg:px-6 px-2 py-2 rounded-full`}
+                  } btn_cmt text-[10px] lg:text-base font-medium cursor-pointer lg:py-2 lg:px-6 px-2 py-2 rounded-full`}
               >
                 Viết bình luận
               </button>

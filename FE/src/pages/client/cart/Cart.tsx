@@ -38,6 +38,55 @@ const Cart = () => {
       return res.data;
     },
   });
+  const updateQuantity = useMutation({
+    mutationFn: async ({ idCart, newQuantity }: { idCart: number; newQuantity: number }) => {
+
+      await instance.put(`/cart/${idCart}`, {
+        quantity: newQuantity,
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['cart'],
+      });
+    },
+  });
+  const deleteCart = useMutation({
+    mutationFn: async ({ idCarts }: { idCarts: number[] }) => {
+      await Promise.all(
+        idCarts.map(idCart =>
+          instance.delete(`/cart/[${idCart}]`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          })
+        )
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['cart'],
+      });
+    }
+  });
+  const handleDeleteCart = (idCarts: number[]) => {
+    deleteCart.mutate({ idCarts });
+  };
+
+
+  const handleIncrease = (idCart: number, currentQuantity: number) => {
+    const newQuantity = currentQuantity + 1;
+    updateQuantity.mutate({ idCart, newQuantity });
+  };
+
+  const handleDecrease = (idCart: number, currentQuantity: number) => {
+    const newQuantity = currentQuantity - 1;
+    updateQuantity.mutate({ idCart, newQuantity });
+  };
 
   const handleAttribute = (idCart: any, variants: any) => {
     setIdCart(idCart);
@@ -51,7 +100,7 @@ const Cart = () => {
   const handleUpdateAttributes = (idCart: any, attributes: any) => {
     setUpdatedAttributes({
       ...updatedAttributes,
-      [idCart]: attributes, // Thay thế hoàn toàn giá trị cũ bằng giá trị mới
+      [idCart]: attributes,
     });
   };
 
@@ -133,17 +182,17 @@ const Cart = () => {
                                         </div>
                                       ))
                                   }
-
                                   <div className="hd-infor-text-tools mt-[10px]">
                                     {
-                                      e.productvariant.attributes.length > 0 && <Button onClick={() => handleAttribute(e?.id, e?.productvariant?.attributes)} className="inline-flex me-[10px] border-none">
+                                      e.productvariant && <Button onClick={() => handleAttribute(e?.id, e?.productvariant?.attributes)} className="inline-flex me-[10px] border-none">
                                         <Note />
                                       </Button>
                                     }
 
-                                    <Link to="" className="inline-flex me-[10px]">
+                                    <Button onClick={() => handleDeleteCart([e.id])} className="inline-flex me-[10px]">
                                       <Delete />
-                                    </Link>
+                                    </Button>
+
                                   </div>
                                 </div>
                               </div>
@@ -196,9 +245,9 @@ const Cart = () => {
                             <div className="hd-price-item !text-center w-3/12 hd-col-item lg:block hidden">
                               <div className="hs-prices">
                                 <div className="hd-text-price">
-                                  <del className="text-[#696969]">{FormatMoney(e?.productvariant?.price_regular)}</del>
+                                  <del className="text-[#696969]">{FormatMoney(e?.productvariant?.price_regular || '')}</del>
                                   <ins className="ms-[6px] no-underline text-[#ec0101]">
-                                    {FormatMoney(e?.productvariant?.price_sale)}
+                                    {FormatMoney(e?.productvariant?.price_sale || '')}
                                   </ins>
                                 </div>
                               </div>
@@ -206,18 +255,18 @@ const Cart = () => {
                             {/*end hd-price-item*/}
                             <div className="hd-quantity-item !text-center w-2/12 hd-col-item lg:block hidden">
                               <div className="hd-quantity relative block min-w-[120px] w-[120px] h-10 mx-auto hd-all-btn">
-                                {/* <button
-                                type="button"
-                                className="hd-btn-item left-0 text-left pl-[15px] p-0 top-0 text-sm cursor-pointer shadow-none transform-none touch-manipulation"
-                                onClick={() => handleDecrease(e?.id, e?.quantity)}
-                              >
-                                <ReduceProduct />
-                              </button> */}
+                                <button
+                                  type="button"
+                                  className="hd-btn-item left-0 text-left pl-[15px] p-0 top-0 text-sm cursor-pointer shadow-none transform-none touch-manipulation"
+                                  onClick={() => handleDecrease(e?.id, e?.quantity)}
+                                >
+                                  <ReduceProduct />
+                                </button>
                                 <span className="select-none leading-9 cursor-text font-semibold text-base">
                                   {e?.quantity}
                                 </span>
                                 <button
-                                  // onClick={() => handleIncrease(e?.id, e?.quantity)}
+                                  onClick={() => handleIncrease(e?.id, e?.quantity)}
                                   type="button"
                                   className="hd-btn-item right-0 text-right pr-[15px] p-0 top-0 text-sm cursor-pointer shadow-none transform-none touch-manipulation"
                                 >
@@ -381,28 +430,3 @@ const Cart = () => {
 export default Cart;
 
 
-// const updateQuantity = useMutation({
-//   mutationFn: async ({ idCart, newQuantity }) => {
-//     await instance.put(`/cart/${idCart}`, {
-//       quantity: newQuantity,
-//     }, {
-//       headers: {
-//         Authorization: `Bearer ${token}`,
-//       }
-//     });
-//   },
-//   onSuccess: (data, variables) => {
-//     queryClient.invalidateQueries({
-//       queryKey: ['cart'],
-//     });
-//   }
-// });
-
-// const handleIncrease = (idCart: any, currentQuantity: any) => {
-//   const newQuantity = currentQuantity + 1;
-//   updateQuantity.mutate({ idCart, newQuantity });
-// };
-// const handleDecrease = (productId, currentQuantity) => {
-//   const newQuantity = Math.max(currentQuantity - 1, 0); // Không cho phép số lượng âm
-//   updateQuantity.mutate({ productId, newQuantity });
-// };

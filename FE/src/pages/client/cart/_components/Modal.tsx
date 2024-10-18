@@ -11,32 +11,29 @@ type Props = {
     onUpdateAttributes: (idCart: any, attributes: any) => void;
     attributes: any;
 };
-
 const ModalCart = ({ open, onClose, idCart, onUpdateAttributes, attributes }: Props) => {
     const { token } = useAuth();
     const [activeAttributes, setActiveAttributes] = useState<any>({});
-
+    const [dataAttributes, setAttribute] = useState<any>([])
     const handleActive = (attribute: any, id: any) => {
-        setActiveAttributes((prev: any) => ({
+        setAttribute((prev: any) => ({
             ...prev,
-            [attribute]: id, // Chỉ cập nhật giá trị cho thuộc tính đang chọn
+            [attribute]: id,
         }));
     };
-
+    console.log("dataAttributes", dataAttributes)
     const handleConfirm = () => {
         onUpdateAttributes(idCart, activeAttributes);
-        console.log("activeAttributes",activeAttributes)
+        setAttribute({});
         onClose();
     };
-
     useEffect(() => {
         if (open && attributes) {
             setActiveAttributes(attributes);
         } else {
-            setActiveAttributes({}); // Reset activeAttributes khi đóng modal
+            setActiveAttributes({});
         }
     }, [open, attributes]);
-
     const { data: cartAttribute, isFetching } = useQuery({
         queryKey: ['cartAttribute', idCart],
         queryFn: async () => {
@@ -49,9 +46,35 @@ const ModalCart = ({ open, onClose, idCart, onUpdateAttributes, attributes }: Pr
         },
         enabled: !!idCart && open,
     });
-
-    const attributesFromCart = cartAttribute?.cart_item.productvariant.attributes.map((e: any) => e.pivot.value);
+    const formattedAttributes = cartAttribute ? cartAttribute.cart_item.product.variants?.map((item: any) => {
+        const attributeObj: { [key: string]: number } = {};
+        item.attributes.forEach((attribute: any) => {
+            attributeObj[attribute.name] = attribute.pivot.attribute_item_id;
+        });
+        return attributeObj;
+    }) : [];
     const dataAttribute = cartAttribute?.getuniqueattributes;
+    const checkDisable = (attribute: string, value: any) => {
+        let result = false;
+        let matchingItems = formattedAttributes.filter((x: any) => {
+            return Object.keys(dataAttributes).every((key) => {
+                if (key !== attribute) {
+                    return x[key] && x[key].toString() === dataAttributes[key].toString();
+                }
+                return true;
+            });
+        });
+        let isAttributeValid = matchingItems.some((x: any) => x[attribute] && x[attribute].toString() === value.toString());
+        if (!isAttributeValid) {
+            result = true;
+        }
+        return result;
+    };
+    const styles = {
+        disable: {
+            opacity: 0.1,
+        }
+    }
     const resultDataAttribute = Object.entries(dataAttribute ?? {}).map(([key, value]) => ({
         attribute: key,
         attributeValue: Object.entries(value ?? {}).map(([id, name]) => ({
@@ -59,7 +82,6 @@ const ModalCart = ({ open, onClose, idCart, onUpdateAttributes, attributes }: Pr
             name,
         })),
     }));
-
     return (
         <AntModal open={open} onCancel={onClose} footer={false} closable={false} maskClosable={false}>
             {isFetching ? (
@@ -73,16 +95,20 @@ const ModalCart = ({ open, onClose, idCart, onUpdateAttributes, attributes }: Pr
                             <p>{e.attribute}</p>
                             <div className={`flex mt-3 gap-2 ${e.attribute === 'Color' ? 'flex-wrap' : 'grid grid-cols-5 sm:grid-cols-7'}`}>
                                 {e.attributeValue.map((item) => {
-                                    const isActive = activeAttributes[e.attribute] === item.id; // Kiểm tra thuộc tính đang chọn
-                                    // const isDefault = attributesFromCart.includes(item.name); // Kiểm tra thuộc tính mặc định
-
+                                    const isActive = dataAttributes[e.attribute] === item.id;
+                                    let dis = false;
+                                    if (e.attribute) {
+                                        dis = checkDisable(e.attribute, item.id);
+                                    }
+                                    const _styles = dis ? styles.disable : {}
                                     return (
                                         <div
                                             key={item.id}
                                             className={`relative flex-1 max-w-[75px] h-8 sm:h-8 rounded-full border-2 cursor-pointer 
                                             border-primary-6000 dark:border-primary-500 
-                                            ${isActive   ? 'border-black' : ''}`}
-                                            onClick={() => handleActive(e.attribute, item.id)}
+                                            ${isActive ? 'border-black' : ''}`}
+                                            onClick={() => !dis && handleActive(e.attribute, item.id)}
+                                            style={_styles}
                                         >
                                             {e.attribute === 'Color' ? (
                                                 <div
