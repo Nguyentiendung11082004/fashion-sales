@@ -1,3 +1,4 @@
+/* eslint-disable no-prototype-builtins */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable react-hooks/exhaustive-deps */
@@ -116,150 +117,54 @@ const ProductDetail = () => {
     product_variant: {},
   });
 
-  // const priceRegulars: number[] =
-  //   product?.variants.map((variant: any) => variant.price_regular) || [];
-  // const [priceProduct, setPriceProduct] = useState<{
-  //   priceMin: number | undefined;
-  //   priceMax: number | undefined;
-  // } | null>(null);
-  // useEffect(() => {
-  //   if (product?.variants && product.variants.length > 0) {
-  //     const priceRegulars: number[] = product.variants.map(
-  //       (variant: any) => variant.price_regular
-  //     );
-
-  //     if (priceRegulars.length > 0) {
-  //       const priceMin = Math.min(...priceRegulars);
-  //       const priceMax = Math.max(...priceRegulars);
-  //       setPriceProduct({ priceMin, priceMax });
-  //     }
-  //   }
-  // }, [product]);
-
   const result = product?.variants.map((variant: any) => {
     if (!variant.attributes) {
       return {};
     }
-
-    const attributeObj = variant.attributes.reduce(
-      (acc: { [key: string]: number }, attribute: any) => {
-        acc[attribute.name] = attribute.pivot.attribute_item_id;
-        return acc;
-      },
-      {}
-    );
-
-    return attributeObj;
   });
 
-  let keySelectedAttributes = Object.keys(selectedAttributes.product_variant);
+  // console.log("Các key đã chọn:", keySelectedAttributes);
 
-  console.log("Dữ liệu truyền vào:", selectedAttributes);
-  console.log("key dữ liệu truyền vào:", keySelectedAttributes);
+  // console.log("Các sản phẩm liên quan:", result);
 
-  if (keySelectedAttributes.length === 0) {
-    keySelectedAttributes = [];
-  } else if (keySelectedAttributes.length === 1) {
-    keySelectedAttributes = [keySelectedAttributes[0]];
-  } else {
-    keySelectedAttributes = keySelectedAttributes.slice(0, -1);
-  }
+  const resultFormat = result?.reduce((acc: any, product: any) => {
+    Object.keys(product).forEach((key) => {
+      if (!acc[key]) {
+        acc[key] = [];
+      }
+      if (!acc[key].includes(product[key])) {
+        acc[key].push(product[key]);
+      }
+    });
+    return acc;
+  }, {});
 
-  console.log("Các key đã chọn:", keySelectedAttributes);
-
-  console.log("Các sản phẩm liên quan:", result);
+  console.log("sản phẩm liên quan sau khi format", resultFormat);
+  const arrayResultFormat =
+    resultFormat && typeof resultFormat === "object"
+      ? Object.values(resultFormat).flat()
+      : [];
+  console.log("mảng sau khi chuyển của arrayResultFormat:", arrayResultFormat);
 
   const matchedPivots = result?.filter((data: any) => {
     const objectVariant = selectedAttributes?.product_variant || {};
     const variantKeys = Object.keys(objectVariant);
 
-    // Kiểm tra số lượng thuộc tính
     if (variantKeys.length === 0) {
       return true;
     }
 
-    // Nếu có từ 2 thuộc tính trở lên, loại bỏ thuộc tính cuối cùng
     const attributesToCompare =
       variantKeys.length > 1
-        ? variantKeys.slice(0, variantKeys.length - 1) // Bỏ qua thuộc tính cuối cùng
-        : variantKeys; 
+        ? variantKeys.slice(0, variantKeys.length - 1)
+        : variantKeys;
 
     return attributesToCompare.every((key) => {
-      return objectVariant[key] == data[key]; 
+      return objectVariant[key] == data[key];
     });
   });
 
-  console.log("Trả về các sản phẩm khớp:", matchedPivots);
-  // Kiểm tra xem matchedPivots có phải là mảng và không rỗng
-
-  const valuesArrayNumber = Array.isArray(matchedPivots)
-    ? matchedPivots.flatMap((pivot) => Object.values(pivot))
-    : [];
-
-  // Chuyển đổi các giá trị trong mảng về kiểu chuỗi
-  const valuesArray = valuesArrayNumber.map((value) => String(value));
-
-  console.log("Mảng giá trị valueArray", valuesArray);
-
-  // console.log("log disable trước khi click: ", disableIdAttribute);
-  const disableIdAttribute: any[] = [];
-  const combinedValuesArray: any[] = [];
-  keySelectedAttributes.map((value: any) => {
-    const keyGetUniqueAttribute = Object.keys(getUniqueAttributes);
-    console.log("keyGetUniqueAttribute", keyGetUniqueAttribute);
-    const getIDAttribute: any = [];
-    keyGetUniqueAttribute.map((valueKeysGetAttribute: any) => {
-      if (value === valueKeysGetAttribute) {
-        const objectGetAttribute: object =
-          getUniqueAttributes?.[valueKeysGetAttribute];
-        console.log("objectGetAttribute", objectGetAttribute);
-        getIDAttribute.push(objectGetAttribute);
-
-        // Lấy các khóa từ objectGetAttribute và chuyển đổi thành chuỗi nếu cần
-        const newAttributes = Object.keys(objectGetAttribute);
-
-        // Kết hợp valuesArray với newAttributes, chỉ thêm những giá trị chưa có
-        const combinedValuesArray = valuesArray.concat(
-          newAttributes.filter((id) => !valuesArray.includes(String(id))) // Chuyển id sang chuỗi
-        );
-
-        // Loại bỏ các giá trị trùng lặp nếu cần
-        const uniqueCombinedValuesArray = [...new Set(combinedValuesArray)];
-
-        console.log("Mảng giá trị đã kết hợp:", uniqueCombinedValuesArray);
-
-        console.log("getIDAttribute", getIDAttribute);
-      } else {
-        const keyRemaining = getUniqueAttributes?.[valueKeysGetAttribute];
-        console.log("keyRemaining", keyRemaining);
-
-        const idAttributeRemaining = Object.keys(keyRemaining);
-        console.log("idAttributeRemaining", idAttributeRemaining);
-        // valuesArray.push(idAttributeRemaining);
-        // Hoặc sử dụng toán tử spread
-        // const combinedValuesArray = [...valuesArray, ...idAttributeRemaining];
-
-        // Lặp qua từng idAttributeRemaining để kiểm tra
-        idAttributeRemaining.map((idValue: any) => {
-          // Kiểm tra nếu idValue không có trong valuesArray
-          const isDisabled = !valuesArray.includes(idValue);
-          if (isDisabled) {
-            disableIdAttribute.push(idValue); // Chỉ thêm nếu không nằm trong valuesArray
-          }
-        });
-      }
-    });
-  });
-
-  // In ra giá trị disable
-  console.log("log disable:", disableIdAttribute);
-
-  // const detructeringMatchedPivotes=
   const handleAttributeSelect = (key: string, valueId: string | number) => {
-    if (disableIdAttribute.includes(valueId)) {
-      return; // Prevent selecting a disabled attribute
-    }
-
     setSelectedAttributes((prev) => {
       const updatedAttributes = { ...prev.product_variant };
 
@@ -272,13 +177,13 @@ const ProductDetail = () => {
       return { product_variant: updatedAttributes };
     });
   };
+
   useEffect(() => {
     const fetchProductVariant = async () => {
       try {
         const variant = await findProductVariant(productId, selectedAttributes);
 
         if (variant.findProductVariant) {
-          // Nếu tìm thấy variant
           setProduct((prevProduct: any) => ({
             ...prevProduct,
             ...variant.findProductVariant,
@@ -459,8 +364,9 @@ const ProductDetail = () => {
                             {Object.keys(value).map((valueId) => {
                               const valueName = value[valueId];
 
-                              const isDisabled =
-                                disableIdAttribute.includes(valueId);
+                              const isDisabled = disable.includes(
+                                parseInt(valueId)
+                              );
 
                               return (
                                 <div
