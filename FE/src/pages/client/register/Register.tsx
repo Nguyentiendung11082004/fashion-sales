@@ -1,4 +1,4 @@
-import { Logo } from "@/components/icons";
+import { LogoClient } from "@/components/icons";
 import { Link } from "react-router-dom";
 
 const Register = () => {
@@ -11,8 +11,8 @@ const Register = () => {
               <div className="hd-header-banner bg-[url('https://cdn.mos.cms.futurecdn.net/whowhatwear/posts/311736/gen-z-fashion-trends-2024-311736-1705592248484-main-768-80.jpg.webp')] bg-no-repeat bg-cover bg-center">
                 <div className="hd-bg-banner overflow-hidden relative !text-center bg-black bg-opacity-55">
                   <div className="z-[100] relative hd-container">
-                    <h1 className="text-white text-6xl font-medium py-[335px]">
-                        KALLES
+                    <h1 className="text-white text-6xl font-medium py-[340px]">
+                        MIX & MATCH
                     </h1>
                   </div>
                 </div>
@@ -23,12 +23,12 @@ const Register = () => {
           <main className="flex items-center justify-center px-8 py-8 sm:px-12 lg:col-span-7 lg:px-16 lg:py-12 xl:col-span-6">
             <div className="max-w-xl lg:max-w-3xl">
               <img
-                src={Logo}
+                src={LogoClient}
                 className="h-10 mb-10"
                 alt="Logo"
               />
               <p className="mt-6 text-2xl font-medium text-gray-900">
-                Chào mừng bạn đến với Kalles
+                Chào mừng bạn đến với Mix & Match
               </p>
               <h1 className="font-bold text-4xl text-center mt-10">
                 Đăng ký tài khoản

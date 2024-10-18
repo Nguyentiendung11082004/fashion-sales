@@ -23,7 +23,7 @@ class BrandRequest extends FormRequest
             'message' =>'Lỗi thêm brand',
             'status' => false,
             'errors' => $validator->errors()
-        ], 400)); 
+        ], 400));
     }
     /**
      * Get the validation rules that apply to the request.

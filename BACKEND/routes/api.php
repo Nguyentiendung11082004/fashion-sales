@@ -1,22 +1,28 @@
 <?php
 
-use App\Http\Controllers\Api\V1\Admin\BrandController;
-use App\Http\Controllers\Api\V1\Admin\CommentsController;
-use App\Http\Controllers\Api\V1\Admin\ProductController;
-use App\Http\Controllers\Api\V1\Admin\TagController;
-use App\Http\Controllers\Api\V1\Client\HomeProductController;
-use App\Http\Controllers\Api\V1\Client\ProductDetailController;
-use App\Http\Controllers\Api\V1\Admin\ClientController;
-use App\Http\Controllers\Api\V1\Admin\EmployeeController;
-use App\Http\Controllers\Api\V1\Client\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\V1\Admin\CategoryController;
-use App\Http\Controllers\Api\V1\Admin\AttributeController;
-use App\Http\Controllers\Api\V1\Admin\AttributeItemController;
+use App\Http\Controllers\Api\V1\Admin\TagController;
+use App\Http\Controllers\Api\V1\Admin\BrandController;
+use App\Http\Controllers\Api\V1\Client\AuthController;
 use App\Http\Controllers\Api\V1\Client\CartController;
 use App\Http\Controllers\Api\V1\Client\ConversationController;
 use App\Http\Controllers\Api\V1\Client\MessageController;
+use App\Http\Controllers\Api\V1\Admin\ClientController;
+use App\Http\Controllers\Api\V1\Client\OrderController;
+use App\Http\Controllers\Api\V1\Admin\ProductController;
+use App\Http\Controllers\Api\V1\Admin\CategoryController;
+use App\Http\Controllers\Api\V1\Admin\CommentsController;
+use App\Http\Controllers\Api\V1\Admin\EmployeeController;
+use App\Http\Controllers\Api\V1\Client\CommentController;
+use App\Http\Controllers\Api\V1\Admin\AttributeController;
+use App\Http\Controllers\Api\V1\Client\CheckoutController;
+use App\Http\Controllers\Api\V1\Client\WishlistController;
+use App\Http\Controllers\Api\V1\Client\HomeProductController;
+use App\Http\Controllers\Api\V1\Client\ProductShopController;
+use App\Http\Controllers\Api\V1\Admin\AttributeItemController;
+use App\Http\Controllers\Api\V1\Client\ProductDetailController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -49,13 +55,21 @@ Route::prefix("v1/")->group(function () {
     Route::apiResource('category', CategoryController::class);
 
     Route::get('product-home', [HomeProductController::class, "getHomeProducts"]);
-    //  để tạm vậy rồi tôi sẽ chia các route admin và client ra sau.
-    // client
-    Route::get('product-detail/{product_id}', [ProductDetailController::class, "productdetail"]);
-    Route::get('find-variant/{product_id}', [ProductDetailController::class, "findvariant"]);
 
+    Route::get('product-detail/{product_id}', [ProductDetailController::class, "productdetail"]);
+    Route::post('product-shop', [ProductShopController::class, "getAllProduct"]);
+    Route::apiResource('wishlist', WishlistController::class);
+
+    Route::get('comment', [CommentController::class, 'index']);
+
+    Route::get('find-variant/{product_id}', [ProductDetailController::class, "findvariant"]);
+    
     Route::post('login', [AuthController::class, 'login']);
     Route::post('register', [AuthController::class, 'register']);
+    Route::resource('order', OrderController::class);
+    Route::resource('checkout', CheckoutController::class);
+
+    
 });
 
 
@@ -75,4 +89,12 @@ Route::middleware('auth:sanctum')->prefix('v1/')->group(function () {
 
     // Gửi tin nhắn trong một cuộc trò chuyện
     Route::post('conversations/messages/{conversation}', [MessageController::class, 'store']);
+  
+    Route::post('comment', [CommentController::class, 'store']); // Thêm bình luận mới
+    Route::get('comment/{id}', [CommentController::class, 'show']); // Lấy chi tiết bình luận
+    Route::put('comment/{id}', [CommentController::class, 'update']); // Cập nhật bình luận
+    Route::delete('comment/{id}', [CommentController::class, 'destroy']); // Xóa bình luận
+
+
+    Route::apiResource('wishlist', WishlistController::class);
 });
