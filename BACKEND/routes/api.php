@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\Admin\TagController;
 use App\Http\Controllers\Api\V1\Admin\BrandController;
@@ -21,6 +20,7 @@ use App\Http\Controllers\Api\V1\Client\ProductShopController;
 use App\Http\Controllers\Api\V1\Admin\AttributeItemController;
 use App\Http\Controllers\Api\V1\Client\ProductDetailController;
 
+use App\Http\Controllers\Api\V1\Client\InforUserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,14 +32,6 @@ use App\Http\Controllers\Api\V1\Client\ProductDetailController;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
-
-
-Route::middleware('auth:sanctum')->get(
-    '/user',
-    function (Request $request) {
-        return $request->user();
-    }
-);
 
 Route::prefix("v1/")->group(function () {
     Route::resource("products", ProductController::class);
@@ -61,20 +53,31 @@ Route::prefix("v1/")->group(function () {
     Route::get('comment', [CommentController::class, 'index']);
 
     Route::get('find-variant/{product_id}', [ProductDetailController::class, "findvariant"]);
-    
+
     Route::post('login', [AuthController::class, 'login']);
     Route::post('register', [AuthController::class, 'register']);
     Route::resource('order', OrderController::class);
     Route::resource('checkout', CheckoutController::class);
+    //Gửi mail
+    Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
+        ->middleware(['signed'])->name('verification.verify');
 
-    
+    // Resend Mail
+    Route::post('/email/verification-notification', [AuthController::class, 'resendVerifyEmail'])
+        ->middleware(['throttle:6,1'])->name('verification.send');
+
+    Route::post('password/forgot', [AuthController::class, 'sendResetPassWordMail']);
+
+    Route::get('password/reset/{token}', [AuthController::class, 'showResetForm'])
+        ->name('password.reset');
+
+    Route::post('password/reset', [AuthController::class, 'reset']);
 });
 
 
 Route::middleware('auth:sanctum')->prefix('v1/')->group(function () {
-    Route::post('logout', [AuthController::class, 'logout']);
     Route::apiResource('cart', CartController::class);
-  
+
     Route::post('comment', [CommentController::class, 'store']); // Thêm bình luận mới
     Route::get('comment/{id}', [CommentController::class, 'show']); // Lấy chi tiết bình luận
     Route::put('comment/{id}', [CommentController::class, 'update']); // Cập nhật bình luận
@@ -82,4 +85,10 @@ Route::middleware('auth:sanctum')->prefix('v1/')->group(function () {
 
 
     Route::apiResource('wishlist', WishlistController::class);
+    Route::get('/user', [InforUserController::class, 'getInforUser']);
+    Route::put('/user/update', [InforUserController::class, 'updateInforUser']);
+    Route::post('logout', [AuthController::class, 'logout']);
+
 });
+
+

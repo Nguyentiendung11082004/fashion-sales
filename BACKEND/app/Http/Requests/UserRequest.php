@@ -28,7 +28,7 @@ class UserRequest extends FormRequest
         if ($this->isMethod('post')) {
             return [
                 'name'         => 'required|string|max:255',
-                'phone_number' => 'required|string|regex:/^[0-9]{10}$/|unique:users,phone_number',
+                'phone_number' => 'required|string|regex:/^0[0-9]{9}$/|unique:users,phone_number',
                 'email'        => 'required|email|unique:users,email',
                 'address'      => 'required|string|max:255',
                 'avatar'       => 'nullable',
@@ -54,7 +54,7 @@ class UserRequest extends FormRequest
                 'name'         => 'nullable|string|max:255',
                 'phone_number' => [
                     'required',
-                    'regex:/^[0-9]{10}$/', // Chỉ chấp nhận số điện thoại gồm đúng 10 chữ số
+                    'regex:/^0[0-9]{9}$/', // Chỉ chấp nhận số điện thoại gồm đúng 10 chữ số
                     Rule::unique('users')->ignore($userID,'id'), // Bỏ qua ID hiện tại
                 ],
                 'email' => [
