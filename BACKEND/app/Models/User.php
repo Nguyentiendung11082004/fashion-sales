@@ -53,21 +53,22 @@ class User extends Authenticatable implements MustVerifyEmail
         'password' => 'hashed',
     ];
 
-    public function comments(){
+    public function comments()
+    {
         return $this->hasMany(Comments::class);
     }
 
-    public function role(){
+    public function role()
+    {
         return $this->belongsTo(Role::class);
     }
-    public function carts(){
+    public function carts()
+    {
         return $this->hasMany(Cart::class);
     }
 
     public function sendEmailVerificationNotification()
-{
-    $this->notify(new CustomVerifyEmail());
-}
-
-    
+    {
+        $this->notify(new CustomVerifyEmail());
+    }
 }
