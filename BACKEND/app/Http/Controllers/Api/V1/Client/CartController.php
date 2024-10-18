@@ -26,9 +26,8 @@ class CartController extends Controller
             $user_id = Auth::id();
             $cart = Cart::query()->where('user_id', $user_id)->with([
                 "cartitems",
-
                 "cartitems.product",
-                "cartitems.productvariant.attributes"
+                "cartitems.productvariant.attributes",
             ])->first();
             if (!$cart) {
                 return response()->json([
@@ -159,7 +158,7 @@ class CartController extends Controller
                     [
                         "cart",
                         "productvariant.attributes",
-                        "product",
+                        "product.variants.attributes",
                     ]
                 )->toArray();
                 // dd($cart_item);
@@ -201,10 +200,10 @@ class CartController extends Controller
                 }
 
                 if ($cart_item->product_variant_id) {
-                    $request->validate([
-                        "product_variant" => "required|array",
-                        "product_variant.*"=>"integer|min:1"
-                    ]);
+                    // $request->validate([
+                    //     "product_variant" => "required|array",
+                    //     "product_variant.*"=>"integer|min:1"
+                    // ]);
                     $getUniqueAttributes = new GetUniqueAttribute();
                     $product_variant = Product::query()->findOrFail($cart_item->product_id)->load(["variants", "variants.attributes"])->toArray();
 
