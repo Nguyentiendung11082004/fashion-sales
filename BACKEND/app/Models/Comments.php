@@ -15,14 +15,19 @@ class Comments extends Model
         "rating",
         'image',
         "status",
+         "parent_id"
     ];
 
     public function product(){
         return $this->belongsTo(Product::class);
     }
-    public function user(){
-        return $this->belongsTo(User::class);
+    
+
+    public function user()
+    {
+        return $this->belongsTo(User::class)->select('id', 'name', 'avatar');
     }
+
     public function parent()
     {
         return $this->belongsTo(Comments::class, 'parent_id');
@@ -32,4 +37,9 @@ class Comments extends Model
     {
         return $this->hasMany(Comments::class, 'parent_id');
     }
+    public function childrenRecursive()
+    {
+        return $this->hasMany(Comments::class, 'parent_id')->with('childrenRecursive');
+    }
 }
+    

@@ -8,7 +8,6 @@ use App\Http\Requests\Banner\StoreBannerRequest;
 use App\Http\Requests\Banner\UpdateBannerRequest;
 use App\Http\Resources\BannerResource;
 use App\Models\Banner;
-use App\Models\Category;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -21,11 +20,42 @@ class BannerController extends Controller
     /**
      * Display a listing of the resource.
      */
+    // public function index(Request $request)
+    // {
+    //     try {
+    //         $banners = Banner::query()->latest('id')->get();
+
+    //         if ($banners->isEmpty()) {
+    //             return response()->json([
+    //                 'status' => false,
+    //                 'message' => 'Không có dữ liệu.',
+    //                 'data' => []
+    //             ], Response::HTTP_OK);
+    //         }
+
+    //         return response()->json([
+    //             'status' => true,
+    //             'message' => 'Danh sách banners được lấy thành công.',
+    //             'data' => [
+    //                 'total' => $banners->count(),
+    //                 'banners' => $banners
+    //             ]
+    //         ], Response::HTTP_OK);
+    //     } catch (\Exception $ex) {
+    //         Log::error('API/V1/Admin/BannerController@index: ', [$ex->getMessage()]);
+
+    //         return response()->json([
+    //             'status' => false,
+    //             'message' => 'Đã có lỗi nghiêm trọng xảy ra. Vui lòng thử lại sau.'
+    //         ], Response::HTTP_INTERNAL_SERVER_ERROR);
+    //     }
+    // }
     public function index(Request $request)
     {
         try {
+            $currentDate = Carbon::now(); // Lấy ngày hiện tại
             $banners = Banner::query()->latest('id')->get();
-
+            
             if ($banners->isEmpty()) {
                 return response()->json([
                     'status' => false,
@@ -33,7 +63,16 @@ class BannerController extends Controller
                     'data' => []
                 ], Response::HTTP_OK);
             }
-
+    
+            // Kiểm tra và cập nhật banner hết hạn
+            // $banners->transform(function ($banner) use ($currentDate) {
+            //     if (Carbon::parse($banner->end_date)->lessThan($currentDate)) {
+            //         // Nếu banner đã hết hạn, trả về ảnh mặc định
+            //         $banner->image = asset('default/bannerdafault.jpg'); 
+            //     }
+            //     return $banner;
+            // });
+    
             return response()->json([
                 'status' => true,
                 'message' => 'Danh sách banners được lấy thành công.',
@@ -44,14 +83,13 @@ class BannerController extends Controller
             ], Response::HTTP_OK);
         } catch (\Exception $ex) {
             Log::error('API/V1/Admin/BannerController@index: ', [$ex->getMessage()]);
-
             return response()->json([
                 'status' => false,
                 'message' => 'Đã có lỗi nghiêm trọng xảy ra. Vui lòng thử lại sau.'
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-
+    
     /**
      * Store a newly created resource in storage.
      */
@@ -203,47 +241,4 @@ class BannerController extends Controller
         'data' => $banners
     ], Response::HTTP_OK);
 }
-public function getPostsByCategory($id)
-{
-    try {
-        // Lấy danh mục cùng với các bài viết thuộc danh mục đó
-        $category = Category::with('posts')->findOrFail($id);
-
-        // Trả về JSON response
-        return response()->json([
-            'status' => true,
-            'message' => 'Danh sách bài viết theo danh mục',
-            'data' => $category->posts
-        ], 200);
-
-    } catch (\Exception $e) {
-        return response()->json([
-            'status' => false,
-            'message' => 'Không tìm thấy danh mục',
-            'error' => $e->getMessage()
-        ], 404);
-    }
-}
-public function getUncategorizedPosts()
-{
-    try {
-        // Lấy các bài viết không thuộc danh mục nào (category_id = null)
-        $posts = Post::whereNull('category_id')->get();
-
-        // Trả về JSON response
-        return response()->json([
-            'status' => true,
-            'message' => 'Danh sách bài viết không thuộc danh mục',
-            'data' => $posts
-        ], 200);
-
-    } catch (\Exception $e) {
-        return response()->json([
-            'status' => false,
-            'message' => 'Không thể lấy danh sách bài viết không thuộc danh mục',
-            'error' => $e->getMessage()
-        ], 500);
-    }
-}
-
 }

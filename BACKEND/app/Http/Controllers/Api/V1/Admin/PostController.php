@@ -13,6 +13,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Post\StorePostRequest;
 use App\Http\Requests\Post\UpdatePostRequest;
 use App\Models\Category;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class PostController extends Controller
 {
@@ -93,38 +94,80 @@ class PostController extends Controller
     /**
      * Update the specified resource in storage.
      */
+    // public function update(UpdatePostRequest $request, $id)
+    // {
+    //     try {
+    //         $post = Post::findOrFail($id);
+    //         $data = $request->all();
+    //         if ($data['post_name'] !== $post->post_name) {
+    //             $data['slug'] = $this->generateUniqueSlug($data['post_name'], $id);
+    //         } else {
+    //             $data['slug'] = $post->slug; 
+    //         }
+    //         $purifier = new HTMLPurifier();
+    //         $data['post_content'] = $purifier->purify($data['post_content']);
+    //         if ($request->has('img_thumbnail')) {
+    //             $data['img_thumbnail'] = $request->img_thumbnail; 
+    //         } else {
+    //             $data['img_thumbnail'] = $post->img_thumbnail; 
+    //         }
+    //         $post->update($data);
+    
+    //         return response()->json([
+    //             'message' => 'Cập nhật bài viết thành công!',
+    //             'data' => $post
+    //         ], Response::HTTP_OK);
+    
+    //     } catch (QueryException $e) {
+    //         return response()->json([
+    //             'message' => 'Cập nhật bài viết thất bại!',
+    //             'error' => $e->getMessage()
+    //         ], 500);
+    //     }
+    // }
     public function update(UpdatePostRequest $request, $id)
-    {
-        try {
-            $post = Post::findOrFail($id);
-            $data = $request->all();
-            if ($data['post_name'] !== $post->post_name) {
-                $data['slug'] = $this->generateUniqueSlug($data['post_name'], $id);
-            } else {
-                $data['slug'] = $post->slug; 
-            }
-            $purifier = new HTMLPurifier();
-            $data['post_content'] = $purifier->purify($data['post_content']);
-            if ($request->has('img_thumbnail')) {
-                $data['img_thumbnail'] = $request->img_thumbnail; 
-            } else {
-                $data['img_thumbnail'] = $post->img_thumbnail; 
-            }
-            $post->update($data);
-    
-            return response()->json([
-                'message' => 'Cập nhật bài viết thành công!',
-                'data' => $post
-            ], Response::HTTP_OK);
-    
-        } catch (QueryException $e) {
-            return response()->json([
-                'message' => 'Cập nhật bài viết thất bại!',
-                'error' => $e->getMessage()
-            ], 500);
+{
+    try {
+        $post = Post::findOrFail($id);
+        $data = $request->all();
+
+        // Kiểm tra và cập nhật slug nếu tên bài viết thay đổi
+        if ($data['post_name'] !== $post->post_name) {
+            $data['slug'] = $this->generateUniqueSlug($data['post_name'], $id);
+        } else {
+            $data['slug'] = $post->slug;
         }
+
+        // Làm sạch nội dung bài viết
+        $purifier = new HTMLPurifier();
+        $data['post_content'] = $purifier->purify($data['post_content']);
+
+        // Kiểm tra và cập nhật ảnh thumbnail nếu có, nếu không thì giữ nguyên ảnh cũ
+        if ($request->has('img_thumbnail') && !empty($request->img_thumbnail)) {
+            $data['img_thumbnail'] = $request->img_thumbnail;
+        } else {
+            $data['img_thumbnail'] = $post->img_thumbnail;
+        }
+
+        // Cập nhật các thông tin khác của bài viết
+        $post->update($data);
+
+        return response()->json([
+            'message' => 'Cập nhật bài viết thành công!',
+            'data' => $post
+        ], Response::HTTP_OK);
+    } catch (ModelNotFoundException $e) {
+        return response()->json([
+            'message' => 'Bài viết không tồn tại!',
+        ], 404);
+    } catch (QueryException $e) {
+        return response()->json([
+            'message' => 'Cập nhật bài viết thất bại!',
+            'error' => $e->getMessage()
+        ], 500);
     }
-    
+}
+
 
     /**
      * Remove the specified resource from storage.
