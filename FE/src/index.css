@@ -250,3 +250,15 @@ body {
   font-weight: bold;
 }
 
+@keyframes bounce-scale {
+  0%, 100% {
+    transform: scale(1); /* Kích thước bình thường */
+  }
+  50% {
+    transform: scale(1.1); /* Phóng to một chút */
+  }
+}
+
+.hover\:animate-bounce-scale:hover {
+  animation: bounce-scale 0.6s infinite; /* Hiệu ứng lặp vô hạn khi hover */
+}

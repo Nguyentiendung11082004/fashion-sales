@@ -1,3 +1,4 @@
+/* eslint-disable prefer-const */
 /* eslint-disable no-prototype-builtins */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/ban-types */
@@ -13,6 +14,7 @@ import { categoriesShow } from "@/services/api/admin/categories";
 import CommentPageDetail from "./CommentPageDetail";
 import { Skeleton } from "antd";
 import { findProductVariant } from "@/services/api/client/productClient.api";
+
 interface IinitialAttributes {
   [key: string]: string;
 }
@@ -121,61 +123,45 @@ const ProductDetail = () => {
     if (!variant.attributes) {
       return {};
     }
+
+    const attributeObj = variant.attributes.reduce(
+      (acc: { [key: string]: number }, attribute: any) => {
+        acc[attribute.name] = attribute.pivot.attribute_item_id;
+        return acc;
+      },
+      {}
+    );
+    return attributeObj;
   });
 
-  // console.log("Các key đã chọn:", keySelectedAttributes);
+  const [dataAttributes, setAttribute] = useState<any>([]);
 
-  // console.log("Các sản phẩm liên quan:", result);
+  const handleAttributeSelect = (attribute: any, id: any) => {
+    setAttribute((prev: any) => ({
+      ...prev,
+      [attribute]: id,
+    }));
+  };
 
-  const resultFormat = result?.reduce((acc: any, product: any) => {
-    Object.keys(product).forEach((key) => {
-      if (!acc[key]) {
-        acc[key] = [];
-      }
-      if (!acc[key].includes(product[key])) {
-        acc[key].push(product[key]);
-      }
+  const checkDisable = (attribute: string, value: any) => {
+    let res = false;
+
+    let matchingItems = result.filter((x: any) => {
+      return Object.keys(dataAttributes).every((key) => {
+        if (key !== attribute) {
+          return x[key] && x[key].toString() === dataAttributes[key].toString();
+        }
+        return true;
+      });
     });
-    return acc;
-  }, {});
 
-  console.log("sản phẩm liên quan sau khi format", resultFormat);
-  const arrayResultFormat =
-    resultFormat && typeof resultFormat === "object"
-      ? Object.values(resultFormat).flat()
-      : [];
-  console.log("mảng sau khi chuyển của arrayResultFormat:", arrayResultFormat);
+    let isAttributeValid = matchingItems.some(
+      (x: any) => x[attribute] && x[attribute].toString() === value.toString()
+    );
 
-  const matchedPivots = result?.filter((data: any) => {
-    const objectVariant = selectedAttributes?.product_variant || {};
-    const variantKeys = Object.keys(objectVariant);
+    res = !isAttributeValid;
 
-    if (variantKeys.length === 0) {
-      return true;
-    }
-
-    const attributesToCompare =
-      variantKeys.length > 1
-        ? variantKeys.slice(0, variantKeys.length - 1)
-        : variantKeys;
-
-    return attributesToCompare.every((key) => {
-      return objectVariant[key] == data[key];
-    });
-  });
-
-  const handleAttributeSelect = (key: string, valueId: string | number) => {
-    setSelectedAttributes((prev) => {
-      const updatedAttributes = { ...prev.product_variant };
-
-      if (updatedAttributes[key] === valueId) {
-        delete updatedAttributes[key];
-      } else {
-        updatedAttributes[key] = valueId;
-      }
-
-      return { product_variant: updatedAttributes };
-    });
+    return res;
   };
 
   useEffect(() => {
@@ -203,6 +189,16 @@ const ProductDetail = () => {
     fetchProductVariant();
   }, [selectedAttributes]);
 
+  const resultGetUniqueAttribute = Object.entries(
+    getUniqueAttributes ?? {}
+  ).map(([key, value]) => ({
+    attribute: key,
+    attributeValue: Object.entries(value ?? {}).map(([id, name]) => ({
+      id,
+      name,
+    })),
+  }));
+
   useEffect(() => {
     if (getUniqueAttributes) {
       const initialAttributes: IinitialAttributes = {};
@@ -224,8 +220,6 @@ const ProductDetail = () => {
 
   if (isLoading) return <Skeleton className="container py-10 lg:flex" />;
   if (isError) return <p>{error.message}</p>;
-
-  console.log("kiểm tra getUnique", getUniqueAttributes);
 
   return (
     <>
@@ -342,71 +336,90 @@ const ProductDetail = () => {
                 </p>
               </div>
               <div>
-                {getUniqueAttributes && (
-                  <div className="mt-2">
-                    {Object.keys(getUniqueAttributes).map((key) => {
-                      const value = getUniqueAttributes[key];
+                <div className="mt-2">
+                  {resultGetUniqueAttribute.map((key) => {
+                    // const value = getUniqueAttributes[key];
 
-                      return (
-                        <div key={key} className="mb-4">
-                          <label className="flex items-center">
-                            <span className="font-medium">{key}:</span>
-                            {selectedAttributes.product_variant[key] !==
-                              undefined && (
-                              <span className="ml-2">
-                                {value[
-                                  selectedAttributes.product_variant[key]
-                                ].toLowerCase()}
-                              </span>
-                            )}
-                          </label>
-                          <div className="flex mt-3 gap-2">
-                            {Object.keys(value).map((valueId) => {
-                              const valueName = value[valueId];
+                    return (
+                      <div key={key.attribute} className="mb-4">
+                        <label className="flex items-center">
+                          <span className="font-medium">{key.attribute}:</span>
+                          {selectedAttributes.product_variant[key.attribute] !==
+                            undefined && (
+                            <span className="ml-2">
+                              {key.attributeValue
+                                .find(
+                                  (item) =>
+                                    item.id ===
+                                    selectedAttributes.product_variant[
+                                      key.attribute
+                                    ]
+                                )
+                                ?.name.toLowerCase()}
+                            </span>
+                          )}
+                        </label>
+                        <div className="flex mt-3 gap-2">
+                          {key.attributeValue.map((item) => {
+                            const isDisabled = checkDisable(
+                              key.attribute,
+                              item.id
+                            );
+                            const isSelected =
+                              selectedAttributes.product_variant[
+                                key.attribute
+                              ] === item.id;
 
-                              const isDisabled = disable.includes(
-                                parseInt(valueId)
-                              );
-
-                              return (
-                                <div
-                                  key={valueId}
-                                  className={`relative flex-1 max-w-[60px] h-8 sm:h-9 rounded-full cursor-pointer flex items-center justify-center ${
-                                    selectedAttributes.product_variant[key] ===
-                                    valueId
-                                      ? "border-gray-700 border-4"
-                                      : "border-gray-200 border-2"
-                                  } ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
-                                  style={{
-                                    backgroundColor:
-                                      key === "color"
-                                        ? valueName
-                                        : "transparent",
-                                  }}
-                                  onClick={() =>
-                                    !isDisabled &&
-                                    handleAttributeSelect(key, valueId)
+                            return (
+                              <div
+                                key={item.id}
+                                className={`relative flex-1 max-w-[60px] h-8 sm:h-9 rounded-full cursor-pointer flex items-center justify-center ${
+                                  isSelected
+                                    ? "border-gray-800 border-4"
+                                    : isDisabled
+                                      ? "border-gray-200 border-2 opacity-50 cursor-not-allowed"
+                                      : ""
+                                }`}
+                                style={{
+                                  backgroundColor:
+                                    key.attribute === "color"
+                                      ? item.name
+                                      : "transparent",
+                                }}
+                                onClick={() => {
+                                  if (!isDisabled) {
+                                    handleAttributeSelect(
+                                      key.attribute,
+                                      item.id
+                                    );
+                                    setSelectedAttributes((prev) => ({
+                                      ...prev,
+                                      product_variant: {
+                                        ...prev.product_variant,
+                                        [key.attribute]: item.id,
+                                      },
+                                    }));
                                   }
-                                >
-                                  {key !== "color" && (
-                                    <div className="absolute inset-0 rounded-full flex items-center justify-center overflow-hidden z-0 bg-gray-300 text-sm md:text-base text-center">
-                                      {valueName}
-                                    </div>
-                                  )}
-                                  {key === "color" && (
-                                    <div className="absolute inset-0 rounded-full overflow-hidden z-0 object-cover bg-cover border-2 border-gray-200">
-                                      <span className="text-sm md:text-base text-center"></span>
-                                    </div>
-                                  )}
-                                </div>
-                              );
-                            })}
-                          </div>
+                                }}
+                              >
+                                {key.attribute !== "color" && (
+                                  <div className="absolute inset-0 rounded-full flex items-center justify-center overflow-hidden z-0 bg-gray-300 text-sm md:text-base text-center">
+                                    {item.name}
+                                  </div>
+                                )}
+                                {key.attribute === "color" && (
+                                  <div className="absolute inset-0 rounded-full overflow-hidden z-0 object-cover bg-cover border-2 border-gray-200">
+                                    <span className="text-sm md:text-base text-center"></span>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
                         </div>
-                      );
-                    })}
-                  </div>
-                )}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
 
               <div className="font-medium mt-2 mb-2">số lượng: </div>

@@ -6,6 +6,7 @@ use App\Models\Wishlist;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Helper\Product\GetUniqueAttribute;
+use Illuminate\Support\Facades\Auth;
 
 class WishlistController extends Controller
 {
@@ -16,33 +17,36 @@ class WishlistController extends Controller
     {
         try {
             // Lấy danh sách sản phẩm yêu thích của người dùng hiện tại
-            $userId = auth()->id(); // Lấy id của người dùng hiện tại
-            // $userId = 1;
+            if (Auth::check()) {
+                $user_id = Auth::id();
+                // $userId = 1;
+                // Query để lấy danh sách các sản phẩm yêu thích cùng với các quan hệ
+                $wishlistItems = Wishlist::with([
+                    'product.galleries',
+                    'product.variants.attributes'
+                ])->where('user_id', $user_id)
+                    ->get();
+                $allProducts = []; // Mảng chứa tất cả sản phẩm và biến thể
 
-            // Query để lấy danh sách các sản phẩm yêu thích cùng với các quan hệ
-            $wishlistItems = Wishlist::with([
-                'product.galleries',
-                'product.variants.attributes'
-            ])->where('user_id', $userId)
-                ->get();
-            $allProducts = []; // Mảng chứa tất cả sản phẩm và biến thể
+                foreach ($wishlistItems as $wishlistItem) {
+                    $product = $wishlistItem->product; // Lấy đối tượng sản phẩm từ wishlistItem
 
-            foreach ($wishlistItems as $wishlistItem) {
-                $product = $wishlistItem->product; // Lấy đối tượng sản phẩm từ wishlistItem
+                    if ($product) {
+                        $product->increment('views'); // Tăng số lượt xem cho sản phẩm
 
-                if ($product) {
-                    $product->increment('views'); // Tăng số lượt xem cho sản phẩm
+                        // Khởi tạo đối tượng lấy thuộc tính duy nhất
+                        $getUniqueAttributes = new GetUniqueAttribute();
 
-                    // Khởi tạo đối tượng lấy thuộc tính duy nhất
-                    $getUniqueAttributes = new GetUniqueAttribute();
-
-                    // Thêm sản phẩm và biến thể vào mảng
-                    $allProducts[] = [
-                        'wishlist_id' => $wishlistItem->id,
-                        'product' => $product,
-                        'getUniqueAttributes' => $getUniqueAttributes->getUniqueAttributes($product->variants->toArray()),
-                    ];
+                        // Thêm sản phẩm và biến thể vào mảng
+                        $allProducts[] = [
+                            'wishlist_id' => $wishlistItem->id,
+                            'product' => $product,
+                            'getUniqueAttributes' => $getUniqueAttributes->getUniqueAttributes($product->variants->toArray()),
+                        ];
+                    }
                 }
+            } else {
+                return response()->json(['message' => 'User not authenticated'], 401);
             }
             // Trả về tất cả sản phẩm sau khi vòng lặp kết thúc
             return response()->json($allProducts);
@@ -62,24 +66,28 @@ class WishlistController extends Controller
                 'product_id' => 'required|exists:products,id',
             ]);
 
-            $userId = auth()->id();  //Lấy id người dùng hiện tại
-            // $userId = 1;
-            // Kiểm tra nếu sản phẩm đã có trong danh sách yêu thích
-            $wishlistItem = Wishlist::where('user_id', $userId)
-                ->where('product_id', $request->product_id)
-                ->first();
+            if (Auth::check()) {
+                $user_id = Auth::id();
+                // $userId = 1;
+                // Kiểm tra nếu sản phẩm đã có trong danh sách yêu thích
+                $wishlistItem = Wishlist::where('user_id', $user_id)
+                    ->where('product_id', $request->product_id)
+                    ->first();
 
-            if (!$wishlistItem) {
-                // Nếu chưa có, thêm sản phẩm vào danh sách yêu thích
-                Wishlist::create([
-                    'user_id' => $userId,
-                    'product_id' => $request->product_id,
-                ]);
+                if (!$wishlistItem) {
+                    // Nếu chưa có, thêm sản phẩm vào danh sách yêu thích
+                    Wishlist::create([
+                        'user_id' => $user_id,
+                        'product_id' => $request->product_id,
+                    ]);
 
-                return response()->json(['message' => 'Sản phẩm đã được thêm vào danh sách yêu thích'], 201);
+                    return response()->json(['message' => 'Sản phẩm đã được thêm vào danh sách yêu thích'], 201);
+                }
+
+                return response()->json(['message' => 'Sản phẩm đã có trong danh sách yêu thích'], 200);
+            } else {
+                return response()->json(['message' => 'User not authenticated'], 401);
             }
-
-            return response()->json(['message' => 'Sản phẩm đã có trong danh sách yêu thích'], 200);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
         }
@@ -107,20 +115,24 @@ class WishlistController extends Controller
     public function destroy(string $id)
     {
         try {
-            $userId = auth()->id();  //Lấy id người dùng hiện tại
-            // $userId = 1;
+            if (Auth::check()) {
+                $user_id = Auth::id();
+                // $userId = 1;
 
-            // Tìm sản phẩm trong danh sách yêu thích theo ID của wishlist
-            $wishlistItem = Wishlist::where('user_id', $userId)->where('id', $id)->first();
-            // dd($wishlistItem);
-            if ($wishlistItem) {
-                // Nếu tìm thấy, xóa sản phẩm khỏi danh sách yêu thích
-                $wishlistItem->delete();
+                // Tìm sản phẩm trong danh sách yêu thích theo ID của wishlist
+                $wishlistItem = Wishlist::where('user_id', $user_id)->where('id', $id)->first();
+                // dd($wishlistItem);
+                if ($wishlistItem) {
+                    // Nếu tìm thấy, xóa sản phẩm khỏi danh sách yêu thích
+                    $wishlistItem->delete();
 
-                return response()->json(['message' => 'Sản phẩm đã được xóa khỏi danh sách yêu thích'], 200);
+                    return response()->json(['message' => 'Sản phẩm đã được xóa khỏi danh sách yêu thích'], 200);
+                }
+
+                return response()->json(['message' => 'Không tìm thấy sản phẩm trong danh sách yêu thích'], 404);
+            } else {
+                return response()->json(['message' => 'User not authenticated'], 401);
             }
-
-            return response()->json(['message' => 'Không tìm thấy sản phẩm trong danh sách yêu thích'], 404);
         } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
         }

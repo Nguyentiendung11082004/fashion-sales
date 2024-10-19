@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useAuth } from "@/common/context/Auth/AuthContext";
-import { Icomments } from "@/common/types/comments";
 import instance from "@/configs/axios";
-import { postComment } from "@/services/api/client/commentClient.api";
 import { UploadOutlined } from "@ant-design/icons";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button, Form, Input, message, Upload, UploadProps } from "antd";

@@ -66,6 +66,7 @@ const BrandForm = () => {
       navigate("/admin/brands");
     },
     onError: () => {
+      setError(error.response.data);
       setIsLoading(false);
       toast.error("Sửa thất bại");
     },

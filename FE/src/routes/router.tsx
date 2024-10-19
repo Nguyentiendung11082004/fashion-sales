@@ -30,6 +30,7 @@ import ClientPage from "@/pages/admin/account/client/Client";
 import FormClient from "@/pages/admin/account/client/components/FormClient";
 import EmployeePage from "@/pages/admin/account/employee/Employee";
 import FormEmployee from "@/pages/admin/account/employee/components/FormEmployee";
+import Wishlist from "@/pages/client/wishlist/Wishlist";
 import Register from "@/pages/client/auth/register/Register";
 import Login from "@/pages/client/auth/login/Login";
 
@@ -45,6 +46,7 @@ const Router = () => {
           <Route path="about" element={<About />} />
           <Route path="cart" element={<Cart />} />
           <Route path="account" element={<Account />} />
+          <Route path="wishlist" element={<Wishlist />} />
           <Route
             path="account/:id/forgotpassword"
             element={<ForgotPassword />}
@@ -85,6 +87,11 @@ const Router = () => {
           <Route path="tags" element={<Tags />} />
           <Route path="tags/create" element={<FormTag />} />
           <Route path="tags/edit/:id" element={<FormTag />} />
+          <Route path="clients" element={<ClientPage />} />
+          <Route path="clients/create" element={<FormClient />} />
+          <Route path="employees" element={<EmployeePage />} />
+          <Route path="employees/create" element={<FormEmployee />} />
+          <Route path="employees/edit/:id" element={<FormEmployee />} />
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
