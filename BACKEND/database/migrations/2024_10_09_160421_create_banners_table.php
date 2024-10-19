@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('link')->nullable();
             $table->date('start_date'); 
             $table->date('end_date'); 
-            $table->boolean('status')->default(true); 
+            $table->boolean('status'); 
             $table->timestamps(); 
 
         });

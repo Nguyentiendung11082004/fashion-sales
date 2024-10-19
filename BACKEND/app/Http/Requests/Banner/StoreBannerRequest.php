@@ -41,7 +41,7 @@ class StoreBannerRequest extends FormRequest
             'link' => 'nullable|url|max:255',          
             'start_date' => 'required|date|before_or_equal:end_date',
             'end_date' => 'required|date|after_or_equal:start_date',  
-            'status' => 'required|boolean' // Chấp nhận cả true/false hoặc 0/1
+            // 'status' => 'required|boolean' // Chấp nhận cả true/false hoặc 0/1
         ];
     }
 }

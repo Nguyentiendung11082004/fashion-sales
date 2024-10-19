@@ -41,7 +41,7 @@ class UpdateBannerRequest extends FormRequest
             'link' => 'nullable|url|max:255',            
             'start_date' => 'nullable|date|before_or_equal:end_date', 
             'end_date' => 'nullable|date|after_or_equal:start_date',  
-            'status' => 'required|boolean'        
+            // 'status' => 'required|boolean'        
         ];
     }
 }

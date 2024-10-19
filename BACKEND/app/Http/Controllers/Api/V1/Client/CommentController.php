@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\V1\Client;
 
 use App\Http\Controllers\Controller;
-
+use App\Models\Order;
 use App\Models\Comments;
 use App\Models\Product;
 use Illuminate\Http\Request;
@@ -18,7 +18,7 @@ class CommentController extends Controller
      */
     public function index()
 {
-    $comments = Comments::with(['user:id,name,avatar', 'childrenRecursive.user:id,name,avatar'])->whereNull('parent_id')->latest('created_at')->get();
+    $comments = Comments::with(['user', 'childrenRecursive.user'])->whereNull('parent_id')->latest('created_at')->get();
     return response()->json($comments, Response::HTTP_OK);
 }
 
@@ -67,7 +67,18 @@ class CommentController extends Controller
             'image' => 'nullable|string',
             'parent_id' => 'nullable|exists:comments,id'
         ]);
-        $comment = Comments::create([
+        //  Kiểm tra xem người dùng đã mua sản phẩm này chưa
+        // $userHasPurchased = Order::where('user_id', Auth::id())
+        // ->where('order_status', 'completed') // Chỉ tính đơn hàng đã hoàn tất
+        // ->whereHas('orderItems', function($query) use ($validated) {
+        //     $query->where('product_id', $validated['product_id']);
+        // })
+        // ->exists();
+
+        // if (!$userHasPurchased) {
+        //     return response()->json(['message' => 'Bạn cần phải mua sản phẩm này trước khi bình luận.'], Response::HTTP_FORBIDDEN);
+        // }
+            $comment = Comments::create([
             'user_id' => Auth::id(),
             'product_id' => $validated['product_id'],
             'content' => $validated['content'],
