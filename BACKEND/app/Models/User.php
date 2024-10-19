@@ -60,4 +60,9 @@ class User extends Authenticatable
     public function carts(){
         return $this->hasMany(Cart::class);
     }
+     // Liên kết đến voucher_logs
+     public function voucherLogs()
+     {
+         return $this->hasMany(VoucherLog::class);
+     }
 }

@@ -50,4 +50,9 @@ class Order extends Model
     {
         return $this->hasMany(OrderDetail::class);
     }
+     // Liên kết đến voucher_logs
+     public function voucherLogs()
+     {
+         return $this->hasMany(VoucherLog::class);
+     }
 }
