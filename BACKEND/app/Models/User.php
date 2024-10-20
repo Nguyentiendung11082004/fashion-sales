@@ -71,4 +71,9 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         $this->notify(new CustomVerifyEmail());
     }
+     // Liên kết đến voucher_logs
+     public function voucherLogs()
+     {
+         return $this->hasMany(VoucherLog::class);
+     }
 }
