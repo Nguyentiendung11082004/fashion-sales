@@ -39,7 +39,7 @@ class Comments extends Model
     }
     public function childrenRecursive()
     {
-        return $this->hasMany(Comments::class, 'parent_id')->with('childrenRecursive');
+        return $this->hasMany(Comments::class, 'parent_id')->with('user:id,name,avatar', 'childrenRecursive');
     }
 }
     

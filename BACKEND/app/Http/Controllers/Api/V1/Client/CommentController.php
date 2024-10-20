@@ -17,10 +17,13 @@ class CommentController extends Controller
      * Hiển thị danh sách bình luận.
      */
     public function index()
-{
-    $comments = Comments::with(['user', 'childrenRecursive.user'])->whereNull('parent_id')->latest('created_at')->get();
-    return response()->json($comments, Response::HTTP_OK);
-}
+    {
+        $comments = Comments::with(['user:id,name,avatar', 'childrenRecursive.user:id,name,avatar'])
+                            ->whereNull('parent_id')
+                            ->latest('created_at')
+                            ->get();
+        return response()->json($comments, Response::HTTP_OK);
+    }
 
     
     
