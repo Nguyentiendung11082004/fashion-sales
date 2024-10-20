@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignIdFor(Conversation::class)->constrained();
             $table->foreignIdFor(User::class)->constrained();
             $table->primary(["conversation_id","user_id"]);
+            $table->boolean('is_deleted')->default(false);
             $table->timestamps();
         });
     }

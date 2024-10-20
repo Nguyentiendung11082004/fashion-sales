@@ -21,6 +21,7 @@ use App\Http\Controllers\Api\V1\Client\WishlistController;
 use App\Http\Controllers\Api\V1\Client\HomeProductController;
 use App\Http\Controllers\Api\V1\Client\ProductShopController;
 use App\Http\Controllers\Api\V1\Admin\AttributeItemController;
+use App\Http\Controllers\Api\V1\Client\ChatController;
 use App\Http\Controllers\Api\V1\Client\ProductDetailController;
 
 
@@ -89,6 +90,9 @@ Route::middleware('auth:sanctum')->prefix('v1/')->group(function () {
 
     // Gửi tin nhắn trong một cuộc trò chuyện
     Route::post('conversations/messages/{conversation}', [MessageController::class, 'store']);
+    Route::post('conversations/messages', [MessageController::class, 'store']);
+    Route::resource("chat",ChatController::class);
+    Route::delete('chat-message/{conversation}',[ChatController::class,"deleteMessage"]);
   
     Route::post('comment', [CommentController::class, 'store']); // Thêm bình luận mới
     Route::get('comment/{id}', [CommentController::class, 'show']); // Lấy chi tiết bình luận

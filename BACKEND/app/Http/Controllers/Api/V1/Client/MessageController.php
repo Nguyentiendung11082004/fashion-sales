@@ -25,8 +25,8 @@ class MessageController extends Controller
 
             $messages = $conversation->messages()->with('user')->orderBy('created_at', 'asc')->get();
             return response()->json([
-                "message"=>"Lấy dữ liệu thành công",
-                "data"=>$messages
+                "message" => "Lấy dữ liệu thành công",
+                "messages" => $messages
             ]);
         } catch (\Exception $ex) {
             return response()->json([
@@ -39,7 +39,7 @@ class MessageController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request, Conversation $conversation)
+    public function store(Request $request)
     {
 
         $request->validate([
@@ -47,6 +47,20 @@ class MessageController extends Controller
         ]);
 
         $user = $request->user();
+        $recipient_id = $request->recipient_id;
+
+        // Kiểm tra xem đã có cuộc trò chuyện giữa hai người chưa
+        $conversation = Conversation::whereHas('users', function ($q) use ($user) {
+            $q->where('id', $user->id);
+        })->whereHas('users', function ($q) use ($recipient_id) {
+            $q->where('id', $recipient_id);
+        })->first();
+
+        if (!$conversation) {
+            // Tạo cuộc trò chuyện mới
+            $conversation = Conversation::create();
+            $conversation->users()->attach([$user->id, $recipient_id]);
+        }
 
         // Kiểm tra quyền truy cập
         if (!$conversation->users->contains($user)) {

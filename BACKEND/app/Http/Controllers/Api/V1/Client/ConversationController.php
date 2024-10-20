@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1\Client;
 
 use App\Http\Controllers\Controller;
 use App\Models\Conversation;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
@@ -18,12 +19,13 @@ class ConversationController extends Controller
         //
         try {
             $user = $request->user();
-
             $conversations = $user->conversations()->with(['users'])->get();
+            // $membership=User::query()->where('role_id',2)->where("id","<>",$user->id)->get();
 
             return response()->json([
                 "message" => "Lấy dữ liệu thành công",
-                "data" => $conversations
+                "conversations" => $conversations,
+                // "membership"=>$membership
             ]);
         } catch (\Exception $ex) {
             return response()->json([
@@ -96,4 +98,5 @@ class ConversationController extends Controller
     {
         //
     }
+    // public function 
 }
