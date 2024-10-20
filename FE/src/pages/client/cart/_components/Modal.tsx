@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Modal as AntModal, Skeleton } from 'antd';
 import instance from '@/configs/axios';
-import { useQuery } from '@tanstack/react-query';
+import { Button, Form, Input } from "antd";
 import { useAuth } from '@/common/context/Auth/AuthContext';
-
+import { useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
 type Props = {
     open: boolean;
     onClose: () => void;
@@ -13,19 +13,15 @@ type Props = {
 };
 const ModalCart = ({ open, onClose, idCart, onUpdateAttributes, attributes }: Props) => {
     const { token } = useAuth();
+    const [loading, setLoading] = useState<boolean>(false)
     const [activeAttributes, setActiveAttributes] = useState<any>({});
     const [dataAttributes, setAttribute] = useState<any>([])
+    const queryClient = useQueryClient();
     const handleActive = (attribute: any, id: any) => {
         setAttribute((prev: any) => ({
             ...prev,
             [attribute]: id,
         }));
-    };
-    console.log("dataAttributes", dataAttributes)
-    const handleConfirm = () => {
-        onUpdateAttributes(idCart, activeAttributes);
-        setAttribute({});
-        onClose();
     };
     useEffect(() => {
         if (open && attributes) {
@@ -46,6 +42,20 @@ const ModalCart = ({ open, onClose, idCart, onUpdateAttributes, attributes }: Pr
         },
         enabled: !!idCart && open,
     });
+    const updateCart = useMutation({
+        mutationFn: async ({ idCart, qty, dataAttributes }: { idCart: number, qty: number, dataAttributes: any }) => {
+            await instance.put(`/cart/${idCart}`, {
+                "quantity": qty,
+                "product_variant": dataAttributes
+            }, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+        }
+    });
+
+
     const formattedAttributes = cartAttribute ? cartAttribute.cart_item.product.variants?.map((item: any) => {
         const attributeObj: { [key: string]: number } = {};
         item.attributes.forEach((attribute: any) => {
@@ -82,6 +92,20 @@ const ModalCart = ({ open, onClose, idCart, onUpdateAttributes, attributes }: Pr
             name,
         })),
     }));
+    const handleConfirm = (idCart: any) => {
+        onUpdateAttributes(idCart, { ...activeAttributes, dataAttributes });
+        setAttribute({});
+        let qty = cartAttribute?.cart_item?.quantity;
+        updateCart.mutate({ idCart, qty, dataAttributes }, {
+            onSuccess: () => {
+                queryClient.invalidateQueries({
+                    queryKey: ['cart']
+                });
+
+            },
+        });
+        onClose();
+    };
     return (
         <AntModal open={open} onCancel={onClose} footer={false} closable={false} maskClosable={false}>
             {isFetching ? (
@@ -95,19 +119,32 @@ const ModalCart = ({ open, onClose, idCart, onUpdateAttributes, attributes }: Pr
                             <p>{e.attribute}</p>
                             <div className={`flex mt-3 gap-2 ${e.attribute === 'Color' ? 'flex-wrap' : 'grid grid-cols-5 sm:grid-cols-7'}`}>
                                 {e.attributeValue.map((item) => {
+                                    // const isDefault = attributes?.map((e: any) => e.pivot.attribute_item_id);
+                                    // const arr = formattedAttributes.map((item: any) => Object.values(item));
+                                    // const result = arr.some((subArray: any[]) =>
+                                    //     subArray.length === isDefault.length &&
+                                    //     subArray.every((val: any, index: string | number) => val === isDefault[index])
+                                    // );
+                                    // || (result && isDefault.includes(Number(item.id)))) 
                                     const isActive = dataAttributes[e.attribute] === item.id;
                                     let dis = false;
                                     if (e.attribute) {
                                         dis = checkDisable(e.attribute, item.id);
                                     }
                                     const _styles = dis ? styles.disable : {}
+                                   
                                     return (
                                         <div
                                             key={item.id}
                                             className={`relative flex-1 max-w-[75px] h-8 sm:h-8 rounded-full border-2 cursor-pointer 
                                             border-primary-6000 dark:border-primary-500 
-                                            ${isActive ? 'border-black' : ''}`}
-                                            onClick={() => !dis && handleActive(e.attribute, item.id)}
+                                              ${isActive ? 'border-black' : ''}
+                                                `}
+                                            onClick={() => {
+                                                if (!dis) {
+                                                    handleActive(e.attribute, item.id);
+                                                }
+                                            }}
                                             style={_styles}
                                         >
                                             {e.attribute === 'Color' ? (
@@ -121,17 +158,18 @@ const ModalCart = ({ open, onClose, idCart, onUpdateAttributes, attributes }: Pr
                                         </div>
                                     );
                                 })}
+
                             </div>
                         </div>
                     ))}
                 </div>
             )}
-            <button
-                onClick={handleConfirm}
-                className="nc-Button relative right-2 h-14 w-64 inline-flex items-center justify-center rounded-full text-sm sm:text-base font-medium sm:py-3.5 sm:px-2 lg:px-2 shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0 animate-bounce focus:animate-none hover:animate-none text-md mt-8 ml-28 border bg-[#56cfe1] text-white"
+            <Button
+                onClick={() => handleConfirm(idCart)}
+                className=" relative right-2 h-14 w-64 inline-flex items-center justify-center rounded-full text-sm sm:text-base font-medium sm:py-3.5 sm:px-2 lg:px-2 shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0 focus:animate-none hover:animate-none text-md mt-8 ml-28 border bg-[#56cfe1] text-white"
             >
                 <span className="xl:ml-3 ml-1 lg:text-base xl:text-lg">Xác nhận</span>
-            </button>
+            </Button>
         </AntModal>
     );
 };
