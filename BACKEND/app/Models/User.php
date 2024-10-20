@@ -3,12 +3,15 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Notifications\CustomVerifyEmail;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable;
 
@@ -50,14 +53,27 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    public function comments(){
+    public function comments()
+    {
         return $this->hasMany(Comments::class);
     }
 
-    public function role(){
+    public function role()
+    {
         return $this->belongsTo(Role::class);
     }
-    public function carts(){
+    public function carts()
+    {
         return $this->hasMany(Cart::class);
     }
+
+    public function sendEmailVerificationNotification()
+    {
+        $this->notify(new CustomVerifyEmail());
+    }
+     // Liên kết đến voucher_logs
+     public function voucherLogs()
+     {
+         return $this->hasMany(VoucherLog::class);
+     }
 }

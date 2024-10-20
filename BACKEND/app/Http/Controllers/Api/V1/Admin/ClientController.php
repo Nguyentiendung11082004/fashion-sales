@@ -9,6 +9,7 @@ use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response as HttpResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class ClientController extends Controller
@@ -18,6 +19,8 @@ class ClientController extends Controller
      */
     public function index()
     {
+
+    
         $clients = User::whereIn('role_id', [1])->with('role')
         ->latest()->get();
 
@@ -75,17 +78,17 @@ class ClientController extends Controller
         try {
             $client = User::with('role')->findOrFail($id);
             return response()->json([
-                'massage' => 'Chi tiết khách hàng id = '.$id,
+                'message' => 'Chi tiết khách hàng id = '.$id,
                 'data'    =>$client
             ]);       
         } catch (\Throwable $th) {
            if ($th instanceof ModelNotFoundException){
             return response()->json([
-                'massage'=>'Không tìm thấy khách hàng có id='.$id,
+                'message'=>'Không tìm thấy khách hàng có id='.$id,
             ], HttpResponse::HTTP_NOT_FOUND);
            }
            return response()->json([
-            'massage'=>'Không tìm thấy khách hàng có id='.$id,
+            'message'=>'Không tìm thấy khách hàng có id='.$id,
         ], HttpResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
     }

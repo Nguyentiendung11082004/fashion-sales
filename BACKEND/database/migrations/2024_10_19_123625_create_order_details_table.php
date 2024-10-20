@@ -16,9 +16,9 @@ return new class extends Migration
     {
         Schema::create('order_details', function (Blueprint $table) {
             $table->id(); // ID của order_detail
-            $table->foreignIdFor(Product::class); // Liên kết với bảng products
-            $table->foreignIdFor(ProductVariant::class)->nullable(); // Liên kết với bảng product_variants nếu có
-            $table->foreignIdFor(Order::class); // Liên kết với bảng orders
+            $table->foreignIdFor(Product::class)->constrained()->onDelete('cascade'); // Liên kết với bảng products
+            $table->foreignIdFor(ProductVariant::class)->constrained()->nullable()->onDelete('cascade'); // Liên kết với bảng product_variants nếu có
+            $table->foreignIdFor(Order::class)->constrained()->onDelete('cascade'); // Liên kết với bảng orders
             // $table->foreignIdFor('voucher_id')->nullable(); // Liên kết với bảng vouchers nếu có
             $table->string('product_name'); // Tên sản phẩm
             $table->string('product_img'); // Ảnh sản phẩm

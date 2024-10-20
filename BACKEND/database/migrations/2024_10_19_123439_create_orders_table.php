@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id(); // ID đơn hàng
             $table->foreignIdFor(User::class)->constrained()->onDelete('cascade'); // Liên kết với bảng users
             $table->foreignIdFor(PaymentMethod::class)->constrained()->onDelete('cascade'); // Liên kết với bảng payment_methods
-            $table->string('order_status'); // Trạng thái đơn hàng
+            $table->string('order_status'); // Trạng thái đơn hàng (completed, pending, shipped, v.v.).
             $table->string('payment_status')->default('pending'); // Trạng thái thanh toán
             $table->string('order_code')->unique(); // Mã đơn hàng
             $table->integer('total_quantity'); // Tổng số lượng
@@ -30,6 +30,7 @@ return new class extends Migration
             $table->string('ship_user_name')->nullable(); // Tên người nhận
             $table->string('ship_user_phonenumber')->nullable(); // Số điện thoại người nhận
             $table->text('ship_user_address')->nullable(); // Địa chỉ người nhận
+            $table->string('shipping_method')->nullable(); // Phương thức vận chuyển
             $table->timestamps(); // Thời gian tạo và cập nhật
 
             // Thêm chỉ mục
