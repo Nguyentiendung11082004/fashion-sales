@@ -399,11 +399,11 @@ const ProductDetail = () => {
                             return (
                               <div
                                 key={item.id}
-                                className={`relative flex-1 max-w-[60px]   border-primary-6000 border-2  h-8 sm:h-9 rounded-full cursor-pointer flex items-center justify-center ${
+                                className={`relative flex-1 max-w-[60px] h-8 sm:h-9 rounded-full cursor-pointer flex items-center justify-center ${
                                   isSelected
-                                    ? "border-gray-800"
+                                    ? "border-gray-800 border-4"
                                     : isDisabled
-                                      ? "border-gray-200 opacity-50 cursor-not-allowed"
+                                      ? "border-gray-200 border-2 opacity-50 cursor-not-allowed"
                                       : ""
                                 }`}
                                 style={{
@@ -429,12 +429,12 @@ const ProductDetail = () => {
                                 }}
                               >
                                 {key.attribute !== "color" && (
-                                  <div className="absolute  inset-0 rounded-full flex items-center justify-center overflow-hidden z-0  text-sm md:text-base text-center">
+                                  <div className="absolute inset-0 rounded-full flex items-center justify-center overflow-hidden z-0 bg-gray-300 text-sm md:text-base text-center">
                                     {item.name}
                                   </div>
                                 )}
                                 {key.attribute === "color" && (
-                                  <div className="absolute inset-0 rounded-full overflow-hidden z-0 object-cover bg-cover border-2 ">
+                                  <div className="absolute inset-0 rounded-full overflow-hidden z-0 object-cover bg-cover border-2 border-gray-200">
                                     <span className="text-sm md:text-base text-center"></span>
                                   </div>
                                 )}
