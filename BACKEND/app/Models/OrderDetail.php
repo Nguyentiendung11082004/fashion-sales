@@ -47,6 +47,6 @@ class OrderDetail extends Model
     // Gán các thuộc tính (attributes) của sản phẩm ở dạng JSON
     public function setAttributesAttribute($value)
     {
-        $this->attributes['attributes'] = json_encode($value);
+        $this->attributes['attributes'] = empty($value) ? null : json_encode($value);
     }
 }

@@ -104,7 +104,7 @@ const Login = () => {
               </div>
               <div className="mt-4 flex items-center justify-between">
                 <span className="border-b w-1/5 md:w-1/4" />
-                <Link to="" className="text-xs text-gray-500 uppercase">Đăng ký</Link>
+                <Link to="/register" className="text-xs text-gray-500 uppercase">Đăng ký</Link>
                 <span className="border-b w-1/5 md:w-1/4" />
               </div>
             </Form>

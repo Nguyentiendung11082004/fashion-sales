@@ -47,16 +47,17 @@ const Router = () => {
           <Route path="cart" element={<Cart />} />
           <Route path="account" element={<Account />} />
           <Route path="wishlist" element={<Wishlist />} />
-          <Route
-            path="account/:id/forgotpassword"
-            element={<ForgotPassword />}
-          />
+          
           <Route path="checkout" element={<Checkout />} />
           <Route path="contact" element={<Contact />} />
           <Route path="history-order" element={<HistoryOrder />} />
         </Route>
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
+        <Route
+            path="account/:id/forgotpassword"
+            element={<ForgotPassword />}
+          />
         <Route path="/admin" element={<LayoutAdmin />}>
           <Route index element={<Dashboard />} />
           <Route path="products" element={<ProductPageManager />} />

@@ -37,7 +37,7 @@ export interface Iproduct {
   attributes: number[];
   quantity: number;
   product_variant?: IProductVariant[];
-   
+  variants: any;
 }
 
 

@@ -12,14 +12,42 @@ import PhoneHome from "../icons/headerWebsite/PhoneHome";
 import UserHome from "../icons/headerWebsite/UserHome";
 import { useAuth } from "@/common/context/Auth/AuthContext";
 import { Button } from "antd";
+import instance from "@/configs/axios";
+import { useQuery } from "@tanstack/react-query";
 type Props = {};
 const Header = (props: Props) => {
   const navigator = useNavigate();
   const { user } = useUser();
+  let infoUser;
+  if (user) {
+    infoUser = user["Infor User"];
+  }
   const { logout } = useAuth();
   const logoutUser = () => {
     logout();
     navigator("/login")
+  }
+  const { token } = useAuth();
+  const { data } = useQuery({
+    queryKey: ['cart'],
+    queryFn: async () => {
+      const res = await instance.get('/cart', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return res.data;
+    },
+  });
+
+  let qty = 0;
+  let cartItems = data?.cart?.cartitems;
+  if (Array.isArray(cartItems)) {
+    cartItems.forEach((item: any) => {
+      qty += item.quantity;
+    });
+  } else if (cartItems && typeof cartItems === 'object') {
+    qty += cartItems.quantity;
   }
   return (
     <>
@@ -80,7 +108,7 @@ const Header = (props: Props) => {
                   </Link>
                 </li>
                 <li className="relative">
-                  <Link to="" className=" font-normal text-hover">
+                  <Link to="/products" className=" font-normal text-hover">
                     Sản Phẩm
                     <span className="absolute text-xs rounded-full px-2 py-[2px] text-white bg-primary top-[-10px] left-16 ">
                       New
@@ -114,7 +142,7 @@ const Header = (props: Props) => {
                 <div className="relative group">
                   <Link to="">
                     {
-                      user ? (<img src={`${user?.avatar}`} className="h-10 w-10 rounded-full object-cover" alt={`${user?.name}`} />) : <UserHome />
+                      user ? (<img src={`${infoUser?.avatar}`} className="h-10 w-10 rounded-full object-cover" alt={`${infoUser?.name}`} />) : <UserHome />
                     }
                   </Link>
                   <div className="absolute left-[-20px] hidden group-hover:flex mt-0 space-x-2">
@@ -143,9 +171,9 @@ const Header = (props: Props) => {
                   </span>
                   <HeartHome />
                 </Link>
-                <Link to="" className="relative">
+                <Link to="/cart" className="relative">
                   <span className="absolute text-xs right-[-5px] top-[-5px] bg-[#000] text-white px-1 rounded-full">
-                    3
+                    {qty}
                   </span>
                   <CartHome />
                 </Link>
@@ -157,5 +185,4 @@ const Header = (props: Props) => {
     </>
   );
 };
-
 export default Header;

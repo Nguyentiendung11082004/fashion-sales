@@ -1,5 +1,4 @@
 import React from "react";
-
 const ReduceProduct = () => {
   return (
     <svg
@@ -18,5 +17,4 @@ const ReduceProduct = () => {
     </svg>
   );
 };
-
 export default ReduceProduct;

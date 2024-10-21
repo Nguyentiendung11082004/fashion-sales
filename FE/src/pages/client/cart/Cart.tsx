@@ -15,6 +15,8 @@ import ModalCart from "./_components/Modal";
 import instance from "@/configs/axios";
 import { useAuth } from "@/common/context/Auth/AuthContext";
 import { FormatMoney } from "@/common/utils/utils";
+import { toast } from "react-toastify";
+import { MinusOutlined } from "@ant-design/icons";
 
 const Cart = () => {
   const [visiable, setVisible] = useState(false);
@@ -25,9 +27,8 @@ const Cart = () => {
     setIdCart('');
     setVisible(false);
   };
-
   const { token } = useAuth();
-  const { data, isLoading } = useQuery({
+  const { data, isFetching } = useQuery({
     queryKey: ['cart'],
     queryFn: async () => {
       const res = await instance.get('/cart', {
@@ -38,11 +39,12 @@ const Cart = () => {
       return res.data;
     },
   });
-  const updateQuantity = useMutation({
-    mutationFn: async ({ idCart, newQuantity }: { idCart: number; newQuantity: number }) => {
 
+  const updateQuantity = useMutation({
+    mutationFn: async ({ idCart, newQuantity, qtyProductVarinat }: { idCart: number; newQuantity: number, qtyProductVarinat: any }) => {
       await instance.put(`/cart/${idCart}`, {
         quantity: newQuantity,
+        product_variant: qtyProductVarinat,
       }, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -54,7 +56,23 @@ const Cart = () => {
         queryKey: ['cart'],
       });
     },
+    onError: (message: any) => {
+      toast.error(message?.response?.data?.message, {
+        autoClose: 5000,
+      })
+    }
   });
+
+
+  const handleIncrease = (idCart: number, currentQuantity: number, qtyProductVarinat: any) => {
+    const newQuantity = currentQuantity + 1;
+    updateQuantity.mutate({ idCart, newQuantity, qtyProductVarinat });
+  };
+
+  const handleDecrease = (idCart: number, currentQuantity: number, qtyProductVarinat: any) => {
+    const newQuantity = currentQuantity - 1;
+    updateQuantity.mutate({ idCart, newQuantity, qtyProductVarinat });
+  };
   const deleteCart = useMutation({
     mutationFn: async ({ idCarts }: { idCarts: number[] }) => {
       await Promise.all(
@@ -77,17 +95,6 @@ const Cart = () => {
     deleteCart.mutate({ idCarts });
   };
 
-
-  const handleIncrease = (idCart: number, currentQuantity: number) => {
-    const newQuantity = currentQuantity + 1;
-    updateQuantity.mutate({ idCart, newQuantity });
-  };
-
-  const handleDecrease = (idCart: number, currentQuantity: number) => {
-    const newQuantity = currentQuantity - 1;
-    updateQuantity.mutate({ idCart, newQuantity });
-  };
-
   const handleAttribute = (idCart: any, variants: any) => {
     setIdCart(idCart);
     setVisible(true);
@@ -103,9 +110,24 @@ const Cart = () => {
       [idCart]: attributes,
     });
   };
-
-
   const carts = data?.cart?.cartitems;
+  carts?.map((cartItem: any) => {
+    const { id, product_id, product_variant_id, quantity, total_price, product, productvariant } = cartItem;
+    const attributesObject = productvariant?.attributes.reduce((acc: any, attribute: any) => {
+      acc[attribute.name] = attribute.pivot.attribute_item_id;
+      return acc;
+    }, {});
+    return {
+      id,
+      product_id,
+      product_variant_id,
+      quantity,
+      total_price,
+      product_name: product.name,
+      product_image: product.img_thumbnail,
+      attributes: attributesObject,
+    };
+  });
 
   return (
     <>
@@ -145,11 +167,16 @@ const Cart = () => {
                 </div>
               </div>
               {/*end hd-pagecart-header*/}
-              <div className="hd-pagecart-items mt-4">
+              <div className="hd-pagecart-items">
                 {
-                  isLoading ? <Skeleton /> : <div className="hd-item relative overflow-hidden">
+                  isFetching ? <Skeleton /> : <div className="hd-item relative overflow-hidden">
                     {
                       carts && carts.length > 0 ? (carts?.map((e: any) => {
+                        const { productvariant } = e;
+                        const attributesObject = productvariant?.attributes.reduce((acc: any, attribute: any) => {
+                          acc[attribute.name] = attribute.pivot.attribute_item_id;
+                          return acc;
+                        }, {});
                         return <>
                           <div className="hd-item-row lg:py-[2rem] py-[1rem] !items-center flex flex-wrap border-solid border-b-2">
                             <div className="hd-infor-item lg:w-5/12 w-full hd-col-item">
@@ -169,30 +196,35 @@ const Cart = () => {
                                   </Link>
 
                                   {/*end hd-price-item*/}
-                                  {
-                                    updatedAttributes && updatedAttributes.length > 0
-                                      ? updatedAttributes.map((item: any) => (
-                                        <div className="hd-infor-text-meta text-[13px] text-[#878787]" key={item.id}>
-                                          <p>{item?.name} : <strong>{item?.pivot?.value || item?.value}</strong></p>
+                                  {updatedAttributes.dataAttributes && Object.entries(updatedAttributes.dataAttributes).length > 0 ? (
+                                    Object.entries(updatedAttributes.dataAttributes).map(([attributeName, attributeValue]) => {
+                                      const attributeItem = updatedAttributes.find((item: any) => item.name === attributeName);
+                                      return (
+                                        <div className="hd-infor-text-meta text-[13px] text-[#878787]" key={attributeName}>
+                                          <p>
+                                            {attributeName}: <strong>{attributeItem ? attributeItem.pivot.value : attributeValue}</strong>
+                                          </p>
                                         </div>
-                                      ))
-                                      : e?.productvariant?.attributes?.map((item: any) => (
-                                        <div className="hd-infor-text-meta text-[13px] text-[#878787]" key={item.id}>
-                                          <p>{item?.name} : <strong>{item?.pivot?.value}</strong></p>
-                                        </div>
-                                      ))
-                                  }
+                                      );
+                                    })
+                                  ) : (
+                                    e?.productvariant?.attributes?.map((item: any) => (
+                                      <div className="hd-infor-text-meta text-[13px] text-[#878787]" key={item.id}>
+                                        <p>{item?.name}: <strong>{item?.pivot?.value}</strong></p>
+                                      </div>
+                                    ))
+                                  )}
+
                                   <div className="hd-infor-text-tools mt-[10px]">
                                     {
-                                      e.productvariant && <Button onClick={() => handleAttribute(e?.id, e?.productvariant?.attributes)} className="inline-flex me-[10px] border-none">
+                                      e.productvariant && <Button onClick={() => handleAttribute(e?.id, e?.productvariant?.attributes)} className="inline-flex  border-none">
                                         <Note />
                                       </Button>
                                     }
 
-                                    <Button onClick={() => handleDeleteCart([e.id])} className="inline-flex me-[10px]">
+                                    <Button onClick={() => handleDeleteCart([e.id])} className="inline-flex border-none">
                                       <Delete />
                                     </Button>
-
                                   </div>
                                 </div>
                               </div>
@@ -201,7 +233,7 @@ const Cart = () => {
                                 onClose={closeModal}
                                 idCart={idCart}
                                 onUpdateAttributes={handleUpdateAttributes}
-                                attributes={updatedAttributes[idCart] || []} // Cung cấp các thuộc tính hiện tại
+                                attributes={updatedAttributes[idCart] || []}
                               />
                               <div className="hd-qty-total block lg:hidden">
                                 <div className="flex items-center justify-between border-2 border-slate-200 rounded-full py-[10px] px-[10px]">
@@ -245,9 +277,9 @@ const Cart = () => {
                             <div className="hd-price-item !text-center w-3/12 hd-col-item lg:block hidden">
                               <div className="hs-prices">
                                 <div className="hd-text-price">
-                                  <del className="text-[#696969]">{FormatMoney(e?.productvariant?.price_regular || '')}</del>
+                                  <del className="text-[#696969]">{FormatMoney(e?.productvariant?.price_regular || e?.product?.price_regular)}</del>
                                   <ins className="ms-[6px] no-underline text-[#ec0101]">
-                                    {FormatMoney(e?.productvariant?.price_sale || '')}
+                                    {FormatMoney(e?.productvariant?.price_sale || e?.product?.price_sale)}
                                   </ins>
                                 </div>
                               </div>
@@ -258,15 +290,15 @@ const Cart = () => {
                                 <button
                                   type="button"
                                   className="hd-btn-item left-0 text-left pl-[15px] p-0 top-0 text-sm cursor-pointer shadow-none transform-none touch-manipulation"
-                                  onClick={() => handleDecrease(e?.id, e?.quantity)}
+                                  onClick={() => handleDecrease(e?.id, e?.quantity, attributesObject)}
                                 >
-                                  <ReduceProduct />
+                                  <MinusOutlined />
                                 </button>
                                 <span className="select-none leading-9 cursor-text font-semibold text-base">
                                   {e?.quantity}
                                 </span>
                                 <button
-                                  onClick={() => handleIncrease(e?.id, e?.quantity)}
+                                  onClick={() => handleIncrease(e?.id, e?.quantity, attributesObject)}
                                   type="button"
                                   className="hd-btn-item right-0 text-right pr-[15px] p-0 top-0 text-sm cursor-pointer shadow-none transform-none touch-manipulation"
                                 >
@@ -337,7 +369,7 @@ const Cart = () => {
                     </label>
                     <textarea
                       className="min-h-28 px-3 py-2 resize-none !w-full hd-cart-note"
-                      placeholder="Chúng tôi có thể giúp bạn?" ơ43uuuiyuiiuyuiijjhghgfghjjhyuyythg0-090909090oopoioopo00pooooo
+                      placeholder="Chúng tôi có thể giúp bạn?"
                       defaultValue={""}
                     />
                     <label className="mt-5 mb-3 !block"> Mã giảm giá: </label>
@@ -389,7 +421,9 @@ const Cart = () => {
                         </div>
                         <div className="hd-col-item w-auto">
                           <div className="text-right font-semibold">
-                            1.552.000₫
+                            {
+                              isFetching ? <Skeleton /> : FormatMoney(data?.sub_total)
+                            }
                           </div>
                         </div>
                       </div>
