@@ -18,6 +18,10 @@ type Props = {};
 const Header = (props: Props) => {
   const navigator = useNavigate();
   const { user } = useUser();
+  let infoUser;
+  if (user) {
+    infoUser = user["Infor User"];
+  }
   const { logout } = useAuth();
   const logoutUser = () => {
     logout();
@@ -35,7 +39,7 @@ const Header = (props: Props) => {
       return res.data;
     },
   });
-  
+
   let qty = 0;
   let cartItems = data?.cart?.cartitems;
   if (Array.isArray(cartItems)) {
@@ -138,7 +142,7 @@ const Header = (props: Props) => {
                 <div className="relative group">
                   <Link to="">
                     {
-                      user ? (<img src={`${user?.avatar}`} className="h-10 w-10 rounded-full object-cover" alt={`${user?.name}`} />) : <UserHome />
+                      user ? (<img src={`${infoUser?.avatar}`} className="h-10 w-10 rounded-full object-cover" alt={`${infoUser?.name}`} />) : <UserHome />
                     }
                   </Link>
                   <div className="absolute left-[-20px] hidden group-hover:flex mt-0 space-x-2">

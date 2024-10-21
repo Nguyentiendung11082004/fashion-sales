@@ -1,6 +1,5 @@
 import Loading from "@/common/Loading/Loading";
 import { Icategories } from "@/common/types/categories";
-import instance from "@/configs/axios";
 import {
   categoriesCreate,
   categoriesShow,
@@ -9,12 +8,11 @@ import {
 import { UploadOutlined } from "@ant-design/icons";
 import {
   useMutation,
-  useQueries,
   useQuery,
-  useQueryClient,
+  useQueryClient
 } from "@tanstack/react-query";
-import { Button, Form, Input, Radio, Upload, UploadProps, message } from "antd";
-import React, { useState } from "react";
+import { Button, Form, Input, Upload, UploadProps, message } from "antd";
+import { useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 

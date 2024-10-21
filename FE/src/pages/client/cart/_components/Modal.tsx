@@ -132,7 +132,7 @@ const ModalCart = ({ open, onClose, idCart, onUpdateAttributes, attributes }: Pr
                                         dis = checkDisable(e.attribute, item.id);
                                     }
                                     const _styles = dis ? styles.disable : {}
-                                   
+
                                     return (
                                         <div
                                             key={item.id}
@@ -147,14 +147,15 @@ const ModalCart = ({ open, onClose, idCart, onUpdateAttributes, attributes }: Pr
                                             }}
                                             style={_styles}
                                         >
-                                            {e.attribute === 'Color' ? (
+                                            {e.attribute.toLowerCase() === 'color' || e.attribute.toLowerCase() === 'màu sắc' ? (
                                                 <div
-                                                    className={`absolute inset-0.5 rounded-full overflow-hidden`}
+                                                    className="absolute inset-0.5 rounded-full overflow-hidden"
                                                     style={{ backgroundColor: item.name.toLowerCase() }}
                                                 ></div>
                                             ) : (
                                                 <p className="flex items-center justify-center h-full text-sm">{item.name}</p>
                                             )}
+
                                         </div>
                                     );
                                 })}

@@ -1,6 +1,7 @@
     import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
     import axios from 'axios';
     import { useAuth } from '../Auth/AuthContext';
+    import instance from '@/configs/axios';
 
     interface UserContextType {
         user: any;
@@ -24,7 +25,7 @@
         const [user, setUser] = useState<any>(null)
         const getUser = async () => {
             try {
-                const response = await axios.get('http://127.0.0.1:8000/api/user', {
+                const response = await instance.get("/user" , {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }

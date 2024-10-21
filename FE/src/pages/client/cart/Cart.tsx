@@ -167,7 +167,7 @@ const Cart = () => {
                 </div>
               </div>
               {/*end hd-pagecart-header*/}
-              <div className="hd-pagecart-items mt-4">
+              <div className="hd-pagecart-items">
                 {
                   isFetching ? <Skeleton /> : <div className="hd-item relative overflow-hidden">
                     {
