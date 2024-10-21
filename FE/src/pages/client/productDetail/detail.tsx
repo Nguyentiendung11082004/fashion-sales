@@ -35,7 +35,7 @@ const ProductDetail = () => {
     },
   });
 
-  // console.log("data detail : ", data);
+  console.log("data detail : ", data);
 
   const getUniqueAttributes = data?.getUniqueAttributes;
   useEffect(() => {
@@ -222,29 +222,6 @@ const ProductDetail = () => {
 
   const comments = data?.product?.comments;
   console.log("comments", comments);
-  // Pagination logic
-  const [currentPage, setCurrentPage] = useState(1);
-  const commentsPerPage = 3;
-  const totalComments = comments?.length;
-  const totalPages = Math.ceil(totalComments / commentsPerPage);
-  const indexOfLastComment = currentPage * commentsPerPage;
-  const indexOfFirstComment = indexOfLastComment - commentsPerPage;
-  const currentComments = comments?.slice(
-    indexOfFirstComment,
-    indexOfLastComment
-  );
-
-  const handleNext = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
-
-  const handlePrev = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
 
   if (isLoading) return <Skeleton className="container py-10 lg:flex" />;
   if (isError) return <p>{error.message}</p>;
@@ -366,6 +343,7 @@ const ProductDetail = () => {
               <div>
                 <div className="mt-2">
                   {resultGetUniqueAttribute.map((key) => {
+
                     return (
                       <div key={key.attribute} className="mb-4">
                         <label className="flex items-center">
@@ -399,11 +377,11 @@ const ProductDetail = () => {
                             return (
                               <div
                                 key={item.id}
-                                className={`relative flex-1 max-w-[60px]   border-primary-6000 border-2  h-8 sm:h-9 rounded-full cursor-pointer flex items-center justify-center ${
+                                className={`relative flex-1 max-w-[60px] h-8 sm:h-9 rounded-full cursor-pointer flex items-center justify-center ${
                                   isSelected
-                                    ? "border-gray-800"
+                                    ? "border-gray-800 border-4"
                                     : isDisabled
-                                      ? "border-gray-200 opacity-50 cursor-not-allowed"
+                                      ? "border-gray-200 border-2 opacity-50 cursor-not-allowed"
                                       : ""
                                 }`}
                                 style={{
@@ -429,12 +407,12 @@ const ProductDetail = () => {
                                 }}
                               >
                                 {key.attribute !== "color" && (
-                                  <div className="absolute  inset-0 rounded-full flex items-center justify-center overflow-hidden z-0  text-sm md:text-base text-center">
+                                  <div className="absolute inset-0 rounded-full flex items-center justify-center overflow-hidden z-0 bg-gray-300 text-sm md:text-base text-center">
                                     {item.name}
                                   </div>
                                 )}
                                 {key.attribute === "color" && (
-                                  <div className="absolute inset-0 rounded-full overflow-hidden z-0 object-cover bg-cover border-2 ">
+                                  <div className="absolute inset-0 rounded-full overflow-hidden z-0 object-cover bg-cover border-2 border-gray-200">
                                     <span className="text-sm md:text-base text-center"></span>
                                   </div>
                                 )}
@@ -635,95 +613,85 @@ const ProductDetail = () => {
               )}
               {activeButton === "reviews" && (
                 <div className="w-full">
+                  {/* <p>Chưa có bình luận nào.</p> */}
                   {comments?.length === 0 ? (
                     <p>Chưa có bình luận nào.</p>
                   ) : (
-                    <>
-                      {comments?.map((value: any, index: any) => (
-                        <div key={index} className="border py-4 mb-4">
-                          <div className="flex items-center">
-                            <img
-                              className="w-[60px] h-[60px] rounded-full mr-4"
-                              alt="avatar-user"
-                              src={
-                                value?.user?.avatar ??
-                                "https://via.placeholder.com/60"
-                              }
-                            />
-                            <div>
-                              <span className="font-semibold">
-                                {value?.user?.name}
-                              </span>
-                              <div className="mt-2 flex">
-                                {[...Array(value?.rating || 0)].map(
-                                  (_, index) => (
-                                    <span
-                                      key={index}
-                                      className="text-yellow-500"
-                                    >
-                                      ★
-                                    </span>
-                                  )
-                                )}
-                              </div>
-                              <p className="text-xs mt-2">
-                                {value?.created_at ?? "DD-MM-YYYY"}
-                              </p>
+                    comments?.map((value: any, index: any) => (
+                      <div key={index} className="border py-4 mb-4">
+                        <div className="flex items-center">
+                          <img
+                            className="w-[60px] h-[60px] rounded-full mr-4"
+                            alt="avatar-user"
+                            src={
+                              value?.user?.avatar ??
+                              "https://via.placeholder.com/60"
+                            }
+                          />
+                          <div>
+                            <span className="font-semibold">
+                              {value?.user?.name}
+                            </span>
+                            <div className="mt-2 flex">
+                              {[...Array(value?.rating || 0)].map(
+                                (_, index) => (
+                                  <span key={index} className="text-yellow-500">
+                                    ★
+                                  </span>
+                                )
+                              )}
                             </div>
-                          </div>
-                          <div className="mt-4 ml-[75px]">
-                            <p>{value?.content}</p>
-                            <img
-                              className="my-4 w-[150px] h-[150px]"
-                              alt="Hình ảnh từ người mua đánh giá"
-                              src={value?.image}
-                            />
+                            <p className="text-xs mt-2">
+                              {value?.created_at ?? "DD-MM-YYYY"}
+                            </p>
                           </div>
                         </div>
-                      ))}
-
-                      {totalComments > 0 && (
-                        <div className="container text-center mt-[20px] text-gray-500 lg:text-sm text-xs">
-                          <button
-                            onClick={handlePrev}
-                            disabled={currentPage === 1}
-                            className={`hover:text-[red] px-4 ${currentPage === 1 ? "text-gray-300" : ""}`}
-                          >
-                            Pre
-                          </button>
-
-                          {[...Array(totalPages)].map((_, index) => (
-                            <button
-                              key={index + 1}
-                              onClick={() => setCurrentPage(index + 1)}
-                              className={`mx-1 px-4 py-2 border border-gray-400 
-                ${currentPage === index + 1 ? "bg-gray-200 font-bold" : ""}
-                hover:bg-gray-100 hover:text-red-500 transition-all`}
-                              style={{
-                                width: "40px",
-                                height: "40px",
-                                borderRadius: "4px",
-                              }}
-                            >
-                              {index + 1}
-                            </button>
-                          ))}
-
-                          <button
-                            onClick={handleNext}
-                            disabled={currentPage === totalPages}
-                            className={`hover:text-[red] px-4 ${currentPage === totalPages ? "text-gray-300" : ""}`}
-                          >
-                            Next
-                          </button>
+                        <div className="mt-4 ml-[75px]">
+                          <p>{value?.content}</p>
+                          <img
+                            className="my-4 w-[150px] h-[150px]"
+                            alt="Hình ảnh từ người mua đánh giá"
+                            src={value?.image}
+                          />
                         </div>
-                      )}
-                    </>
+                      </div>
+                    ))
                   )}
+
+                  {/* phân trang */}
+
+                  <div className="container text-center mt-[20px] text-gray-500 lg:text-sm text-xs">
+                    <button className="hover:text-[red] px-4 text-gray-300">
+                      Pre
+                    </button>
+                    <button
+                      className="mx-1 px-4 py-2 border border-gray-400 bg-gray-200 font-bold hover:bg-gray-100 hover:text-red-500 transition-all"
+                      style={{
+                        width: "40px",
+                        height: "40px",
+                        borderRadius: "4px",
+                      }}
+                    >
+                      1
+                    </button>
+                    <button
+                      className="mx-1 px-4 py-2 border border-gray-400 hover:bg-gray-100 hover:text-red-500 transition-all"
+                      style={{
+                        width: "40px",
+                        height: "40px",
+                        borderRadius: "4px",
+                      }}
+                    >
+                      2
+                    </button>
+                    <button className="hover:text-[red] px-4">Next</button>
+                  </div>
                 </div>
               )}
-
-              {activeButton === "comment" && <CommentProduct />}
+              {activeButton === "comment" && (
+                // bình luận sản phẩm
+                <CommentProduct />
+              )}
             </div>
           </div>
         </div>

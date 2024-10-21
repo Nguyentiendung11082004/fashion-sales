@@ -139,8 +139,8 @@ const ModalCart = ({
                   return (
                     <div
                       key={item.id}
-                      className={`relative flex-1 max-w-[75px] h-8 sm:h-8 rounded-full border-2 cursor-pointer 
-                                            border-primary-6000 dark:border-primary-500 
+                      className={`relative flex-1 max-w-[75px] h-8 sm:h-8 rounded-full  cursor-pointer 
+                                            border-primary-6000 border-2 
                                             ${isActive ? "border-black" : ""}`}
                       onClick={() => !dis && handleActive(e.attribute, item.id)}
                       style={_styles}
