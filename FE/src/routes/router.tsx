@@ -33,6 +33,8 @@ import FormClient from "@/pages/admin/account/client/components/FormClient";
 import EmployeePage from "@/pages/admin/account/employee/Employee";
 import FormEmployee from "@/pages/admin/account/employee/components/FormEmployee";
 import Wishlist from "@/pages/client/wishlist/Wishlist";
+import LiveChat from "@/pages/client/liveChat/liveChat";
+import Chatbox from "@/pages/admin/chatbox/Chatbox";
 
 
 const Router = () => {
@@ -47,6 +49,7 @@ const Router = () => {
           <Route path="cart" element={<Cart />} />
           <Route path="account" element={<Account />} />
           <Route path="wishlist" element={<Wishlist />} />
+          <Route path="livechat" element={<LiveChat />} />
           <Route
             path="account/:id/forgotpassword"
             element={<ForgotPassword />}
@@ -92,6 +95,7 @@ const Router = () => {
           <Route path="employees" element={<EmployeePage />} />
           <Route path="employees/create" element={<FormEmployee />} />
           <Route path="employees/edit/:id" element={<FormEmployee />} />
+          <Route path="chatbox" element={<Chatbox />} />
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>

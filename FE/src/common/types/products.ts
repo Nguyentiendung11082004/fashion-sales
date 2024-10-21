@@ -8,7 +8,7 @@ export interface IProductVariant {
     image:string;
 }
 export interface Iproduct {
-    id: number;
+    id: number | string;
     type: number;
     brand_id: number;
     category_id: number;
@@ -30,7 +30,7 @@ export interface Iproduct {
     attribute_item_id: any;
     attributes: number[];
     quantity: number;
-    product_variant?: IProductVariant[];
+    variants?: IProductVariant[];
 }
 
 

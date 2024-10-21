@@ -8,7 +8,7 @@ import './index.css'
 import { StyleProvider } from "@ant-design/cssinjs";
 import { AuthProvider } from "./common/context/Auth/AuthContext.tsx";
 import { UserProvider } from "./common/context/User/UserContext.tsx";
-import { WishlistProvider } from "./pages/client/wishlist/WishlistContext.tsx";
+import { WishlistProvider } from "./common/context/Wishlist/WishlistContext.tsx";
 const queryClient = new QueryClient({
     defaultOptions: {
         queries: {
@@ -28,7 +28,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                         </WishlistProvider>
                     </UserProvider>
                 </AuthProvider>
-                <ReactQueryDevtools initialIsOpen={false} />
+                {/* <ReactQueryDevtools initialIsOpen={false} /> */}
             </StyleProvider>
         </BrowserRouter>
     </QueryClientProvider>

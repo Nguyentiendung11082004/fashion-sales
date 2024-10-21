@@ -12,15 +12,18 @@ import PhoneHome from "../icons/headerWebsite/PhoneHome";
 import UserHome from "../icons/headerWebsite/UserHome";
 import { useAuth } from "@/common/context/Auth/AuthContext";
 import { Button } from "antd";
+import { useWishlist } from "@/common/context/Wishlist/WishlistContext";
 type Props = {};
 const Header = (props: Props) => {
   const navigator = useNavigate();
+  const { data :  wishlist = []} = useWishlist();
   const { user } = useUser();
   const { logout } = useAuth();
   const logoutUser = () => {
     logout();
     navigator("/login")
   }
+  const wishlistCount = wishlist.length;
   return (
     <>
       <div>
@@ -137,9 +140,9 @@ const Header = (props: Props) => {
                   </div>
 
                 </div>
-                <Link to="" className="relative">
+                <Link to="/wishlist" className="relative">
                   <span className="absolute text-xs right-[-5px] top-[-5px] bg-[#000] text-white px-1 rounded-full">
-                    0
+                    {wishlistCount}
                   </span>
                   <HeartHome />
                 </Link>

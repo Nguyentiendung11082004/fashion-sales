@@ -35,7 +35,8 @@ const LayoutAdmin: React.FC = () => {
         collapsible
         collapsed={collapsed}
         width={250}
-        className="bg-[black]"
+        
+        className="bg-[black] min-h-screen"
       >
         <div className="flex items-center justify-center h-[25px] bg-[black]">
           <div className="demo-logo-vertical" />
@@ -151,6 +152,15 @@ const LayoutAdmin: React.FC = () => {
             },
             {
               key: "11",
+              icon: <CommentOutlined />,
+              label: (
+                <NavLink className="text-white" to="/admin/chatbox">
+                  Tin nhắn
+                </NavLink>
+              ),
+            },
+            {
+              key: "12",
               icon: <ShoppingCartOutlined />,
               label: (
                 <NavLink className="text-white" to="/admin/order">
@@ -159,7 +169,7 @@ const LayoutAdmin: React.FC = () => {
               ),
             },
             {
-              key: "12",
+              key: "13",
               icon: <TagsOutlined />,
               label: (
                 <NavLink className="text-white" to="/admin/tags">
@@ -168,7 +178,7 @@ const LayoutAdmin: React.FC = () => {
               ),
             },
             {
-              key: "13",
+              key: "14",
               icon: <TagsOutlined />,
               label: (
                 <NavLink className="text-white" to="/admin/brands">
@@ -176,11 +186,12 @@ const LayoutAdmin: React.FC = () => {
                 </NavLink>
               ),
             },
+            
           ]}
         />
       </Sider>
       <Layout>
-        <div className="header flex justify-between items-center border-b border-gray-200 bg-white">
+        <div className="header flex justify-between items-center border-b border-gray-200 bg-white h-[60px]">
           <div className="header__left flex items-center ">
             <div className="flex align-center">
               <Button

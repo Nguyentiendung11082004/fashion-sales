@@ -12,6 +12,6 @@ export interface ResponseData {
 
 export interface ResponseWishlist {
     wishlist_id: number;
-    product: Iproduct
+    product: Iproduct;
     getUniqueAttributes: any;
 }

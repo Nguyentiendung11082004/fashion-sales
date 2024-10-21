@@ -8,7 +8,7 @@ import { UploadOutlined } from '@ant-design/icons'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Button, Form, Input, InputNumber, Radio, RadioChangeEvent, Select, Skeleton, Switch, Table, Upload, message } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
-import { UploadProps } from 'antd/es/upload'
+import { UploadFile, UploadProps } from 'antd/es/upload'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
@@ -147,6 +147,8 @@ const ProductForm = () => {
         setSelectedItems(combinedItems);
         setIsColumnsVisible(combinedItems.length > 0);
     };
+
+
     const getPropsImgThumbnail = (index: number): UploadProps => ({
         name: 'file',
         action: 'https://api.cloudinary.com/v1_1/dlvwxauhf/image/upload',
@@ -154,6 +156,7 @@ const ProductForm = () => {
             upload_preset: "fashion-sales",
             folder: "fashion-sales"
         },
+        listType: "picture",
         onChange(info: any) {
             if (info.file.status === "done") {
                 const isImage = /^image\//.test(info.file.type);
@@ -178,6 +181,7 @@ const ProductForm = () => {
             folder: "fashion-sales"
         },
         multiple: true,
+        listType: "picture",
         onChange(info: any) {
             if (info.file.status === "done") {
                 const isImage = /^image\//.test(info?.file?.type);
@@ -192,7 +196,9 @@ const ProductForm = () => {
                 message.error(`${info.file.name} file upload failed.`)
             }
         },
+        
     }
+    const [fileList, setFileList] = useState<UploadFile[]>([]);
     const propsImgThumbnail: UploadProps = {
         name: 'file',
         action: 'https://api.cloudinary.com/v1_1/dlvwxauhf/image/upload',
@@ -200,6 +206,7 @@ const ProductForm = () => {
             upload_preset: "fashion-sales",
             folder: "fashion-sales"
         },
+        fileList,
         onChange(info: any) {
             if (info.file.status === "done") {
                 const isImage = /^image\//.test(info.file.type);
@@ -216,6 +223,13 @@ const ProductForm = () => {
             } else if (info.file.status === "error") {
                 message.error(`${info.file.name} file upload failed.`);
             }
+            setFileList(info.fileList.slice(-1));
+        },
+        onRemove(file) {
+            setFileList([]); // Xóa danh sách file
+            setUrlImage(null); // Xóa URL ảnh
+            message.info(`${file.name} đã bị xóa.`);
+            return true;
         },
     };
     const columns: any = [
@@ -319,6 +333,9 @@ const ProductForm = () => {
             acc[attribute.id] = attribute.pivot.attribute_item_ids;
             return acc;
         }, {});
+
+        // setUrlImage(productShow.img_thumbnail || null);
+        // setImageGaller(productShow.gallery || []); 
 
         setAttribute(productType);
         setSelectedAttributeChildren(productAttribute);
@@ -517,6 +534,7 @@ const ProductForm = () => {
                         <Form layout='vertical' className="grid grid-cols-1 md:grid-cols-3 gap-4"
                             onFinish={onFinish}
                             form={form}
+                            
                         >
                             <Form.Item name="name" label="Tên sản phẩm" className="col-span-1"
                             >
@@ -579,13 +597,13 @@ const ProductForm = () => {
                             <Form.Item name="img_thumbnail" label="Ảnh sản phẩm" >
                                 <Upload
                                     {...propsImgThumbnail}
-                                    showUploadList={{
-                                        showPreviewIcon: false,
-                                        showRemoveIcon: true,
-                                    }}
-                                    onRemove={() => {
-                                        setUrlImage(null);
-                                    }}
+                                    // showUploadList={{
+                                    //     showPreviewIcon: false,
+                                    //     showRemoveIcon: true,
+                                    // }}
+                                    // onRemove={() => {
+                                    //     setUrlImage(null);
+                                    // }}
                                 >
                                     <Button icon={<UploadOutlined />}>Tải lên ảnh</Button>
                                 </Upload>
@@ -611,6 +629,10 @@ const ProductForm = () => {
 
                                 <Upload
                                     {...propsGallery}
+                                    onRemove={(file) => {
+                                        const newGallery = imageGallery.filter((_, idx) => idx !== Number(file.uid));
+                                        setImageGaller(newGallery);
+                                    }}
                                 >
                                     <Button icon={<UploadOutlined />}>Tải lên gallery</Button>
                                 </Upload>

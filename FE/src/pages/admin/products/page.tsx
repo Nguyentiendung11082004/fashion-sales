@@ -122,7 +122,7 @@ const ProductPageManager = () => {
       dataIndex: 'trend',
       render: (is_trend) => <Tag
         color={is_trend ? 'green' : 'red'}
-      >{is_trend == true ? 'Hot trend' : 'Lỗi thời'}</Tag>
+      >{is_trend == true ? 'Hot trend' : 'Cơ bản'}</Tag>
     },
     // {
     //   title: 'is_new',
