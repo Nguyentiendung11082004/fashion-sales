@@ -4,14 +4,14 @@ import { ResponseWishlist } from "@/common/types/responseDataFilter";
 import CartDetail from "@/components/icons/detail/CartDetail";
 import Eye from "@/components/icons/detail/Eye";
 import HeartRed from "@/components/icons/detail/HeartRed";
-// import HeartWhite from "@/components/icons/detail/HeartWhite";
 import instance from "@/configs/axios";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-// import HeartWhite from "@/components/icons/detail/HeartWhite";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
 const Wishlist = () => {
   const queryClient = useQueryClient();
+
   const { token } = useAuth(); // Lấy token
   const { data, isFetching } = useQuery<ResponseWishlist[]>({
     queryKey: ["productsData", token],
@@ -24,7 +24,21 @@ const Wishlist = () => {
       return response.data;
     },
   });
-  console.log(data);
+  // console.log(data);
+
+  const [currentPage, setCurrentPage] = useState(1); // Trang hiện tại
+  const productsPerPage = 12; // Mỗi trang có 12 sản phẩm
+  const totalProducts = data?.length || 0; // Tổng số sản phẩm
+  // Tính toán các sản phẩm hiển thị trên trang hiện tại
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = data?.slice(indexOfFirstProduct, indexOfLastProduct);
+  // Tính số trang
+  const totalPages = Math.ceil(totalProducts / productsPerPage);
+   // Hàm để chuyển trang
+   const handlePageChange = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+  };
 
   const mutationDel = useMutation({
     mutationFn: async ({ wishlist_id, token }: { wishlist_id: number; token: any }) => {
@@ -75,7 +89,7 @@ const Wishlist = () => {
                   </div>
                 ))
             ) : data?.length ? (
-              data?.map(({ wishlist_id, product, getUniqueAttributes }) => (
+              currentProducts?.map(({ wishlist_id, product, getUniqueAttributes }) => (
                 <div className="product-item" key={wishlist_id}>
                   <div className="lg:mb-[25px] mb-[20px]">
                     <div className="cursor-pointer lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] sm:h-[345px] overflow-hidden">
@@ -252,7 +266,38 @@ const Wishlist = () => {
                 </div>
               </div>
             )}
+            
           </div>
+          {/* Phân trang */}
+          <div className="pagination flex justify-center mt-6">
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="px-4 py-2 mx-1 bg-gray-100 rounded"
+              >
+                Quay lại
+              </button>
+              {Array.from({ length: totalPages }, (_, index) => index + 1).map(
+                (pageNumber) => (
+                  <button
+                    key={pageNumber}
+                    onClick={() => handlePageChange(pageNumber)}
+                    className={`px-4 py-2 mx-1 ${
+                      currentPage === pageNumber ? "text-black" : "text-gray-300"
+                    } rounded`}
+                  >
+                    {pageNumber}
+                  </button>
+                )
+              )}
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="px-4 py-2 mx-1 bg-gray-100 rounded"
+              >
+                Chuyển tiếp
+              </button>
+            </div>
         </div>
       </div>
     </>

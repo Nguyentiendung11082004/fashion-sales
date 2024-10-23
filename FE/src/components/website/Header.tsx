@@ -12,11 +12,13 @@ import PhoneHome from "../icons/headerWebsite/PhoneHome";
 import UserHome from "../icons/headerWebsite/UserHome";
 import { useAuth } from "@/common/context/Auth/AuthContext";
 import { Button } from "antd";
+import { useWishlist } from "@/common/context/Wishlist/WishlistContext";
 import instance from "@/configs/axios";
 import { useQuery } from "@tanstack/react-query";
 type Props = {};
 const Header = (props: Props) => {
   const navigator = useNavigate();
+  const { data :  wishlist = []} = useWishlist();
   const { user } = useUser();
   let infoUser;
   if (user) {
@@ -27,6 +29,7 @@ const Header = (props: Props) => {
     logout();
     navigator("/login")
   }
+  const wishlistCount = wishlist.length;
   const { token } = useAuth();
   const { data } = useQuery({
     queryKey: ['cart'],
@@ -41,7 +44,7 @@ const Header = (props: Props) => {
   });
 
   let qty = 0;
-  let cartItems = data?.cart?.cartitems;
+  const cartItems = data?.cart?.cartitems;
   if (Array.isArray(cartItems)) {
     cartItems.forEach((item: any) => {
       qty += item.quantity;
@@ -173,9 +176,9 @@ const Header = (props: Props) => {
 
 
                 </div>
-                <Link to="" className="relative">
+                <Link to="/wishlist" className="relative">
                   <span className="absolute text-xs right-[-5px] top-[-5px] bg-[#000] text-white px-1 rounded-full">
-                    0
+                    {wishlistCount}
                   </span>
                   <HeartHome />
                 </Link>

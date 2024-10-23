@@ -21,7 +21,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                 <AppContextProviders>
                     <App />
                 </AppContextProviders>
-                <ReactQueryDevtools initialIsOpen={false} />
+                {/* <ReactQueryDevtools initialIsOpen={false} /> */}
             </StyleProvider>
         </BrowserRouter>
     </QueryClientProvider>
