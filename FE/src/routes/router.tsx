@@ -49,15 +49,7 @@ const Router = () => {
           <Route path="cart" element={<Cart />} />
           <Route path="account" element={<Account />} />
           <Route path="wishlist" element={<Wishlist />} />
-<<<<<<< HEAD
           
-=======
-          {/* <Route path="livechat" element={<LiveChat />} /> */}
-          <Route
-            path="account/:id/forgotpassword"
-            element={<ForgotPassword />}
-          />
->>>>>>> 8a7b94bdd111b7874c96e09d071058ac5724ddc6
           <Route path="checkout" element={<Checkout />} />
           <Route path="contact" element={<Contact />} />
           <Route path="history-order" element={<HistoryOrder />} />
@@ -97,13 +89,10 @@ const Router = () => {
           <Route path="tags/edit/:id" element={<FormTag />} />
           <Route path="clients" element={<ClientPage />} />
           <Route path="clients/create" element={<FormClient />} />
-<<<<<<< HEAD
-=======
           <Route path="employees" element={<EmployeePage />} />
           <Route path="employees/create" element={<FormEmployee />} />
           <Route path="employees/edit/:id" element={<FormEmployee />} />
           <Route path="chatbox" element={<Chatbox />} />
->>>>>>> 8a7b94bdd111b7874c96e09d071058ac5724ddc6
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
