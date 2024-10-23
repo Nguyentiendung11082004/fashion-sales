@@ -20,29 +20,29 @@ class CheckoutController extends Controller
     {
         try {
             $data = $request->validated(); // Lấy dữ liệu đã xác thực
-            
+
             // Kiểm tra xem người dùng có muốn mua ngay hay không
             $isImmediatePurchase = isset($data['product_id']) && isset($data['quantity']);
-            
+
             // Kiểm tra xem người dùng có muốn mua từ giỏ hàng hay không
             $isCartPurchase = isset($data['cart_item_ids']) && is_array($data['cart_item_ids']) && count($data['cart_item_ids']) > 0;
-    
+
             // Nếu cả hai trường hợp đều không đúng thì trả về lỗi
             if (!$isImmediatePurchase && !$isCartPurchase) {
                 return response()->json(['message' => 'Phải chọn mua ngay hoặc mua từ giỏ hàng.'], Response::HTTP_BAD_REQUEST);
             } elseif ($isImmediatePurchase && $isCartPurchase) {
                 return response()->json(['message' => 'Phải chọn mua ngay hoặc mua từ giỏ hàng.'], Response::HTTP_BAD_REQUEST);
             }
-    
+
             // Initialize variables for sub_total and cart_items
             $sub_total = 0;
             $total_items = 0;
             $order_items = [];
-    
+
             if (auth('sanctum')->check()) {
                 $user_id = auth('sanctum')->id();
                 $user = User::findOrFail($user_id)->only(['id', 'name', 'email', 'address', 'phone_number']);
-    
+
                 if ($isCartPurchase) {
                     // Handle cart purchase logic for logged-in users
                     $cart = Cart::query()
@@ -52,28 +52,28 @@ class CheckoutController extends Controller
                                 $query->whereIn('id', $data['cart_item_ids']);
                             },
                             "cartitems.product",
-                            "cartitems.productvariant"
+                            "cartitems.productvariant.attributes"
                         ])
                         ->first();
-    
+
                     if (!$cart || $cart->cartitems->isEmpty()) {
                         return response()->json(['message' => 'Sản phẩm không tồn tại trong giỏ hàng'], 400);
                     }
-    
+
                     // Kiểm tra nếu có sản phẩm nào không tồn tại trong giỏ hàng
                     $invalid_items = array_diff($data['cart_item_ids'], $cart->cartitems->pluck('id')->toArray());
-    
+
                     if (!empty($invalid_items)) {
                         return response()->json([
                             'message' => 'Sản phẩm không tồn tại trong giỏ hàng',
                             'invalid_items' => $invalid_items // Gửi danh sách sản phẩm không hợp lệ để người dùng biết
                         ], 400);
                     }
-    
+
                     foreach ($cart->cartitems as $cart_item) {
                         $quantity = $cart_item->quantity;
                         $total_items += 1;
-    
+
                         if ($cart_item->productvariant) {
                             $variant_price = $cart_item->productvariant->price_sale;
                             $total_price = $variant_price * $quantity;
@@ -81,7 +81,7 @@ class CheckoutController extends Controller
                             $product_price = $cart_item->product->price_sale;
                             $total_price = $product_price * $quantity;
                         }
-    
+
                         $sub_total += $total_price;
                         $order_items[] = [
                             'quantity' => $quantity,
@@ -92,22 +92,23 @@ class CheckoutController extends Controller
                     }
                 } elseif ($isImmediatePurchase) {
                     // Handle immediate purchase
-                    $product = Product::with('variants')->findOrFail($data['product_id']);
+                    $product = Product::with('variants.attributes')->findOrFail($data['product_id']);
+                    dd($product);
                     $quantity = $data['quantity'];
                     $total_items += 1;
-    
+
                     if ($product->type == 1) {
                         // Sản phẩm có biến thể
                         if (!isset($data['product_variant_id'])) {
                             return response()->json(['message' => 'Sản phẩm này có biến thể. Vui lòng chọn biến thể.'], Response::HTTP_BAD_REQUEST);
                         }
-                        $variant = $product->variants()->findOrFail($data['product_variant_id']);
+                        $variant = $product->variants()->with('attributes')->findOrFail($data['product_variant_id']);
                         $total_price = $variant->price_sale * $quantity;
                     } else {
                         // Sản phẩm đơn
                         $total_price = $product->price_sale * $quantity;
                     }
-    
+
                     $sub_total = $total_price;
                     $order_items[] = [
                         'quantity' => $quantity,
@@ -119,22 +120,24 @@ class CheckoutController extends Controller
             } else {
                 // Người dùng chưa đăng nhập
                 if ($isImmediatePurchase) {
-                    $product = Product::with('variants')->findOrFail($data['product_id']);
+                    $product = Product::query()->findOrFail($data['product_id']);
                     $quantity = $data['quantity'];
                     $total_items += 1;
-    
+
                     if ($product->type == 1) {
                         // Sản phẩm có biến thể
                         if (!isset($data['product_variant_id'])) {
                             return response()->json(['message' => 'Sản phẩm này có biến thể. Vui lòng chọn biến thể.'], Response::HTTP_BAD_REQUEST);
                         }
-                        $variant = $product->variants()->findOrFail($data['product_variant_id']);
+                        $variant = $product->variants()
+                        ->with('attributes') // Gọi thêm attributes
+                        ->findOrFail($data['product_variant_id']);
                         $total_price = $variant->price_sale * $quantity;
                     } else {
                         // Sản phẩm đơn
                         $total_price = $product->price_sale * $quantity;
                     }
-    
+
                     $sub_total = $total_price;
                     $order_items[] = [
                         'quantity' => $quantity,
@@ -146,7 +149,7 @@ class CheckoutController extends Controller
                     return response()->json(['message' => 'Bạn cần đăng nhập để mua từ giỏ hàng.'], Response::HTTP_BAD_REQUEST);
                 }
             }
-    
+
             return response()->json([
                 "message" => "Dữ liệu thành công",
                 "user" => $user ?? null, // return user only if logged in
@@ -161,5 +164,4 @@ class CheckoutController extends Controller
             );
         }
     }
-    
 }
