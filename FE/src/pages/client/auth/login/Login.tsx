@@ -3,62 +3,70 @@
 import { LogoClient } from "@/components/icons";
 import BackgroundLogin from "@/components/icons/login/Background";
 import LoginIcon1 from "@/components/icons/login/LoginIcon1";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button, Form, Input } from "antd";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAuth } from "@/common/context/Auth/AuthContext";
 import instance from "@/configs/axios";
-// import LoginIcon1 from "@/components/icons/login/LoginIcon1";
-
-
+import Loading from "@/common/Loading/Loading";
 const Login = () => {
-  const [loading,setLoading] = useState<boolean>(false)
+  const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<any>('');
   const navigator = useNavigate();
   const [form] = Form.useForm();
-  const { login ,token} = useAuth();
+  const { login, token } = useAuth();
+  const queryClient = useQueryClient();
   const { mutate } = useMutation({
     mutationFn: async (user) => {
-      const {data}  = await instance.post('/login', user)
+      const { data } = await instance.post('/login', user)
       return data;
     },
     onMutate: () => {
       setLoading(true);
+      queryClient.invalidateQueries({
+        queryKey: ['user']
+      });
     },
     onSuccess: (data) => {
+      setLoading(true);
       login(data);
       toast.success(data.message);
       navigator("/");
     },
     onError: (error: any) => {
+      setLoading(true);
       setError(error.response.data);
       toast.error('Có lỗi xảy ra');
     },
     onSettled: () => {
-      setLoading(false); 
+      setLoading(false);
     }
   });
 
   const onFinish = (data: any) => {
     setError('');
-    login(data)
     mutate(data);
+    login(data)
   };
 
   return (
     <>
       <div>
+
         <div>
           <BackgroundLogin />
         </div>
         <img
           src={LogoClient}
-          className="absolute h-10 z-10 lg:ml-[140px] mt-[30px] mx-auto"
+          className="fixed h-10 z-10 lg:ml-[140px] mt-[30px] mx-auto"
           alt="Logo"
         />
         <div className="absolute lg:right-[12%] top-[10%]">
+          {
+            loading ? <Loading /> : ''
+          }
           <div className="w-full m-9 p-[50px] lg:w-[450px] shadow-2xl border">
             <h2 className="text-2xl font-semibold text-gray-700 text-center">Đăng nhập</h2>
             <p className="text-xl text-gray-600 text-center">Chào mừng trở lại</p>
@@ -73,6 +81,7 @@ const Login = () => {
               <Link to="" className="text-xs text-center text-gray-500 uppercase">hoặc với email</Link>
               <span className="border-b w-1/5 lg:w-1/4" />
             </div>
+
             <Form layout="vertical" onFinish={onFinish} form={form}>
               <div className="mt-4">
                 <Form.Item name='email' label="Email của bạn" className="block text-gray-700 text-sm font-bold mb-2">
@@ -97,6 +106,7 @@ const Login = () => {
                   <div className="text-red-600">{error.errors.password[0]}</div>
                 ) : null}
               </div>
+              <Link to={'/account/forgotpassword'} className="text-black">Quên mật khẩu ?</Link>
               <div className="mt-8">
                 <Button htmlType="submit" className="bg-gray-700 text-white font-bold p-6 w-full rounded hover:bg-gray-600" loading={loading}>
                   Đăng nhập
@@ -108,8 +118,11 @@ const Login = () => {
                 <span className="border-b w-1/5 md:w-1/4" />
               </div>
             </Form>
+
+
           </div>
         </div>
+
       </div>
     </>
   );

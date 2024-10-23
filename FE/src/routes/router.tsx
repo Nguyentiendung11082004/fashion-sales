@@ -55,7 +55,7 @@ const Router = () => {
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
         <Route
-            path="account/:id/forgotpassword"
+            path="account/forgotpassword"
             element={<ForgotPassword />}
           />
         <Route path="/admin" element={<LayoutAdmin />}>
@@ -78,9 +78,6 @@ const Router = () => {
           <Route path="comments" element={<CommentPage />} />
           <Route path="clients" element={<ClientPage />} />
           <Route path="clients/create" element={<FormClient />} />
-          <Route path="employees" element={<EmployeePage />} />
-          <Route path="employees/create" element={<FormEmployee />} />
-          <Route path="employees/edit/:id" element={<FormEmployee />} />
           <Route path="brands" element={<Brands />} />
           <Route path="brands/create" element={<BrandForm />} />
           <Route path="brands/edit/:id" element={<BrandForm />} />
@@ -90,9 +87,6 @@ const Router = () => {
           <Route path="tags/edit/:id" element={<FormTag />} />
           <Route path="clients" element={<ClientPage />} />
           <Route path="clients/create" element={<FormClient />} />
-          <Route path="employees" element={<EmployeePage />} />
-          <Route path="employees/create" element={<FormEmployee />} />
-          <Route path="employees/edit/:id" element={<FormEmployee />} />
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>

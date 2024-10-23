@@ -1,19 +1,31 @@
-// toastConfig.js
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import '@/index.css'; 
-const Toast = {
-    success: (message:string) => {
-        toast.success(message, {
-            className: 'toast-success',
-        });
-    },
-    error: (message:string) => {
-        toast.error(message, {
-            className: 'toast-error', 
-        });
-    },
-};
-export const ToastProvider = () => <ToastContainer />;
+import React, { useEffect } from 'react';
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
 
-export default Toast;
+const MySwal = withReactContent(Swal);
+
+interface NotificationProps {
+    title: string;
+    icon: 'success' | 'error' | 'warning' | 'info' | 'question'; 
+    text: string; 
+    isVisible: boolean; 
+}
+
+const Notification: React.FC<NotificationProps> = ({ title, icon, text, isVisible }) => {
+    useEffect(() => {
+        if (isVisible) {
+            MySwal.fire({
+                title: title,
+                icon: icon,
+                text: text,
+                timerProgressBar: true,
+                showConfirmButton: false,
+                timer: 1500,
+            });
+        }
+    }, [isVisible]);
+
+    return null; 
+};
+
+export default Notification;

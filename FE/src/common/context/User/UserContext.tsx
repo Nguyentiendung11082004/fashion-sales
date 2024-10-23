@@ -3,7 +3,8 @@ import axios from 'axios';
 import { useAuth } from '../Auth/AuthContext';
 import instance from '@/configs/axios';
 import { useQuery } from '@tanstack/react-query';
-
+import { Flex, Spin } from 'antd';
+import Loading from '@/common/Loading/Loading';
 interface UserContextType {
     user: any;
     loading: boolean;
@@ -34,13 +35,13 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             return res.data;
         },
     });
-    if (isFetching) return <div>Loading...</div>
-
-
+    // if (isFetching) return <div><Loading /></div>
 
     return (
         <UserContext.Provider value={{ user, loading, error }}>
-            {children}
+            {
+                isFetching ? <Loading /> : children
+            }
         </UserContext.Provider>
     );
 };
