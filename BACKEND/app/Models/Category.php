@@ -31,9 +31,13 @@ class Category extends Model
     public function products(){
         return $this->hasMany(Product::class);
     }
-     // Lấy tất cả danh mục con (bao gồm cả con cháu)
-     public function allChildren()
+    // Lấy tất cả danh mục con (bao gồm cả con cháu)
+    public function allChildren()
      {
          return $this->children()->with('allChildren');
      }
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
 }

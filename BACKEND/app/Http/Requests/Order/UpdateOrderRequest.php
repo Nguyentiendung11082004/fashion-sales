@@ -11,7 +11,7 @@ class UpdateOrderRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,10 @@ class UpdateOrderRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'order_status' => 'required|string|in:Đang chờ xác nhận,Hủy',  // Allowed statuses
+            'user_note' => 'nullable|string|max:255',                // Optional user note by default
+            // Require user_note if the status is "Hủy"
+            'user_note' => 'required_if:status,Hủy|string|max:255',  
         ];
     }
 }

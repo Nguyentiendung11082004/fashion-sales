@@ -13,6 +13,8 @@ import UserHome from "../icons/headerWebsite/UserHome";
 import { useAuth } from "@/common/context/Auth/AuthContext";
 import { Button } from "antd";
 import { useWishlist } from "@/common/context/Wishlist/WishlistContext";
+import instance from "@/configs/axios";
+import { useQuery } from "@tanstack/react-query";
 type Props = {};
 const Header = (props: Props) => {
   const navigator = useNavigate();
@@ -24,6 +26,28 @@ const Header = (props: Props) => {
     navigator("/login")
   }
   const wishlistCount = wishlist.length;
+  const { token } = useAuth();
+  const { data } = useQuery({
+    queryKey: ['cart'],
+    queryFn: async () => {
+      const res = await instance.get('/cart', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return res.data;
+    },
+  });
+  
+  let qty = 0;
+  const cartItems = data?.cart?.cartitems;
+  if (Array.isArray(cartItems)) {
+    cartItems.forEach((item: any) => {
+      qty += item.quantity;
+    });
+  } else if (cartItems && typeof cartItems === 'object') {
+    qty += cartItems.quantity;
+  }
   return (
     <>
       <div>
@@ -83,7 +107,7 @@ const Header = (props: Props) => {
                   </Link>
                 </li>
                 <li className="relative">
-                  <Link to="" className=" font-normal text-hover">
+                  <Link to="/products" className=" font-normal text-hover">
                     Sản Phẩm
                     <span className="absolute text-xs rounded-full px-2 py-[2px] text-white bg-primary top-[-10px] left-16 ">
                       New
@@ -146,9 +170,9 @@ const Header = (props: Props) => {
                   </span>
                   <HeartHome />
                 </Link>
-                <Link to="" className="relative">
+                <Link to="/cart" className="relative">
                   <span className="absolute text-xs right-[-5px] top-[-5px] bg-[#000] text-white px-1 rounded-full">
-                    3
+                    {qty}
                   </span>
                   <CartHome />
                 </Link>
@@ -160,5 +184,4 @@ const Header = (props: Props) => {
     </>
   );
 };
-
 export default Header;

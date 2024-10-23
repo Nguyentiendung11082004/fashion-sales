@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { LogoClient } from "@/components/icons";
 import BackgroundLogin from "@/components/icons/login/Background";
 import LoginIcon1 from "@/components/icons/login/LoginIcon1";
-import axios from "axios";
 import { useMutation } from "@tanstack/react-query";
 import { Button, Form, Input } from "antd";
 import { useState } from "react";
@@ -9,6 +10,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAuth } from "@/common/context/Auth/AuthContext";
 import instance from "@/configs/axios";
+// import LoginIcon1 from "@/components/icons/login/LoginIcon1";
 
 
 const Login = () => {

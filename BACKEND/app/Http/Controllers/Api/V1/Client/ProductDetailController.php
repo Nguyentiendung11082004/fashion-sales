@@ -20,9 +20,7 @@ class ProductDetailController extends Controller
     public function productdetail(string $id)
     {
         try {
-
             $product = Product::query()->with([
-
                 "brand",
                 "category",
                 "galleries",

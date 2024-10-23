@@ -9,11 +9,9 @@ import Checkout from "@/pages/client/checkout/Checkout";
 import Contact from "@/pages/client/contact/Contact";
 import ForgotPassword from "@/pages/client/auth/forgotpassword/ForgotPassword";
 import HistoryOrder from "@/pages/client/historyOrder/HistoryOrder";
-import Login from "@/pages/client/auth/login/Login";
 import NotFound from "@/pages/client/notfound/NotFound";
 import ProductDetail from "@/pages/client/productDetail/ProductDetail";
 import Products from "@/pages/client/products/Products";
-import Register from "@/pages/client/auth/register/Register";
 import { Route, Routes } from "react-router-dom";
 import HomePage from "../pages/client/home/HomePage";
 import LayoutWebsite from "../pages/client/layout";
@@ -35,6 +33,8 @@ import FormEmployee from "@/pages/admin/account/employee/components/FormEmployee
 import Wishlist from "@/pages/client/wishlist/Wishlist";
 import LiveChat from "@/pages/client/liveChat/liveChat";
 import Chatbox from "@/pages/admin/chatbox/Chatbox";
+import Register from "@/pages/client/auth/register/Register";
+import Login from "@/pages/client/auth/login/Login";
 
 
 const Router = () => {

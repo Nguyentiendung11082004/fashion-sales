@@ -16,6 +16,10 @@ import { ResponseData } from "@/common/types/responseDataFilter";
 import unorm from "unorm";
 import { useWishlist } from "@/common/context/Wishlist/WishlistContext";
 import HeartRed from "@/components/icons/detail/HeartRed";
+import { Button, Spin } from 'antd';
+import { LoadingOutlined } from '@ant-design/icons';
+import { useAuth } from "@/common/context/Auth/AuthContext";
+import { useCart } from "@/common/context/Cart/CartContext";
 
 const Products = () => {
   const [growboxDropdownOpen, setGrowboxDropdownOpen] = useState(false);
@@ -260,6 +264,17 @@ const Products = () => {
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
 
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const { isLoading, addToCart } = useCart();
+  const handleAddToCart = (idProduct: any, idProductVariant: any) => {
+    addToCart(idProduct, idProductVariant)
+  }
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
@@ -1085,13 +1100,15 @@ const Products = () => {
                               </button>
                             </Link>
                             <Link to="" className="group/btn relative">
-                              <button className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]">
-                                <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                                  Thêm vào giỏ hàng
-                                </p>
-                                <CartDetail />
-                              </button>
-                            </Link>
+                            <button onClick={() => handleAddToCart(product?.id, product?.variants[0]?.id)} className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]">
+                              <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
+                                Thêm vào giỏ hàng
+                              </p>
+                              {
+                                isLoading ? <Spin indicator={<LoadingOutlined style={{ fontSize: 28, color: '#fff' }} />} className="translate-y-[-12px]" /> : <CartDetail />
+                              }
+                            </button>
+                          </Link>
                           </div>
                           <div className="flex justify-center">
                             <div

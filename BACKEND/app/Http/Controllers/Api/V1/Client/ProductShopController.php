@@ -42,8 +42,8 @@ class ProductShopController extends Controller
         $sortDirection = $request->input('sortDirection');
         $sortPrice = $request->input('sortPrice');
         $sortAlphaOrder = $request->input('sortAlphaOrder');
-
-
+        $new = $request->input('new');
+        $sale = $request->input('sale');
 
         // Kiểm tra giá trị sortDirection
         if ($sortDirection && !in_array(strtolower($sortDirection), ['asc', 'desc'])) {
@@ -61,20 +61,20 @@ class ProductShopController extends Controller
                 })
                 ->when($trend, function ($query, $new) {
                     // Lọc sản phẩm hot trend
-                    return $query->where('trend', 1);
+                    return $query->where('is_new', 1);
                 })
                 ->when($sale, function ($query) {
                     return $query->where(function ($q) {
                         $q->where(function ($query) {
                             $query->where('type', 0)
                                 ->whereNotNull('price_sale')
-                                ->whereColumn('price_sale', '<', 'price_regular'); // Để đảm bảo lọc bao gồm cả giá sale null
+                                ->WhereColumn('price_sale', '<', 'price_regular');
                         })
                             ->orWhere(function ($query) {
                                 $query->where('type', 1)
                                     ->whereHas('variants', function ($query) {
                                         $query->whereNotNull('price_sale')
-                                            ->whereColumn('price_sale', '<', 'price_regular');
+                                            ->WhereColumn('price_sale', '<', 'price_regular');
                                     });
                             });
                     });
@@ -115,6 +115,7 @@ class ProductShopController extends Controller
                             ->whereIn('product_variant_has_attributes.value', $sizes); // Truy cập giá trị trực tiếp từ bảng trung gian
                     });
                 })
+                // khoảng giá
                 ->when($minPrice || $maxPrice, function ($query) use ($minPrice, $maxPrice) {
                     return $query->where(function ($subQuery) use ($minPrice, $maxPrice) {
                         if (!is_null($minPrice)) {

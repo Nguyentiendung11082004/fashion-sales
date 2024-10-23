@@ -5,8 +5,9 @@ namespace App\Http\Controllers\Api\V1\Client;
 use App\Models\Wishlist;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Http\Helper\Product\GetUniqueAttribute;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Helper\Product\GetUniqueAttribute;
+
 
 class WishlistController extends Controller
 {
@@ -65,7 +66,25 @@ class WishlistController extends Controller
             $request->validate([
                 'product_id' => 'required|exists:products,id',
             ]);
+            if (Auth::check()) {
+                $user_id = Auth::id();
+                //Lấy id người dùng hiện tại
+                // $userId = 1;
+                // Kiểm tra nếu sản phẩm đã có trong danh sách yêu thích
+                $wishlistItem = Wishlist::where('user_id', $user_id)
+                    ->where('product_id', $request->product_id)
+                    ->first();
 
+                if (!$wishlistItem) {
+                    // Nếu chưa có, thêm sản phẩm vào danh sách yêu thích
+                    Wishlist::create([
+                        'user_id' => $user_id,
+                        'product_id' => $request->product_id,
+                    ]);
+
+                    return response()->json(['message' => 'Sản phẩm đã được thêm vào danh sách yêu thích'], 201);
+                }
+            }
             if (Auth::check()) {
                 $user_id = Auth::id();
                 // $userId = 1;
@@ -87,27 +106,14 @@ class WishlistController extends Controller
                 return response()->json(['message' => 'Sản phẩm đã có trong danh sách yêu thích'], 200);
             } else {
                 return response()->json(['message' => 'User not authenticated'], 401);
-            }
-        } catch (\Exception $e) {
+            } 
+        }
+         catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
-    // /**
-    //  * Display the specified resource.
-    //  */
-    // public function show(string $id)
-    // {
-    //     //
-    // }
-
-    // /**
-    //  * Update the specified resource in storage.
-    //  */
-    // public function update(Request $request, string $id)
-    // {
-    //     //
-    // }
+    
 
     /**
      * Remove the specified resource from storage.
@@ -116,7 +122,7 @@ class WishlistController extends Controller
     {
         try {
             if (Auth::check()) {
-                $user_id = Auth::id();
+                $user_id = Auth::id();  //Lấy id người dùng hiện tại
                 // $userId = 1;
 
                 // Tìm sản phẩm trong danh sách yêu thích theo ID của wishlist

@@ -17,11 +17,11 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(User::class)->constrained();
             $table->foreignIdFor(Product::class)->constrained();
-            $table->text("content");
-            $table->integer("rating")->nullable();
+            $table->foreignId('parent_id')->nullable()->constrained('comments')->onDelete('cascade');
+            $table->text('content');
+            $table->integer('rating')->nullable();
             $table->string('image')->nullable();
-            $table->boolean("status")->default(true);
-
+            $table->boolean('status')->default(true);
             $table->timestamps();
         });
     }

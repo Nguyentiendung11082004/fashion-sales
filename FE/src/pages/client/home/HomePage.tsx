@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   BannerIntro1,
   BannerIntro2,
@@ -124,14 +125,14 @@ const HomePage = () => {
                     {product.price_regular && (
                       <div>
                         {product.price_sale > 0 &&
-                        product.price_sale < product.price_regular ? (
+                          product.price_sale < product.price_regular ? (
                           <>
                             <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400">
                               -
                               {Math.round(
                                 ((product.price_regular - product.price_sale) /
                                   product.price_regular) *
-                                  100
+                                100
                               )}
                               %
                             </div>
@@ -363,7 +364,7 @@ const HomePage = () => {
       group-hover:translate-y-0
       opacity-0
       group-hover:opacity-100
-    "
+      "
                       >
                         <ul className="flex">
                           {product.unique_attributes.size && (
@@ -380,14 +381,14 @@ const HomePage = () => {
                     {product.price_regular && (
                       <div>
                         {product.price_sale > 0 &&
-                        product.price_sale < product.price_regular ? (
+                          product.price_sale < product.price_regular ? (
                           <>
                             <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400">
                               -
                               {Math.round(
                                 ((product.price_regular - product.price_sale) /
                                   product.price_regular) *
-                                  100
+                                100
                               )}
                               %
                             </div>
