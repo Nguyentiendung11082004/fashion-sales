@@ -9,7 +9,7 @@ import {
 import CartDetail from "@/components/icons/detail/CartDetail";
 import Eye from "@/components/icons/detail/Eye";
 import HeartWhite from "@/components/icons/detail/HeartWhite";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import Banner from "./Banner/Banner";
 import Slideshow from "./SampleSlider/SampleSlider";
@@ -19,6 +19,7 @@ import { convertColorNameToClass } from "@/common/colors/colorUtils";
 import { useWishlist } from "../../../common/context/Wishlist/WishlistContext";
 import HeartRed from "@/components/icons/detail/HeartRed";
 import LiveChat from "../liveChat/liveChat";
+import ModalPopup from "@/common/ModalPopup/ModalPopup";
 
 const HomePage = () => {
   const [trendProducts, setTrendProducts] = useState<any[]>([]);
@@ -36,6 +37,8 @@ const HomePage = () => {
         console.error("Có lỗi xảy ra khi lấy sản phẩm", error);
       });
   }, []);
+
+  const modalRef = useRef<HTMLDialogElement>(null);
 
   return (
     <>
@@ -93,7 +96,8 @@ const HomePage = () => {
                         </button>
                       </Link>
                       <Link to="" className="group/btn relative">
-                        <button className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]">
+                        <button className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]"
+                                onClick={() => modalRef.current?.showModal()}>
                           <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
                             Thêm vào giỏ hàng
                           </p>
@@ -259,6 +263,7 @@ const HomePage = () => {
               </div>
             ))}
           </div>
+          <ModalPopup ref={modalRef} />
         </section>
 
         <section className="container my-16 text-center">

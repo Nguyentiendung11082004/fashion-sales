@@ -159,7 +159,7 @@ const Header = (props: Props) => {
                       ) : (
                         <div className="flex flex-col space-y-2">
                           <Link
-                            to="/signup"
+                            to="/register"
                             className=" py-2 w-[150px] text-center text-white bg-orange-400 rounded-md hover:bg-orange-500 transition duration-200 ease-in-out">
                             Đăng Ký
                           </Link>
