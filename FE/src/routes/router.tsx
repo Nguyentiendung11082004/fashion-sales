@@ -49,7 +49,7 @@ const Router = () => {
           <Route path="cart" element={<Cart />} />
           <Route path="account" element={<Account />} />
           <Route path="wishlist" element={<Wishlist />} />
-          <Route path="livechat" element={<LiveChat />} />
+          {/* <Route path="livechat" element={<LiveChat />} /> */}
           <Route
             path="account/:id/forgotpassword"
             element={<ForgotPassword />}

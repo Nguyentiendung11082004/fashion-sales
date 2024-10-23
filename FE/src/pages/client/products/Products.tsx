@@ -273,13 +273,7 @@ const Products = () => {
   const handleAddToCart = (idProduct: any, idProductVariant: any) => {
     addToCart(idProduct, idProductVariant)
   }
-  useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
+  
   return (
     <>
       <div>
