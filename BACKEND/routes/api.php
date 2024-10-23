@@ -69,6 +69,10 @@ Route::prefix("v1/")->group(function () {
     Route::post('register', [AuthController::class, 'register']);
     Route::resource('order', OrderController::class);
     Route::resource('checkout', CheckoutController::class);
+    Route::get("getprovinces",[CheckoutController::class,"getProvinces"]);
+    Route::post("getdistricts",[CheckoutController::class,"getDistricts"]);
+    Route::post("getwards",[CheckoutController::class,"getWards"]);
+
 
     
 });
