@@ -107,9 +107,23 @@ class ProductController extends Controller
                             "sku" => $item["sku"],
 
                         ]);
-                        foreach ($item["attribute_item_id"] as $key => $value) {
-                            // dd($value);
-                            $productVariant->attributes()->attach($request->input('attribute_id')[$key], ["attribute_item_id" => $value["id"], "value" => $value['value']]);
+                        foreach ($item["attribute_item_id"] as  $value) {
+
+                            $attribute_id = null;
+
+                            foreach ($request->input('attribute_id') as  $attr_id) {
+
+                                if (in_array($value['id'], $request->input('attribute_item_id')[$attr_id])) {
+                                    $attribute_id = $attr_id;
+                                    break;
+                                }
+                            }
+                            if ($attribute_id !== null) {
+                                $productVariant->attributes()->attach(
+                                    $attribute_id,
+                                    ["attribute_item_id" => $value["id"], "value" => $value['value']]
+                                );
+                            }
                         }
                     }
                 }
@@ -190,7 +204,7 @@ class ProductController extends Controller
                 if (isset($request->gallery)) {
 
                     foreach ($request->gallery as $galleryItem) {
-                        
+
                         if (isset($galleryItem['id']) && isset($galleryItem['image'])) {
 
                             $gallery = ProductGallery::query()->findOrFail($galleryItem['id']);
@@ -211,9 +225,9 @@ class ProductController extends Controller
                     $product->attributes()->sync($syncData);
 
                     // Lấy biến thể hiện tại của sản phẩm từ database
-                   
 
-                   
+
+
                     // Tải các biến thể hiện có của sản phẩm và chuyển đổi thành mảng
                     $existingVariants = $product->load(['variants'])->toArray()['variants'];
 
@@ -227,7 +241,7 @@ class ProductController extends Controller
 
                         // Xử lý hình ảnh
                         if (isset($item["image"])) {
-                           
+
                             $url = $item["image"];
                         } else {
                             // Giữ ảnh cũ nếu không upload ảnh mới
@@ -266,17 +280,29 @@ class ProductController extends Controller
                             $processedVariantIds[] = $productVariant->id;
                         }
 
-                        // Xử lý thuộc tính của biến thể
-                        foreach ($item["attribute_item_id"] as $key => $value) {
-                            // Lấy attribute_id tương ứng
-                            $attributeId = $request->input('attribute_id')[$key] ?? null;
-                            if ($attributeId) {
-                                $syncVariant[$attributeId] = [
+                        foreach ($item["attribute_item_id"] as  $value) {
+
+                            $attribute_id = null;
+
+                            foreach ($request->input('attribute_id') as  $attr_id  ) { //2,1
+
+                                if (in_array($value['id'], $request->input('attribute_item_id')[$attr_id])) {
+                                    $attribute_id = $attr_id;
+                                    break;
+                                }
+                            }
+                            // dd($attribute_id);
+
+                            if ($attribute_id !== null) {
+                                
+                                $syncVariant[$attribute_id] = [
                                     "attribute_item_id" => $value["id"],
                                     "value" => $value["value"]
                                 ];
                             }
+                            // dd($syncVariant);
                         }
+                        // dd($syncVariant);
 
                         // Đồng bộ hóa thuộc tính
                         $productVariant->attributes()->sync($syncVariant);
@@ -344,11 +370,11 @@ class ProductController extends Controller
         try {
             $product = Product::query()->findOrFail($id);
             $respone = DB::transaction(function () use ($product) {
-                
+
                 ProductGallery::query()->where('product_id', $product->id)->delete();
                 $product->tags()->sync([]);
                 if ($product->type == 1) {
-                 
+
                     DB::table('product_variant_has_attributes')->whereIn('product_variant_id', function ($query) use ($product) {
                         $query->select('id')
                             ->from('product_variants')
