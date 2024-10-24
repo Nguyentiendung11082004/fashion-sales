@@ -30,11 +30,19 @@ const Login = () => {
       });
     },
     onSuccess: (data) => {
+<<<<<<< HEAD
       toast.success("Đăng nhập thành công");
+=======
+      // setLoading(true);
+>>>>>>> 652ebbbd680431c5fe828f87b9383e3a6e166d2e
       login(data);
       navigator("/");
     },
     onError: (error: any) => {
+<<<<<<< HEAD
+=======
+      // setLoading(true);
+>>>>>>> 652ebbbd680431c5fe828f87b9383e3a6e166d2e
       setError(error.response.data);
       toast.error('Có lỗi xảy ra');
     },
@@ -63,7 +71,12 @@ const Login = () => {
         />
         <div className="absolute lg:right-[12%] top-[10%]">
           {/* {
+<<<<<<< HEAD
             loading ? <Loading /> : ''
+=======
+            loading 
+            ? <Loading /> : ''
+>>>>>>> 652ebbbd680431c5fe828f87b9383e3a6e166d2e
           } */}
           <div className="w-full m-9 p-[50px] lg:w-[450px] shadow-2xl border">
             <h2 className="text-2xl font-semibold text-gray-700 text-center">Đăng nhập</h2>

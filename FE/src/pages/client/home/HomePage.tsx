@@ -9,7 +9,7 @@ import {
 import CartDetail from "@/components/icons/detail/CartDetail";
 import Eye from "@/components/icons/detail/Eye";
 import HeartWhite from "@/components/icons/detail/HeartWhite";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import Banner from "./Banner/Banner";
 import Slideshow from "./SampleSlider/SampleSlider";
@@ -19,6 +19,8 @@ import { convertColorNameToClass } from "@/common/colors/colorUtils";
 import { useWishlist } from "../../../common/context/Wishlist/WishlistContext";
 import HeartRed from "@/components/icons/detail/HeartRed";
 import LiveChat from "../liveChat/liveChat";
+import CartPopup from "@/components/ModalPopup/CartPopup";
+import DetailPopup from "@/components/ModalPopup/DetailPopup";
 
 const HomePage = () => {
   const [trendProducts, setTrendProducts] = useState<any[]>([]);
@@ -36,6 +38,9 @@ const HomePage = () => {
         console.error("Có lỗi xảy ra khi lấy sản phẩm", error);
       });
   }, []);
+
+  const modalRef = useRef<HTMLDialogElement>(null);
+  const modalRefDetail = useRef<HTMLDialogElement>(null);
 
   return (
     <>
@@ -85,7 +90,8 @@ const HomePage = () => {
                     </div>
                     <div className="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100">
                       <Link to="" className="group/btn relative m-auto">
-                        <button className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]">
+                        <button className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]"
+                                onClick={() => modalRefDetail.current?.showModal()}>
                           <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
                             Xem thêm
                           </p>
@@ -93,7 +99,8 @@ const HomePage = () => {
                         </button>
                       </Link>
                       <Link to="" className="group/btn relative">
-                        <button className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]">
+                        <button className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]"
+                                onClick={() => modalRef.current?.showModal()}>
                           <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
                             Thêm vào giỏ hàng
                           </p>
@@ -259,6 +266,8 @@ const HomePage = () => {
               </div>
             ))}
           </div>
+          <CartPopup ref={modalRef} />
+          <DetailPopup ref={modalRefDetail} />
         </section>
 
         <section className="container my-16 text-center">

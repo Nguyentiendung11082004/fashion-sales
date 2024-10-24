@@ -126,7 +126,7 @@ const ModalCart = ({ open, onClose, idCart, onUpdateAttributes, attributes }: Pr
             ) : (
                 <div>
                     <h2 className='text-2xl font-bold text-gray-800 mb-2'>{cartAttribute?.cart_item?.product?.name}</h2>
-                    <span className='text-2xl text-red-600 mb-4'>{FormatMoney(currentPrice || cartAttribute?.cart_item?.productvariant?.price_sale)}</span>
+                    <span className='text-2xl text-[#696969] mb-4'>{FormatMoney(currentPrice || cartAttribute?.cart_item?.productvariant?.price_sale)}</span>
                     {resultDataAttribute.map((e) => (
                         <div key={e.attribute} >
                             <p>{e.attribute}</p>

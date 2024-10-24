@@ -283,7 +283,6 @@ const Products = () => {
   const buyNow = (idPr: any, qty: number) => {
     navigate('/checkout', { state: { cartId: idPr } });
   }
-
   return (
     <>
       <div>
