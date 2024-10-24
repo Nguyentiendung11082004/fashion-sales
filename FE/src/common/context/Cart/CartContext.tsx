@@ -27,18 +27,18 @@ export const useCart = () => {
 export const CartProvider = ({ children }: { children: ReactNode }) => {
     const { token } = useAuth();
     const queryClient = useQueryClient();
-    const [error, setError] = useState(null)
-    const { data, isLoading } = useQuery({
-        queryKey: ['cart'],
-        queryFn: async () => {
-            const res = await instance.get('/cart', {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            return res.data;
-        },
-    });
+        const { data, isLoading } = useQuery({
+            queryKey: ['cart'],
+            queryFn: async () => {
+                const res = await instance.get('/cart', {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                return res.data;
+            },
+            enabled: !!token,
+        });
     const addCartMutation = useMutation({
         mutationFn: async ({ idProduct, idProductVariant }: { idProduct: number, idProductVariant: number }) => {
             await instance.post(`/cart`, {
@@ -50,6 +50,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
                     Authorization: `Bearer ${token}`,
                 },
             });
+            
         },
         onSuccess: () => {
             queryClient.invalidateQueries({

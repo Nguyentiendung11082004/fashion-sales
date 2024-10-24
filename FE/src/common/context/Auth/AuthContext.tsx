@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { useLocalStorage } from '../../hooks/useStogare';
+import { toast } from 'react-toastify';
 
 interface AuthContextType {
     isAuth: boolean;

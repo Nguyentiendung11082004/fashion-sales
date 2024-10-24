@@ -18,7 +18,7 @@ import { useQuery } from "@tanstack/react-query";
 type Props = {};
 const Header = (props: Props) => {
   const navigator = useNavigate();
-  const { data :  wishlist = []} = useWishlist();
+  const { data: wishlist = [] } = useWishlist();
   const { user } = useUser();
   let infoUser;
   if (user) {
@@ -143,11 +143,15 @@ const Header = (props: Props) => {
             <div className="lg:col-span-2 col-span-4 flex items-center justify-end order-3">
               <div className="flex items-center space-x-4">
                 <div className="relative group">
-                  <Link to="/account">
-                    {
-                      user ? (<img src={`${infoUser?.avatar}`} className="h-10 w-10 rounded-full object-cover" alt={`${infoUser?.name}`} />) : <UserHome />
-                    }
-                  </Link>
+
+                  {
+                    user ? <Link to="/account">
+                      {
+                        user ? (<img src={`${infoUser?.avatar}`} className="h-10 w-10 rounded-full object-cover" alt={`${infoUser?.name}`} />) : <UserHome />
+                      }
+                    </Link> : <UserHome />
+                  }
+
                   <div className="absolute left-[-50px] hidden group-hover:flex flex-col items-start mt-0 space-y-2 p-4 bg-white shadow-lg rounded-lg transition-all duration-300 z-10">
                     {
                       user ? (
@@ -159,7 +163,7 @@ const Header = (props: Props) => {
                       ) : (
                         <div className="flex flex-col space-y-2">
                           <Link
-                            to="/signup"
+                            to="/register"
                             className=" py-2 w-[150px] text-center text-white bg-orange-400 rounded-md hover:bg-orange-500 transition duration-200 ease-in-out">
                             Đăng Ký
                           </Link>

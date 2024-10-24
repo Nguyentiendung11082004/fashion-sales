@@ -30,13 +30,11 @@ const Login = () => {
       });
     },
     onSuccess: (data) => {
-      setLoading(true);
+      toast.success("Đăng nhập thành công");
       login(data);
-      toast.success(data.message);
       navigator("/");
     },
     onError: (error: any) => {
-      setLoading(true);
       setError(error.response.data);
       toast.error('Có lỗi xảy ra');
     },
@@ -48,7 +46,7 @@ const Login = () => {
   const onFinish = (data: any) => {
     setError('');
     mutate(data);
-    login(data)
+    // login(data)
   };
 
   return (
@@ -64,9 +62,9 @@ const Login = () => {
           alt="Logo"
         />
         <div className="absolute lg:right-[12%] top-[10%]">
-          {
+          {/* {
             loading ? <Loading /> : ''
-          }
+          } */}
           <div className="w-full m-9 p-[50px] lg:w-[450px] shadow-2xl border">
             <h2 className="text-2xl font-semibold text-gray-700 text-center">Đăng nhập</h2>
             <p className="text-xl text-gray-600 text-center">Chào mừng trở lại</p>
