@@ -72,6 +72,9 @@ Route::prefix("v1/")->group(function () {
     Route::get("getprovinces",[CheckoutController::class,"getProvinces"]);
     Route::post("getdistricts",[CheckoutController::class,"getDistricts"]);
     Route::post("getwards",[CheckoutController::class,"getWards"]);
+    Route::post("getavailableservices",[CheckoutController::class,"getAvailableServices"]);
+    Route::post("calculateshippingfee",[CheckoutController::class,"calculateShippingFee"]);
+
 
 
     
