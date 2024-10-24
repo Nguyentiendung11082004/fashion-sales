@@ -5,6 +5,8 @@ use App\Http\Controllers\Api\V1\Admin\TagController;
 use App\Http\Controllers\Api\V1\Admin\BrandController;
 use App\Http\Controllers\Api\V1\Client\AuthController;
 use App\Http\Controllers\Api\V1\Client\CartController;
+use App\Http\Controllers\Api\V1\Client\ConversationController;
+use App\Http\Controllers\Api\V1\Client\MessageController;
 use App\Http\Controllers\Api\V1\Admin\ClientController;
 use App\Http\Controllers\Api\V1\Client\OrderController;
 use App\Http\Controllers\Api\V1\Admin\ProductController;
@@ -20,6 +22,7 @@ use App\Http\Controllers\Api\V1\Client\CheckoutController;
 use App\Http\Controllers\Api\V1\Client\WishlistController;
 use App\Http\Controllers\Api\V1\Client\HomeProductController;
 use App\Http\Controllers\Api\V1\Client\ProductShopController;
+use App\Http\Controllers\Api\V1\Client\ChatController;
 use App\Http\Controllers\Api\V1\Client\ProductDetailController;
 
 use App\Http\Controllers\Api\V1\Client\InforUserController;
@@ -67,6 +70,16 @@ Route::prefix("v1/")->group(function () {
     Route::get('password/reset/{token}', [AuthController::class, 'showResetForm'])
         ->name('password.reset');
     Route::post('password/reset', [AuthController::class, 'reset']);
+    
+    Route::get("getprovinces",[CheckoutController::class,"getProvinces"]);
+    Route::post("getdistricts",[CheckoutController::class,"getDistricts"]);
+    Route::post("getwards",[CheckoutController::class,"getWards"]);
+    Route::post("getavailableservices",[CheckoutController::class,"getAvailableServices"]);
+    Route::post("calculateshippingfee",[CheckoutController::class,"calculateShippingFee"]);
+
+
+
+    
 });
 
 
@@ -82,6 +95,7 @@ Route::middleware('auth:sanctum')->prefix('v1/')->group(function () {
     Route::get('/posts', [PostController::class, 'index']);
 
     // Lấy danh sách bình luận
+
     Route::post('comment', [CommentController::class, 'store']); // Thêm bình luận mới
     Route::get('comment/{id}', [CommentController::class, 'show']); // Lấy chi tiết bình luận
     Route::put('comment/{id}', [CommentController::class, 'update']); // Cập nhật bình luận
@@ -90,6 +104,22 @@ Route::middleware('auth:sanctum')->prefix('v1/')->group(function () {
     Route::post('/posts', [PostController::class, 'store']);
     Route::put('/posts/{id}', [PostController::class, 'update']);
     Route::delete('/posts/{id}', [PostController::class, 'destroy']);
+
+
+     // Tạo hoặc lấy cuộc trò chuyện giữa hai người dùng
+     Route::post('conversations', [ConversationController::class, 'store']);
+
+     // Lấy tất cả các cuộc trò chuyện của người dùng
+     Route::get('conversations', [ConversationController::class, 'index']);
+ 
+     // Lấy tin nhắn trong một cuộc trò chuyện
+     Route::get('conversations/messages/{conversation}', [MessageController::class, 'index']);
+ 
+     // Gửi tin nhắn trong một cuộc trò chuyện
+     Route::post('conversations/messages/{conversation}', [MessageController::class, 'store']);
+     Route::post('conversations/messages', [MessageController::class, 'store']);
+     Route::resource("chat",ChatController::class);
+     Route::delete('chat-message/{conversation}',[ChatController::class,"deleteMessage"]);
 
    
 });
