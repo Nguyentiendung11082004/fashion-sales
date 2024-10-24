@@ -5,7 +5,7 @@ import HeartBlack from "@/components/icons/detail/HeartBlack";
 import HeartRedPopup from "@/components/icons/detail/HeartRedPopup";
 
 // Component AddToCartModal sử dụng forwardRef để truyền ref từ cha
-const ModalPopup = forwardRef((props, ref) => {
+const CartPopup = forwardRef((props, ref) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedColor, setSelectedColor] = useState(null);
   const [selectedSize, setSelectedSize] = useState(null);
@@ -39,13 +39,12 @@ const ModalPopup = forwardRef((props, ref) => {
         {/* Nút đóng ở góc phải */}
         <button
           onClick={handleClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-black"
+          className="absolute -top-2 -right-2 text-white hover:bg-[#56cfe1] bg-black px-3 pt-3 pb-2"
         >
           <CloseOutlined className="text-lg" />
         </button>
 
         <div>
-          {/* <h2 className="text-2xl font-bold text-gray-800 mb-4">Add to Cart</h2> */}
           <h2 className="text-2xl font-bold text-gray-800 mb-2">Chân váy</h2>
           <span className="text-2xl text-[#696969]">200.000 đ</span>
           {/* Chọn màu */}
@@ -127,7 +126,7 @@ const ModalPopup = forwardRef((props, ref) => {
             onClick={handleClose}
             className="h-12 w-full mt-4 rounded-full bg-[#56cfe1] text-white text-lg font-medium hover:bg-[#4bc3d5]"
           >
-            Add to Cart
+            Thêm vào giỏ hàng
           </Button>
         </div>
       </div>
@@ -135,4 +134,4 @@ const ModalPopup = forwardRef((props, ref) => {
   );
 });
 
-export default ModalPopup;
+export default CartPopup;
