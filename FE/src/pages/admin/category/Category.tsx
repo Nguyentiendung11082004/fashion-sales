@@ -1,7 +1,7 @@
 
 import Loading from "@/common/Loading/Loading";
 import { Icategories } from "@/common/types/categories";
-import { categoriesDestroy, categoriesIndex } from "@/services/api/categories";
+import { categoriesDestroy, categoriesIndex } from "@/services/api/admin/categories";
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button, Modal, Pagination, Table } from "antd";
@@ -17,7 +17,6 @@ const CategoryPage = () => {
   
   const initialPage = queryClient.getQueryData(['currentCategoryPage']) || 1;
   const [currentCategoryPage, setcurrentCategoryPage] = useState(Number(initialPage));
-  console.log("currentCategoryPage",currentCategoryPage)
   const [visiable, setVisiable] = useState(false);
   const [currentId, setCurrentId] = useState<number | null>(null);
   const { data, isFetching, isError } = useQuery({

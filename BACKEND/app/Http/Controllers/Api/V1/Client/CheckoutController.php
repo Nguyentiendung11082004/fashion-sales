@@ -53,7 +53,7 @@ class CheckoutController extends Controller
                                 $query->whereIn('id', $data['cart_item_ids']);
                             },
                             "cartitems.product",
-                            "cartitems.productvariant"
+                            "cartitems.productvariant.attributes"
                         ])
                         ->first();
 
@@ -74,7 +74,6 @@ class CheckoutController extends Controller
                     foreach ($cart->cartitems as $cart_item) {
                         $quantity = $cart_item->quantity;
                         $total_items += 1;
-
                         if ($cart_item->productvariant) {
                             $variant_price = $cart_item->productvariant->price_sale;
                             $total_price = $variant_price * $quantity;
@@ -93,7 +92,8 @@ class CheckoutController extends Controller
                     }
                 } elseif ($isImmediatePurchase) {
                     // Handle immediate purchase
-                    $product = Product::with('variants')->findOrFail($data['product_id']);
+                    $product = Product::with('variants.attributes')->findOrFail($data['product_id']);
+                    dd($product);
                     $quantity = $data['quantity'];
                     $total_items += 1;
 
@@ -102,7 +102,7 @@ class CheckoutController extends Controller
                         if (!isset($data['product_variant_id'])) {
                             return response()->json(['message' => 'Sản phẩm này có biến thể. Vui lòng chọn biến thể.'], Response::HTTP_BAD_REQUEST);
                         }
-                        $variant = $product->variants()->findOrFail($data['product_variant_id']);
+                        $variant = $product->variants()->with('attributes')->findOrFail($data['product_variant_id']);
                         $total_price = $variant->price_sale * $quantity;
                     } else {
                         // Sản phẩm đơn
@@ -120,7 +120,7 @@ class CheckoutController extends Controller
             } else {
                 // Người dùng chưa đăng nhập
                 if ($isImmediatePurchase) {
-                    $product = Product::with('variants')->findOrFail($data['product_id']);
+                    $product = Product::query()->findOrFail($data['product_id']);
                     $quantity = $data['quantity'];
                     $total_items += 1;
 
@@ -129,7 +129,9 @@ class CheckoutController extends Controller
                         if (!isset($data['product_variant_id'])) {
                             return response()->json(['message' => 'Sản phẩm này có biến thể. Vui lòng chọn biến thể.'], Response::HTTP_BAD_REQUEST);
                         }
-                        $variant = $product->variants()->findOrFail($data['product_variant_id']);
+                        $variant = $product->variants()
+                            ->with('attributes') // Gọi thêm attributes
+                            ->findOrFail($data['product_variant_id']);
                         $total_price = $variant->price_sale * $quantity;
                     } else {
                         // Sản phẩm đơn
@@ -359,8 +361,8 @@ class CheckoutController extends Controller
             $fee = json_decode($response, true)['data'];
 
             return response()->json([
-                "fee"=>$fee
-            ],Response::HTTP_OK);
+                "fee" => $fee
+            ], Response::HTTP_OK);
         } catch (\Exception $ex) {
             return response()->json([
                 "message" => $ex->getMessage()

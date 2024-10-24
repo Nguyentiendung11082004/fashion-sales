@@ -1,6 +1,6 @@
 import Loading from "@/common/Loading/Loading";
 import { Icomments } from "@/common/types/comments";
-import { deleteComment, getComments } from "@/services/api/comments.api";
+import { deleteComment, getComments } from "@/services/api/admin/comments.api";
 import { DeleteOutlined } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button, Modal, Pagination, Table } from "antd";

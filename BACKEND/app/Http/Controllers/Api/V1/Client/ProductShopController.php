@@ -17,7 +17,7 @@ class ProductShopController extends Controller
     // lấy ra tất cả product và biến thể của nó
     public function getAllProduct(ProductShopRequest $request)
     {
-        // Lấy tất danh mục 
+        // Lấy tất danh mục
         $allCategory = Category::whereNull('parent_id')->latest('id')->get();
         // Lấy tất cả brands
         $allBrand = Brand::query()->latest('id')->get();
@@ -35,8 +35,12 @@ class ProductShopController extends Controller
         $maxPrice = $request->input('max_price'); // Người dùng nhập giá tối đa
         $categories = $request->input('categorys');
         $brands = $request->input('brands');
-        $sortPrice = $request->input('sortPrice');
+        $sale = $request->input('sale');
+        $new = $request->input('new');
+
+        $trend = $request->input('trend');
         $sortDirection = $request->input('sortDirection');
+        $sortPrice = $request->input('sortPrice');
         $sortAlphaOrder = $request->input('sortAlphaOrder');
         $new = $request->input('new');
         $sale = $request->input('sale');
@@ -52,6 +56,10 @@ class ProductShopController extends Controller
         try {
             $products = Product::query()
                 ->when($new, function ($query, $new) {
+                    // Lọc sản phẩm new
+                    return $query->where('is_new', 1);
+                })
+                ->when($trend, function ($query, $new) {
                     // Lọc sản phẩm hot trend
                     return $query->where('is_new', 1);
                 })

@@ -1,19 +1,57 @@
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React from "react";
-import { Link } from "react-router-dom";
+import { useUser } from "@/common/context/User/UserContext";
+import { Link, useNavigate } from "react-router-dom";
 import { Flag, LogoClient } from "../icons";
-import PhoneHome from "../icons/headerWebsite/PhoneHome";
+import CartHome from "../icons/headerWebsite/CartHome";
 import EmailHome from "../icons/headerWebsite/EmailHome";
+import HeartHome from "../icons/headerWebsite/HeartHome";
 import MapHome from "../icons/headerWebsite/MapHome";
 import MenuHome from "../icons/headerWebsite/MenuHome";
+import PhoneHome from "../icons/headerWebsite/PhoneHome";
 import UserHome from "../icons/headerWebsite/UserHome";
-import HeartHome from "../icons/headerWebsite/HeartHome";
-import CartHome from "../icons/headerWebsite/CartHome";
-
+import { useAuth } from "@/common/context/Auth/AuthContext";
+import { Button } from "antd";
+import { useWishlist } from "@/common/context/Wishlist/WishlistContext";
+import instance from "@/configs/axios";
+import { useQuery } from "@tanstack/react-query";
 type Props = {};
-
 const Header = (props: Props) => {
+  const navigator = useNavigate();
+  const { data :  wishlist = []} = useWishlist();
+  const { user } = useUser();
+  let infoUser;
+  if (user) {
+    infoUser = user["Infor User"];
+  }
+  const { logout } = useAuth();
+  const logoutUser = () => {
+    logout();
+    navigator("/login")
+  }
+  const wishlistCount = wishlist.length;
+  const { token } = useAuth();
+  const { data } = useQuery({
+    queryKey: ['cart'],
+    queryFn: async () => {
+      const res = await instance.get('/cart', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return res.data;
+    },
+  });
+
+  let qty = 0;
+  const cartItems = data?.cart?.cartitems;
+  if (Array.isArray(cartItems)) {
+    cartItems.forEach((item: any) => {
+      qty += item.quantity;
+    });
+  } else if (cartItems && typeof cartItems === 'object') {
+    qty += cartItems.quantity;
+  }
   return (
     <>
       <div>
@@ -60,7 +98,7 @@ const Header = (props: Props) => {
         <div className="w-[100%] bg-[#fff] sticky top-0 left-0 right-0  z-20 ">
           <header className="lg:mx-10 bg-[#fff] h-[70px] grid grid-cols-12 gap-4 ">
             <div className="lg:col-span-2 col-span-4 flex justify-center items-center md:items-center md:justify-center lg:justify-start  order-2 lg:order-1">
-                <img src={LogoClient} alt="" className="h-[40px]" />
+              <img src={LogoClient} alt="" className="h-[40px]" />
             </div>
             <div className="col-span-4 flex items-center justify-start md:items-center md:justify-start lg:hidden  order-1  ">
               <MenuHome />
@@ -73,7 +111,7 @@ const Header = (props: Props) => {
                   </Link>
                 </li>
                 <li className="relative">
-                  <Link to="" className=" font-normal text-hover">
+                  <Link to="/products" className=" font-normal text-hover">
                     Sản Phẩm
                     <span className="absolute text-xs rounded-full px-2 py-[2px] text-white bg-primary top-[-10px] left-16 ">
                       New
@@ -104,18 +142,49 @@ const Header = (props: Props) => {
             </div>
             <div className="lg:col-span-2 col-span-4 flex items-center justify-end order-3">
               <div className="flex items-center space-x-4">
-                <Link to="">
-                  <UserHome />
-                </Link>
-                <Link to="" className="relative">
+                <div className="relative group">
+                  <Link to="/account">
+                    {
+                      user ? (<img src={`${infoUser?.avatar}`} className="h-10 w-10 rounded-full object-cover" alt={`${infoUser?.name}`} />) : <UserHome />
+                    }
+                  </Link>
+                  <div className="absolute left-[-50px] hidden group-hover:flex flex-col items-start mt-0 space-y-2 p-4 bg-white shadow-lg rounded-lg transition-all duration-300 z-10">
+                    {
+                      user ? (
+                        <Button
+                          onClick={() => logoutUser()}
+                          className="py-2 w-[150px] text-center text-white bg-red-500 rounded-md hover:bg-red-600 transition duration-200 ease-in-out">
+                          Đăng Xuất
+                        </Button>
+                      ) : (
+                        <div className="flex flex-col space-y-2">
+                          <Link
+                            to="/signup"
+                            className=" py-2 w-[150px] text-center text-white bg-orange-400 rounded-md hover:bg-orange-500 transition duration-200 ease-in-out">
+                            Đăng Ký
+                          </Link>
+                          <Link
+                            to="/login"
+                            className="py-2 w-[150px] text-center text-white bg-blue-600 rounded-md hover:bg-blue-500 transition duration-200 ease-in-out">
+                            Đăng Nhập
+                          </Link>
+                        </div>
+                      )
+                    }
+                  </div>
+
+
+
+                </div>
+                <Link to="/wishlist" className="relative">
                   <span className="absolute text-xs right-[-5px] top-[-5px] bg-[#000] text-white px-1 rounded-full">
-                    0
+                    {wishlistCount}
                   </span>
                   <HeartHome />
                 </Link>
-                <Link to="" className="relative">
+                <Link to="/cart" className="relative">
                   <span className="absolute text-xs right-[-5px] top-[-5px] bg-[#000] text-white px-1 rounded-full">
-                    3
+                    {qty}
                   </span>
                   <CartHome />
                 </Link>
@@ -127,5 +196,4 @@ const Header = (props: Props) => {
     </>
   );
 };
-
 export default Header;
