@@ -14,11 +14,13 @@ import PhoneHome from "../icons/headerWebsite/PhoneHome";
 import UserHome from "../icons/headerWebsite/UserHome";
 import { useAuth } from "@/common/context/Auth/AuthContext";
 import { Button } from "antd";
+import { useWishlist } from "@/common/context/Wishlist/WishlistContext";
 import instance from "@/configs/axios";
 import { useQuery } from "@tanstack/react-query";
 type Props = {};
 const Header = (props: Props) => {
   const navigator = useNavigate();
+  const { data: wishlist = [] } = useWishlist();
   const { user } = useUser();
   let infoUser;
   if (user) {
@@ -29,6 +31,7 @@ const Header = (props: Props) => {
     logout();
     navigator("/login")
   }
+  const wishlistCount = wishlist.length;
   const { token } = useAuth();
   const { data } = useQuery({
     queryKey: ['cart'],
@@ -43,7 +46,7 @@ const Header = (props: Props) => {
   });
 
   let qty = 0;
-  let cartItems = data?.cart?.cartitems;
+  const cartItems = data?.cart?.cartitems;
   if (Array.isArray(cartItems)) {
     cartItems.forEach((item: any) => {
       qty += item.quantity;
@@ -142,23 +145,33 @@ const Header = (props: Props) => {
             <div className="lg:col-span-2 col-span-4 flex items-center justify-end order-3">
               <div className="flex items-center space-x-4">
                 <div className="relative group">
-                  <Link to="">
-                    {
-                      user ? (<img src={`${infoUser?.avatar}`} className="h-10 w-10 rounded-full object-cover" alt={`${infoUser?.name}`} />) : <UserHome />
-                    }
-                  </Link>
-                  <div className="absolute left-[-20px] hidden group-hover:flex mt-0 space-x-2">
+
+                  {
+                    user ? <Link to="/account">
+                      {
+                        user ? (<img src={`${infoUser?.avatar}`} className="h-10 w-10 rounded-full object-cover" alt={`${infoUser?.name}`} />) : <UserHome />
+                      }
+                    </Link> : <UserHome />
+                  }
+
+                  <div className="absolute left-[-50px] hidden group-hover:flex flex-col items-start mt-0 space-y-2 p-4 bg-white shadow-lg rounded-lg transition-all duration-300 z-10">
                     {
                       user ? (
-                        <Button onClick={() => logoutUser()} className="w-32 px-4 py-2 text-white bg-black rounded hover:bg-gray-800">
+                        <Button
+                          onClick={() => logoutUser()}
+                          className="py-2 w-[150px] text-center text-white bg-red-500 rounded-md hover:bg-red-600 transition duration-200 ease-in-out">
                           Đăng Xuất
                         </Button>
                       ) : (
-                        <div className="flex space-x-2">
-                          <Link to="/signup" className="w-24 px-4 py-2 text-white bg-black rounded hover:bg-gray-800">
+                        <div className="flex flex-col space-y-2">
+                          <Link
+                            to="/register"
+                            className=" py-2 w-[150px] text-center text-white bg-orange-400 rounded-md hover:bg-orange-500 transition duration-200 ease-in-out">
                             Đăng Ký
                           </Link>
-                          <Link to="/login" className="w-32 px-4 py-2 text-white bg-black rounded hover:bg-gray-800">
+                          <Link
+                            to="/login"
+                            className="py-2 w-[150px] text-center text-white bg-blue-600 rounded-md hover:bg-blue-500 transition duration-200 ease-in-out">
                             Đăng Nhập
                           </Link>
                         </div>
@@ -166,10 +179,12 @@ const Header = (props: Props) => {
                     }
                   </div>
 
+
+
                 </div>
-                <Link to="" className="relative">
+                <Link to="/wishlist" className="relative">
                   <span className="absolute text-xs right-[-5px] top-[-5px] bg-[#000] text-white px-1 rounded-full">
-                    0
+                    {wishlistCount}
                   </span>
                   <HeartHome />
                 </Link>

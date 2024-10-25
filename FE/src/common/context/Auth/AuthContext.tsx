@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { useLocalStorage } from '../../hooks/useStogare';
+import { toast } from 'react-toastify';
 
 interface AuthContextType {
     isAuth: boolean;
@@ -21,7 +22,7 @@ export const useAuth = () => {
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [isAuth, setIsAuth] = useState<boolean>(false);
     const [token, setToken] = useLocalStorage('token', null);
-
+    const [user, setUser] = useLocalStorage('user', null);
     useEffect(() => {
         if (token) {
             setIsAuth(true);
@@ -32,6 +33,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     const login = (userData: any) => {
         setToken(userData.token);
+        if (userData?.user) {
+            setUser(userData?.user);
+        }
     };
     const logout = () => {
         setIsAuth(false);

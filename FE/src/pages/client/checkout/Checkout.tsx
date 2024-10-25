@@ -1,48 +1,58 @@
-import React from "react";
+import Loading from "@/common/Loading/Loading";
+import { useAuth } from "@/common/context/Auth/AuthContext";
+import { FormatMoney } from "@/common/utils/utils";
+import AddressCheckout from "@/components/icons/checkout/AddressCheckout";
+import CheckoutIcon12 from "@/components/icons/checkout/CheckoutIcon12";
+import CheckoutIcon13 from "@/components/icons/checkout/CheckoutIcon13";
+import CheckoutIcon22 from "@/components/icons/checkout/CheckoutIcon22";
 import CheckoutIcon7 from "@/components/icons/checkout/CheckoutIcon7";
 import CheckoutIcon8 from "@/components/icons/checkout/CheckoutIcon8";
 import CheckoutIcon9 from "@/components/icons/checkout/CheckoutIcon9";
-import { Link } from "react-router-dom";
-import { Product1 } from "@/components/icons";
-import CheckoutIcon10 from "@/components/icons/checkout/CheckoutIcon10";
-import CheckoutIcon11 from "@/components/icons/checkout/CheckoutIcon11";
-import CheckoutIcon13 from "@/components/icons/checkout/CheckoutIcon13";
-import CheckoutIcon14 from "@/components/icons/checkout/CheckoutIcon14";
-import CheckoutIcon15 from "@/components/icons/checkout/CheckoutIcon15";
-import CheckoutIcon16 from "@/components/icons/checkout/CheckoutIcon16";
-import CheckoutIcon17 from "@/components/icons/checkout/CheckoutIcon17";
-import CheckoutIcon18 from "@/components/icons/checkout/CheckoutIcon18";
-import CheckoutIcon19 from "@/components/icons/checkout/CheckoutIcon19";
-import CheckoutIcon20 from "@/components/icons/checkout/CheckoutIcon20";
-import CheckoutIcon21 from "@/components/icons/checkout/CheckoutIcon21";
-import CheckoutIcon22 from "@/components/icons/checkout/CheckoutIcon22";
-import User from "@/components/icons/checkout/User";
 import Completed from "@/components/icons/checkout/Completed";
-import AddressCheckout from "@/components/icons/checkout/AddressCheckout";
-import CheckoutIcon12 from "@/components/icons/checkout/CheckoutIcon12";
 import IconPay from "@/components/icons/checkout/IconPay";
+import User from "@/components/icons/checkout/User";
+import instance from "@/configs/axios";
+import { useQuery } from "@tanstack/react-query";
+import { Link, useLocation } from "react-router-dom";
 
 const Checkout = () => {
-  return (
-    <>
-      <main
-        id="main-content"
-        className="min-h-fit !shadow-none !outline-0 block isolate *:box-border"
-      >
-        <div className="hd-page-head">
-          <div className="hd-header-banner bg-[url('./src/assets/images/shopping-cart-head.webp')] bg-no-repeat bg-cover bg-center ">
-            <div className="hd-bg-banner overflow-hidden relative !text-center bg-black bg-opacity-55 py-[50px] mb-0">
-              <div className="relative hd-container">
-                <h1 className="text-white text-xl font-medium leading-5">
-                  Thanh toán
-                </h1>
-              </div>
+  const { token } = useAuth();
+  const location = useLocation();
+  const { cartIds } = location.state || {};
+  const { cartId } = location.state || {};
+  const { data: dataCheckout, isFetching } = useQuery({
+    queryKey: ['checkout'],
+    queryFn: async () => {
+      const payload = cartIds ? { cart_item_ids: cartIds || [] } : { product_id: cartId, quantity: 1,};
+    const { data } = await instance.post(`/checkout`, payload, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      }
+    });
+    return data;
+  }
+  })
+return (
+  <>
+    <main
+      id="main-content"
+      className="min-h-fit !shadow-none !outline-0 block isolate *:box-border"
+    >
+      <div className="hd-page-head">
+        <div className="hd-header-banner bg-[url('./src/assets/images/shopping-cart-head.webp')] bg-no-repeat bg-cover bg-center ">
+          <div className="hd-bg-banner overflow-hidden relative !text-center bg-black bg-opacity-55 py-[50px] mb-0">
+            <div className="relative hd-container">
+              <h1 className="text-white text-xl font-medium leading-5">
+                Thanh toán
+              </h1>
             </div>
           </div>
         </div>
-        {/*end hd-page-head*/}
-        <div className="hd-CheckoutPage">
-          <main className="container py-16 lg:pb-28 lg:pt-20">
+      </div>
+      {/*end hd-page-head*/}
+      <div className="hd-CheckoutPage">
+        <main className="container py-16 lg:pb-28 lg:pt-20">
+          {
             <div className="flex flex-col lg:flex-row">
               <div className="flex-1">
                 <div className="space-y-8">
@@ -60,9 +70,9 @@ const Checkout = () => {
                             <Completed />
                           </h3>
                           <div className="font-semibold mt-1 text-sm">
-                            <span>Thu Hằng</span>
+                            <span>{dataCheckout?.user?.name}</span>
                             <span className="ml-3 tracking-tighter">
-                              0921 735 576
+                              {dataCheckout?.user?.phone_number}
                             </span>
                           </div>
                         </div>
@@ -137,7 +147,7 @@ const Checkout = () => {
                           </h3>
                           <div className="font-semibold mt-1 text-sm">
                             <span>
-                              80 Xuân Phương, Bắc Từ Liêm, Hà Nội, Việt Nam
+                              {dataCheckout?.user?.address}
                             </span>
                           </div>
                         </div>
@@ -560,326 +570,101 @@ const Checkout = () => {
               {/*end-left*/}
               <div className="flex-shrink-0 border-t lg:border-t-0 lg:border-l border-slate-200 my-10 lg:my-0 lg:mx-10 xl:lg:mx-14 2xl:mx-16" />
               <div className="w-full lg:w-[36%]">
-                <h3 className="text-lg font-semibold">Đặt hàng</h3>
+                <h3 className="text-lg font-semibold mb-4">Đặt hàng</h3>
+                {isFetching ? <Loading /> :
+                  dataCheckout?.order_items.map((e: any) => (
+                    <div className="relative flex  first:pt-0 last:pb-0">
+                      <div className="relative h-36 w-24 sm:w-28 flex-shrink-0 overflow-hidden  ">
+                        <img
+                          alt={e?.product?.name || "Product Image"}
+                          loading="lazy"
+                          decoding="async"
+                          data-nimg="fill"
+                          className="w-full object-contain object-center rounded-xl"
+                          sizes="150px"
+                          src={e?.variant?.image ? e?.variant?.image : e?.product?.img_thumbnail}
+
+                        />
+                        <Link className="absolute inset-0" to="/product-detail" />
+                      </div>
+                      <div className="ml-3 sm:ml-6 flex flex-1 flex-col">
+                        <div>
+                          <div className="flex justify-between">
+                            <div className="">
+                              <h3 className="text-base font-semibold">
+                                <Link to="/product-detail">
+                                  {e?.product?.name}
+                                </Link>
+                              </h3>
+                              <div className="mt-1.5  flex text-sm text-slate-600">
+                                <div className="flex items-center ">
+
+                                  {
+                                    e?.variant?.attributes?.map((z: any, index: number) => (
+                                      <span >
+                                        {z.pivot.value}
+                                        {index < e.variant.attributes.length - 1 && <span className="mx-2">/</span>}
+                                      </span>
+                                    ))
+                                  }
+                                </div>
+
+
+                              </div>
+                              <div className="mt-3 flex justify-between w-full sm:hidden relative">
+                                <select
+                                  name="qty"
+                                  id="qty"
+                                  className="form-select text-sm rounded-md py-1 border-slate-200 relative z-10"
+                                >
+                                  <option value={1}>1</option>
+                                  <option value={2}>2</option>
+                                  <option value={3}>3</option>
+                                  <option value={4}>4</option>
+                                  <option value={5}>5</option>
+                                  <option value={6}>6</option>
+                                  <option value={7}>7</option>
+                                </select>
+                                <div>
+                                  <div className="flex items-center border-2 border-green-500 rounded-lg py-1 px-2 md:py-1.5 md:px-2.5 text-sm font-medium h-full">
+                                    <span className="text-green-500 !leading-none">
+                                      $74
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                              {/*end-form-change-qty*/}
+                            </div>
+                            <div className="hidden flex-1 sm:flex justify-end">
+                              <div className="mt-[1.7px]">
+                                <div className="flex items-center text-sm font-medium">
+                                  {/* <del className="mr-1">{FormatMoney(e.variant.price_regular)}</del> */}
+                                  <span className="text-[red]">{e?.variant?.price_sale ? FormatMoney(e.variant.price_sale) : FormatMoney(e?.product?.price_sale)}</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-end mt-6 justify-between text-sm">
+                          <div className="hidden sm:block text-center relative">
+                            <div className="flex items-center">
+                              <span>Số lượng:  </span><p className="font-bold ml-2 text-base">{e?.quantity}</p>
+                            </div>
+                          </div>
+                          <Link
+                            to="##"
+                            className="relative z-10 flex items-center mt-3 font-medium hover:text-[#00BADB] text-sm"
+                          >
+                            <span>Xóa</span>
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+
                 <div className="hd-checkout-pro mt-8 divide-y divide-slate-200/70">
-                  <div className="relative flex py-7 first:pt-0 last:pb-0">
-                    <div className="relative h-36 w-24 sm:w-28 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
-                      <img
-                        alt="Rey Nylon Backpack"
-                        loading="lazy"
-                        decoding="async"
-                        data-nimg="fill"
-                        className="h-full w-full object-contain object-center"
-                        sizes="150px"
-                        src={Product1}
-                        style={{
-                          position: "absolute",
-                          height: "100%",
-                          width: "100%",
-                          inset: 0,
-                          color: "transparent",
-                        }}
-                      />
-                      <Link className="absolute inset-0" to="/product-detail" />
-                    </div>
-                    <div className="ml-3 sm:ml-6 flex flex-1 flex-col">
-                      <div>
-                        <div className="flex justify-between">
-                          <div className="flex-[1.5]">
-                            <h3 className="text-base font-semibold">
-                              <Link to="/product-detail">
-                                Rey Nylon Backpack
-                              </Link>
-                            </h3>
-                            <div className="mt-1.5 sm:mt-2.5 flex text-sm text-slate-600">
-                              <div className="flex items-center space-x-1.5">
-                                <CheckoutIcon10 />
-                                <span>Black</span>
-                              </div>
-                              <span className="mx-4 border-l border-slate-200" />
-                              <div className="flex items-center space-x-1.5">
-                                <CheckoutIcon11 />
-                                <span>2XL</span>
-                              </div>
-                            </div>
-                            <div className="mt-3 flex justify-between w-full sm:hidden relative">
-                              <select
-                                name="qty"
-                                id="qty"
-                                className="form-select text-sm rounded-md py-1 border-slate-200 relative z-10"
-                              >
-                                <option value={1}>1</option>
-                                <option value={2}>2</option>
-                                <option value={3}>3</option>
-                                <option value={4}>4</option>
-                                <option value={5}>5</option>
-                                <option value={6}>6</option>
-                                <option value={7}>7</option>
-                              </select>
-                              <div>
-                                <div className="flex items-center border-2 border-green-500 rounded-lg py-1 px-2 md:py-1.5 md:px-2.5 text-sm font-medium h-full">
-                                  <span className="text-green-500 !leading-none">
-                                    $74
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                            {/*end-form-change-qty*/}
-                          </div>
-                          <div className="hidden flex-1 sm:flex justify-end">
-                            <div className="mt-[1.7px]">
-                              <div className="flex items-center text-sm font-medium">
-                                <del className="mr-1">12.000.000đ</del>
-                                <span className="text-[red]">776.000₫</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex mt-auto pt-4 items-end justify-between text-sm">
-                        <div className="hidden sm:block text-center relative">
-                          <div className="nc-NcInputNumber flex items-center justify-between space-x-5 relative z-10">
-                            <div className="nc-NcInputNumber__content flex items-center justify-between w-[104px] sm:w-28">
-                              <button
-                                className="w-8 h-8 rounded-full flex items-center justify-center border border-neutral-400 dark:border-neutral-500 bg-white focus:outline-none hover:border-neutral-700 dark:hover:border-neutral-400 disabled:hover:border-neutral-400 dark:disabled:hover:border-neutral-500 disabled:opacity-50 disabled:cursor-default"
-                                type="button"
-                                disabled
-                              >
-                                <CheckoutIcon12 />
-                              </button>
-                              <span className="select-none block flex-1 text-center leading-none">
-                                1
-                              </span>
-                              <button
-                                className="w-8 h-8 rounded-full flex items-center justify-center border border-neutral-400 dark:border-neutral-500 bg-white focus:outline-none hover:border-neutral-700 dark:hover:border-neutral-400 disabled:hover:border-neutral-400 dark:disabled:hover:border-neutral-500 disabled:opacity-50 disabled:cursor-default"
-                                type="button"
-                              >
-                                <CheckoutIcon13 />
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                        <Link
-                          to="##"
-                          className="relative z-10 flex items-center mt-3 font-medium hover:text-[#00BADB] text-sm"
-                        >
-                          <span>Xóa</span>
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="relative flex py-7 first:pt-0 last:pb-0">
-                    <div className="relative h-36 w-24 sm:w-28 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
-                      <img
-                        alt="Rey Nylon Backpack"
-                        loading="lazy"
-                        decoding="async"
-                        data-nimg="fill"
-                        className="h-full w-full object-contain object-center"
-                        sizes="150px"
-                        src={Product1}
-                        style={{
-                          position: "absolute",
-                          height: "100%",
-                          width: "100%",
-                          inset: 0,
-                          color: "transparent",
-                        }}
-                      />
-                      <Link className="absolute inset-0" to="/product-detail" />
-                    </div>
-                    <div className="ml-3 sm:ml-6 flex flex-1 flex-col">
-                      <div>
-                        <div className="flex justify-between">
-                          <div className="flex-[1.5]">
-                            <h3 className="text-base font-semibold">
-                              <Link to="/product-detail">
-                                Rey Nylon Backpack
-                              </Link>
-                            </h3>
-                            <div className="mt-1.5 sm:mt-2.5 flex text-sm text-slate-600">
-                              <div className="flex items-center space-x-1.5">
-                                <CheckoutIcon14 />
-                                <span>Black</span>
-                              </div>
-                              <span className="mx-4 border-l border-slate-200" />
-                              <div className="flex items-center space-x-1.5">
-                                <CheckoutIcon15 />
-                                <span>2XL</span>
-                              </div>
-                            </div>
-                            <div className="mt-3 flex justify-between w-full sm:hidden relative">
-                              <select
-                                name="qty"
-                                id="qty"
-                                className="form-select text-sm rounded-md py-1 border-slate-200 relative z-10"
-                              >
-                                <option value={1}>1</option>
-                                <option value={2}>2</option>
-                                <option value={3}>3</option>
-                                <option value={4}>4</option>
-                                <option value={5}>5</option>
-                                <option value={6}>6</option>
-                                <option value={7}>7</option>
-                              </select>
-                              <div>
-                                <div className="flex items-center border-2 border-green-500 rounded-lg py-1 px-2 md:py-1.5 md:px-2.5 text-sm font-medium h-full">
-                                  <span className="text-green-500 !leading-none">
-                                    $74
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                            {/*end-form-change-qty*/}
-                          </div>
-                          <div className="hidden flex-1 sm:flex justify-end">
-                          <div className="mt-[1.7px]">
-                              <div className="flex items-center text-sm font-medium">
-                                <del className="mr-1">12.000.000đ</del>
-                                <span className="text-[red]">776.000₫</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex mt-auto pt-4 items-end justify-between text-sm">
-                        <div className="hidden sm:block text-center relative">
-                          <div className="nc-NcInputNumber flex items-center justify-between space-x-5 relative z-10">
-                            <div className="nc-NcInputNumber__content flex items-center justify-between w-[104px] sm:w-28">
-                              <button
-                                className="w-8 h-8 rounded-full flex items-center justify-center border border-neutral-400 dark:border-neutral-500 bg-white focus:outline-none hover:border-neutral-700 dark:hover:border-neutral-400 disabled:hover:border-neutral-400 dark:disabled:hover:border-neutral-500 disabled:opacity-50 disabled:cursor-default"
-                                type="button"
-                                disabled
-                              >
-                                <CheckoutIcon16 />
-                              </button>
-                              <span className="select-none block flex-1 text-center leading-none">
-                                1
-                              </span>
-                              <button
-                                className="w-8 h-8 rounded-full flex items-center justify-center border border-neutral-400 dark:border-neutral-500 bg-white focus:outline-none hover:border-neutral-700 dark:hover:border-neutral-400 disabled:hover:border-neutral-400 dark:disabled:hover:border-neutral-500 disabled:opacity-50 disabled:cursor-default"
-                                type="button"
-                              >
-                                <CheckoutIcon17 />
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                        <Link
-                          to="##"
-                          className="relative z-10 flex items-center mt-3 font-medium hover:text-[#00BADB] text-sm"
-                        >
-                          <span>Xóa</span>
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="relative flex py-7 first:pt-0 last:pb-0">
-                    <div className="relative h-36 w-24 sm:w-28 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
-                      <img
-                        alt="Rey Nylon Backpack"
-                        loading="lazy"
-                        decoding="async"
-                        data-nimg="fill"
-                        className="h-full w-full object-contain object-center"
-                        sizes="150px"
-                        src={Product1}
-                        style={{
-                          position: "absolute",
-                          height: "100%",
-                          width: "100%",
-                          inset: 0,
-                          color: "transparent",
-                        }}
-                      />
-                      <Link className="absolute inset-0" to="/product-detail" />
-                    </div>
-                    <div className="ml-3 sm:ml-6 flex flex-1 flex-col">
-                      <div>
-                        <div className="flex justify-between">
-                          <div className="flex-[1.5]">
-                            <h3 className="text-base font-semibold">
-                              <Link to="/product-detail">
-                                Rey Nylon Backpack
-                              </Link>
-                            </h3>
-                            <div className="mt-1.5 sm:mt-2.5 flex text-sm text-slate-600">
-                              <div className="flex items-center space-x-1.5">
-                                <CheckoutIcon18 />
-                                <span>Black</span>
-                              </div>
-                              <span className="mx-4 border-l border-slate-200" />
-                              <div className="flex items-center space-x-1.5">
-                                <CheckoutIcon19 />
-                                <span>2XL</span>
-                              </div>
-                            </div>
-                            <div className="mt-3 flex justify-between w-full sm:hidden relative">
-                              <select
-                                name="qty"
-                                id="qty"
-                                className="form-select text-sm rounded-md py-1 border-slate-200 relative z-10"
-                              >
-                                <option value={1}>1</option>
-                                <option value={2}>2</option>
-                                <option value={3}>3</option>
-                                <option value={4}>4</option>
-                                <option value={5}>5</option>
-                                <option value={6}>6</option>
-                                <option value={7}>7</option>
-                              </select>
-                              <div>
-                                <div className="flex items-center border-2 border-green-500 rounded-lg py-1 px-2 md:py-1.5 md:px-2.5 text-sm font-medium h-full">
-                                  <span className="text-green-500 !leading-none">
-                                    $74
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                            {/*end-form-change-qty*/}
-                          </div>
-                          <div className="hidden flex-1 sm:flex justify-end">
-                            <div className="mt-[1.7px]">
-                              <div className="flex items-center text-sm font-medium">
-                                <del className="mr-1">12.000.000đ</del>
-                                <span className="text-[red]">776.000₫</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex mt-auto pt-4 items-end justify-between text-sm">
-                        <div className="hidden sm:block text-center relative">
-                          <div className="nc-NcInputNumber flex items-center justify-between space-x-5 relative z-10">
-                            <div className="nc-NcInputNumber__content flex items-center justify-between w-[104px] sm:w-28">
-                              <button
-                                className="w-8 h-8 rounded-full flex items-center justify-center border border-neutral-400 dark:border-neutral-500 bg-white focus:outline-none hover:border-neutral-700 dark:hover:border-neutral-400 disabled:hover:border-neutral-400 dark:disabled:hover:border-neutral-500 disabled:opacity-50 disabled:cursor-default"
-                                type="button"
-                                disabled
-                              >
-                                <CheckoutIcon20 />
-                              </button>
-                              <span className="select-none block flex-1 text-center leading-none">
-                                1
-                              </span>
-                              <button
-                                className="w-8 h-8 rounded-full flex items-center justify-center border border-neutral-400 dark:border-neutral-500 bg-white focus:outline-none hover:border-neutral-700 dark:hover:border-neutral-400 disabled:hover:border-neutral-400 dark:disabled:hover:border-neutral-500 disabled:opacity-50 disabled:cursor-default"
-                                type="button"
-                              >
-                                <CheckoutIcon21 />
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                        <Link
-                          to="##"
-                          className="relative z-10 flex items-center mt-3 font-medium hover:text-[#00BADB] text-sm"
-                        >
-                          <span>Xóa</span>
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
+
+
                 </div>
                 {/*end hd-checkout-pro*/}
                 <div className="hd-checkout-text-count mt-10 pt-6 text-sm text-slate-500 border-t border-slate-200/70 dark:border-slate-700">
@@ -916,7 +701,7 @@ const Checkout = () => {
                   </div>
                   <div className="flex justify-between font-semibold text-slate-900 text-base pt-4">
                     <span>Tổng tiền</span>
-                    <span>15.000.000đ</span>
+                    <span>{FormatMoney(dataCheckout?.sub_total)}</span>
                   </div>
                 </div>
                 {/*end hd-checkout-text-count*/}
@@ -951,12 +736,14 @@ const Checkout = () => {
               </div>
               {/*end-right*/}
             </div>
-          </main>
-        </div>
-        {/*end hd-CheckoutPage*/}
-      </main>
-    </>
-  );
+          }
+
+        </main>
+      </div>
+      {/*end hd-CheckoutPage*/}
+    </main>
+  </>
+);
 };
 
 export default Checkout;

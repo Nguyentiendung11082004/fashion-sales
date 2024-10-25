@@ -31,6 +31,8 @@ import FormClient from "@/pages/admin/account/client/components/FormClient";
 import EmployeePage from "@/pages/admin/account/employee/Employee";
 import FormEmployee from "@/pages/admin/account/employee/components/FormEmployee";
 import Wishlist from "@/pages/client/wishlist/Wishlist";
+import LiveChat from "@/pages/client/liveChat/liveChat";
+import Chatbox from "@/pages/admin/chatbox/Chatbox";
 import Register from "@/pages/client/auth/register/Register";
 import Login from "@/pages/client/auth/login/Login";
 import Banners from "@/pages/admin/banners/Banners";
@@ -57,7 +59,10 @@ const Router = () => {
         </Route>
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
-        <Route path="account/:id/forgotpassword" element={<ForgotPassword />} />
+        <Route
+            path="account/forgotpassword"
+            element={<ForgotPassword />}
+          />
         <Route path="/admin" element={<LayoutAdmin />}>
           <Route index element={<Dashboard />} />
           <Route path="products" element={<ProductPageManager />} />
@@ -78,9 +83,6 @@ const Router = () => {
           <Route path="comments" element={<CommentPage />} />
           <Route path="clients" element={<ClientPage />} />
           <Route path="clients/create" element={<FormClient />} />
-          <Route path="employees" element={<EmployeePage />} />
-          <Route path="employees/create" element={<FormEmployee />} />
-          <Route path="employees/edit/:id" element={<FormEmployee />} />
           <Route path="brands" element={<Brands />} />
           <Route path="brands/create" element={<BrandForm />} />
           <Route path="brands/edit/:id" element={<BrandForm />} />
@@ -99,6 +101,7 @@ const Router = () => {
           <Route path="posts" element={<Posts />} />
           <Route path="posts/create" element={<FormPost />} />
           <Route path="posts/edit/:id" element={<FormPost />} />
+          <Route path="chatbox" element={<Chatbox />} />
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>

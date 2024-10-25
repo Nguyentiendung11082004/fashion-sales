@@ -1,12 +1,8 @@
-/* eslint-disable no-useless-catch */
+
 import { Icategories } from "@/common/types/categories";
 import instance from "@/configs/axios";
 
-const handleRequest = async (
-  method: "get" | "post" | "put" | "delete",
-  url: string,
-  value?: Icategories
-) => {
+const handleRequest = async (method: "get" | "post" | "put" | "delete", url: string, value?: Icategories) => {
   try {
     const { data } = await instance[method](url, value);
     return data;

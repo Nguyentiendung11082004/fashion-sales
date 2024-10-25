@@ -161,7 +161,7 @@ class CartController extends Controller
                         "product.variants.attributes",
                     ]
                 )->toArray();
-                // dd($cart_item);
+                
 
                 $product_variant = Product::query()->findOrFail($cart_item['product']['type'] ? $cart_item["productvariant"]["product_id"] : $cart_item['product']['id'])->load(["variants.attributes"])->toArray();
                 $getUniqueAttributes = new GetUniqueAttribute();

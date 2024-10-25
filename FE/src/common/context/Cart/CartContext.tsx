@@ -3,7 +3,9 @@ import { useAuth } from '../Auth/AuthContext';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import instance from '@/configs/axios';
 import { toast } from 'react-toastify';
-
+import Swal from 'sweetalert2';
+import withReactContent from 'sweetalert2-react-content';
+const MySwal = withReactContent(Swal);
 interface CartContextType {
     data: any;
     isLoading: boolean;
@@ -25,18 +27,18 @@ export const useCart = () => {
 export const CartProvider = ({ children }: { children: ReactNode }) => {
     const { token } = useAuth();
     const queryClient = useQueryClient();
-    const [error, setError] = useState(null)
-    const { data, isLoading } = useQuery({
-        queryKey: ['cart'],
-        queryFn: async () => {
-            const res = await instance.get('/cart', {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            return res.data;
-        },
-    });
+        const { data, isLoading } = useQuery({
+            queryKey: ['cart'],
+            queryFn: async () => {
+                const res = await instance.get('/cart', {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                return res.data;
+            },
+            enabled: !!token,
+        });
     const addCartMutation = useMutation({
         mutationFn: async ({ idProduct, idProductVariant }: { idProduct: number, idProductVariant: number }) => {
             await instance.post(`/cart`, {
@@ -48,17 +50,31 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
                     Authorization: `Bearer ${token}`,
                 },
             });
+            
         },
         onSuccess: () => {
             queryClient.invalidateQueries({
                 queryKey: ['cart']
             })
-            toast.success("Thêm vào giỏ hàng thành công")
+            MySwal.fire({
+                title: <strong>Chúc mừng!</strong>,
+                icon: 'success',
+                text: 'Thêm vào giỏ hàng thành công',
+                timer: 1500, 
+                timerProgressBar: true, 
+                showConfirmButton: false, 
+              });
+            
         },
         onError: (message: any) => {
-            toast.error(message?.response?.data?.message, {
-                autoClose: 5000,
-            })
+            MySwal.fire({
+                title: <strong>Thất bại</strong>,
+                icon: 'error',
+                text: `${message?.response?.data?.message}`,
+                timer: 2000, 
+                timerProgressBar: true, 
+                showConfirmButton: false, 
+              });
         }
     });
 

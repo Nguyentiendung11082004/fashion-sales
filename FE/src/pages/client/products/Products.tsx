@@ -15,11 +15,13 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import NoDatasIcon from "@/components/icons/products/NoDataIcon";
 import { ResponseData } from "@/common/types/responseDataFilter";
 import unorm from "unorm";
+import { useWishlist } from "@/common/context/Wishlist/WishlistContext";
 import HeartRed from "@/components/icons/detail/HeartRed";
-import { useWishlist } from "../wishlist/WishlistContext";
 import { Button, Spin } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
+import { useAuth } from "@/common/context/Auth/AuthContext";
 import { useCart } from "@/common/context/Cart/CartContext";
+import ModalBuyNow from "./_components/ModalBuyNow";
 
 const Products = () => {
   const [growboxDropdownOpen, setGrowboxDropdownOpen] = useState(false);
@@ -31,6 +33,7 @@ const Products = () => {
     useState<React.ReactNode>(null);
   const { handleAddToWishlist, isInWishlist } = useWishlist();
 
+  const [allproducts, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -197,14 +200,17 @@ const Products = () => {
   const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchTerm(value);
-    if (value.trim() === "") {
+
+    const trimmedValue = value.trimStart(); // Loại bỏ khoảng trắng đầu
+
+    if (trimmedValue === "") {
       setSuggestions([]);
       setNoProductsMessage(null);
       queryClient.invalidateQueries({ queryKey: ["productsData"] });
     } else {
       const fetchSuggestions = async () => {
         const response = await instance.post("/product-shop", {
-          search: value,
+          search: trimmedValue, // Gửi giá trị đã loại bỏ khoảng trắng đầu
         });
         const suggestionsData = response.data.products.map(
           (item: any) => item.product.name
@@ -214,16 +220,12 @@ const Products = () => {
         const filteredSuggestions = suggestionsData.filter(
           (suggestion: string) => {
             const normalizedSuggestion = unorm.nfkd(suggestion.toLowerCase()); // Chuẩn hóa gợi ý
-            const normalizedValue = unorm.nfkd(value.toLowerCase()); // Chuẩn hóa giá trị tìm kiếm
+            const normalizedValue = unorm.nfkd(trimmedValue.toLowerCase()); // Chuẩn hóa giá trị tìm kiếm
             return normalizedSuggestion.startsWith(normalizedValue); // So sánh
           }
         );
 
-        // if (filteredSuggestions.length > 0) {
         setSuggestions(filteredSuggestions);
-        // } else {
-        //     setSuggestions([]);
-        // }
       };
       fetchSuggestions();
     }
@@ -243,6 +245,7 @@ const Products = () => {
       return response.data;
     },
   });
+  // console.log(pro);
 
   const toggleGrowboxDropdown = () => {
     setGrowboxDropdownOpen(!growboxDropdownOpen);
@@ -267,46 +270,13 @@ const Products = () => {
   };
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
+
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
   // chọn thuộc tính để xem chi tiết
-
-  const [selectAttributeOne, setSelectAttributeOne] = useState<string>();
-  const [selectAttributeTwo, setSelectAttributeTwo] = useState<string>();
-  const [idAttributeToDetail, setIdAttributeToDetail] = useState<string[]>([]);
-
-  const onHandleSelectOne = (id: string) => {
-    if (id) {
-      setSelectAttributeOne(id);
-    }
-  };
-
-  const onHandleSelectTwo = (id: string) => {
-    if (id) {
-      setSelectAttributeTwo(id);
-    }
-  };
-
-  useEffect(() => {
-    const updatedAttributes = [];
-    if (selectAttributeOne) updatedAttributes.push(selectAttributeOne);
-    if (selectAttributeTwo) updatedAttributes.push(selectAttributeTwo);
-
-    setIdAttributeToDetail(updatedAttributes);
-  }, [selectAttributeOne, selectAttributeTwo]);
-
-  console.log("idAttributeToDetail products page", idAttributeToDetail);
-
-  const onHandleToDetail = (id: any) => {
-    navigate(`/products/${id}`, {
-      state: { idAttributeToDetail: idAttributeToDetail },
-    });
-  };
-
-  console.log("pro?.products?", pro?.products);
 
   return (
     <>
@@ -887,6 +857,7 @@ const Products = () => {
                             item.value.charAt(0).toUpperCase() +
                               item.value.slice(1).toLowerCase()
                           ] || "No Size"}
+                          {/*Dịch sang TViet và Chữ cái đầu viết hoa */}
                         </span>
                       </label>
                     </div>
@@ -1091,179 +1062,259 @@ const Products = () => {
                     </div>
                   ))
                 ) : ( */}
-                {pro?.products?.map(({ product, getUniqueAttributes }) => (
-                  <div
-                    className="nc-ProductCard relative flex flex-col bg-transparent"
-                    key={product.id}
-                  >
-                    <div className="lg:mb-[25px] mb-[20px]">
-                      <div className="cursor-pointer lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] sm:h-[345px] overflow-hidden">
-                        <img
-                          className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover/image:opacity-0 object-cover "
-                          src={product.img_thumbnail}
-                        />
-                        <img
-                          className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover/image:opacity-100 object-cover"
-                          src={product.img_thumbnail}
-                        />
-                        <div className="absolute inset-0 bg-black opacity-0 transition-opacity duration-300 ease-in-out group-hover:opacity-10"></div>
-                        <div>
-                          <button
-                            className="absolute left-5 top-5 cursor-pointer"
-                            onClick={() => handleAddToWishlist(product)}
-                          >
-                            {isInWishlist(product.id) ? (
-                              <HeartRed />
-                            ) : (
-                              <HeartWhite />
-                            )}
-                          </button>
-                        </div>
-                        <div className="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100">
-                          <Link
-                            to={`${product.id}`}
-                            className="group/btn relative m-auto"
-                            onClick={() => onHandleToDetail(`${product.id}`)}
-                          >
-                            <button className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]">
-                              <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                                Xem thêm
-                              </p>
-                              <Eye />
-                            </button>
-                          </Link>
-                          <Link to="" className="group/btn relative">
+                {pro?.products?.map(({ product, getUniqueAttributes }) => {
+                  const inWishlist = isInWishlist(product.id);
+
+                  return (
+                    <div
+                      className="nc-ProductCard relative flex flex-col bg-transparent"
+                      key={product.id}
+                    >
+                      <div className="lg:mb-[25px] mb-[20px]">
+                        <div className="cursor-pointer lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] sm:h-[345px] overflow-hidden">
+                          <img
+                            className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover/image:opacity-0 object-cover "
+                            src={product.img_thumbnail}
+                          />
+                          <img
+                            className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover/image:opacity-100 object-cover"
+                            src={product.img_thumbnail}
+                          />
+                          <div className="absolute inset-0 bg-black opacity-0 transition-opacity duration-300 ease-in-out group-hover:opacity-10"></div>
+                          <div>
                             <button
-                              onClick={() =>
-                                handleAddToCart(
-                                  product?.id,
-                                  product?.variants[0]?.id
-                                )
-                              }
-                              className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]"
+                              className="absolute left-5 top-5 cursor-pointer"
+                              onClick={() => handleAddToWishlist(product)}
                             >
-                              <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                                Thêm vào giỏ hàng
-                              </p>
-                              {isLoading ? (
-                                <Spin
-                                  indicator={
-                                    <LoadingOutlined
-                                      style={{ fontSize: 28, color: "#fff" }}
-                                    />
-                                  }
-                                  className="translate-y-[-12px]"
-                                />
-                              ) : (
-                                <CartDetail />
-                              )}
+                              {inWishlist ? <HeartRed /> : <HeartWhite />}
                             </button>
-                          </Link>
-                        </div>
-                        <div className="flex justify-center">
-                          <div
-                            className="absolute bottom-2 text-center text-white
+                          </div>
+                          <div className="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100">
+                            <div className="group/btn relative">
+                              {product.variants.length > 0 ? (
+                                <button className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]">
+                                  <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
+                                    Mua ngay
+                                  </p>
+                                  <Eye />
+                                </button>
+                              ) : (
+                                <button
+                                  onClick={() => buyNow(product?.id, 1)}
+                                  className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]"
+                                >
+                                  <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
+                                    Mua ngay
+                                  </p>
+                                  <Eye />
+                                </button>
+                              )}
+                            </div>
+
+                            <Link to="" className="group/btn relative">
+                              <button
+                                onClick={() =>
+                                  handleAddToCart(
+                                    product?.id,
+                                    product?.variants[0]?.id
+                                  )
+                                }
+                                className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]"
+                              >
+                                <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
+                                  Thêm vào giỏ hàng
+                                </p>
+                                {isLoading ? (
+                                  <Spin
+                                    indicator={
+                                      <LoadingOutlined
+                                        style={{ fontSize: 28, color: "#fff" }}
+                                      />
+                                    }
+                                    className="translate-y-[-12px]"
+                                  />
+                                ) : (
+                                  <CartDetail />
+                                )}
+                              </button>
+                            </Link>
+                          </div>
+                          <div className="flex justify-center">
+                            <div
+                              className="absolute bottom-2 text-center text-white
               -translate-y-7 transform 
                 transition-all duration-500 ease-in-out 
                 group-hover:translate-y-0
                 opacity-0
                 group-hover:opacity-100
               "
-                          >
-                            <ul className="flex">
-                              {getUniqueAttributes?.size &&
-                                Object.entries(getUniqueAttributes.size).map(
-                                  ([id, size]: [string, any]) => (
-                                    <li
-                                      className="ml-2"
-                                      key={id}
-                                      onClick={() => onHandleSelectOne(id)}
-                                    >
-                                      {size}
-                                    </li>
-                                  )
-                                )}
-                            </ul>
+                            >
+                              <ul className="flex">
+                                {getUniqueAttributes &&
+                                  Object.entries(getUniqueAttributes).map(
+                                    ([key, value]) => (
+                                      <li key={key}>
+                                        {/* {key}:  */}
+                                        {Array.isArray(value)
+                                          ? value
+                                              .map((v) => v.size || v)
+                                              .join(", ") // Lấy thuộc tính 'size' hoặc hiển thị giá trị trực tiếp
+                                          : typeof value === "object" &&
+                                              value !== null
+                                            ? Object.values(value).join(", ") // Hiển thị các giá trị của object
+                                            : String(value)}
+                                      </li>
+                                    )
+                                  )}
+                              </ul>
+                            </div>
                           </div>
+
+                          {product.price_regular && (
+                            <div>
+                              {product.price_sale > 0 &&
+                              product.price_sale < product.price_regular ? (
+                                <>
+                                  <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400">
+                                    -
+                                    {Math.round(
+                                      ((product.price_regular -
+                                        product.price_sale) /
+                                        product.price_regular) *
+                                        100
+                                    )}
+                                    %
+                                  </div>
+                                </>
+                              ) : (
+                                <div></div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                        <div>
+                          <p className="text-base font-medium text-black mb-1 cursor-pointer hd-all-hover-bluelight">
+                            {product.name.charAt(0).toUpperCase() +
+                              product.name.slice(1).toLowerCase()}
+                          </p>
+                          {(product?.price_regular ||
+                            product?.variants?.length) && (
+                            <div>
+                              {(() => {
+                                const variants = product?.variants || [];
+                                // Tính toán giá bán và giá gốc từ các biến thể
+                                const minPriceSale = Math.min(
+                                  ...variants
+                                    .map((variant: any) => variant.price_sale)
+                                    .filter((price: any) => price >= 0)
+                                );
+                                const minPriceRegular = Math.min(
+                                  ...variants
+                                    .map(
+                                      (variant: any) => variant.price_regular
+                                    )
+                                    .filter((price: any) => price >= 0)
+                                );
+                                const maxPriceRegular = Math.max(
+                                  ...variants
+                                    .map(
+                                      (variant: any) => variant.price_regular
+                                    )
+                                    .filter((price: any) => price > 0)
+                                );
+                                const productPriceSale = product?.price_sale;
+                                const productPriceRegular =
+                                  product?.price_regular;
+
+                                // Điều kiện hiển thị
+                                if (minPriceSale >= 0) {
+                                  // Nếu có giá sale
+                                  if (
+                                    productPriceSale &&
+                                    productPriceSale < productPriceRegular
+                                  ) {
+                                    return (
+                                      <>
+                                        <del className="mr-1">
+                                          {new Intl.NumberFormat(
+                                            "vi-VN"
+                                          ).format(productPriceRegular)}
+                                          ₫
+                                        </del>
+                                        <span className="text-[red]">
+                                          {new Intl.NumberFormat(
+                                            "vi-VN"
+                                          ).format(productPriceSale)}
+                                          ₫
+                                        </span>
+                                      </>
+                                    );
+                                  } else if (
+                                    productPriceSale &&
+                                    productPriceSale === productPriceRegular
+                                  ) {
+                                    return (
+                                      <span>
+                                        {new Intl.NumberFormat("vi-VN").format(
+                                          productPriceRegular
+                                        )}
+                                        ₫
+                                      </span>
+                                    );
+                                  } else {
+                                    return (
+                                      <span>
+                                        {new Intl.NumberFormat("vi-VN").format(
+                                          minPriceSale
+                                        )}
+                                        ₫ -{" "}
+                                        {new Intl.NumberFormat("vi-VN").format(
+                                          maxPriceRegular
+                                        )}
+                                        ₫
+                                      </span>
+                                    );
+                                  }
+                                } else {
+                                  // Nếu không có giá sale, chỉ hiển thị khoảng giá regular
+                                  return (
+                                    <span>
+                                      {new Intl.NumberFormat("vi-VN").format(
+                                        minPriceRegular
+                                      )}
+                                      ₫ -{" "}
+                                      {new Intl.NumberFormat("vi-VN").format(
+                                        maxPriceRegular
+                                      )}
+                                      ₫
+                                    </span>
+                                  );
+                                }
+                              })()}
+                            </div>
+                          )}
                         </div>
 
-                        {product.price_regular && (
-                          <div>
-                            {product.price_sale > 0 &&
-                            product.price_sale < product.price_regular ? (
-                              <>
-                                <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400">
-                                  -
-                                  {Math.round(
-                                    ((product.price_regular -
-                                      product.price_sale) /
-                                      product.price_regular) *
-                                      100
-                                  )}
-                                  %
-                                </div>
-                              </>
-                            ) : (
-                              <div></div>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                      <div>
-                        <p className="text-base font-medium text-black mb-1 cursor-pointer hd-all-hover-bluelight">
-                          {product.name.charAt(0).toUpperCase() +
-                            product.name.slice(1).toLowerCase()}
-                        </p>
-                        {product.price_regular && (
-                          <div>
-                            {product.price_sale > 0 &&
-                            product.price_sale < product.price_regular ? (
-                              <>
-                                <del className="mr-1">
-                                  {new Intl.NumberFormat("vi-VN").format(
-                                    product.price_regular
-                                  )}
-                                  ₫{/* Dạng tiền tệ VN */}
-                                </del>
-                                <span className="text-[red]">
-                                  {new Intl.NumberFormat("vi-VN").format(
-                                    product.price_sale
-                                  )}
-                                  ₫
-                                </span>
-                              </>
-                            ) : (
-                              <span className="">
-                                {new Intl.NumberFormat("vi-VN").format(
-                                  product.price_regular
-                                )}
-                                ₫
-                              </span>
-                            )}
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="t4s-product-colors flex">
-                        {getUniqueAttributes?.color &&
-                          Object.entries(getUniqueAttributes.color)
-                            .filter(([id, color]) => typeof color === "string")
-                            .map(([id, color]) => (
-                              <div key={id} className="mr-2 mt-1">
-                                <span className="t4s-pr-color__item flex flex-col items-center cursor-pointer">
-                                  <span className="t4s-pr-color__value border border-gray-400 w-5 h-5 hover:border-black hover:border-2 rounded-full p-[5px]">
-                                    <div
-                                      className={`w-[17px] h-[17px] rounded-full ml-[-4.25px] mt-[-4px] hover:mt-[-5px] hover:ml-[-5px] ${convertColorNameToClass(color)}`}
-                                      onClick={() => onHandleSelectTwo(id)}
-                                    ></div>
+                        <div className="t4s-product-colors flex">
+                          {getUniqueAttributes?.color &&
+                            Object.values(getUniqueAttributes.color)
+                              .filter((color) => typeof color === "string")
+                              .map((color, index) => (
+                                <div key={index} className="mr-2 mt-1">
+                                  <span className="t4s-pr-color__item flex flex-col items-center cursor-pointer">
+                                    <span className="t4s-pr-color__value border border-gray-400 w-5 h-5 hover:border-black hover:border-2 rounded-full p-[5px]">
+                                      <div
+                                        className={` w-[17px] h-[17px] rounded-full ml-[-4.25px] mt-[-4px] hover:mt-[-5px] hover:ml-[-5px] ${convertColorNameToClass(color)}`}
+                                      ></div>
+                                    </span>
                                   </span>
-                                </span>
-                              </div>
-                            ))}
+                                </div>
+                              ))}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
                 {/* )} */}
               </div>
             </div>

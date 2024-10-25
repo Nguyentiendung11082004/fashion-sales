@@ -84,7 +84,7 @@ const Register = () => {
               <h1 className="font-bold text-4xl text-center mt-10">
                 Đăng ký tài khoản
               </h1>
-              <Form className="mt-8 grid grid-cols-6 gap-6"  layout="vertical" onFinish={onFinish} >
+              <Form className="mt-8 grid grid-cols-6 gap-6" layout="vertical" onFinish={onFinish} >
                 <div className="col-span-6">
                   <Form.Item name="email" label="Email">
                     <Input placeholder="Nhập Email"
@@ -126,14 +126,15 @@ const Register = () => {
                   ) : null}
                 </div>
                 <div className="col-span-3 sm:col-span-3">
-                  <Form.Item name="img" label="Ảnh">
+                  {/* <Form.Item name="img" label="Ảnh">
                     {urlImage ? <Input placeholder="Chọn ảnh" type="file"
                       src={urlImage}
                       className=" text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none"
                     ></Input> : ''}
-                  </Form.Item>
-                  <Form.Item name="avatar" label="Ảnh">
+                  </Form.Item> */}
+                  <Form.Item name="avatar" label="Ảnh" >
                     <Upload
+                    className="w-full"
                       {...propImgUser}
                       showUploadList={{
                         showPreviewIcon: false,
@@ -143,30 +144,7 @@ const Register = () => {
                         setUrlImage(null);
                       }}
                     >
-                      {urlImage ? (
-                        <>
-                          <img
-                            src={urlImage}
-                            alt="Uploaded"
-                            className=" text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none"
-                            style={{ marginTop: 16, width: 100, marginBottom: "10px" }}
-                          />
-                        </>
-                      ) : (
-
-                        <>
-                          <img
-                            alt="Uploaded"
-                            style={{
-                              marginTop: 16,
-                              width: 100,
-                              marginBottom: "10px",
-                            }}
-                          />
-                        </>
-
-                      )}
-                      <Button icon={<UploadOutlined />}>Tải lên ảnh</Button>
+                      <Button icon={<UploadOutlined />} className="w-full">Tải lên ảnh</Button>
                     </Upload>
                   </Form.Item>
                 </div>

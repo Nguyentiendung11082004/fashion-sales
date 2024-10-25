@@ -136,7 +136,7 @@ const ProductPageManager = () => {
               </Button>
             </Link>
             <Button
-              onClick={() => handleOpen(record?.id)}
+              onClick={() => handleOpen(record?.id as number)}
               className="btn-danger"
               style={{ width: "46px" }}
             >

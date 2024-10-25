@@ -1,17 +1,13 @@
-import { User1 } from "@/components/icons";
-import AddImage from "@/components/icons/about/AboutInfo";
-import React, { useContext, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import Email from "@/components/icons/account/Email";
-import DateBirth from "@/components/icons/account/DateBirdth";
-import Address from "@/components/icons/account/Address";
-import Phone from "@/components/icons/account/Phone";
-import axios from "axios";
-import { useAuth } from "@/common/context/Auth/AuthContext";
 import { useUser } from "@/common/context/User/UserContext";
+import AddImage from "@/components/icons/about/AboutInfo";
+import Address from "@/components/icons/account/Address";
+import DateBirth from "@/components/icons/account/DateBirdth";
+import Email from "@/components/icons/account/Email";
+import Phone from "@/components/icons/account/Phone";
+import { Link } from "react-router-dom";
 const Account = () => {
   const { user } = useUser();
-  
+  const dataUser = user?.['Infor User'];
   return (
     <main
       id="main-content"
@@ -34,8 +30,8 @@ const Account = () => {
           <div className="max-w-auto">
             <div className="max-w-[42rem]">
               <span className="hd-all-textgrey block mt-4">
-                <span className="text-black font-semibold">{user?.name}</span>
-                {user?.email} {user?.address}
+                <span className="text-black font-semibold">{dataUser?.name}</span>
+                <span className="mx-2">{dataUser?.email}</span> <span>{dataUser?.address}</span>
               </span>
             </div>
             <hr className="mt-[1rem] h-0 border-solid border-b-2" />
@@ -76,7 +72,7 @@ const Account = () => {
                     decoding="async"
                     data-nimg={1}
                     className="w-32 h-32 rounded-full object-cover z-0"
-                    src={`${user?.avatar}`}
+                    src={`${dataUser?.avatar}`}
                     style={{ color: "transparent" }}
                   />
                   <div className="absolute inset-0 flex cursor-pointer items-center justify-center bg-black bg-opacity-35">
@@ -95,13 +91,14 @@ const Account = () => {
                     className="nc-Label text-base font-medium"
                     data-nc-id="Label"
                   >
-                    Họ &amp; tên
+                    Họ tên
                   </label>
 
                   <input
                     className="block w-full outline-0 border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50 focus:border-neutral-200 rounded-2xl font-normal h-11 px-4 py-3 mt-1.5"
                     type="text"
-                    value={`${user?.name || ''}`}
+                    value={`${dataUser?.name || ''}`}
+
                   />
                 </div>
                 <div className="mt-5">
@@ -119,7 +116,7 @@ const Account = () => {
                     </span>
                     <input
                       className="block w-full outline-0 border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50 rounded-2xl font-normal h-11 px-4 py-3 !rounded-l-none"
-                      value={`${user?.email || ''}`}
+                      value={`${dataUser?.email || ''}`}
 
                       type="text"
                     />
@@ -160,7 +157,7 @@ const Account = () => {
                     </span>
                     <input
                       className="block w-full outline-0 border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50 rounded-2xl font-normal h-11 px-4 py-3 !rounded-l-none"
-                      value={`${user?.address || ''}`}
+                      value={`${dataUser?.address || ''}`}
                       type="text"
                     />
                   </div>
@@ -172,10 +169,12 @@ const Account = () => {
                   >
                     Giới tính
                   </label>
-                  <select className="nc-Select h-11 mt-1.5 px-[10px] block w-full outline-0 rounded-2xl border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-50">
-                    {/* <option value="Nam">Nam</option>
+                  <select
+                    className="nc-Select h-11 mt-1.5 px-[10px] block w-full outline-0 rounded-2xl border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-50"
+                    value={dataUser.role_id == 1 ? "Nam" : "Nữ"}
+                  >
+                    <option value="Nam">Nam</option>
                     <option value="Nữ">Nữ</option>
-                    <option value="Khác">Khác</option> */}
                   </select>
                 </div>
                 <div className="mt-5">
@@ -193,7 +192,7 @@ const Account = () => {
                     </span>
                     <input
                       className="block w-full outline-0 border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50 rounded-2xl font-normal h-11 px-4 py-3 !rounded-l-none"
-                      value={`${user?.phone_number || ''}`}
+                      value={`${dataUser?.phone_number || ''}`}
                       type="text"
                     />
                   </div>
