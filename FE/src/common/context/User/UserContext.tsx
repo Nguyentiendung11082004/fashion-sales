@@ -34,13 +34,14 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             });
             return res.data;
         },
+        enabled: !!token,
     });
     // if (isFetching) return <div><Loading /></div>
 
     return (
         <UserContext.Provider value={{ user, loading, error }}>
-            {
-                isFetching ? <Loading /> : children
+            { 
+            isFetching ? <Loading /> : children
             }
         </UserContext.Provider>
     );

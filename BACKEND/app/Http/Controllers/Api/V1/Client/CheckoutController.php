@@ -93,7 +93,7 @@ class CheckoutController extends Controller
                 } elseif ($isImmediatePurchase) {
                     // Handle immediate purchase
                     $product = Product::with('variants.attributes')->findOrFail($data['product_id']);
-                    dd($product);
+                    // dd($product);
                     $quantity = $data['quantity'];
                     $total_items += 1;
 
