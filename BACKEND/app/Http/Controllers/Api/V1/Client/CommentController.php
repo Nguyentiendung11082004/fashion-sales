@@ -45,16 +45,17 @@ class CommentController extends Controller
             'parent_id' => 'nullable|exists:comments,id'
         ]);
         //  Kiểm tra xem người dùng đã mua sản phẩm này chưa
-        // $userHasPurchased = Order::where('user_id', Auth::id())
-        // ->where('order_status', 'completed') // Chỉ tính đơn hàng đã hoàn tất
-        // ->whereHas('orderItems', function($query) use ($validated) {
-        //     $query->where('product_id', $validated['product_id']);
-        // })
-        // ->exists();
+        $userHasPurchased = Order::where('user_id', Auth::id())
+        ->where('order_status', 'completed')
+        ->whereHas('orderDetails', function($query) use ($validated) { 
+            $query->where('product_id', $validated['product_id']);
+        })
+        ->exists();
+    
 
-        // if (!$userHasPurchased) {
-        //     return response()->json(['message' => 'Bạn cần phải mua sản phẩm này trước khi bình luận.'], Response::HTTP_FORBIDDEN);
-        // }
+        if (!$userHasPurchased) {
+            return response()->json(['message' => 'Bạn cần phải mua sản phẩm này trước khi bình luận.'], Response::HTTP_FORBIDDEN);
+        }
             $comment = Comments::create([
             'user_id' => Auth::id(),
             'product_id' => $validated['product_id'],
