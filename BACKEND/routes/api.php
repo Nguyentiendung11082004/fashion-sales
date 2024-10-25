@@ -75,9 +75,6 @@ Route::prefix("v1/")->group(function () {
     Route::post("getavailableservices",[CheckoutController::class,"getAvailableServices"]);
     Route::post("calculateshippingfee",[CheckoutController::class,"calculateShippingFee"]);
 
-
-
-    
 });
 
 
