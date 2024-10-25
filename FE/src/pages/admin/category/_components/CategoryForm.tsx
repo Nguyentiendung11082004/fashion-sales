@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/ban-types */
 import Loading from "@/common/Loading/Loading";
 import { Icategories } from "@/common/types/categories";
 import {
@@ -6,11 +9,7 @@ import {
   categoriesUpdate,
 } from "@/services/api/admin/categories";
 import { UploadOutlined } from "@ant-design/icons";
-import {
-  useMutation,
-  useQuery,
-  useQueryClient
-} from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button, Form, Input, Upload, UploadProps, message } from "antd";
 import { useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";

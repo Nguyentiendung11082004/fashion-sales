@@ -33,7 +33,10 @@ import FormEmployee from "@/pages/admin/account/employee/components/FormEmployee
 import Wishlist from "@/pages/client/wishlist/Wishlist";
 import Register from "@/pages/client/auth/register/Register";
 import Login from "@/pages/client/auth/login/Login";
-
+import Banners from "@/pages/admin/banners/Banners";
+import BannersForm from "@/pages/admin/banners/components/BannersForm";
+import Posts from "@/pages/admin/posts/Posts";
+import FormPost from "@/pages/admin/posts/components/FormPost";
 
 const Router = () => {
   return (
@@ -47,17 +50,14 @@ const Router = () => {
           <Route path="cart" element={<Cart />} />
           <Route path="account" element={<Account />} />
           <Route path="wishlist" element={<Wishlist />} />
-          
+
           <Route path="checkout" element={<Checkout />} />
           <Route path="contact" element={<Contact />} />
           <Route path="history-order" element={<HistoryOrder />} />
         </Route>
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
-        <Route
-            path="account/:id/forgotpassword"
-            element={<ForgotPassword />}
-          />
+        <Route path="account/:id/forgotpassword" element={<ForgotPassword />} />
         <Route path="/admin" element={<LayoutAdmin />}>
           <Route index element={<Dashboard />} />
           <Route path="products" element={<ProductPageManager />} />
@@ -93,6 +93,12 @@ const Router = () => {
           <Route path="employees" element={<EmployeePage />} />
           <Route path="employees/create" element={<FormEmployee />} />
           <Route path="employees/edit/:id" element={<FormEmployee />} />
+          <Route path="banners" element={<Banners />} />
+          <Route path="banners/create" element={<BannersForm />} />
+          <Route path="banners/edit/:id" element={<BannersForm />} />
+          <Route path="posts" element={<Posts />} />
+          <Route path="posts/create" element={<FormPost />} />
+          <Route path="posts/edit/:id" element={<FormPost />} />
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>

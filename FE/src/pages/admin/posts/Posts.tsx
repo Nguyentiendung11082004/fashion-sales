@@ -1,39 +1,47 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { useAuth } from "@/common/context/Auth/AuthContext";
 import Loading from "@/common/Loading/Loading";
-import { IUser } from "@/common/types/users";
-import { deleteEmployee, getEmployees } from "@/services/api/admin/employee";
+import { IPost } from "@/common/types/post";
+import instance from "@/configs/axios";
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Button, Image, Modal, Pagination } from "antd";
-import Table, { ColumnType } from "antd/es/table";
-import dayjs from "dayjs";
+import { Button, Image, Modal, Pagination, Table } from "antd";
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
-const EmployeePage = () => {
-  const queryClient = useQueryClient();
+const Posts = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentEmployeeId, setCurrentEmployeeId] = useState<number | null>(
-    null
-  );
+  const [currentPost, setcurrentPost] = useState<number | null>(null);
+  const queryClient = useQueryClient();
   const initialPage = queryClient.getQueryData(["currentPage"]) || 1;
-
   const [currentPage, setCurrentPage] = useState(Number(initialPage));
-
   const [pageSize] = useState(5);
   const navigate = useNavigate();
+  const { token } = useAuth();
   const { data, isLoading } = useQuery({
-    queryKey: ["employees"],
-    queryFn: getEmployees,
+    queryKey: ["posts"],
+    queryFn: async () => {
+      const res = await instance.get("/posts", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return res.data;
+    },
   });
-  console.log("data employees",data);
 
   const { mutate } = useMutation({
-    mutationFn: deleteEmployee,
+    mutationFn: async (id: string) => {
+      await instance.delete(`/posts/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["employees"] });
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
       toast.success("Xoá thành công");
     },
     onError: () => {
@@ -41,9 +49,6 @@ const EmployeePage = () => {
     },
   });
 
-  const handleEdit = (id: number) => {
-    navigate(`edit/${id}`, { state: { currentPage } });
-  };
   useEffect(() => {
     const totalItems = data?.data?.length || 0;
     const maxPage = Math.ceil(totalItems / pageSize);
@@ -54,88 +59,86 @@ const EmployeePage = () => {
   }, [data, currentPage, pageSize]);
 
   const showModal = (id: number | null) => {
-    setCurrentEmployeeId(id);
+    setcurrentPost(id);
     setIsModalOpen(true);
   };
 
+  const handleEdit = (id: number) => {
+    navigate(`edit/${id}`, { state: { currentPage } });
+  };
+
   const handleOk = () => {
-    if (currentEmployeeId !== null) {
-      mutate(currentEmployeeId);
+    if (currentPost !== null) {
+      mutate(currentPost.toString());
     }
     setIsModalOpen(false);
+    setcurrentPost(null);
   };
 
   const handleCancel = () => {
     setIsModalOpen(false);
+    setcurrentPost(null);
   };
 
-  const column: ColumnType<IUser>[] = [
+  const column: any = [
     {
       title: "STT",
       key: "index",
       render: (__: any, _: any, index: number) => (
         <div>{index + 1 + pageSize * (currentPage - 1)}</div>
       ),
+      width: 50,
     },
     {
-      title: "Name",
-      dataIndex: "name",
+      title: "Tên",
+      dataIndex: "post_name",
+      width: 100,
     },
     {
-      title: "Avatar",
-      dataIndex: "avatar",
-      render: (avatar: string, _: IUser) => <Image src={avatar} width={100} />,
+      title: "Ảnh",
+      dataIndex: "img_thumbnail",
+      render: (img_thumbnail: any) => (
+        <Image src={img_thumbnail} style={{ height: "50", margin: "0 auto" }} />
+      ),
+      width: 100,
     },
     {
-      title: "Phone",
-      dataIndex: "phone_number",
+      title: "Nội dung",
+      dataIndex: "post_content",
+      width: 400,
     },
     {
-      title: "Email",
-      dataIndex: "email",
-    },
-    {
-      title: "Address",
-      dataIndex: "address",
-    },
-    {
-      title: "BirthDate",
-      dataIndex: "birth_date",
-      render: (birth_date: string) => {
-        const date = dayjs(birth_date);
-        return date.isValid() ? date.format("DD/MM/YYYY") : "";
+      title: "Trạng thái",
+      dataIndex: "status",
+      render: (status: number | undefined) => {
+        if (typeof status !== "number") return "";
+        return status === 1 ? "Ẩn" : "Hiện";
       },
     },
     {
-      title: "Gender",
-      dataIndex: "gender",
-      render: (gender: number | undefined) => {
-        if (typeof gender !== "number") return "";
-        return gender === 1 ? "Nam" : "Nữ";
+      title: "Nêu bật",
+      dataIndex: "featured",
+      render: (featured: number | undefined) => {
+        if (typeof featured !== "number") return "";
+        return featured === 1 ? "Nêu bật" : "Không nêu bật";
       },
     },
-    {
-      title: "Create At",
-      dataIndex: "create_at",
-      render: (create_at: string) => {
-        const date = dayjs(create_at);
-        return date.isValid() ? date.format("DD/MM/YYYY HH:mm:ss") : "N/A";
-      },
-    },
+
     {
       title: "Action",
       fixed: "right",
-      render: (employee: IUser) => (
+      width: 150,
+      render: (post: IPost) => (
         <div>
           <Button
             className="mx-2 bg-yellow-400 text-white"
-            onClick={() => handleEdit(employee.id)}
+            onClick={() => handleEdit(post.id)}
           >
             <EditOutlined />
           </Button>
           <Button
             className="bg-red-500 text-white"
-            onClick={() => showModal(employee.id)}
+            onClick={() => showModal(post.id)}
           >
             <DeleteOutlined />
           </Button>
@@ -149,7 +152,7 @@ const EmployeePage = () => {
             cancelText="Hủy"
             mask={false}
           >
-            <p>Bạn có chắc chắn muốn xóa tài khoản này không ?</p>
+            <p>Bạn có chắc chắn muốn xóa không ?</p>
           </Modal>
         </div>
       ),
@@ -157,9 +160,9 @@ const EmployeePage = () => {
   ];
 
   const dataSource = Array.isArray(data?.data)
-    ? data.data.map((employee: IUser) => ({
-        key: employee.id,
-        ...employee,
+    ? data.data.map((post: IPost) => ({
+        key: post.id,
+        ...post,
       }))
     : [];
 
@@ -167,7 +170,7 @@ const EmployeePage = () => {
     <div className="p-6 min-h-screen">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2">
-          Nhân viên
+          Bài viết
         </h1>
         <Link to={`create`}>
           <Button
@@ -175,11 +178,12 @@ const EmployeePage = () => {
             type="primary"
           >
             <PlusOutlined className="mr-2" />
-            Thêm nhân viên
+            Thêm bài viết
           </Button>
         </Link>
       </div>
       <div className="">
+        <div className="flex space-x-4 py-4"></div>
         {isLoading ? (
           <Loading />
         ) : (
@@ -209,4 +213,4 @@ const EmployeePage = () => {
   );
 };
 
-export default EmployeePage;
+export default Posts;

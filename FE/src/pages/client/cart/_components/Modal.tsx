@@ -33,10 +33,10 @@ const ModalCart = ({
   };
   useEffect(() => {
     if (open && attributes) {
-      setActiveAttributes(attributes);
-    } else {
-      setActiveAttributes({});
-    }
+        setActiveAttributes(attributes);
+      } else {
+        setActiveAttributes({});
+      }
   }, [open, attributes]);
   const { data: cartAttribute, isFetching } = useQuery({
     queryKey: ["cartAttribute", idCart],

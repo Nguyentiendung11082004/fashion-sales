@@ -9,7 +9,7 @@ import {
 import CartDetail from "@/components/icons/detail/CartDetail";
 import Eye from "@/components/icons/detail/Eye";
 import HeartWhite from "@/components/icons/detail/HeartWhite";
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Banner from "./Banner/Banner";
 import Slideshow from "./SampleSlider/SampleSlider";
@@ -71,10 +71,15 @@ const HomePage = () => {
                     />
                     <div className="absolute inset-0 bg-black opacity-0 transition-opacity duration-300 ease-in-out group-hover:opacity-10"></div>
                     <div>
-                      <button className="absolute left-5 top-5 cursor-pointer"
+                      <button
+                        className="absolute left-5 top-5 cursor-pointer"
                         onClick={() => handleAddToWishlist(product)}
                       >
-                        {isInWishlist(product.id) ? <HeartRed /> : <HeartWhite />}
+                        {isInWishlist(product.id) ? (
+                          <HeartRed />
+                        ) : (
+                          <HeartWhite />
+                        )}
                       </button>
                     </div>
                     <div className="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100">
@@ -116,17 +121,18 @@ const HomePage = () => {
                         </ul>
                       </div>
                     </div>
+                    zz
                     {product.price_regular && (
                       <div>
                         {product.price_sale > 0 &&
-                          product.price_sale < product.price_regular ? (
+                        product.price_sale < product.price_regular ? (
                           <>
                             <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400">
                               -
                               {Math.round(
                                 ((product.price_regular - product.price_sale) /
                                   product.price_regular) *
-                                100
+                                  100
                               )}
                               %
                             </div>
@@ -139,12 +145,13 @@ const HomePage = () => {
                   </div>
                   <div>
                     <p className="text-base font-medium text-black mb-1 cursor-pointer hd-all-hover-bluelight">
-                      {product.name.charAt(0).toUpperCase() + product.name.slice(1).toLowerCase()}
+                      {product.name.charAt(0).toUpperCase() +
+                        product.name.slice(1).toLowerCase()}
                     </p>
                     {product.price_regular && (
                       <div>
                         {product.price_sale > 0 &&
-                          product.price_sale < product.price_regular ? (
+                        product.price_sale < product.price_regular ? (
                           <>
                             <del className="mr-1">
                               {new Intl.NumberFormat("vi-VN").format(
@@ -306,14 +313,14 @@ const HomePage = () => {
                     {product.price_regular && (
                       <div>
                         {product.price_sale > 0 &&
-                          product.price_sale < product.price_regular ? (
+                        product.price_sale < product.price_regular ? (
                           <>
                             <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400">
                               -
                               {Math.round(
                                 ((product.price_regular - product.price_sale) /
                                   product.price_regular) *
-                                100
+                                  100
                               )}
                               %
                             </div>
@@ -326,12 +333,13 @@ const HomePage = () => {
                   </div>
                   <div>
                     <p className="text-base font-medium text-black mb-1 cursor-pointer hd-all-hover-bluelight">
-                      {product.name.charAt(0).toUpperCase() + product.name.slice(1).toLowerCase()}
+                      {product.name.charAt(0).toUpperCase() +
+                        product.name.slice(1).toLowerCase()}
                     </p>
                     {product.price_regular && (
                       <div>
                         {product.price_sale > 0 &&
-                          product.price_sale < product.price_regular ? (
+                        product.price_sale < product.price_regular ? (
                           <>
                             <del className="mr-1">
                               {new Intl.NumberFormat("vi-VN").format(

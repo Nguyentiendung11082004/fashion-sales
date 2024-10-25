@@ -22,7 +22,7 @@ const CommentProduct = () => {
   const { token } = useAuth();
   const postCommentProduct = useMutation({
     mutationFn: async () => {
-      await instance.post(`/comment`, {
+      await instance.post(`/comments`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -32,12 +32,9 @@ const CommentProduct = () => {
       setIsLoading(true);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["comment"] });
+      queryClient.invalidateQueries({ queryKey: ["comments"] });
       toast.success("Bình luận thành công");
       form.resetFields();
-      //   setIsLoading(false);
-      //   setRating(0);
-      //   setUrlImage(null);
     },
     onError: (error: any) => {
       setError(error.response.data.message);
@@ -67,19 +64,7 @@ const CommentProduct = () => {
   };
 
   const onFinish = (data: any) => {
-    // const commentData: any = {
-    //   rating,
-    //   content: data.content,
-    //   image: urlImage || "",
-    //   id: "",
-    //   user_id: 0,
-    //   product_id: 0,
-    //   status: 0,
-    // };
-
     postCommentProduct.mutate(data);
-    // console.log("sadfas", data);
-    // console.log("Submitting comment:", commentData);
   };
 
   return (

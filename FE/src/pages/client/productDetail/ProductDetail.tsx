@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable prefer-const */
 /* eslint-disable no-prototype-builtins */
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -5,15 +6,19 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Less from "../../../components/icons/detail/Less";
-import { Link, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { productShow } from "@/services/api/admin/products.api";
 import RelatedProducts from "./RelatedProducts";
 import { categoriesShow } from "@/services/api/admin/categories";
-import { Skeleton } from "antd";
+import { Button, Skeleton } from "antd";
 import { findProductVariant } from "@/services/api/client/productClient.api";
 import CommentProduct from "./CommentProduct";
+import { useCart } from "@/common/context/Cart/CartContext";
+import { toast } from "react-toastify";
+import instance from "@/configs/axios";
+import { useAuth } from "@/common/context/Auth/AuthContext";
 
 interface IinitialAttributes {
   [key: string]: string;
@@ -35,7 +40,7 @@ const ProductDetail = () => {
     },
   });
 
-  // console.log("data detail : ", data);
+  console.log("data detail : ", data);
 
   const getUniqueAttributes = data?.getUniqueAttributes;
   useEffect(() => {
@@ -101,16 +106,27 @@ const ProductDetail = () => {
     setMainImage(image);
     // setPriceProduct({ priceMax: undefined, priceMin: undefined });
   };
+  const { token } = useAuth();
 
   // thêm vào giỏ hàng
+  const location = useLocation();
+
+  const { idAttributeToDetail = [] } = location.state || {}; 
+
+  console.log("attributeId trang chi tiết", idAttributeToDetail);
+
   const [quantity, setQuantity] = useState<number>(1);
 
   const increaseQuantity = () => {
     setQuantity((prev) => prev + 1);
   };
-
+  const { addToCart } = useCart();
   const decreaseQuantity = () => {
     setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
+  };
+
+  const onHandleAddToCart = (id: any, idProductVariant: any) => {
+    addToCart(id, idProductVariant);
   };
 
   const [selectedAttributes, setSelectedAttributes] = useState<{
@@ -164,11 +180,12 @@ const ProductDetail = () => {
     return res;
   };
 
+  // const { attributeId } = location.state || {};
+
   useEffect(() => {
     const fetchProductVariant = async () => {
       try {
         const variant = await findProductVariant(productId, selectedAttributes);
-
         if (variant.findProductVariant) {
           setProduct((prevProduct: any) => ({
             ...prevProduct,
@@ -500,7 +517,28 @@ const ProductDetail = () => {
                     </div>
                   </div>
                 </div>
-                <button className="h-11 w-full   px-2 py-2 rounded-full test nc-Button relative right-2  inline-flex items-center justify-center  text-sm sm:text-base font-medium sm:py-3.5 sm:px-2 lg:px-2 shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0  animate-bounce focus:animate-none hover:animate-none text-md  mt-3  border bg-[#56cfe1] text-white">
+
+                <Button
+                  // onClick={() => {
+                  //   // if (product?.findProductVariant?.id !== "" && product?.id) {
+                  //   //   handleAddToCart(
+                  //   //     product.id,
+                  //   //     product?.findProductVariant?.id
+                  //   //   );
+                  //   // }
+
+                  //   // if (product && product?.findProductVariant === "") {
+                  //   //   handleAddToCart(
+                  //   //     product.id,
+                  //   //     product?.findProductVariant?.id == ""
+                  //   //   );
+                  //   // }
+
+                  // }}
+                  onClick={() => onHandleAddToCart(id, product?.id)}
+                  className={`h-11 w-full px-2 py-2 rounded-full ...`}
+                  disabled={isLoading}
+                >
                   <svg
                     className="hidden lg:hidden xl:block sm:inline-block w-5 h-5 mb-0.5"
                     viewBox="0 0 9 9"
@@ -521,7 +559,8 @@ const ProductDetail = () => {
                   <span className="xl:ml-3 ml-1 lg:text-base xl:text-base">
                     Thêm vào giỏ hàng
                   </span>
-                </button>
+                </Button>
+
                 <br />
                 <div className="flex border border-slate-600 rounded-full items-center px-2 h-10 hover:border-red-500 hover:text-red-500">
                   <svg

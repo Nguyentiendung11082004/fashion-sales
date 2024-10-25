@@ -1,22 +1,24 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Less from "@/components/icons/detail/Less";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import HeartWhite from "@/components/icons/detail/HeartWhite";
 import Eye from "@/components/icons/detail/Eye";
 import CartDetail from "@/components/icons/detail/CartDetail";
 import "rc-slider/assets/index.css";
-import { colorTranslations, convertColorNameToClass } from "@/common/colors/colorUtils";
+import {
+  colorTranslations,
+  convertColorNameToClass,
+} from "@/common/colors/colorUtils";
 import instance from "@/configs/axios";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import NoDatasIcon from "@/components/icons/products/NoDataIcon";
 import { ResponseData } from "@/common/types/responseDataFilter";
-import unorm from 'unorm';
+import unorm from "unorm";
 import HeartRed from "@/components/icons/detail/HeartRed";
 import { useWishlist } from "../wishlist/WishlistContext";
-import { Button, Spin } from 'antd';
-import { LoadingOutlined } from '@ant-design/icons';
-import { useAuth } from "@/common/context/Auth/AuthContext";
+import { Button, Spin } from "antd";
+import { LoadingOutlined } from "@ant-design/icons";
 import { useCart } from "@/common/context/Cart/CartContext";
 
 const Products = () => {
@@ -25,7 +27,8 @@ const Products = () => {
   const growboxRef = useRef<HTMLDivElement>(null);
   const toepfeRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
-  const [noProductsMessage, setNoProductsMessage] = useState<React.ReactNode>(null);
+  const [noProductsMessage, setNoProductsMessage] =
+    useState<React.ReactNode>(null);
   const { handleAddToWishlist, isInWishlist } = useWishlist();
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -51,6 +54,7 @@ const Products = () => {
     sortPrice: null,
     sortAlphaOrder: null,
   });
+  const navigate = useNavigate();
 
   const { mutate } = useMutation({
     mutationFn: async (filters: any) => {
@@ -77,7 +81,7 @@ const Products = () => {
     onError: (error) => {
       console.error("Có lỗi xảy ra:", error);
     },
-  })
+  });
   const applyFilters = useCallback(() => {
     const filters = {
       search: searchTerm,
@@ -98,7 +102,19 @@ const Products = () => {
     setSelectedSortName(temporarySortName);
     setGrowboxDropdownOpen(false);
     setToepfeDropdownOpen(false);
-  }, [searchTerm, selectedCategories, selectedBrand, selectedSizes, selectedColors, minPrice, maxPrice, isSale, selectedSort, temporarySortName, mutate]);
+  }, [
+    searchTerm,
+    selectedCategories,
+    selectedBrand,
+    selectedSizes,
+    selectedColors,
+    minPrice,
+    maxPrice,
+    isSale,
+    selectedSort,
+    temporarySortName,
+    mutate,
+  ]);
 
   const handleClearFilters = () => {
     setSearchTerm("");
@@ -195,11 +211,13 @@ const Products = () => {
         );
 
         // Lọc gợi ý chỉ hiển thị những từ khóa bắt đầu bằng searchTerm (có phân biệt dấu)
-        const filteredSuggestions = suggestionsData.filter((suggestion: string) => {
-          const normalizedSuggestion = unorm.nfkd(suggestion.toLowerCase()); // Chuẩn hóa gợi ý
-          const normalizedValue = unorm.nfkd(value.toLowerCase()); // Chuẩn hóa giá trị tìm kiếm
-          return normalizedSuggestion.startsWith(normalizedValue); // So sánh
-        });
+        const filteredSuggestions = suggestionsData.filter(
+          (suggestion: string) => {
+            const normalizedSuggestion = unorm.nfkd(suggestion.toLowerCase()); // Chuẩn hóa gợi ý
+            const normalizedValue = unorm.nfkd(value.toLowerCase()); // Chuẩn hóa giá trị tìm kiếm
+            return normalizedSuggestion.startsWith(normalizedValue); // So sánh
+          }
+        );
 
         // if (filteredSuggestions.length > 0) {
         setSuggestions(filteredSuggestions);
@@ -218,16 +236,14 @@ const Products = () => {
   };
 
   // data
-  const {
-    data: pro,
-    isFetching,
-  } = useQuery<ResponseData>({
+  const { data: pro, isFetching } = useQuery<ResponseData>({
     queryKey: ["productsData"],
     queryFn: async () => {
       const response = await instance.post("/product-shop");
       return response.data;
     },
   });
+
   const toggleGrowboxDropdown = () => {
     setGrowboxDropdownOpen(!growboxDropdownOpen);
     setToepfeDropdownOpen(false);
@@ -247,14 +263,51 @@ const Products = () => {
 
   const { isLoading, addToCart } = useCart();
   const handleAddToCart = (idProduct: any, idProductVariant: any) => {
-    addToCart(idProduct, idProductVariant)
-  }
+    addToCart(idProduct, idProductVariant);
+  };
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  // chọn thuộc tính để xem chi tiết
+
+  const [selectAttributeOne, setSelectAttributeOne] = useState<string>();
+  const [selectAttributeTwo, setSelectAttributeTwo] = useState<string>();
+  const [idAttributeToDetail, setIdAttributeToDetail] = useState<string[]>([]);
+
+  const onHandleSelectOne = (id: string) => {
+    if (id) {
+      setSelectAttributeOne(id);
+    }
+  };
+
+  const onHandleSelectTwo = (id: string) => {
+    if (id) {
+      setSelectAttributeTwo(id);
+    }
+  };
+
+  useEffect(() => {
+    const updatedAttributes = [];
+    if (selectAttributeOne) updatedAttributes.push(selectAttributeOne);
+    if (selectAttributeTwo) updatedAttributes.push(selectAttributeTwo);
+
+    setIdAttributeToDetail(updatedAttributes);
+  }, [selectAttributeOne, selectAttributeTwo]);
+
+  console.log("idAttributeToDetail products page", idAttributeToDetail);
+
+  const onHandleToDetail = (id: any) => {
+    navigate(`/products/${id}`, {
+      state: { idAttributeToDetail: idAttributeToDetail },
+    });
+  };
+
+  console.log("pro?.products?", pro?.products);
+
   return (
     <>
       <div>
@@ -298,7 +351,6 @@ const Products = () => {
                   className="ttnc-ButtonCircle flex items-center justify-center rounded-full !leading-none disabled:bg-opacity-70 bg-slate-900 hd-all-hoverblue-btn
         text-slate-50 absolute right-2.5 top-1/2 transform -translate-y-1/2  w-11 h-11 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0"
                   type="submit"
-
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -348,7 +400,6 @@ const Products = () => {
                       onClick={() => {
                         setSearchTerm(suggestion); // Điền vào ô tìm kiếm
                         setSuggestions([]);
-
                       }}
                     >
                       {suggestion.toLowerCase()}
@@ -442,10 +493,14 @@ const Products = () => {
               </button>
               <div className="hd-show-brand font-medium px-2">
                 {pro?.brands
-                  ?.filter((brand) => appliedBrands.includes(brand.id.toString()))
+                  ?.filter((brand) =>
+                    appliedBrands.includes(brand.id.toString())
+                  )
                   .map((brand) => (
                     <span key={brand.id} className="underline mr-2">
-                      - {brand.name.charAt(0).toUpperCase() + brand.name.slice(1).toLowerCase()}
+                      -{" "}
+                      {brand.name.charAt(0).toUpperCase() +
+                        brand.name.slice(1).toLowerCase()}
                     </span>
                   ))}
               </div>
@@ -472,8 +527,9 @@ const Products = () => {
                             name={item.name}
                             value={item.id.toString()}
                             checked={selectedBrand.includes(item.id.toString())}
-                            onChange={() => handleCheckboxChange("brands", item.id.toString())}
-
+                            onChange={() =>
+                              handleCheckboxChange("brands", item.id.toString())
+                            }
                           />
                           <label
                             htmlFor={`brand-${item.id}`}
@@ -776,8 +832,12 @@ const Products = () => {
                         type="checkbox"
                         name={item.name}
                         value={item.id}
-                        checked={selectedCategories.includes(item.id.toString())}
-                        onChange={() => handleCheckboxChange("categories", item.id.toString())}
+                        checked={selectedCategories.includes(
+                          item.id.toString()
+                        )}
+                        onChange={() =>
+                          handleCheckboxChange("categories", item.id.toString())
+                        }
                       />
                       <label
                         htmlFor={`cat-${item.id}`}
@@ -808,9 +868,15 @@ const Products = () => {
                         }
                         checked={selectedColors.includes(
                           item.value.charAt(0).toUpperCase() +
-                          item.value.slice(1).toLowerCase()
+                            item.value.slice(1).toLowerCase()
                         )}
-                        onChange={() => handleCheckboxChange("colors", item.value.charAt(0).toUpperCase() + item.value.slice(1).toLowerCase())}
+                        onChange={() =>
+                          handleCheckboxChange(
+                            "colors",
+                            item.value.charAt(0).toUpperCase() +
+                              item.value.slice(1).toLowerCase()
+                          )
+                        }
                       />
                       <label
                         htmlFor={`color-${item.id}`}
@@ -819,7 +885,7 @@ const Products = () => {
                         <span className="text-slate-900 text-sm font-normal ">
                           {colorTranslations[
                             item.value.charAt(0).toUpperCase() +
-                            item.value.slice(1).toLowerCase()
+                              item.value.slice(1).toLowerCase()
                           ] || "No Size"}
                         </span>
                       </label>
@@ -862,7 +928,9 @@ const Products = () => {
                           name={item.name}
                           value={item.value}
                           checked={selectedSizes.includes(item.value)}
-                          onChange={() => handleCheckboxChange("sizes", item.value)}
+                          onChange={() =>
+                            handleCheckboxChange("sizes", item.value)
+                          }
                         />
                         <label
                           htmlFor={`size-${item.id}`}
@@ -1003,7 +1071,6 @@ const Products = () => {
           <div className="border-l border-gray-200"></div>
 
           <div className="">
-
             {/* products */}
             {noProductsMessage && (
               <div className="flex bg-gray-50 h-full w-[1000px] justify-center pt-32">
@@ -1041,14 +1108,23 @@ const Products = () => {
                         />
                         <div className="absolute inset-0 bg-black opacity-0 transition-opacity duration-300 ease-in-out group-hover:opacity-10"></div>
                         <div>
-                          <button className="absolute left-5 top-5 cursor-pointer"
+                          <button
+                            className="absolute left-5 top-5 cursor-pointer"
                             onClick={() => handleAddToWishlist(product)}
                           >
-                            {isInWishlist(product.id) ? <HeartRed /> : <HeartWhite />}
+                            {isInWishlist(product.id) ? (
+                              <HeartRed />
+                            ) : (
+                              <HeartWhite />
+                            )}
                           </button>
                         </div>
                         <div className="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100">
-                          <Link to="" className="group/btn relative m-auto">
+                          <Link
+                            to={`${product.id}`}
+                            className="group/btn relative m-auto"
+                            onClick={() => onHandleToDetail(`${product.id}`)}
+                          >
                             <button className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]">
                               <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
                                 Xem thêm
@@ -1057,13 +1133,30 @@ const Products = () => {
                             </button>
                           </Link>
                           <Link to="" className="group/btn relative">
-                            <button onClick={() => handleAddToCart(product?.id, product?.variants[0]?.id)} className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]">
+                            <button
+                              onClick={() =>
+                                handleAddToCart(
+                                  product?.id,
+                                  product?.variants[0]?.id
+                                )
+                              }
+                              className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]"
+                            >
                               <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
                                 Thêm vào giỏ hàng
                               </p>
-                              {
-                                isLoading ? <Spin indicator={<LoadingOutlined style={{ fontSize: 28, color: '#fff' }} />} className="translate-y-[-12px]" /> : <CartDetail />
-                              }
+                              {isLoading ? (
+                                <Spin
+                                  indicator={
+                                    <LoadingOutlined
+                                      style={{ fontSize: 28, color: "#fff" }}
+                                    />
+                                  }
+                                  className="translate-y-[-12px]"
+                                />
+                              ) : (
+                                <CartDetail />
+                              )}
                             </button>
                           </Link>
                         </div>
@@ -1078,13 +1171,18 @@ const Products = () => {
               "
                           >
                             <ul className="flex">
-                              {getUniqueAttributes?.size && (
-                                <li>
-                                  {Object.values(getUniqueAttributes.size).join(
-                                    ", "
-                                  )}
-                                </li>
-                              )}
+                              {getUniqueAttributes?.size &&
+                                Object.entries(getUniqueAttributes.size).map(
+                                  ([id, size]: [string, any]) => (
+                                    <li
+                                      className="ml-2"
+                                      key={id}
+                                      onClick={() => onHandleSelectOne(id)}
+                                    >
+                                      {size}
+                                    </li>
+                                  )
+                                )}
                             </ul>
                           </div>
                         </div>
@@ -1092,7 +1190,7 @@ const Products = () => {
                         {product.price_regular && (
                           <div>
                             {product.price_sale > 0 &&
-                              product.price_sale < product.price_regular ? (
+                            product.price_sale < product.price_regular ? (
                               <>
                                 <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400">
                                   -
@@ -1100,7 +1198,7 @@ const Products = () => {
                                     ((product.price_regular -
                                       product.price_sale) /
                                       product.price_regular) *
-                                    100
+                                      100
                                   )}
                                   %
                                 </div>
@@ -1119,7 +1217,7 @@ const Products = () => {
                         {product.price_regular && (
                           <div>
                             {product.price_sale > 0 &&
-                              product.price_sale < product.price_regular ? (
+                            product.price_sale < product.price_regular ? (
                               <>
                                 <del className="mr-1">
                                   {new Intl.NumberFormat("vi-VN").format(
@@ -1148,14 +1246,15 @@ const Products = () => {
 
                       <div className="t4s-product-colors flex">
                         {getUniqueAttributes?.color &&
-                          Object.values(getUniqueAttributes.color)
-                            .filter((color) => typeof color === "string")
-                            .map((color, index) => (
-                              <div key={index} className="mr-2 mt-1">
+                          Object.entries(getUniqueAttributes.color)
+                            .filter(([id, color]) => typeof color === "string")
+                            .map(([id, color]) => (
+                              <div key={id} className="mr-2 mt-1">
                                 <span className="t4s-pr-color__item flex flex-col items-center cursor-pointer">
                                   <span className="t4s-pr-color__value border border-gray-400 w-5 h-5 hover:border-black hover:border-2 rounded-full p-[5px]">
                                     <div
-                                      className={` w-[17px] h-[17px] rounded-full ml-[-4.25px] mt-[-4px] hover:mt-[-5px] hover:ml-[-5px] ${convertColorNameToClass(color)}`}
+                                      className={`w-[17px] h-[17px] rounded-full ml-[-4.25px] mt-[-4px] hover:mt-[-5px] hover:ml-[-5px] ${convertColorNameToClass(color)}`}
+                                      onClick={() => onHandleSelectTwo(id)}
                                     ></div>
                                   </span>
                                 </span>
@@ -1166,7 +1265,6 @@ const Products = () => {
                   </div>
                 ))}
                 {/* )} */}
-
               </div>
             </div>
 
