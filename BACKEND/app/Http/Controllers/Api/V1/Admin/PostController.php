@@ -130,26 +130,19 @@ class PostController extends Controller
     try {
         $post = Post::findOrFail($id);
         $data = $request->all();
-
-        // Kiểm tra và cập nhật slug nếu tên bài viết thay đổi
         if ($data['post_name'] !== $post->post_name) {
             $data['slug'] = $this->generateUniqueSlug($data['post_name'], $id);
         } else {
             $data['slug'] = $post->slug;
         }
-
-        // Làm sạch nội dung bài viết
         $purifier = new HTMLPurifier();
         $data['post_content'] = $purifier->purify($data['post_content']);
-
-        // Kiểm tra và cập nhật ảnh thumbnail nếu có, nếu không thì giữ nguyên ảnh cũ
         if ($request->has('img_thumbnail') && !empty($request->img_thumbnail)) {
             $data['img_thumbnail'] = $request->img_thumbnail;
         } else {
             $data['img_thumbnail'] = $post->img_thumbnail;
         }
 
-        // Cập nhật các thông tin khác của bài viết
         $post->update($data);
 
         return response()->json([
