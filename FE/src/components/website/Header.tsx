@@ -19,7 +19,7 @@ type Props = {};
 const Header = (props: Props) => {
   const navigator = useNavigate();
   const { data :  wishlist = []} = useWishlist();
-  const { user } = useUser();
+  const { user, urlImage } = useUser();
   let infoUser;
   if (user) {
     infoUser = user["Infor User"];
@@ -145,7 +145,7 @@ const Header = (props: Props) => {
                 <div className="relative group">
                   <Link to="/account">
                     {
-                      user ? (<img src={`${infoUser?.avatar}`} className="h-10 w-10 rounded-full object-cover" alt={`${infoUser?.name}`} />) : <UserHome />
+                      user ? (<img src={urlImage || infoUser?.avatar} className="h-10 w-10 rounded-full object-cover" alt={infoUser?.name} />) : <UserHome />
                     }
                   </Link>
                   <div className="absolute left-[-50px] hidden group-hover:flex flex-col items-start mt-0 space-y-2 p-4 bg-white shadow-lg rounded-lg transition-all duration-300 z-10">
