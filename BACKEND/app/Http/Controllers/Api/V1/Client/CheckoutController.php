@@ -18,7 +18,7 @@ use App\Http\Requests\Checkout\StoreCheckoutRequest;
 
 class CheckoutController extends Controller
 {
-    public function StoreOld(StoreCheckoutRequest $request)
+   /* public function StoreOld(StoreCheckoutRequest $request)
     {
         try {
             $data = $request->validated(); // Lấy dữ liệu đã xác thực
@@ -60,7 +60,6 @@ class CheckoutController extends Controller
                                 $query->whereIn('id', $data['cart_item_ids']);
                             },
                             "cartitems.product",
-                            "cartitems.productvariant.attributes"
                             "cartitems.productvariant.attributes"
                         ])
                         ->first();
@@ -186,7 +185,7 @@ class CheckoutController extends Controller
                 Response::HTTP_INTERNAL_SERVER_ERROR
             );
         }
-    }
+    }*/
     public function store(StoreCheckoutRequest $request)
     {
         try {
