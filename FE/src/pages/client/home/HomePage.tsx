@@ -21,6 +21,7 @@ import HeartRed from "@/components/icons/detail/HeartRed";
 import LiveChat from "../liveChat/liveChat";
 import CartPopup from "@/components/ModalPopup/CartPopup";
 import DetailPopup from "@/components/ModalPopup/DetailPopup";
+import { Button } from "antd";
 
 const HomePage = () => {
   const [trendProducts, setTrendProducts] = useState<any[]>([]);
@@ -272,7 +273,7 @@ const HomePage = () => {
 
         <section className="container my-16 text-center">
           <Link to="">
-            <button className="btn-load">Tải Thêm</button>
+            <Button className="btn-load">Tải Thêm</Button>
           </Link>
         </section>
 

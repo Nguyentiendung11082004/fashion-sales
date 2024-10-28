@@ -40,15 +40,10 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     return (
         <UserContext.Provider value={{ user, loading, error }}>
-<<<<<<< HEAD
-            { 
+            {/* { 
             isFetching ? <Loading /> : children
-=======
-            {
-                // isFetching ? <Loading /> : 
-                children
->>>>>>> 652ebbbd680431c5fe828f87b9383e3a6e166d2e
-            }
+            } */}
+            {children}
         </UserContext.Provider>
     );
 };

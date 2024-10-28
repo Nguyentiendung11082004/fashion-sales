@@ -221,7 +221,6 @@ class CheckoutController extends Controller
 
             $districts = json_decode($response, true)['data'];
 
-
             return response()->json([
                 "message" => "Lấy dữ liệu thành công",
                 "districts" => $districts

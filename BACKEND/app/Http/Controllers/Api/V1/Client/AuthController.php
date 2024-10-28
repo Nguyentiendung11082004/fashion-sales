@@ -212,7 +212,8 @@ class AuthController extends Controller
             // Tạo token reset mật khẩu
             $token = Password::createToken($user);
 
-            $url = route('password.reset', ['token' => str($token)]);
+            // $url = route('password.reset', ['token' => str($token)]);
+            $url = "http://localhost:5173/password/reset/" . $token;
 
             // Gửi thông báo qua queue
             Notification::send($user, new ResetPasswordNotification($url, $token));

@@ -223,7 +223,7 @@ const DetailPopup = forwardRef((props, ref) => {
             <div className="mx-3">
               <Button
                 onClick={handleClose}
-                className="w-full h-11 rounded-full  bg-[#56cfe1] text-white text-lg font-medium hover:bg-[#4bc3d5]"
+                className="w-full h-11 rounded-full  bg-[#56cfe1] text-white text-base font-medium hover:bg-[#4bc3d5]"
               >
                 Thêm vào giỏ hàng
               </Button>
