@@ -1,7 +1,7 @@
 import Icon1 from "@/assets/icons/BackgroundLine.fbaf1dad.svg";
 import Facebook from "@/assets/icons/facebook.b22e79d5.svg";
 import Telegram from "@/assets/icons/telegram.a3c75624.svg";
-import Login from "@/assets/icons/loginpage.svg";
+// import Login from "@/assets/icons/loginpage.svg";
 import Twitter from "@/assets/icons/twitter.d12eec73.svg";
 import Youtube from "@/assets/icons/youtube.bcae2a7a.svg";
 import Flag from "@/assets/icons/vn.svg";
@@ -42,7 +42,7 @@ export {
   Icon1,
   Facebook,
   Telegram,
-  Login,
+  // Login,
   Twitter,
   Youtube,
   Flag,
