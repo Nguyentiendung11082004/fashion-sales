@@ -83,18 +83,12 @@ Route::prefix("v1/")->group(function () {
 
 });
 
-Route::get('comment', [CommentController::class, 'index']);
 Route::middleware('auth:sanctum')->prefix('v1/')->group(function () {
     Route::apiResource('cart', CartController::class);
     Route::apiResource('wishlist', WishlistController::class);
     Route::get('/user', [InforUserController::class, 'getInforUser']);
     Route::put('/user/update', [InforUserController::class, 'updateInforUser']);
     Route::post('logout', [AuthController::class, 'logout']);
-
-    // Client routes cho bình luận (comments)
-   
-   
-
 
      // Tạo hoặc lấy cuộc trò chuyện giữa hai người dùng
      Route::post('conversations', [ConversationController::class, 'store']);
