@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1\Client;
 
+use App\Http\Controllers\API\V1\Service\PaymentController;
 use App\Models\Cart;
 use App\Models\User;
 use App\Models\Order;
@@ -11,11 +12,11 @@ use App\Models\OrderDetail;
 use Illuminate\Http\Response;
 use App\Models\ProductVariant;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\Order\StoreOrderRequest;
 use App\Http\Requests\Order\UpdateOrderRequest;
+use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
@@ -46,7 +47,9 @@ class OrderController extends Controller
      */
     public function store(StoreOrderRequest $request)
     {
+       
         try {
+           
             $data = $request->validated(); // Lấy dữ liệu đã xác thực
             // Kiểm tra xem người dùng có muốn mua ngay hay không
             $isImmediatePurchase = isset($data['id_product']) && isset($data['quantity']);

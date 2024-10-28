@@ -269,18 +269,14 @@ class CheckoutController extends Controller
         }
     }
     // lấy ra các dịch vụ vận chuyển
-    public function getAvailableServices(Request $request)
+    public function getAvailableServices($request)
     {
         try {
 
-            $request->validate([
-                "from_district_id" => "required",
-                "to_district_id" => "required",
-                // "weight"=>"required",
-            ]);
-            $from_district_id = $request->from_district_id;
-            $to_district_id = $request->to_district_id;
-            // $weight = $request->weight;
+            $from_district_id = $request["from_district_id"];
+            $to_district_id = $request["to_district_id"];
+            $weight = $request["weight"];
+          
             $api_key = '18f28540-8fbc-11ef-839a-16ebf09470c6';
 
 
@@ -293,7 +289,7 @@ class CheckoutController extends Controller
                 'shop_id' => 5404595,  // Thay YOUR_SHOP_ID bằng mã shop GHN của bạn
                 'from_district' => $from_district_id,
                 'to_district' => $to_district_id,
-                // 'weight' => $weight
+                'weight' => $weight
             ]));
             curl_setopt($ch, CURLOPT_HTTPHEADER, [
                 'Token: ' . $api_key,
@@ -303,11 +299,9 @@ class CheckoutController extends Controller
             $response = curl_exec($ch);
             curl_close($ch);
 
-            $services = json_decode($response, true)['data'];
-
-            return response()->json([
-                "services" => $services
-            ], Response::HTTP_OK);
+            $services = json_decode($response, true)['data'][0];
+           
+            return  $services ;
         } catch (\Exception $ex) {
             return response()->json([
                 "message" => $ex->getMessage()
@@ -317,20 +311,20 @@ class CheckoutController extends Controller
     public function calculateShippingFee(Request $request)
     {
         try {
+           
             $request->validate([
                 "from_district_id" => "required",
                 "to_district_id" => "required",
                 "weight" => "required", //đơn vị tính g
-                "service_id" => "required",
-                "insurance_value" => "nullable",
-                "coupon" => "nullable",
+                
             ]);
+            
+           
             $from_district_id = $request->from_district_id;
             $to_district_id = $request->to_district_id;
             $weight = $request->weight;
-            $service_id = $request->service_id; // Dịch vụ vận chuyển mà bạn chọn
-            $insurance_value = $request->insurance_value; // Giá trị bảo hiểm hàng hóa (nếu có)
-            $coupon = $request->coupon; // Mã giảm giá (nếu có)
+            $services=$this->getAvailableServices($request);
+            $service_id = $services["service_id"]; 
             $api_key = '18f28540-8fbc-11ef-839a-16ebf09470c6';
             $ch = curl_init();
 
@@ -339,14 +333,11 @@ class CheckoutController extends Controller
             curl_setopt($ch, CURLOPT_POST, 1);
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
                 'service_id' => $service_id,
-                'insurance_value' => $insurance_value,
-                'coupon' => $coupon,
+                
                 'from_district_id' => $from_district_id,
                 'to_district_id' => $to_district_id,
                 'weight' => $weight,
-                // 'length' => $request->length, // chiều dài (nếu có)
-                // 'width' => $request->width,   // chiều rộng (nếu có)
-                // 'height' => $request->height  // chiều cao (nếu có)
+               
             ]));
             curl_setopt($ch, CURLOPT_HTTPHEADER, [
                 'Token: ' . $api_key,
