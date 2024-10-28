@@ -60,6 +60,7 @@ Route::prefix("v1/")->group(function () {
     Route::post('register', [AuthController::class, 'register']);
     Route::resource('order', OrderController::class);
     Route::resource('checkout', CheckoutController::class);
+    Route::apiResource('posts', PostController::class);
     //Gửi mail
     Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
         ->middleware(['signed'])->name('verification.verify');
@@ -82,7 +83,7 @@ Route::prefix("v1/")->group(function () {
     
 });
 
-
+Route::get('comment', [CommentController::class, 'index']);
 Route::middleware('auth:sanctum')->prefix('v1/')->group(function () {
     Route::apiResource('cart', CartController::class);
     Route::apiResource('wishlist', WishlistController::class);
@@ -91,19 +92,8 @@ Route::middleware('auth:sanctum')->prefix('v1/')->group(function () {
     Route::post('logout', [AuthController::class, 'logout']);
 
     // Client routes cho bình luận (comments)
-    // đức sửa lại
-    Route::get('/posts', [PostController::class, 'index']);
-
-    // Lấy danh sách bình luận
-
-    Route::post('comment', [CommentController::class, 'store']); // Thêm bình luận mới
-    Route::get('comment/{id}', [CommentController::class, 'show']); // Lấy chi tiết bình luận
-    Route::put('comment/{id}', [CommentController::class, 'update']); // Cập nhật bình luận
-    Route::delete('comment/{id}', [CommentController::class, 'destroy']); // Xóa bình luận
-    Route::get('/posts/{id}', [PostController::class, 'show']);
-    Route::post('/posts', [PostController::class, 'store']);
-    Route::put('/posts/{id}', [PostController::class, 'update']);
-    Route::delete('/posts/{id}', [PostController::class, 'destroy']);
+   
+   
 
 
      // Tạo hoặc lấy cuộc trò chuyện giữa hai người dùng
@@ -121,5 +111,6 @@ Route::middleware('auth:sanctum')->prefix('v1/')->group(function () {
      Route::resource("chat",ChatController::class);
      Route::delete('chat-message/{conversation}',[ChatController::class,"deleteMessage"]);
 
+    Route::apiResource('comment', CommentController::class);
    
 });
