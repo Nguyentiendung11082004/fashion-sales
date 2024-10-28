@@ -24,8 +24,8 @@ use App\Http\Controllers\Api\V1\Client\HomeProductController;
 use App\Http\Controllers\Api\V1\Client\ProductShopController;
 use App\Http\Controllers\Api\V1\Client\ChatController;
 use App\Http\Controllers\Api\V1\Client\ProductDetailController;
-
 use App\Http\Controllers\Api\V1\Client\InforUserController;
+use App\Http\Controllers\API\V1\Service\PaymentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -77,10 +77,10 @@ Route::prefix("v1/")->group(function () {
     Route::post("getwards",[CheckoutController::class,"getWards"]);
     Route::post("getavailableservices",[CheckoutController::class,"getAvailableServices"]);
     Route::post("calculateshippingfee",[CheckoutController::class,"calculateShippingFee"]);
+    Route::post('/payment/vnpay', [PaymentController::class, 'createPayment']);
+    Route::get('/payment/vnpay-return', [PaymentController::class, 'vnpayReturn']);
 
 
-
-    
 });
 
 Route::get('comment', [CommentController::class, 'index']);
