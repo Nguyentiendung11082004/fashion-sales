@@ -25,8 +25,12 @@ class ProductDetailController extends Controller
                 "category",
                 "galleries",
                 "tags",
-                "comments.user",
-
+                "comments" => function ($query) {
+                    $query->whereNull('parent_id') 
+                          ->latest('created_at'); 
+                },
+                "comments.user", 
+                "comments.childrenRecursive.user",
                 "variants.attributes"
             ])->findOrFail($id);
             $product->increment('views');

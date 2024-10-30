@@ -231,7 +231,7 @@ const FormEmployee = () => {
             </Select>
           </Form.Item>
           {errors.role_id && (
-            <div className="text-red-600">{errors.gender}</div>
+            <div className="text-red-600">{errors.role_id}</div>
           )}
 
           <Button

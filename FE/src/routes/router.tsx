@@ -4,6 +4,8 @@ import EmployeePage from "@/pages/admin/account/employee/Employee";
 import FormEmployee from "@/pages/admin/account/employee/components/FormEmployee";
 import AttributeItemValues from "@/pages/admin/attribute/attribute-item-values/page";
 import AttributeItem from "@/pages/admin/attribute/attribute-item/page";
+import Banners from "@/pages/admin/banners/Banners";
+import BannersForm from "@/pages/admin/banners/components/BannersForm";
 import Brands from "@/pages/admin/brands/Brands";
 import BrandForm from "@/pages/admin/brands/_components/BrandForm";
 import CategoryPage from "@/pages/admin/category/Category";
@@ -13,6 +15,8 @@ import CommentPage from "@/pages/admin/comments/Comments";
 import Dashboard from "@/pages/admin/dashboard/Dashboard";
 import LayoutAdmin from "@/pages/admin/layout";
 import OrderPage from "@/pages/admin/order/Order";
+import Posts from "@/pages/admin/posts/Posts";
+import FormPost from "@/pages/admin/posts/components/FormPost";
 import ProductDetailAdmin from "@/pages/admin/products/_components/ProductDetail";
 import ProductForm from "@/pages/admin/products/_components/ProductForm";
 import ProductPageManager from "@/pages/admin/products/page";
@@ -36,9 +40,6 @@ import { Route, Routes } from "react-router-dom";
 import HomePage from "../pages/client/home/HomePage";
 import LayoutWebsite from "../pages/client/layout";
 import { PasswordResetHandler } from "@/pages/client/auth/resetpassword/PasswordResetHandler";
-
-
-
 const Router = () => {
   return (
     <>
@@ -92,6 +93,12 @@ const Router = () => {
           <Route path="employees" element={<EmployeePage />} />
           <Route path="employees/create" element={<FormEmployee />} />
           <Route path="employees/edit/:id" element={<FormEmployee />} />
+          <Route path="banners" element={<Banners />} />
+          <Route path="banners/create" element={<BannersForm />} />
+          <Route path="banners/edit/:id" element={<BannersForm />} />
+          <Route path="posts" element={<Posts />} />
+          <Route path="posts/create" element={<FormPost />} />
+          <Route path="posts/edit/:id" element={<FormPost />} />
           <Route path="chatbox" element={<Chatbox />} />
         </Route>
         <Route path="*" element={<NotFound />} />
