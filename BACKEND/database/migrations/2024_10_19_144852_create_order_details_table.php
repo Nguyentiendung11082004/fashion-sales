@@ -17,17 +17,16 @@ return new class extends Migration
         Schema::create('order_details', function (Blueprint $table) {
             $table->id(); // ID của order_detail
             $table->foreignIdFor(Product::class)->constrained()->onDelete('cascade'); // Liên kết với bảng products
-            $table->foreignIdFor(ProductVariant::class)->constrained()->nullable()->onDelete('cascade'); // Liên kết với bảng product_variants nếu có
+            $table->foreignIdFor(ProductVariant::class)->nullable()->constrained()->onDelete('cascade'); // Liên kết với bảng product_variants nếu có
             $table->foreignIdFor(Order::class)->constrained()->onDelete('cascade'); // Liên kết với bảng orders
-            // $table->foreignIdFor('voucher_id')->nullable(); // Liên kết với bảng vouchers nếu có
             $table->string('product_name'); // Tên sản phẩm
             $table->string('product_img'); // Ảnh sản phẩm
             $table->json('attributes')->nullable(); // Các thuộc tính của sản phẩm nếu có
             $table->integer('quantity'); // Số lượng sản phẩm
             $table->decimal('price', 15, 2); // Giá sản phẩm
             $table->decimal('total_price', 15, 2); // Tổng giá trị của mục đơn hàng
+            $table->decimal('discount', 15, 2)->nullable();  // Giảm giá của sản phẩm, nếu có
             $table->timestamps(); // Thời gian tạo và cập nhật
-
             // Thêm chỉ mục
             $table->index('product_id');
             $table->index('order_id');

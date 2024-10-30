@@ -12,7 +12,8 @@ import Completed from "@/components/icons/checkout/Completed";
 import IconPay from "@/components/icons/checkout/IconPay";
 import User from "@/components/icons/checkout/User";
 import instance from "@/configs/axios";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { Button } from "antd";
 import { ChangeEvent, useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
@@ -52,7 +53,7 @@ const Checkout = () => {
     console.log("Raw Value:", e.target.value, "Converted Integer Value:", value);
     setIdQuanHuyen(value);
   };
-  
+
   const { data: quanHuyen } = useQuery<any>({
     queryKey: ['quanHuyen', idTinh],
     queryFn: async () => {
@@ -71,6 +72,42 @@ const Checkout = () => {
     },
     enabled: !!quanHuyen
   });
+  const mutationVnPay = useMutation({
+    mutationFn: async () => {
+      const res = await instance.post(`/payment/vnpay`, {
+        total_amount: "",
+        order_id: ""
+      })
+    }
+  })
+  const [voucher, setVoucher] = useState<any>();
+  const [subTotal, setSubTotal] = useState();
+  const [totalDiscount, setTotalDiscount] = useState();
+  const mutationVoucher = useMutation({
+    mutationFn: async () => {
+      const res = await instance.post(`/checkout`, {
+        cart_item_ids: cartIds || cartId,
+        voucher_code: voucher,
+      },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          }
+        }
+      )
+      console.log("res", res)
+      setTotalDiscount(res?.data?.total_discount)
+      setSubTotal(res?.data?.sub_total)
+      return res.data;
+    }
+  })
+
+  const handleVnPay = () => {
+    mutationVnPay.mutate()
+  }
+  const handleVoucher = () => {
+    mutationVoucher.mutate();
+  }
   // console.log("phuongXa", phuongXa)
   // useEffect(() => {
   //   getTinhThanh()
@@ -294,10 +331,10 @@ const Checkout = () => {
                                 className="hd-Label text-base font-medium text-neutral-900"
                                 data-nc-id="Label"
                               >
-                               Xã 
+                                Xã
                               </label>
                               <select className="hd-Select pl-[13px] outline-0 h-11 mt-1.5 block w-full text-sm rounded-2xl border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:bg-neutral-50 dark:focus:ring-primary-6000 dark:focus:ring-opacity-25">
-                                                               
+
                                 {
                                   phuongXa?.wards?.map((e: any) => (
                                     <option value={`${e?.WardsId}`}>{e?.WardName}</option>
@@ -313,7 +350,7 @@ const Checkout = () => {
                                 className="hd-Label text-base font-medium text-neutral-900"
                                 data-nc-id="Label"
                               >
-                                Tỉnh
+                                Quận/Huyện
                               </label>
                               <select onChange={handleChangeQuanHuyen} className="hd-Select pl-[13px] outline-0 h-11 mt-1.5 block w-full text-sm rounded-2xl border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:bg-neutral-50 dark:focus:ring-primary-6000 dark:focus:ring-opacity-25">
                                 {
@@ -407,7 +444,7 @@ const Checkout = () => {
                       </div>
                     </div>
                     {/*end hd-ShippingAddress*/}
-                    <div id="hd-PaymentMethod" className="scroll-mt-24">
+                    <button onClick={() => handleVnPay()} id="hd-PaymentMethod" className="scroll-mt-24">
                       <div className="border border-slate-200 rounded-xl">
                         <div className="p-6 flex flex-col sm:flex-row items-start">
                           <span className="hidden sm:block">
@@ -630,7 +667,7 @@ const Checkout = () => {
                         </div>
                         {/*end hd-form-change-PaymentMethod-none*/}
                       </div>
-                    </div>
+                    </button>
                     {/*end hd-PaymentMethod*/}
                   </div>
                 </div>
@@ -640,93 +677,96 @@ const Checkout = () => {
                   <h3 className="text-lg font-semibold mb-4">Đặt hàng</h3>
                   {isFetching ? <Loading /> :
                     dataCheckout?.order_items.map((e: any) => (
-                      <div className="relative flex  first:pt-0 last:pb-0">
-                        <div className="relative h-36 w-24 sm:w-28 flex-shrink-0 overflow-hidden  ">
-                          <img
-                            alt={e?.product?.name || "Product Image"}
-                            loading="lazy"
-                            decoding="async"
-                            data-nimg="fill"
-                            className="w-full object-contain object-center rounded-xl"
-                            sizes="150px"
-                            src={e?.variant?.image ? e?.variant?.image : e?.product?.img_thumbnail}
+                      <>
+                        <div className="relative flex  first:pt-0 last:pb-0">
+                          <div className="relative h-36 w-24 sm:w-28 flex-shrink-0 overflow-hidden  ">
+                            <img
+                              alt={e?.product?.name || "Product Image"}
+                              loading="lazy"
+                              decoding="async"
+                              data-nimg="fill"
+                              className="w-full object-contain object-center rounded-xl"
+                              sizes="150px"
+                              src={e?.variant?.image ? e?.variant?.image : e?.product?.img_thumbnail}
 
-                          />
-                          <Link className="absolute inset-0" to="/product-detail" />
-                        </div>
-                        <div className="ml-3 sm:ml-6 flex flex-1 flex-col">
-                          <div>
-                            <div className="flex justify-between">
-                              <div className="">
-                                <h3 className="text-base font-semibold">
-                                  <Link to="/product-detail">
-                                    {e?.product?.name}
-                                  </Link>
-                                </h3>
-                                <div className="mt-1.5  flex text-sm text-slate-600">
-                                  <div className="flex items-center ">
+                            />
+                            <Link className="absolute inset-0" to="/product-detail" />
+                          </div>
+                          <div className="ml-3 sm:ml-6 flex flex-1 flex-col">
+                            <div>
+                              <div className="flex justify-between">
+                                <div className="">
+                                  <h3 className="text-base font-semibold">
+                                    <Link to="/product-detail">
+                                      {e?.product?.name}
+                                    </Link>
+                                  </h3>
+                                  <div className="mt-1.5  flex text-sm text-slate-600">
+                                    <div className="flex items-center ">
 
-                                    {
-                                      e?.variant?.attributes?.map((z: any, index: number) => (
-                                        <span >
-                                          {z.pivot.value}
-                                          {index < e.variant.attributes.length - 1 && <span className="mx-2">/</span>}
-                                        </span>
-                                      ))
-                                    }
+                                      {
+                                        e?.variant?.attributes?.map((z: any, index: number) => (
+                                          <span >
+                                            {z.pivot.value}
+                                            {index < e.variant.attributes.length - 1 && <span className="mx-2">/</span>}
+                                          </span>
+                                        ))
+                                      }
+                                    </div>
+
+
                                   </div>
-
-
+                                  <div className="mt-3 flex justify-between w-full sm:hidden relative">
+                                    <select
+                                      name="qty"
+                                      id="qty"
+                                      className="form-select text-sm rounded-md py-1 border-slate-200 relative z-10"
+                                    >
+                                      <option value={1}>1</option>
+                                      <option value={2}>2</option>
+                                      <option value={3}>3</option>
+                                      <option value={4}>4</option>
+                                      <option value={5}>5</option>
+                                      <option value={6}>6</option>
+                                      <option value={7}>7</option>
+                                    </select>
+                                    <div>
+                                      <div className="flex items-center border-2 border-green-500 rounded-lg py-1 px-2 md:py-1.5 md:px-2.5 text-sm font-medium h-full">
+                                        <span className="text-green-500 !leading-none">
+                                          $74
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  {/*end-form-change-qty*/}
                                 </div>
-                                <div className="mt-3 flex justify-between w-full sm:hidden relative">
-                                  <select
-                                    name="qty"
-                                    id="qty"
-                                    className="form-select text-sm rounded-md py-1 border-slate-200 relative z-10"
-                                  >
-                                    <option value={1}>1</option>
-                                    <option value={2}>2</option>
-                                    <option value={3}>3</option>
-                                    <option value={4}>4</option>
-                                    <option value={5}>5</option>
-                                    <option value={6}>6</option>
-                                    <option value={7}>7</option>
-                                  </select>
-                                  <div>
-                                    <div className="flex items-center border-2 border-green-500 rounded-lg py-1 px-2 md:py-1.5 md:px-2.5 text-sm font-medium h-full">
-                                      <span className="text-green-500 !leading-none">
-                                        $74
-                                      </span>
+                                <div className="hidden flex-1 sm:flex justify-end">
+                                  <div className="mt-[1.7px]">
+                                    <div className="flex items-center text-sm font-medium">
+                                      {/* <del className="mr-1">{FormatMoney(e.variant.price_regular)}</del> */}
+                                      <span className="text-[red]">{e?.variant?.price_sale ? FormatMoney(e.variant.price_sale) : FormatMoney(e?.product?.price_sale)}</span>
                                     </div>
                                   </div>
                                 </div>
-                                {/*end-form-change-qty*/}
                               </div>
-                              <div className="hidden flex-1 sm:flex justify-end">
-                                <div className="mt-[1.7px]">
-                                  <div className="flex items-center text-sm font-medium">
-                                    {/* <del className="mr-1">{FormatMoney(e.variant.price_regular)}</del> */}
-                                    <span className="text-[red]">{e?.variant?.price_sale ? FormatMoney(e.variant.price_sale) : FormatMoney(e?.product?.price_sale)}</span>
-                                  </div>
+                            </div>
+                            <div className="flex items-end mt-6 justify-between text-sm">
+                              <div className="hidden sm:block text-center relative">
+                                <div className="flex items-center">
+                                  <span>Số lượng:  </span><p className="font-bold ml-2 text-base">{e?.quantity}</p>
                                 </div>
                               </div>
+                              <Link
+                                to="##"
+                                className="relative z-10 flex items-center mt-3 font-medium hover:text-[#00BADB] text-sm"
+                              >
+
+                              </Link>
                             </div>
-                          </div>
-                          <div className="flex items-end mt-6 justify-between text-sm">
-                            <div className="hidden sm:block text-center relative">
-                              <div className="flex items-center">
-                                <span>Số lượng:  </span><p className="font-bold ml-2 text-base">{e?.quantity}</p>
-                              </div>
-                            </div>
-                            <Link
-                              to="##"
-                              className="relative z-10 flex items-center mt-3 font-medium hover:text-[#00BADB] text-sm"
-                            >
-                             
-                            </Link>
                           </div>
                         </div>
-                      </div>
+
+                      </>
                     ))}
 
                   <div className="hd-checkout-pro mt-8 divide-y divide-slate-200/70">
@@ -746,8 +786,9 @@ const Checkout = () => {
                         <input
                           className="block w-full outline-0 border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50 rounded-2xl text-sm font-normal h-10 px-4 py-3 flex-1"
                           type="text"
+                          onChange={(e) => setVoucher(e.target.value)}
                         />
-                        <button className="text-gray-800 outline-0 border border-neutral-200 hover:bg-neutral-100 rounded-2xl px-4 ml-3 font-medium text-sm bg-neutral-200/70 dark:hover:bg-neutral-100 w-24 flex justify-center items-center transition-colors">
+                        <button onClick={() => handleVoucher()} className="text-gray-800 outline-0 border border-neutral-200 hover:bg-neutral-100 rounded-2xl px-4 ml-3 font-medium text-sm bg-neutral-200/70 dark:hover:bg-neutral-100 w-24 flex justify-center items-center transition-colors">
                           Áp dụng
                         </button>
                       </div>
@@ -767,16 +808,16 @@ const Checkout = () => {
                       <span className="font-semibold text-slate-900">5.000.000đ</span>
                     </div> */}
                     <div className="flex justify-between py-2.5 mt-2">
-                      <span>Tiền gốc</span>
+                      <span>Phí ship</span>
                       <span className="font-semibold text-slate-900">5.000.000đ</span>
                     </div>
-                     <div className="flex justify-between py-2.5">
+                    <div className="flex justify-between py-2.5">
                       <span>Voucher</span>
-                      <span className="font-semibold text-slate-900">5.000.000đ</span>
-                    </div> 
+                      <span className="font-semibold text-slate-900">{totalDiscount || 0}đ</span>
+                    </div>
                     <div className="flex justify-between font-semibold text-slate-900 text-base pt-4">
                       <span>Tổng tiền</span>
-                      <span>{FormatMoney(dataCheckout?.sub_total)}</span>
+                      <span>{FormatMoney(subTotal ? subTotal : dataCheckout?.sub_total)}</span>
                     </div>
                   </div>
                   {/*end hd-checkout-text-count*/}

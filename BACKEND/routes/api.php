@@ -24,8 +24,8 @@ use App\Http\Controllers\Api\V1\Client\HomeProductController;
 use App\Http\Controllers\Api\V1\Client\ProductShopController;
 use App\Http\Controllers\Api\V1\Client\ChatController;
 use App\Http\Controllers\Api\V1\Client\ProductDetailController;
-
 use App\Http\Controllers\Api\V1\Client\InforUserController;
+use App\Http\Controllers\API\V1\Service\PaymentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -77,24 +77,18 @@ Route::prefix("v1/")->group(function () {
     Route::post("getwards",[CheckoutController::class,"getWards"]);
     Route::post("getavailableservices",[CheckoutController::class,"getAvailableServices"]);
     Route::post("calculateshippingfee",[CheckoutController::class,"calculateShippingFee"]);
+    Route::post('/payment/vnpay', [PaymentController::class, 'createPayment']);
+    Route::get('/payment/vnpay-return', [PaymentController::class, 'vnpayReturn']);
 
 
-
-    
 });
 
-Route::get('comment', [CommentController::class, 'index']);
 Route::middleware('auth:sanctum')->prefix('v1/')->group(function () {
     Route::apiResource('cart', CartController::class);
     Route::apiResource('wishlist', WishlistController::class);
     Route::get('/user', [InforUserController::class, 'getInforUser']);
     Route::put('/user/update', [InforUserController::class, 'updateInforUser']);
     Route::post('logout', [AuthController::class, 'logout']);
-
-    // Client routes cho bình luận (comments)
-   
-   
-
 
      // Tạo hoặc lấy cuộc trò chuyện giữa hai người dùng
      Route::post('conversations', [ConversationController::class, 'store']);
