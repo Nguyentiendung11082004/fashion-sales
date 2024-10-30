@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\V1\Admin\EmployeeController;
 use App\Http\Controllers\Api\V1\Admin\AttributeController;
 use App\Http\Controllers\Api\V1\Admin\AttributeItemController;
 use App\Http\Controllers\Api\V1\Admin\BannerController;
+use App\Http\Controllers\Api\V1\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Api\V1\Admin\PostController;
 use App\Http\Controllers\Api\V1\Client\CommentController;
 use App\Http\Controllers\Api\V1\Client\CheckoutController;
@@ -58,6 +59,7 @@ Route::prefix("v1/")->group(function () {
     Route::resource('order', OrderController::class);
     Route::resource('checkout', CheckoutController::class);
     Route::apiResource('posts', PostController::class);
+    Route::apiResource('order-status', AdminOrderController::class);
     //Gửi mail
     Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
         ->middleware(['signed'])->name('verification.verify');
