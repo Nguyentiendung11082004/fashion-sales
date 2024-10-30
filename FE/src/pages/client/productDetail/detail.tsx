@@ -117,20 +117,6 @@ const ProductDetail = () => {
     }
   };
 
-  // Trạng thái lưu các bình luận cha đã mở
-  const [openComments, setOpenComments] = useState(new Set());
-
-  const toggleChildComments = (commentId: any) => {
-    const updatedOpenComments = new Set(openComments);
-    if (updatedOpenComments.has(commentId)) {
-      updatedOpenComments.delete(commentId);
-    } else {
-      updatedOpenComments.add(commentId);
-    }
-    setOpenComments(updatedOpenComments);
-  };
-
-  // Hàm render bình luận
   const renderComments = (
     comments: any,
     level = 0,
@@ -150,9 +136,6 @@ const ProductDetail = () => {
       displayedComments.add(comment.id);
 
       const isChild = level >= 3;
-      const hasChildren =
-        comment.children_recursive && comment.children_recursive.length > 0;
-      const isOpen = openComments.has(comment.id);
 
       return (
         <div key={comment.id} className="">
@@ -160,7 +143,6 @@ const ProductDetail = () => {
             className={`py-4 mb-2 ${isChild ? "mt-2 border-none" : "border-2 border-gray-200"}`}
             style={{ marginLeft: isChild ? "0px" : `${level * 50}px` }}
           >
-            {/* Bình luận cha */}
             <div className="flex items-start">
               <img
                 className={`w-10 h-10 border-black rounded-full mr-4 border-2`}
@@ -176,6 +158,7 @@ const ProductDetail = () => {
                       : ""}
                   </p>
                 )}
+
                 {level === 0 && (
                   <div className="flex">
                     {[...Array(comment?.rating || 0)].map((_, index) => (
@@ -185,12 +168,14 @@ const ProductDetail = () => {
                     ))}
                   </div>
                 )}
+
                 <p className="mt-2">
                   {level > 0 && parentName && (
                     <span className="font-bold">{parentName} </span>
                   )}
                   {comment?.content}
                 </p>
+
                 {comment?.image && (
                   <img
                     className="my-4 w-[150px] h-[150px]"
@@ -201,7 +186,6 @@ const ProductDetail = () => {
               </div>
             </div>
 
-            {/* Các nút chức năng cho người dùng */}
             <div className="pl-[60px]">
               {comment?.user_id === idUser ? (
                 <>
@@ -235,7 +219,6 @@ const ProductDetail = () => {
               )}
             </div>
 
-            {/* Hiện nút trả lời */}
             {replyToCommentId === comment.id && (
               <ReplyComment
                 productId={productId}
@@ -245,31 +228,21 @@ const ProductDetail = () => {
               />
             )}
 
-            {/* Hiển thị nút ẩn/hiện các bình luận con */}
-            {hasChildren && (
-              <button
-                onClick={() => toggleChildComments(comment.id)}
-                className="text-blue-500 mt-2 pl-[59px] text-sm font-semibold"
-              >
-                {isOpen
-                  ? "Ẩn phản hồi"
-                  : `Hiện ${comment.children_recursive.length} phản hồi`}
-              </button>
-            )}
-
-            {/* Render các bình luận con nếu mở */}
-            {isOpen &&
-              hasChildren &&
-              comment.children_recursive.map((childComment: any) => (
-                <div key={childComment.id}>
-                  {renderComments(
-                    [childComment],
-                    level + 1,
-                    displayedComments,
-                    comment.user.name
-                  )}
+            {comment.children_recursive &&
+              comment.children_recursive.length > 0 && (
+                <div>
+                  {comment.children_recursive.map((childComment: any) => (
+                    <div key={childComment.id}>
+                      {renderComments(
+                        [childComment],
+                        level + 1,
+                        displayedComments,
+                        comment.user.name
+                      )}
+                    </div>
+                  ))}
                 </div>
-              ))}
+              )}
           </div>
         </div>
       );

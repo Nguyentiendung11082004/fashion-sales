@@ -1,11 +1,10 @@
 /* eslint-disable prefer-const */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState, useEffect } from "react";
-import { Modal as AntModal, Skeleton } from "antd";
-import instance from "@/configs/axios";
-import { Button } from "antd";
 import { useAuth } from "@/common/context/Auth/AuthContext";
+import instance from "@/configs/axios";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Modal as AntModal, Button, Skeleton } from "antd";
+import { useEffect, useState } from "react";
 type Props = {
   open: boolean;
   onClose: () => void;

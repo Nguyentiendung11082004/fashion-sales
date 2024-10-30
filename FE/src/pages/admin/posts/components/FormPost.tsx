@@ -1,13 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { IUser } from "@/common/types/users";
 import instance from "@/configs/axios";
-import { createClient, updateClient } from "@/services/api/admin/clients";
+import { categoriesIndex } from "@/services/api/admin/categories";
 import { UploadOutlined } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Button,
-  DatePicker,
   Form,
   Input,
   message,
@@ -16,15 +14,14 @@ import {
   Upload,
   UploadProps,
 } from "antd";
-import { categoriesIndex } from "@/services/api/admin/categories";
 
+import { useAuth } from "@/common/context/Auth/AuthContext";
+import { IPost } from "@/common/types/post";
+import TextArea from "antd/es/input/TextArea";
 import { Option } from "antd/es/mentions";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import { useAuth } from "@/common/context/Auth/AuthContext";
-import { IPost } from "@/common/types/post";
-import TextArea from "antd/es/input/TextArea";
 
 const FormPost = () => {
   const [form] = Form.useForm();
@@ -93,6 +90,8 @@ const FormPost = () => {
   });
   const location = useLocation();
   const currentPage = location.state?.currentPage || 1;
+
+
   const updatePost = useMutation({
     mutationFn: async ({ data, id }: { data: IPost; id: string }) => {
       const res = await instance.put(`/posts/${id}`, data, {
@@ -138,6 +137,7 @@ const FormPost = () => {
   };
 
   const onFinish = (value: any) => {
+    console.log("value nè: ", value);
     if (urlImage) {
       value.img_thumbnail = urlImage;
     }
@@ -145,7 +145,7 @@ const FormPost = () => {
     value.featured = value.featured === "1" ? "1" : "0";
     console.log(value);
     if (id) {
-      updatePost.mutate({ data: value, id }); 
+      updatePost.mutate({ data: value, id });
     } else {
       createPost.mutate({
         ...value,

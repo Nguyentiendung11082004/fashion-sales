@@ -1,27 +1,25 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import Less from "@/components/icons/detail/Less";
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import HeartWhite from "@/components/icons/detail/HeartWhite";
-import Eye from "@/components/icons/detail/Eye";
-import CartDetail from "@/components/icons/detail/CartDetail";
-import "rc-slider/assets/index.css";
 import {
   colorTranslations,
   convertColorNameToClass,
 } from "@/common/colors/colorUtils";
-import instance from "@/configs/axios";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import NoDatasIcon from "@/components/icons/products/NoDataIcon";
-import { ResponseData } from "@/common/types/responseDataFilter";
-import unorm from "unorm";
-import { useWishlist } from "@/common/context/Wishlist/WishlistContext";
-import HeartRed from "@/components/icons/detail/HeartRed";
-import { Button, Spin } from "antd";
-import { LoadingOutlined } from "@ant-design/icons";
-import { useAuth } from "@/common/context/Auth/AuthContext";
 import { useCart } from "@/common/context/Cart/CartContext";
-import ModalBuyNow from "./_components/ModalBuyNow";
+import { useWishlist } from "@/common/context/Wishlist/WishlistContext";
+import { ResponseData } from "@/common/types/responseDataFilter";
+import CartDetail from "@/components/icons/detail/CartDetail";
+import Eye from "@/components/icons/detail/Eye";
+import HeartRed from "@/components/icons/detail/HeartRed";
+import HeartWhite from "@/components/icons/detail/HeartWhite";
+import Less from "@/components/icons/detail/Less";
+import NoDatasIcon from "@/components/icons/products/NoDataIcon";
+import instance from "@/configs/axios";
+import { LoadingOutlined } from "@ant-design/icons";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Spin } from "antd";
+import "rc-slider/assets/index.css";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import unorm from "unorm";
 
 const Products = () => {
   const [growboxDropdownOpen, setGrowboxDropdownOpen] = useState(false);
@@ -268,6 +266,7 @@ const Products = () => {
   const handleAddToCart = (idProduct: any, idProductVariant: any) => {
     addToCart(idProduct, idProductVariant);
   };
+
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
 

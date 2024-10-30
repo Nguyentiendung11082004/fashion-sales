@@ -72,8 +72,6 @@ const BannersForm = () => {
   });
   const location = useLocation();
   const currentPage = location.state?.currentPage || 1;
-  console.log('CURRENTpAGE',currentPage);
-  console.log("location.state?.currentPage",location.state?.currentPage);
 
   const updateBanner = useMutation({
     mutationFn: (data: IBanner) => bannerUpdate(Number(id), data),
