@@ -15,11 +15,11 @@ class PaymentController extends Controller
     public function createPayment($request)
     {
         try {
-           
-            $request->validate([
-                "order_id" => "required",
-                "total_amount" => "required"
-            ]);
+        //    bắt buộc gửi lên phải có order_id và total_amount
+            // $request->validate([
+            //     "order_id" => "required",
+            //     "total_amount" => "required"
+            // ]);
             $vnp_TmnCode = $this->vnp_TmnCode;
             $vnp_HashSecret = $this->vnp_HashSecret;
             $vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
@@ -91,25 +91,25 @@ class PaymentController extends Controller
 
         if ($secureHash === $vnp_SecureHash) {
             if ($vnp_ResponseCode == "00") {
-                return response()->json([
+                return[
                     'status' => 'success',
                     'message' => 'Thanh toán thành công!',
                     'order_id' => $vnp_TxnRef,
                     'amount' => $vnp_Amount / 100,
-                ]);
+                ];
             } else {
-                return response()->json([
+                return [
                     'status' => 'error',
                     'message' => 'Thanh toán thất bại!',
                     'order_id' => $vnp_TxnRef,
                     'error_code' => $vnp_ResponseCode,
-                ]);
+                ];
             }
         } else {
-            return response()->json([
+            return [
                 'status' => 'error',
                 'message' => 'Xác thực không hợp lệ!',
-            ]);
+            ];
         }
     }
 }

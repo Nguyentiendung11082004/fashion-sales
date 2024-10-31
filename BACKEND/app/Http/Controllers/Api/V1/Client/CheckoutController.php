@@ -475,7 +475,7 @@ class CheckoutController extends Controller
             'total_discount' => $voucher_discount, // Tổng số tiền giảm
         ];
     }
-
+    // lấy thông tin thành phố
     public function getProvinces()
     {
         try {
@@ -506,6 +506,7 @@ class CheckoutController extends Controller
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+    // lấy thông tin quận/ huyện
     public function getDistricts(Request $request)
     {
         try {
@@ -543,6 +544,7 @@ class CheckoutController extends Controller
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+    // lấy thông tin xã
     public function getWards(Request $request)
     {
         try {
@@ -613,6 +615,7 @@ class CheckoutController extends Controller
             curl_close($ch);
 
             $services = json_decode($response, true)['data'][0];
+            // dd($services);
            
             return  $services ;
         } catch (\Exception $ex) {
@@ -621,6 +624,7 @@ class CheckoutController extends Controller
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+    // tính phí vận chuyển
     public function calculateShippingFee(Request $request)
     {
         try {
