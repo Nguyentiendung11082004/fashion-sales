@@ -18,4 +18,7 @@ class VoucherMeta extends Model
     {
         return $this->belongsTo(Voucher::class);
     }
+
+    
+   
 }
