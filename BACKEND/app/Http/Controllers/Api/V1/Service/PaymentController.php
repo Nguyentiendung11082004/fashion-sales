@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers\API\V1\Service;
 
-use App\Http\Controllers\Controller;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
 
 class PaymentController extends Controller
 
@@ -15,19 +16,14 @@ class PaymentController extends Controller
     public function createPayment($request)
     {
         try {
-           
-            $request->validate([
-                "order_id" => "required",
-                "total_amount" => "required"
-            ]);
             $vnp_TmnCode = $this->vnp_TmnCode;
             $vnp_HashSecret = $this->vnp_HashSecret;
             $vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
             // trả về url mà bạn muốn hiển thị khi thanh toán thành công
             $vnp_Returnurl = "http://127.0.0.1:8000/api/v1/payment/vnpay-return";
 
-            $vnp_TxnRef = $request->order_id;
-            $vnp_Amount = $request->total_amount * 100;
+            $vnp_TxnRef = $request->id;
+            $vnp_Amount = $request->total * 100;
             $vnp_OrderInfo = str_replace(" ", "%20", "Payment for order #" . $vnp_TxnRef);
             $vnp_Locale = 'vn';
 
@@ -54,9 +50,9 @@ class PaymentController extends Controller
             $query = http_build_query($inputData);
             $vnp_Url = $vnp_Url . "?" . $query . '&vnp_SecureHash=' . $vnpSecureHash;
 
-            return response()->json([
+            return [
                 'payment_url' => $vnp_Url
-            ]);
+            ];
         } catch (\Exception $ex) {
             return response()->json([
                 "message" => $ex->getMessage(),
@@ -90,14 +86,31 @@ class PaymentController extends Controller
         $secureHash = hash_hmac('sha512', $hashData, $vnp_HashSecret);
 
         if ($secureHash === $vnp_SecureHash) {
-            if ($vnp_ResponseCode == "00") {
-                return response()->json([
-                    'status' => 'success',
-                    'message' => 'Thanh toán thành công!',
-                    'order_id' => $vnp_TxnRef,
-                    'amount' => $vnp_Amount / 100,
-                ]);
+            // Lấy đơn hàng từ CSDL dựa trên `vnp_TxnRef`
+            $order = Order::find($vnp_TxnRef);
+            if ($vnp_ResponseCode === "00") {
+                // dd($order);
+                if ($order) {
+                    // Cập nhật trạng thái thanh toán và các thông tin liên quan
+                    $order->update([
+                        'payment_status' => 'Đã thanh toán', // Cập nhật trạng thái thành công
+                    ]);
+                    return response()->json([
+                        'status' => 'success',
+                        'message' => 'Thanh toán thành công!',
+                        'order_id' => $vnp_TxnRef,
+                        'amount' => $vnp_Amount / 100,
+                    ]);
+                } else {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Không tìm thấy đơn hàng!',
+                    ]);
+                }
             } else {
+                $order->update([
+                    'payment_status' => 'Thanh toán online thất bại', // Cập nhật trạng thái
+                ]);
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Thanh toán thất bại!',
@@ -106,10 +119,10 @@ class PaymentController extends Controller
                 ]);
             }
         } else {
-            return response()->json([
+            return [
                 'status' => 'error',
                 'message' => 'Xác thực không hợp lệ!',
-            ]);
+            ];
         }
     }
 }

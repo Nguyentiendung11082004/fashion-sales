@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreignIdFor(Voucher::class)->onDelete('cascade'); // Liên kết đến bảng vouchers
             $table->foreignIdFor(User::class)->onDelete('cascade'); // Liên kết đến bảng users
             $table->foreignIdFor(Order::class)->onDelete('cascade'); // Liên kết đến bảng users
-            $table->enum('action', ['used', 'reverted']); // hoạt động:used, reverted(nếu đơn hàng được trả lại)
+            $table->enum('action', ['used', 'reverted'])->default('used'); // hoạt động:used, reverted(nếu đơn hàng được trả lại)
             $table->timestamps(); // Thời gian tạo và cập nhật
         });
     }

@@ -4,6 +4,7 @@ namespace App\Http\Requests\Order;
 
 use App\Models\Cart;
 use App\Models\Product;
+use App\Models\Voucher;
 use App\Models\CartItem;
 use App\Models\ProductVariant;
 use Illuminate\Foundation\Http\FormRequest;
@@ -48,71 +49,80 @@ class StoreOrderRequest extends FormRequest
             'cart_item_ids' => 'required_without:id_product|array',
             'cart_item_ids.*' => 'integer|exists:cart_items,id', // Kiểm tra từng ID của cart_item_ids
             'quantityOfCart.*' => 'required_without:id_product|integer|min:1', // Kiểm tra từng quantity tương ứng với cart_item_ids
-
+            'voucher_code' => 'nullable|string|exists:vouchers,code',
         ];
     }
     public function withValidator($validator)
-{
-    $validator->after(function ($validator) {
-        // Kiểm tra nếu mua ngay
-        if ($this->has('id_product')) {
-            $product = Product::find($this->id_product);
+    {
+        $validator->after(function ($validator) {
+            $this->validateProduct($validator);
+            $this->validateVoucher($validator);
+        });
+    }
 
-            if ($product->type) {  // Sản phẩm có biến thể
+    protected function validateProduct($validator)
+    {
+        if ($this->has('product_id')) {
+            $product = Product::find($this->product_id);
+
+            if ($product->type) { // Sản phẩm có biến thể
                 if (!$this->filled('product_variant_id')) {
                     $validator->errors()->add('product_variant_id', 'Vui lòng chọn biến thể sản phẩm.');
                 } else {
-                    $variant = ProductVariant::find($this->product_variant_id);
-                    if (!$variant || $variant->product_id != $product->id) {
-                        $validator->errors()->add('product_variant_id', 'Biến thể sản phẩm không hợp lệ.');
-                    } else {
-                        if ($this->quantity > $variant->quantity) {
-                            $validator->errors()->add('quantity', 'Số lượng mua vượt quá số lượng tồn kho của biến thể.');
-                        }
-                    }
+                    $this->validateVariant($validator, $product);
                 }
-            } else {  // Sản phẩm đơn
+            } else { // Sản phẩm đơn
                 if ($this->filled('product_variant_id')) {
                     $validator->errors()->add('product_variant_id', 'Sản phẩm đơn không có biến thể.');
                 }
-
                 if ($this->quantity > $product->quantity) {
                     $validator->errors()->add('quantity', 'Số lượng mua vượt quá số lượng tồn kho.');
                 }
             }
         }
+    }
 
-       // Kiểm tra nếu mua từ giỏ hàng
-       if ($this->has('cart_item_ids')) {
-        foreach ($this->cart_item_ids as $index => $itemId) {
-            $quantityFromRequest = $this->quantityOfCart[$itemId] ?? 0;  // Lấy số lượng từ request
-            $cartItem = CartItem::find($itemId);
-            if (!$cartItem) {
-                $validator->errors()->add("cart_item_ids.$index", "Giỏ hàng không hợp lệ.");
-                continue;
-            }
-            // Kiểm tra loại sản phẩm (sản phẩm đơn hoặc biến thể)
-            $product = $cartItem->product;
-
-            if ($product->type == 1) {  // Sản phẩm có biến thể (type = 1)
-                $variant = $cartItem->productVariant;
-
-                if (!$variant) {
-                    $validator->errors()->add("cart_item_ids.$index", "Biến thể sản phẩm không hợp lệ.");
-                } else {
-                    if ($quantityFromRequest > $variant->quantity) {
-                        $validator->errors()->add("quantityOfCart.$index", "Số lượng mua vượt quá số lượng tồn kho của biến thể.");
-                    }
-                }
-            } else {  // Sản phẩm đơn (type = 0)
-                if ($quantityFromRequest > $product->quantity) {
-                    $validator->errors()->add("quantityOfCart.$index", "Số lượng mua vượt quá số lượng tồn kho của sản phẩm.");
-                }
-            }
+    protected function validateVariant($validator, $product)
+    {
+        $variant = ProductVariant::find($this->product_variant_id);
+        if (!$variant || $variant->product_id != $product->id) {
+            $validator->errors()->add('product_variant_id', 'Biến thể sản phẩm không hợp lệ.');
+        } elseif ($this->quantity > $variant->quantity) {
+            $validator->errors()->add('quantity', 'Số lượng mua vượt quá số lượng tồn kho của biến thể.');
         }
     }
-    });
-}
+
+    protected function validateVoucher($validator)
+    {
+        if ($this->filled('voucher_code')) {
+            $voucher = Voucher::where('code', $this->voucher_code)->where('is_active', true)->first();
+
+            if (!$voucher) {
+                $validator->errors()->add('voucher_code', 'Voucher không hợp lệ.');
+                return;
+            }
+            $this->checkVoucherDates($validator, $voucher);
+            $this->checkVoucherUsage($validator, $voucher);
+        }
+    }
+
+    protected function checkVoucherDates($validator, $voucher)
+    {
+        if ($voucher->start_date && $voucher->start_date > now()) {
+            $validator->errors()->add('voucher_code', 'Voucher chưa bắt đầu.');
+        }
+
+        if ($voucher->end_date && $voucher->end_date < now()) {
+            $validator->errors()->add('voucher_code', 'Voucher đã hết hạn.');
+        }
+    }
+
+    protected function checkVoucherUsage($validator, $voucher)
+    {
+        if ($voucher->usage_limit && $voucher->used_count >= $voucher->usage_limit) {
+            $validator->errors()->add('voucher_code', 'Voucher đã hết lượt sử dụng.');
+        }
+    }
 
     protected function failedValidation(Validator $validator)
     {

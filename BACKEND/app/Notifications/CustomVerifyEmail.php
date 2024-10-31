@@ -18,8 +18,9 @@ class CustomVerifyEmail extends BaseVerifyEmail
             'verification.verify', // tên route xác thực
             Carbon::now()->addMinutes(60), // thời gian hết hạn
             [
-                'id' => $notifiable->getKey(), 
-                'hash' => sha1($notifiable->getEmailForVerification()),
+                'id'       => $notifiable->getKey(), 
+                'hash'     => sha1($notifiable->getEmailForVerification()),
+
             ]
         );
     }

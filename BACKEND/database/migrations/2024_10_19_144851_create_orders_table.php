@@ -33,7 +33,7 @@ return new class extends Migration
             $table->text('ship_user_address')->nullable(); // Địa chỉ người nhận
             $table->string('shipping_method')->nullable(); // Phương thức vận chuyển
             $table->foreignIdFor(Voucher::class)->nullable()->constrained()->onDelete('set null'); // Thêm khóa ngoại với cột voucher_id cho phép null
-            $table->decimal('voucher_discount', 15, 2)->nullable();  // Số tiền giảm giá từ voucher (nếu có)
+            $table->decimal('voucher_discount', 15, 2)->default(0);  // Số tiền giảm giá từ voucher (nếu có)
             $table->timestamps(); // Thời gian tạo và cập nhật
 
             // Thêm chỉ mục

@@ -25,7 +25,7 @@ return new class extends Migration
             $table->integer('quantity'); // Số lượng sản phẩm
             $table->decimal('price', 15, 2); // Giá sản phẩm
             $table->decimal('total_price', 15, 2); // Tổng giá trị của mục đơn hàng
-            $table->decimal('discount', 15, 2)->nullable();  // Giảm giá của sản phẩm, nếu có
+            $table->decimal('discount', 15, 2)->default(0);  // Giảm giá của sản phẩm, nếu có
             $table->timestamps(); // Thời gian tạo và cập nhật
             // Thêm chỉ mục
             $table->index('product_id');
