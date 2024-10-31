@@ -525,7 +525,20 @@ class OrderController extends Controller
                     'total_quantity' => $order->orderDetails()->count(),
                     'total' => $totalPrice,
                 ]);
-                return response()->json($order->load('orderDetails')->toArray(), Response::HTTP_CREATED);
+                // Thực hiện thanh toán nếu chọn phương thức online (VNPay)
+                // Thực hiện thanh toán nếu chọn phương thức online (VNPay)
+                if ($data['payment_method_id'] == 2) {
+                    $payment = new PaymentController();
+                    $response = $payment->createPayment($order);
+
+                    // Chuyển hướng người dùng đến trang thanh toán
+                    return response()->json(['payment_url' => $response['payment_url']], Response::HTTP_OK);
+                } else {
+                    // Nếu thanh toán thất bại, rollback và trả về lỗi
+                    DB::rollBack();
+                    return response()->json(['message' => 'Thanh toán đơn hàng thất bại!'], Response::HTTP_INTERNAL_SERVER_ERROR);
+                }
+                // return response()->json($order->load('orderDetails')->toArray(), Response::HTTP_CREATED);
             });
 
             return $response;
