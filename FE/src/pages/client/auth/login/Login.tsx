@@ -63,7 +63,8 @@ const Login = () => {
         />
         <div className="absolute lg:right-[12%] top-[10%]">
           {/* {
-            loading ? <Loading /> : ''
+            loading 
+            ? <Loading /> : ''
           } */}
           <div className="w-full m-9 p-[50px] lg:w-[450px] shadow-2xl border">
             <h2 className="text-2xl font-semibold text-gray-700 text-center">Đăng nhập</h2>

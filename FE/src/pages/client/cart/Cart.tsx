@@ -31,7 +31,7 @@ const Cart = () => {
     setVisible(false);
   };
   const { token } = useAuth();
-  const { data, isFetching,isLoading } = useQuery({
+  const { data, isFetching, isLoading } = useQuery({
     queryKey: ['cart'],
     queryFn: async () => {
       const res = await instance.get('/cart', {
@@ -68,12 +68,10 @@ const Cart = () => {
   const handleCheckout = () => {
     navigate('/checkout', { state: { cartIds: cartsId } });
   }
-
   const handleIncrease = (idCart: number, currentQuantity: number, qtyProductVarinat: any) => {
     const newQuantity = currentQuantity + 1;
     updateQuantity.mutate({ idCart, newQuantity, qtyProductVarinat });
   };
-
   const handleDecrease = (idCart: number, currentQuantity: number, qtyProductVarinat: any) => {
     const newQuantity = currentQuantity - 1;
     updateQuantity.mutate({ idCart, newQuantity, qtyProductVarinat });
@@ -99,7 +97,6 @@ const Cart = () => {
   const handleDeleteCart = (idCarts: number[]) => {
     deleteCart.mutate({ idCarts });
   };
-
   const handleAttribute = (idCart: any, variants: any) => {
     setIdCart(idCart);
     setVisible(true);
@@ -108,7 +105,6 @@ const Cart = () => {
       [idCart]: variants,
     }));
   };
-
   const handleUpdateAttributes = (idCart: any, attributes: any) => {
     setUpdatedAttributes({
       ...updatedAttributes,
@@ -134,7 +130,14 @@ const Cart = () => {
       attributes: attributesObject,
     };
   });
-
+  const [isAllChecked, setIsAllChecked] = useState(false);
+  const handleCheckAll = () => {
+    setIsAllChecked(!isAllChecked);
+    // Cập nhật trạng thái các checkbox trong giỏ hàng nếu cần
+    // setCarts((prevCarts) =>
+    //   prevCarts.map((item) => ({ ...item, checked: !isAllChecked }))
+    // );
+  };
   return (
     <>
       <main
@@ -154,27 +157,29 @@ const Cart = () => {
         </div>
         {/*end hd-page-head*/}
         <section className="hd-page-body text-[14px] lg:mt-[60px] mt-[30px] block m-0 p-0 border-0 isolate *:box-border">
-   
-
           <div className="hd-container block">
             <form className="hd-form-cart overflow-hidden relative">
               <div className="hd-pagecart-header text-sm uppercase font-semibold pt-5 pb-1.5 border-solid border-b-2">
                 <div className="flex flex-wrap mt-0 !items-center">
-                  <div className="lg:w-5/12 w-full flex-grow-0 flex-shrink-0 basis-auto hd-col-item">
+                  <div className="w-[5%] flex-grow-0 flex-shrink-0 basis-auto hd-col-item">
+                    <input type="checkbox" checked={isAllChecked}
+                      onChange={handleCheckAll} />
+                  </div>
+                  <div className="lg:w-[40%] w-full flex-grow-0 flex-shrink-0 basis-auto hd-col-item">
+                    {/* <input type="checkbox" /> */}
                     Sản phẩm
                   </div>
-                  <div className="w-3/12 flex-grow-0 flex-shrink-0 basis-auto hd-col-item !text-center hidden lg:block">
+                  <div className="w-[25%] flex-grow-0 flex-shrink-0 basis-auto hd-col-item !text-center hidden lg:block">
                     Giá
                   </div>
-                  <div className="w-2/12 flex-grow-0 flex-shrink-0 basis-auto hd-col-item !text-center hidden lg:block">
+                  <div className="w-[15%] flex-grow-0 flex-shrink-0 basis-auto hd-col-item !text-center hidden lg:block">
                     Số lượng
                   </div>
-                  <div className="w-2/12 flex-grow-0 flex-shrink-0 basis-auto hd-col-item lg:text-end text-right hidden lg:block">
+                  <div className="w-[15%] flex-grow-0 flex-shrink-0 basis-auto hd-col-item lg:text-end text-right hidden lg:block">
                     Tổng
                   </div>
                 </div>
               </div>
-              {/*end hd-pagecart-header*/}
               <div className="hd-pagecart-items">
                 <div className="hd-item relative overflow-hidden">
                   {
@@ -188,6 +193,9 @@ const Cart = () => {
                         <div className="hd-item-row lg:py-[2rem] py-[1rem] !items-center flex flex-wrap border-solid border-b-2">
                           <div className="hd-infor-item lg:w-5/12 w-full hd-col-item">
                             <div className="hd-infor !items-center !flex">
+                              <div className="mr-10">
+                                <input type="checkbox" />
+                              </div>
                               <Link
                                 to=""
                                 className="min-w-[120px] max-w-[120px] block overflow-hidden relative w-full touch-manipulation pb-[10px] lg:pb-0"
@@ -201,7 +209,6 @@ const Cart = () => {
                                 >
                                   {e?.product?.name}
                                 </Link>
-
                                 {/*end hd-price-item*/}
                                 {updatedAttributes.dataAttributes && Object.entries(updatedAttributes.dataAttributes).length > 0 ? (
                                   Object.entries(updatedAttributes.dataAttributes).map(([attributeName, attributeValue]) => {

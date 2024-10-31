@@ -8,7 +8,6 @@ const handleRequest = async (
   value?: Icomments
 ) => {
   try {
-    // const {data} = await instance[method](url, value);
     const { data } = await instance[method](url, value);
     return data;
   } catch (error) {

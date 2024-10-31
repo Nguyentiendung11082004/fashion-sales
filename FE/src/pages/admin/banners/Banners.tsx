@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Loading from "@/common/Loading/Loading";
+import { IBanner } from "@/common/types/banners";
 import { IUser } from "@/common/types/users";
-import { deleteEmployee, getEmployees } from "@/services/api/admin/employee";
+import { bannersDestroy, bannersIndex } from "@/services/api/admin/banners";
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button, Image, Modal, Pagination } from "antd";
@@ -12,28 +13,26 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
-const EmployeePage = () => {
-  const queryClient = useQueryClient();
+const Banner = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentEmployeeId, setCurrentEmployeeId] = useState<number | null>(
-    null
-  );
+  const [currentBanner, setcurrentBanner] = useState<number | null>(null);
+  const queryClient = useQueryClient();
   const initialPage = queryClient.getQueryData(["currentPage"]) || 1;
-
   const [currentPage, setCurrentPage] = useState(Number(initialPage));
 
   const [pageSize] = useState(5);
   const navigate = useNavigate();
-  const { data, isLoading } = useQuery({
-    queryKey: ["employees"],
-    queryFn: getEmployees,
+
+  const { data: dataBanner, isLoading } = useQuery({
+    queryKey: ["banners"],
+    queryFn: bannersIndex,
   });
-  console.log("data employees",data);
+  const data = dataBanner?.data;
 
   const { mutate } = useMutation({
-    mutationFn: deleteEmployee,
+    mutationFn: bannersDestroy,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["employees"] });
+      queryClient.invalidateQueries({ queryKey: ["banners"] });
       toast.success("Xoá thành công");
     },
     onError: () => {
@@ -41,11 +40,9 @@ const EmployeePage = () => {
     },
   });
 
-  const handleEdit = (id: number) => {
-    navigate(`edit/${id}`, { state: { currentPage } });
-  };
   useEffect(() => {
-    const totalItems = data?.data?.length || 0;
+    const totalItems = data?.banners?.length || 0;
+    console.log("data?.banners", data?.banners);
     const maxPage = Math.ceil(totalItems / pageSize);
 
     if (totalItems > 0 && currentPage > maxPage) {
@@ -54,19 +51,25 @@ const EmployeePage = () => {
   }, [data, currentPage, pageSize]);
 
   const showModal = (id: number | null) => {
-    setCurrentEmployeeId(id);
+    setcurrentBanner(id);
     setIsModalOpen(true);
   };
 
+  const handleEdit = (id: number) => {
+    navigate(`edit/${id}`, { state: { currentPage } });
+  };
+
   const handleOk = () => {
-    if (currentEmployeeId !== null) {
-      mutate(currentEmployeeId);
+    if (currentBanner !== null) {
+      mutate(currentBanner);
     }
     setIsModalOpen(false);
+    setcurrentBanner(null);
   };
 
   const handleCancel = () => {
     setIsModalOpen(false);
+    setcurrentBanner(null);
   };
 
   const column: ColumnType<IUser>[] = [
@@ -76,66 +79,60 @@ const EmployeePage = () => {
       render: (__: any, _: any, index: number) => (
         <div>{index + 1 + pageSize * (currentPage - 1)}</div>
       ),
+      width: 50,
     },
     {
-      title: "Name",
-      dataIndex: "name",
+      title: "Title",
+      dataIndex: "title",
+      width: 200,
     },
     {
-      title: "Avatar",
-      dataIndex: "avatar",
-      render: (avatar: string, _: IUser) => <Image src={avatar} width={100} />,
+      title: "Img",
+      dataIndex: "image",
+      render: (image: any) => (
+        <Image src={image} style={{ height: "50", margin: "0 auto" }} />
+      ),
+      width: 100,
     },
     {
-      title: "Phone",
-      dataIndex: "phone_number",
+      title: "Link",
+      dataIndex: "link",
+      width: 200,
     },
     {
-      title: "Email",
-      dataIndex: "email",
-    },
-    {
-      title: "Address",
-      dataIndex: "address",
-    },
-    {
-      title: "BirthDate",
-      dataIndex: "birth_date",
-      render: (birth_date: string) => {
-        const date = dayjs(birth_date);
+      title: "Ngày bắt đầu",
+      dataIndex: "start_date",
+      render: (start_date: string) => {
+        const date = dayjs(start_date);
         return date.isValid() ? date.format("DD/MM/YYYY") : "";
       },
+      width: 40,
     },
     {
-      title: "Gender",
-      dataIndex: "gender",
-      render: (gender: number | undefined) => {
-        if (typeof gender !== "number") return "";
-        return gender === 1 ? "Nam" : "Nữ";
+      title: "Ngày kết thúc",
+      dataIndex: "end_date",
+      render: (end_date: string) => {
+        const date = dayjs(end_date);
+        return date.isValid() ? date.format("DD/MM/YYYY") : "";
       },
+      width: 40,
     },
-    {
-      title: "Create At",
-      dataIndex: "create_at",
-      render: (create_at: string) => {
-        const date = dayjs(create_at);
-        return date.isValid() ? date.format("DD/MM/YYYY HH:mm:ss") : "N/A";
-      },
-    },
+
     {
       title: "Action",
       fixed: "right",
-      render: (employee: IUser) => (
+      width: 150,
+      render: (banner: IBanner) => (
         <div>
           <Button
             className="mx-2 bg-yellow-400 text-white"
-            onClick={() => handleEdit(employee.id)}
+            onClick={() => handleEdit(banner.id)}
           >
             <EditOutlined />
           </Button>
           <Button
             className="bg-red-500 text-white"
-            onClick={() => showModal(employee.id)}
+            onClick={() => showModal(banner.id)}
           >
             <DeleteOutlined />
           </Button>
@@ -149,17 +146,17 @@ const EmployeePage = () => {
             cancelText="Hủy"
             mask={false}
           >
-            <p>Bạn có chắc chắn muốn xóa tài khoản này không ?</p>
+            <p>Bạn có chắc chắn muốn xóa không ?</p>
           </Modal>
         </div>
       ),
     },
   ];
 
-  const dataSource = Array.isArray(data?.data)
-    ? data.data.map((employee: IUser) => ({
-        key: employee.id,
-        ...employee,
+  const dataSource = Array.isArray(data?.banners)
+    ? data.banners.map((banner: IBanner) => ({
+        key: banner.id,
+        ...banner,
       }))
     : [];
 
@@ -167,7 +164,7 @@ const EmployeePage = () => {
     <div className="p-6 min-h-screen">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2">
-          Nhân viên
+          Banner
         </h1>
         <Link to={`create`}>
           <Button
@@ -175,11 +172,12 @@ const EmployeePage = () => {
             type="primary"
           >
             <PlusOutlined className="mr-2" />
-            Thêm nhân viên
+            Thêm ảnh banner
           </Button>
         </Link>
       </div>
       <div className="">
+        <div className="flex space-x-4 py-4"></div>
         {isLoading ? (
           <Loading />
         ) : (
@@ -209,4 +207,4 @@ const EmployeePage = () => {
   );
 };
 
-export default EmployeePage;
+export default Banner;

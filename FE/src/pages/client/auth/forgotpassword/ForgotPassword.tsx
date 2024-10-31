@@ -17,11 +17,10 @@ const ForgotPassword = () => {
       toast.success(data.message)
     },
     onError: () => {
-      toast.error("That bai")
+      toast.error("Thất bại")
     }
   })
   const onSubmit = (value: any) => {
-    console.log(value)
     emailMutation.mutate(value);
   }
   return (

@@ -1,26 +1,25 @@
-import Less from "@/components/icons/detail/Less";
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import HeartWhite from "@/components/icons/detail/HeartWhite";
-import Eye from "@/components/icons/detail/Eye";
-import CartDetail from "@/components/icons/detail/CartDetail";
-import "rc-slider/assets/index.css";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   colorTranslations,
   convertColorNameToClass,
 } from "@/common/colors/colorUtils";
-import instance from "@/configs/axios";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import NoDatasIcon from "@/components/icons/products/NoDataIcon";
-import { ResponseData } from "@/common/types/responseDataFilter";
-import unorm from "unorm";
-import { useWishlist } from "@/common/context/Wishlist/WishlistContext";
-import HeartRed from "@/components/icons/detail/HeartRed";
-import { Button, Spin } from 'antd';
-import { LoadingOutlined } from '@ant-design/icons';
-import { useAuth } from "@/common/context/Auth/AuthContext";
 import { useCart } from "@/common/context/Cart/CartContext";
-import ModalBuyNow from "./_components/ModalBuyNow";
+import { useWishlist } from "@/common/context/Wishlist/WishlistContext";
+import { ResponseData } from "@/common/types/responseDataFilter";
+import CartDetail from "@/components/icons/detail/CartDetail";
+import Eye from "@/components/icons/detail/Eye";
+import HeartRed from "@/components/icons/detail/HeartRed";
+import HeartWhite from "@/components/icons/detail/HeartWhite";
+import Less from "@/components/icons/detail/Less";
+import NoDatasIcon from "@/components/icons/products/NoDataIcon";
+import instance from "@/configs/axios";
+import { LoadingOutlined } from "@ant-design/icons";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Spin } from "antd";
+import "rc-slider/assets/index.css";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import unorm from "unorm";
 
 const Products = () => {
   const [growboxDropdownOpen, setGrowboxDropdownOpen] = useState(false);
@@ -56,6 +55,7 @@ const Products = () => {
     sortPrice: null,
     sortAlphaOrder: null,
   });
+  const navigate = useNavigate();
 
   const { mutate } = useMutation({
     mutationFn: async (filters: any) => {
@@ -83,7 +83,6 @@ const Products = () => {
       console.error("Có lỗi xảy ra:", error);
     },
   });
-
   const applyFilters = useCallback(() => {
     const filters = {
       search: searchTerm,
@@ -262,6 +261,9 @@ const Products = () => {
       setToepfeDropdownOpen(false);
     }
   };
+
+ 
+
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
 
@@ -275,7 +277,6 @@ const Products = () => {
   //   // setIdCart('');
   //   setVisible(false);
   // };
-  const navigate = useNavigate();
   const { isLoading, addToCart } = useCart();
   const handleAddToCart = (idProduct: any, idProductVariant: any) => {
     addToCart(idProduct, idProductVariant)
@@ -283,7 +284,6 @@ const Products = () => {
   const buyNow = (idPr: any, qty: number) => {
     navigate('/checkout', { state: { cartId: idPr } });
   }
-
   return (
     <>
       <div>
@@ -844,13 +844,13 @@ const Products = () => {
                         }
                         checked={selectedColors.includes(
                           item.value.charAt(0).toUpperCase() +
-                          item.value.slice(1).toLowerCase()
+                            item.value.slice(1).toLowerCase()
                         )}
                         onChange={() =>
                           handleCheckboxChange(
                             "colors",
                             item.value.charAt(0).toUpperCase() +
-                            item.value.slice(1).toLowerCase()
+                              item.value.slice(1).toLowerCase()
                           )
                         }
                       />
@@ -861,7 +861,7 @@ const Products = () => {
                         <span className="text-slate-900 text-sm font-normal ">
                           {colorTranslations[
                             item.value.charAt(0).toUpperCase() +
-                            item.value.slice(1).toLowerCase()
+                              item.value.slice(1).toLowerCase()
                           ] || "No Size"}
                           {/*Dịch sang TViet và Chữ cái đầu viết hoa */}
                         </span>
@@ -1097,35 +1097,51 @@ const Products = () => {
                           </div>
                           <div className="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100">
                             <div className="group/btn relative">
-                              {
-                                product.variants.length > 0 ? (
-                                  <button className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]">
-                                    <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                                      Mua ngay
-                                    </p>
-                                    <Eye />
-                                  </button>
-                                ) : (
-                                  <button onClick={() => buyNow(product?.id, 1)} className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]">
-                                    <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                                      Mua ngay
-                                    </p>
-                                    <Eye />
-                                  </button>
-                                )
-                              }
+                              {product.variants.length > 0 ? (
+                                <button className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]">
+                                  <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
+                                    Mua ngay
+                                  </p>
+                                  <Eye />
+                                </button>
+                              ) : (
+                                <button
+                                  onClick={() => buyNow(product?.id, 1)}
+                                  className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]"
+                                >
+                                  <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
+                                    Mua ngay
+                                  </p>
+                                  <Eye />
+                                </button>
+                              )}
                             </div>
-                           
-
 
                             <Link to="" className="group/btn relative">
-                              <button onClick={() => handleAddToCart(product?.id, product?.variants[0]?.id)} className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]">
+                              <button
+                                onClick={() =>
+                                  handleAddToCart(
+                                    product?.id,
+                                    product?.variants[0]?.id
+                                  )
+                                }
+                                className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]"
+                              >
                                 <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
                                   Thêm vào giỏ hàng
                                 </p>
-                                {
-                                  isLoading ? <Spin indicator={<LoadingOutlined style={{ fontSize: 28, color: '#fff' }} />} className="translate-y-[-12px]" /> : <CartDetail />
-                                }
+                                {isLoading ? (
+                                  <Spin
+                                    indicator={
+                                      <LoadingOutlined
+                                        style={{ fontSize: 28, color: "#fff" }}
+                                      />
+                                    }
+                                    className="translate-y-[-12px]"
+                                  />
+                                ) : (
+                                  <CartDetail />
+                                )}
                               </button>
                             </Link>
                           </div>
@@ -1141,17 +1157,21 @@ const Products = () => {
                             >
                               <ul className="flex">
                                 {getUniqueAttributes &&
-                                  Object.entries(getUniqueAttributes).map(([key, value]) => (
-                                    <li key={key}>
-                                      {/* {key}:  */}
-                                      {Array.isArray(value)
-                                        ? value.map((v) => v.size || v).join(", ") // Lấy thuộc tính 'size' hoặc hiển thị giá trị trực tiếp
-                                        : typeof value === "object" && value !== null
-                                          ? Object.values(value).join(", ") // Hiển thị các giá trị của object
-                                          : String(value)}
-                                    </li>
-                                  ))}
-
+                                  Object.entries(getUniqueAttributes).map(
+                                    ([key, value]) => (
+                                      <li key={key}>
+                                        {/* {key}:  */}
+                                        {Array.isArray(value)
+                                          ? value
+                                              .map((v) => v.size || v)
+                                              .join(", ") // Lấy thuộc tính 'size' hoặc hiển thị giá trị trực tiếp
+                                          : typeof value === "object" &&
+                                              value !== null
+                                            ? Object.values(value).join(", ") // Hiển thị các giá trị của object
+                                            : String(value)}
+                                      </li>
+                                    )
+                                  )}
                               </ul>
                             </div>
                           </div>
@@ -1159,7 +1179,7 @@ const Products = () => {
                           {product.price_regular && (
                             <div>
                               {product.price_sale > 0 &&
-                                product.price_sale < product.price_regular ? (
+                              product.price_sale < product.price_regular ? (
                                 <>
                                   <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400">
                                     -
@@ -1167,7 +1187,7 @@ const Products = () => {
                                       ((product.price_regular -
                                         product.price_sale) /
                                         product.price_regular) *
-                                      100
+                                        100
                                     )}
                                     %
                                   </div>
@@ -1185,88 +1205,73 @@ const Products = () => {
                           </p>
                           {(product?.price_regular ||
                             product?.variants?.length) && (
-                              <div>
-                                {(() => {
-                                  const variants = product?.variants || [];
-                                  // Tính toán giá bán và giá gốc từ các biến thể
-                                  const minPriceSale = Math.min(
-                                    ...variants
-                                      .map((variant: any) => variant.price_sale)
-                                      .filter((price: any) => price >= 0)
-                                  );
-                                  const minPriceRegular = Math.min(
-                                    ...variants
-                                      .map(
-                                        (variant: any) => variant.price_regular
-                                      )
-                                      .filter((price: any) => price >= 0)
-                                  );
-                                  const maxPriceRegular = Math.max(
-                                    ...variants
-                                      .map(
-                                        (variant: any) => variant.price_regular
-                                      )
-                                      .filter((price: any) => price > 0)
-                                  );
-                                  const productPriceSale = product?.price_sale;
-                                  const productPriceRegular =
-                                    product?.price_regular;
+                            <div>
+                              {(() => {
+                                const variants = product?.variants || [];
+                                // Tính toán giá bán và giá gốc từ các biến thể
+                                const minPriceSale = Math.min(
+                                  ...variants
+                                    .map((variant: any) => variant.price_sale)
+                                    .filter((price: any) => price >= 0)
+                                );
+                                const minPriceRegular = Math.min(
+                                  ...variants
+                                    .map(
+                                      (variant: any) => variant.price_regular
+                                    )
+                                    .filter((price: any) => price >= 0)
+                                );
+                                const maxPriceRegular = Math.max(
+                                  ...variants
+                                    .map(
+                                      (variant: any) => variant.price_regular
+                                    )
+                                    .filter((price: any) => price > 0)
+                                );
+                                const productPriceSale = product?.price_sale;
+                                const productPriceRegular =
+                                  product?.price_regular;
 
-                                  // Điều kiện hiển thị
-                                  if (minPriceSale >= 0) {
-                                    // Nếu có giá sale
-                                    if (
-                                      productPriceSale &&
-                                      productPriceSale < productPriceRegular
-                                    ) {
-                                      return (
-                                        <>
-                                          <del className="mr-1">
-                                            {new Intl.NumberFormat(
-                                              "vi-VN"
-                                            ).format(productPriceRegular)}
-                                            ₫
-                                          </del>
-                                          <span className="text-[red]">
-                                            {new Intl.NumberFormat(
-                                              "vi-VN"
-                                            ).format(productPriceSale)}
-                                            ₫
-                                          </span>
-                                        </>
-                                      );
-                                    } else if (
-                                      productPriceSale &&
-                                      productPriceSale === productPriceRegular
-                                    ) {
-                                      return (
-                                        <span>
-                                          {new Intl.NumberFormat("vi-VN").format(
-                                            productPriceRegular
-                                          )}
+                                // Điều kiện hiển thị
+                                if (minPriceSale >= 0) {
+                                  // Nếu có giá sale
+                                  if (
+                                    productPriceSale &&
+                                    productPriceSale < productPriceRegular
+                                  ) {
+                                    return (
+                                      <>
+                                        <del className="mr-1">
+                                          {new Intl.NumberFormat(
+                                            "vi-VN"
+                                          ).format(productPriceRegular)}
+                                          ₫
+                                        </del>
+                                        <span className="text-[red]">
+                                          {new Intl.NumberFormat(
+                                            "vi-VN"
+                                          ).format(productPriceSale)}
                                           ₫
                                         </span>
-                                      );
-                                    } else {
-                                      return (
-                                        <span>
-                                          {new Intl.NumberFormat("vi-VN").format(
-                                            minPriceSale
-                                          )}
-                                          ₫ -{" "}
-                                          {new Intl.NumberFormat("vi-VN").format(
-                                            maxPriceRegular
-                                          )}
-                                          ₫
-                                        </span>
-                                      );
-                                    }
-                                  } else {
-                                    // Nếu không có giá sale, chỉ hiển thị khoảng giá regular
+                                      </>
+                                    );
+                                  } else if (
+                                    productPriceSale &&
+                                    productPriceSale === productPriceRegular
+                                  ) {
                                     return (
                                       <span>
                                         {new Intl.NumberFormat("vi-VN").format(
-                                          minPriceRegular
+                                          productPriceRegular
+                                        )}
+                                        ₫
+                                      </span>
+                                    );
+                                  } else {
+                                    return (
+                                      <span>
+                                        {new Intl.NumberFormat("vi-VN").format(
+                                          minPriceSale
                                         )}
                                         ₫ -{" "}
                                         {new Intl.NumberFormat("vi-VN").format(
@@ -1276,9 +1281,24 @@ const Products = () => {
                                       </span>
                                     );
                                   }
-                                })()}
-                              </div>
-                            )}
+                                } else {
+                                  // Nếu không có giá sale, chỉ hiển thị khoảng giá regular
+                                  return (
+                                    <span>
+                                      {new Intl.NumberFormat("vi-VN").format(
+                                        minPriceRegular
+                                      )}
+                                      ₫ -{" "}
+                                      {new Intl.NumberFormat("vi-VN").format(
+                                        maxPriceRegular
+                                      )}
+                                      ₫
+                                    </span>
+                                  );
+                                }
+                              })()}
+                            </div>
+                          )}
                         </div>
 
                         <div className="t4s-product-colors flex">
