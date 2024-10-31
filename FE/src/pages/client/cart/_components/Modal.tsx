@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useAuth } from '@/common/context/Auth/AuthContext';
 import { FormatMoney } from '@/common/utils/utils';
 import instance from '@/configs/axios';

@@ -92,8 +92,8 @@ const ProductDetail = () => {
   });
 
   // Phân trang
-  const [currentPage, setCurrentPage] = useState(1); // Trang hiện tại
-  const commentsPerPage = 3; // Số lượng bình luận mỗi trang
+  const [currentPage, setCurrentPage] = useState(1);
+  const commentsPerPage = 3;
 
   // Xác định vị trí của các bình luận trên trang hiện tại
   const indexOfLastComment = currentPage * commentsPerPage;
@@ -101,9 +101,9 @@ const ProductDetail = () => {
   const currentComments = comments?.slice(
     indexOfFirstComment,
     indexOfLastComment
-  ); // Các bình luận hiển thị trên trang hiện tại
+  );
 
-  const totalPages = Math.ceil(comments?.length / commentsPerPage); // Tổng số trang
+  const totalPages = Math.ceil(comments?.length / commentsPerPage);
 
   const handleNextPage = () => {
     if (currentPage < totalPages) {
@@ -160,7 +160,6 @@ const ProductDetail = () => {
             className={`py-4 mb-2 ${isChild ? "mt-2 border-none" : "border-2 border-gray-200"}`}
             style={{ marginLeft: isChild ? "0px" : `${level * 50}px` }}
           >
-            {/* Bình luận cha */}
             <div className="flex items-start">
               <img
                 className={`w-10 h-10 border-black rounded-full mr-4 border-2`}
@@ -201,7 +200,6 @@ const ProductDetail = () => {
               </div>
             </div>
 
-            {/* Các nút chức năng cho người dùng */}
             <div className="pl-[60px]">
               {comment?.user_id === idUser ? (
                 <>
@@ -235,7 +233,6 @@ const ProductDetail = () => {
               )}
             </div>
 
-            {/* Hiện nút trả lời */}
             {replyToCommentId === comment.id && (
               <ReplyComment
                 productId={productId}
@@ -245,7 +242,6 @@ const ProductDetail = () => {
               />
             )}
 
-            {/* Hiển thị nút ẩn/hiện các bình luận con */}
             {hasChildren && (
               <button
                 onClick={() => toggleChildComments(comment.id)}
@@ -257,7 +253,6 @@ const ProductDetail = () => {
               </button>
             )}
 
-            {/* Render các bình luận con nếu mở */}
             {isOpen &&
               hasChildren &&
               comment.children_recursive.map((childComment: any) => (
@@ -275,7 +270,6 @@ const ProductDetail = () => {
       );
     });
   };
-  // console.log("data detail: ", data)
   const [activeButton, setActiveButton] = useState("details");
 
   const handleButtonClick = (buttonName: string) => {
@@ -311,12 +305,15 @@ const ProductDetail = () => {
   const decreaseQuantity = () => {
     setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
   };
-  const onHandleAddToCart = (idProduct: any, idProductVariant: any) => {
+  const onHandleAddToCart = (
+    idProduct: any,
+    idProductVariant: any,
+    quantity: any
+  ) => {
     if (data.getUniqueAttributes == 0) {
       idProductVariant = undefined;
     }
-
-    addToCart(idProduct, idProductVariant);
+    addToCart(idProduct, idProductVariant, quantity);
   };
 
   const [selectedAttributes, setSelectedAttributes] = useState<{
@@ -715,7 +712,7 @@ const ProductDetail = () => {
                 </div>
 
                 <Button
-                  onClick={() => onHandleAddToCart(id, product?.id)}
+                  onClick={() => onHandleAddToCart(id, product?.id, quantity)}
                   className={`h-11 w-full px-2 py-2 rounded-full ...`}
                   disabled={isLoading}
                 >

@@ -262,8 +262,6 @@ const Products = () => {
     }
   };
 
- 
-
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
 
@@ -279,11 +277,11 @@ const Products = () => {
   // };
   const { isLoading, addToCart } = useCart();
   const handleAddToCart = (idProduct: any, idProductVariant: any) => {
-    addToCart(idProduct, idProductVariant)
-  }
+    addToCart(idProduct, idProductVariant);
+  };
   const buyNow = (idPr: any, qty: number) => {
-    navigate('/checkout', { state: { cartId: idPr } });
-  }
+    navigate("/checkout", { state: { cartId: idPr } });
+  };
   return (
     <>
       <div>
@@ -1072,6 +1070,9 @@ const Products = () => {
                   const inWishlist = isInWishlist(product.id);
 
                   return (
+                    // <Link to={`/products/${product.id}`}>
+                    // </Link>
+
                     <div
                       className="nc-ProductCard relative flex flex-col bg-transparent"
                       key={product.id}
@@ -1134,7 +1135,10 @@ const Products = () => {
                                   <Spin
                                     indicator={
                                       <LoadingOutlined
-                                        style={{ fontSize: 28, color: "#fff" }}
+                                        style={{
+                                          fontSize: 28,
+                                          color: "#fff",
+                                        }}
                                       />
                                     }
                                     className="translate-y-[-12px]"
@@ -1321,11 +1325,8 @@ const Products = () => {
                     </div>
                   );
                 })}
-                {/* )} */}
               </div>
             </div>
-
-            {/* end-products */}
           </div>
         </div>
       </div>
