@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers\API\V1\Service;
 
-use App\Http\Controllers\Controller;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
 
 class PaymentController extends Controller
 
@@ -85,36 +86,37 @@ class PaymentController extends Controller
         $secureHash = hash_hmac('sha512', $hashData, $vnp_HashSecret);
 
         if ($secureHash === $vnp_SecureHash) {
-            if ($vnp_ResponseCode == "00") {
-                if ($vnp_ResponseCode === "00") {
-                    // Lấy đơn hàng từ CSDL dựa trên `vnp_TxnRef`
-                    $order = Order::find($vnp_TxnRef);
-                    // dd($order);
-                    if ($order) {
-                        // Cập nhật trạng thái thanh toán và các thông tin liên quan
-                        $order->update([
-                            'payment_status' => 'Đã thanh toán', // Cập nhật trạng thái thành công
-                        ]);
-                        return response()->json([
-                            'status' => 'success',
-                            'message' => 'Thanh toán thành công!',
-                            'order_id' => $vnp_TxnRef,
-                            'amount' => $vnp_Amount / 100,
-                        ]);
-                    } else {
-                        return response()->json([
-                            'status' => 'error',
-                            'message' => 'Không tìm thấy đơn hàng!',
-                        ]);
-                    }
+            // Lấy đơn hàng từ CSDL dựa trên `vnp_TxnRef`
+            $order = Order::find($vnp_TxnRef);
+            if ($vnp_ResponseCode === "00") {
+                // dd($order);
+                if ($order) {
+                    // Cập nhật trạng thái thanh toán và các thông tin liên quan
+                    $order->update([
+                        'payment_status' => 'Đã thanh toán', // Cập nhật trạng thái thành công
+                    ]);
+                    return response()->json([
+                        'status' => 'success',
+                        'message' => 'Thanh toán thành công!',
+                        'order_id' => $vnp_TxnRef,
+                        'amount' => $vnp_Amount / 100,
+                    ]);
                 } else {
                     return response()->json([
                         'status' => 'error',
-                        'message' => 'Thanh toán thất bại!',
-                        'order_id' => $vnp_TxnRef,
-                        'error_code' => $vnp_ResponseCode,
+                        'message' => 'Không tìm thấy đơn hàng!',
                     ]);
                 }
+            } else {
+                $order->update([
+                    'payment_status' => 'Thanh toán online thất bại', // Cập nhật trạng thái
+                ]);
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Thanh toán thất bại!',
+                    'order_id' => $vnp_TxnRef,
+                    'error_code' => $vnp_ResponseCode,
+                ]);
             }
         } else {
             return [
