@@ -45,13 +45,20 @@ class OrderController extends Controller
     /**
      * Display the specified resource.
      */
-   public function show($id)
+    public function show($id)
     {
-        Log::info('Fetching order with ID: ' . $id); // Ghi log ID
+        Log::info('Fetching order with ID: ' . $id);
         try {
-            // Tìm đơn hàng theo ID và kèm chi tiết đơn hàng
-            $order = Order::with('orderDetails')->findOrFail($id);
-            return response()->json($order, Response::HTTP_OK);
+            // Lấy thông tin đơn hàng từ bảng Order
+            $order = Order::findOrFail($id);
+            $orderDetails = $order->orderDetails()->get();
+            // Kết hợp thông tin đơn hàng với các chi tiết
+            $orderData = [
+                'order' => $order,
+                'order_details' => $orderDetails,
+            ];
+    
+            return response()->json($orderData, Response::HTTP_OK);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             Log::error('Order not found: ' . $e->getMessage());
             return response()->json(['message' => 'Order not found'], Response::HTTP_NOT_FOUND);
@@ -61,7 +68,6 @@ class OrderController extends Controller
         }
     }
     
-
     
 
     /**
@@ -107,7 +113,6 @@ class OrderController extends Controller
         $currentStatus = $order->order_status;
         $newStatus = $request->input('order_status');
 
-        // Mảng ánh xạ trạng thái với giá trị số tương ứng
         $statusMap = [
             'Đang chờ xác nhận' => 1,
             'Đã xác nhận' => 2,
@@ -122,12 +127,10 @@ class OrderController extends Controller
             $newStatus = array_search((int)$newStatus, $statusMap);
         }
 
-        // Kiểm tra xem trạng thái mới có hợp lệ không
+        // Kiểm tra trạng thái đơn hàng 
         if (!array_key_exists($newStatus, $statusMap)) {
             return response()->json(['message' => 'Trạng thái không hợp lệ.'], Response::HTTP_BAD_REQUEST);
         }
-
-        // Áp dụng quy tắc trạng thái
         if (in_array($currentStatus, ['Giao hàng thành công', 'Đã hủy'])) {
             return response()->json(['message' => "Không thể thay đổi trạng thái \"$currentStatus\"."], Response::HTTP_BAD_REQUEST);
         }
@@ -152,7 +155,7 @@ class OrderController extends Controller
         $order->order_status = $newStatus;
         $order->save();
 
-        return response()->json(['message' => 'Cập nhật trạng thái thành công.', 'order' => $order], Response::HTTP_OK);
+        return response()->json(['message' => 'Cập nhật trạng thái đơn hàng thành công.', 'order' => $order], Response::HTTP_OK);
     } catch (\Exception $e) {
         return response()->json(['message' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
     }
