@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Loading from '@/common/Loading/Loading'
 import { Icategories } from '@/common/types/categories'
 import { IProductVariant, Iproduct } from '@/common/types/products'

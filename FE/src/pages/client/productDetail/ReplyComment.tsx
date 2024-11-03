@@ -121,10 +121,10 @@ const ReplyComment = ({
           initialValues={InForCommentId}
           className="flex justify-between items-center w-full"
         >
-          {/* {replyToCommentId ? "Phản hồi" : "Sửa phản hồi"} */}
           <div className="w-[90%] flex items-center">
             <Form.Item name="content" className="w-[85%]">
               <TextArea
+                autoFocus
                 placeholder="Nhập nhận xét của bạn"
                 rows={4}
                 className="h-full"

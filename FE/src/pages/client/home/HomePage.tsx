@@ -23,6 +23,7 @@ import LiveChat from "../liveChat/liveChat";
 import CartPopup from "@/components/ModalPopup/CartPopup";
 import DetailPopup from "@/components/ModalPopup/DetailPopup";
 import { Button } from "antd";
+import Post from "./Post";
 
 const HomePage = () => {
   const [trendProducts, setTrendProducts] = useState<any[]>([]);
@@ -41,8 +42,16 @@ const HomePage = () => {
       });
   }, []);
 
+
+  
+
   const modalRef = useRef<HTMLDialogElement>(null);
   const modalRefDetail = useRef<HTMLDialogElement>(null);
+
+
+
+
+  
 
   return (
     <>
@@ -536,7 +545,7 @@ const HomePage = () => {
             ))}
           </div>
         </section>
-        <section className="container mt-28">
+        {/* <section className="container mt-28">
           <div className="custom-heading ">
             <div className="flex-auto items-center mx-auto">
               <div className="mx-4 text-2xl font-bold text-gray-900">
@@ -600,7 +609,9 @@ const HomePage = () => {
               </span>
             </div>
           </div>
-        </section>
+        </section> */}
+
+        <Post />
 
         <Slideshow />
 

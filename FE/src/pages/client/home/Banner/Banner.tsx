@@ -15,12 +15,11 @@ const Banner = () => {
       try {
         return await instance.get(`/banners`);
       } catch (error) {
-        throw new Error("");
+        throw new Error("Error");
       }
     },
   });
 
-  console.log("data banners: ", data);
 
   useEffect(() => {
     const interval = setInterval(() => {

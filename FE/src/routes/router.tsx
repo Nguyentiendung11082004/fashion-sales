@@ -40,6 +40,9 @@ import { Route, Routes } from "react-router-dom";
 import HomePage from "../pages/client/home/HomePage";
 import LayoutWebsite from "../pages/client/layout";
 import { PasswordResetHandler } from "@/pages/client/auth/resetpassword/PasswordResetHandler";
+import Vouchers from "@/pages/admin/vouchers/Vouchers";
+import VoucherDetail from "@/pages/admin/vouchers/components/VoucherDetail";
+import FormVoucher from "@/pages/admin/vouchers/components/FormVoucher";
 const Router = () => {
   return (
     <>
@@ -59,7 +62,10 @@ const Router = () => {
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
         <Route path="account/forgotpassword" element={<ForgotPassword />} />
-        <Route path="/password/reset/:token" element={<PasswordResetHandler />} />
+        <Route
+          path="/password/reset/:token"
+          element={<PasswordResetHandler />}
+        />
         <Route path="password/reset" element={<ResetPassword />} />
         <Route path="/admin" element={<LayoutAdmin />}>
           <Route index element={<Dashboard />} />
@@ -100,6 +106,10 @@ const Router = () => {
           <Route path="posts/create" element={<FormPost />} />
           <Route path="posts/edit/:id" element={<FormPost />} />
           <Route path="chatbox" element={<Chatbox />} />
+          <Route path="vouchers" element={<Vouchers />} />
+          <Route path="vouchers/:id" element={<VoucherDetail />} />
+          <Route path="vouchers/create" element={<FormVoucher />} />
+          <Route path="vouchers/edit/:id" element={<FormVoucher />} />
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>

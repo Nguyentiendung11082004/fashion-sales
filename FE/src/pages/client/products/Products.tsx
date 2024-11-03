@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   colorTranslations,
@@ -1277,7 +1278,7 @@ const Products = () => {
                                         {new Intl.NumberFormat("vi-VN").format(
                                           minPriceSale
                                         )}
-                                        ₫ -{" "}
+                                        ₫ -
                                         {new Intl.NumberFormat("vi-VN").format(
                                           maxPriceRegular
                                         )}

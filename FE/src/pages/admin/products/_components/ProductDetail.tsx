@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { IProductVariant } from '@/common/types/products';
 import instance from '@/configs/axios';
 import { useQuery } from '@tanstack/react-query';
 import { Skeleton } from 'antd';
-import React from 'react';
 import { useParams } from 'react-router-dom';
 
 const ProductDetailAdmin = () => {

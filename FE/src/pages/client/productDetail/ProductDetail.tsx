@@ -69,9 +69,10 @@ const ProductDetail = () => {
   const comments = data?.product?.comments;
 
   // người dùng xóa, sửa bình luận
+
   // thông tin user đăng nhập
   const { user } = useUser();
-  const idUser = user?.["Infor User"].id;
+  const idUser = user?.InforUser.id;
 
   const queryClient = useQueryClient();
   const { mutate } = useMutation({
@@ -95,7 +96,6 @@ const ProductDetail = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const commentsPerPage = 3;
 
-  // Xác định vị trí của các bình luận trên trang hiện tại
   const indexOfLastComment = currentPage * commentsPerPage;
   const indexOfFirstComment = indexOfLastComment - commentsPerPage;
   const currentComments = comments?.slice(
