@@ -3,7 +3,7 @@
         'name' => 'laravel/laravel',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '2f229f323943e4446bd3e963d8bc04b4b44b9472',
+        'reference' => 'a2a5f199ca89292ad08e9e443ab76a5821e6a64c',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -391,10 +391,7 @@
         'laravel/laravel' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-
-            'reference' => '71dd86852bac7048156adcda81f6192000d46a3a',
-
-
+            'reference' => 'a2a5f199ca89292ad08e9e443ab76a5821e6a64c',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -816,9 +813,9 @@
             'dev_requirement' => false,
         ),
         'pusher/pusher-php-server' => array(
-            'pretty_version' => '7.2.4',
-            'version' => '7.2.4.0',
-            'reference' => 'de2f72296808f9cafa6a4462b15a768ff130cddb',
+            'pretty_version' => '7.2.6',
+            'version' => '7.2.6.0',
+            'reference' => 'd89e9997191d18fb0fe03a956fa3ccfe0af524ea',
             'type' => 'library',
             'install_path' => __DIR__ . '/../pusher/pusher-php-server',
             'aliases' => array(),
