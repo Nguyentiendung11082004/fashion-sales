@@ -18,7 +18,7 @@ use App\Http\Requests\Checkout\StoreCheckoutRequest;
 
 class CheckoutController extends Controller
 {
-   /* public function StoreOld(StoreCheckoutRequest $request)
+    /* public function StoreOld(StoreCheckoutRequest $request)
     {
         try {
             $data = $request->validated(); // Lấy dữ liệu đã xác thực
@@ -588,10 +588,10 @@ class CheckoutController extends Controller
     {
         try {
 
-            $from_district_id = $request["from_district_id"];
+
             $to_district_id = $request["to_district_id"];
             $weight = $request["weight"];
-          
+
             $api_key = '18f28540-8fbc-11ef-839a-16ebf09470c6';
 
 
@@ -602,7 +602,7 @@ class CheckoutController extends Controller
             curl_setopt($ch, CURLOPT_POST, 1);
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
                 'shop_id' => 5404595,  // Thay YOUR_SHOP_ID bằng mã shop GHN của bạn
-                'from_district' => $from_district_id,
+                'from_district' => 1804, //đan phượng
                 'to_district' => $to_district_id,
                 'weight' => $weight
             ]));
@@ -616,8 +616,8 @@ class CheckoutController extends Controller
 
             $services = json_decode($response, true)['data'][0];
             // dd($services);
-           
-            return  $services ;
+
+            return  $services;
         } catch (\Exception $ex) {
             return response()->json([
                 "message" => $ex->getMessage()
@@ -630,18 +630,24 @@ class CheckoutController extends Controller
         try {
            
             $request->validate([
-                "from_district_id" => "required",
+               
                 "to_district_id" => "required",
+                "to_ward_code" => "required|string",
                 "weight" => "required", //đơn vị tính g
-                
+
             ]);
-            
-           
-            $from_district_id = $request->from_district_id;
+
+
+            // $from_district_id = $request->from_district_id;
             $to_district_id = $request->to_district_id;
+            $to_ward_code = $request->to_ward_code;
+
             $weight = $request->weight;
-            $services=$this->getAvailableServices($request);
-            $service_id = $services["service_id"]; 
+
+
+            $services = $this->getAvailableServices($request);
+            // dd($services);
+            $service_id = $services["service_id"];
             $api_key = '18f28540-8fbc-11ef-839a-16ebf09470c6';
             $ch = curl_init();
 
@@ -649,12 +655,16 @@ class CheckoutController extends Controller
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($ch, CURLOPT_POST, 1);
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
+                "shop_id" => 5404595,
+
                 'service_id' => $service_id,
-                
-                'from_district_id' => $from_district_id,
-                'to_district_id' => $to_district_id,
-                'weight' => $weight,
+                // 100039
+                // 53321
                
+                'to_district_id' => $to_district_id,
+                "to_ward_code" => $to_ward_code,
+                'weight' => $weight,
+
             ]));
             curl_setopt($ch, CURLOPT_HTTPHEADER, [
                 'Token: ' . $api_key,

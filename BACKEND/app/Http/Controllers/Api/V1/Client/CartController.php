@@ -133,7 +133,7 @@ class CartController extends Controller
                     ]);
                 }
                 // \Log::info('Broadcasting CartEvent', ['cart_id' => $cart->id, 'cart_item' => $cartItem]);
-                broadcast(new CartEvent($cart->id, $cartItem))->toOthers();
+                // broadcast(new CartEvent($cart->id, $cartItem))->toOthers();
 
 
 
