@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1\Client;
 
+use App\Events\CartEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Helper\Product\GetUniqueAttribute;
 use App\Http\Requests\Cart\StoreCart;
@@ -123,7 +124,7 @@ class CartController extends Controller
                     $cartItem->save();
                 } else {
                     // Tạo mới mục giỏ hàng
-                    CartItem::create([
+                    $cartItem=CartItem::create([
                         'cart_id' => $cart->id,
                         'product_id' => $product->id,
                         'product_variant_id' => $variant ? $variant->id : null,
@@ -131,6 +132,9 @@ class CartController extends Controller
 
                     ]);
                 }
+                // \Log::info('Broadcasting CartEvent', ['cart_id' => $cart->id, 'cart_item' => $cartItem]);
+                // broadcast(new CartEvent($cart->id, $cartItem))->toOthers();
+
 
 
                 return response()->json(['message' => 'Thêm vào giỏ hàng thành công'], Response::HTTP_OK);

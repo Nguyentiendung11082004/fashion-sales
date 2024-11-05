@@ -91,8 +91,8 @@ class OrderController extends Controller
                 $order = Order::create([
                     'user_id' => $user['id'],
                     'payment_method_id' => $data['payment_method_id'],
-                    'order_status' => "Đang chờ xác nhận đơn hàng",
-                    'payment_status' => $data['payment_status'],
+                    // 'order_status' => "Đang chờ xác nhận đơn hàng",
+                    // 'payment_status' => $data['payment_status'],
                     'total_quantity' => 0,
                     'total' => 0.00,
                     'user_name' => $user['name'],
@@ -247,10 +247,11 @@ class OrderController extends Controller
                         return response()->json(['message' => $voucher_result['error']], Response::HTTP_BAD_REQUEST);
                     }
                     $totalPrice -= $voucher_result['total_discount'];
+                    $voucher = $voucher_result['voucher'];
                     // Cập nhật voucher_id và voucher_discount cho order
                     // dd($voucher_result['voucher_discount']);
                     $order->update([
-                        'voucher_id' => $voucher_result['voucher_id'],
+                        'voucher_id' => $voucher->id,
                         'voucher_discount' => $voucher_result['voucher_discount'],
                     ]);
                     // Cập nhật discount cho từng order detail
@@ -270,13 +271,13 @@ class OrderController extends Controller
                             ]);
                         }
                     }
+                    $voucher->increment('used_count', 1);
                 }
                 // Cập nhật tổng số lượng và tổng tiền cho đơn hàng
                 $order->update([
                     'total_quantity' => $order->orderDetails()->count(),
                     'total' => $totalPrice,
                 ]);
-                // Thực hiện thanh toán nếu chọn phương thức online (VNPay)
                 // Thực hiện thanh toán nếu chọn phương thức online (VNPay)
                 if ($data['payment_method_id'] == 2) {
                     $payment = new PaymentController();
@@ -287,7 +288,6 @@ class OrderController extends Controller
                 } 
                 return response()->json($order->load('orderDetails')->toArray(), Response::HTTP_CREATED);
             });
-
             return $response;
         } catch (\Exception $ex) {
             return response()->json(['message' => $ex->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -358,7 +358,7 @@ class OrderController extends Controller
         }
 
         return [
-            'voucher_id' => $voucher->id,
+            'voucher' => $voucher,
             'voucher_discount' => $voucher_discount['total_discount'],
             'voucher_description' => $voucher_discount['voucher_description'],
             'eligible_products' => $eligible_products,

@@ -7,7 +7,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Conversation;
 use App\Models\Message;
 use App\Models\User;
-use Dotenv\Util\Str;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -20,18 +19,46 @@ class ChatController extends Controller
      */
     public function index()
     {
-        //
         try {
             $user = Auth::user();
-            $menbership = User::query()->where('id', "<>", $user->id)->where("role_id", 2)->get();
-            $conversation = Conversation::query()->with(["users"=>function($query) use($user){
-                $query->wherePivot("user_id","<>",$user->id);
-            }])->get();
 
+            if (!$user) {
+                return response()->json([
+                    "message" => "User is not authenticated"
+                ], Response::HTTP_UNAUTHORIZED);
+            }
+            $conversations = Conversation::query()
+                ->with(['users' => function ($query) use ($user) {
+                    // Lọc để không lấy người dùng đã xóa cuộc trò chuyện
+                    $query->where(function ($query) use ($user) {
+                        $query->where('users.id', $user->id)
+                            ->where('conversation_users.is_deleted', 0);
+                    })->orWhere(function ($query) use ($user) {
+                        $query->where('users.id', '!=', $user->id); // Lấy người dùng khác không phụ thuộc vào is_deleted
+                    });
+                }])
+                ->whereHas('users', function ($query) use ($user) {
+                    $query->where('users.id', $user->id)
+                        ->where('conversation_users.is_deleted', 0);
+                })
+                ->get()
+                ->map(function ($conversation) use ($user) {
+                    // Chỉ giữ lại người đối thoại trong cuộc trò chuyện
+                    $otherUser = $conversation->users->first(function ($u) use ($user) {
+                        return $u->id !== $user->id;
+                    });
+
+                    // Ghi đè lại mảng `users` để chỉ chứa người đối thoại
+                    $conversationArray = $conversation->toArray();
+                    $conversationArray['users'] = $otherUser ? [$otherUser->toArray()] : [];
+
+                    return $conversationArray;
+                });
+
+            // dd($conversations->toArray());
             return response()->json([
-                "message" => "lấy dữ liệu thành công",
-                "menbership" => $menbership,
-                "conversation" => $conversation
+                "message" => "Lấy dữ liệu thành công",
+                "conversation" => $conversations
             ]);
         } catch (\Exception $ex) {
             return response()->json([
@@ -40,20 +67,10 @@ class ChatController extends Controller
         }
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+
         try {
             return  DB::transaction(function () use ($request) {
                 $request->validate([
@@ -63,12 +80,11 @@ class ChatController extends Controller
 
 
                 $user = $request->user();
-
-                $recipient_id = $request->recipient_id;
+                // dd($user->id);
+                $recipient_id = $request->input("recipient_id");
                 if ($recipient_id == $user->id) {
                     return response()->json([
                         "message" => "Bạn không thể gửi tin nhắn cho chính mình",
-
                     ], Response::HTTP_INTERNAL_SERVER_ERROR);
                 }
                 // Kiểm tra xem đã có cuộc trò chuyện giữa hai người chưa
@@ -77,10 +93,11 @@ class ChatController extends Controller
                 })->whereHas('users', function ($q) use ($recipient_id) {
                     $q->where('id', $recipient_id);
                 })->first();
-
+                // dd($conversation);
                 if (!$conversation) {
                     // Tạo cuộc trò chuyện mới
                     $conversation = Conversation::create();
+                    // dd($conversation);
                     $conversation->users()->attach([$user->id, $recipient_id]);
                 }
                 // Kiểm tra quyền truy cập
@@ -91,10 +108,12 @@ class ChatController extends Controller
 
 
                 // Tạo tin nhắn mới
-                $message = $conversation->messages()->create([
-                    'user_id' => $user->id,
-                    'content' => $request->input("content"),
+                $message = Message::query()->create([
+                    "user_id" => $user->id,
+                    "conversation_id" => $conversation->id,
+                    "content" => $request->input("content"),
                 ]);
+                // dd($message);
 
 
                 // Phát sự kiện MessageSent
@@ -119,24 +138,17 @@ class ChatController extends Controller
     {
         try {
 
-
             $user = request()->user();
+            // dd($user->toArray());
             $conversation = Conversation::query()->findOrFail($id);
-
-            // // $conversation->load('users');
-            // dd($conversation->load('users')->toArray());
+            // dd($conversation->users->contains("id", $user->id));
             if (!$conversation->users->contains("id", $user->id)) {
 
-                return response()->json(['error' => 'Unauthorized'], 403);
+                return response()->json(['error' => 'Bạn không có quyền truy cập'], 403);
             }
 
-            $messages = $conversation->messages()
-
-                ->with('user:id,name,email')
-
-                ->orderBy('created_at', 'asc')
-                ->get();
-            // dd($messages->toArray());
+            // Lấy tin nhắn và lọc theo is_deleted
+            $messages = $conversation->messages()->with('user:id,name,email' )->get();
 
             // Lấy danh sách người dùng từ các tin nhắn, sau đó loại bỏ trùng lặp
             $uniqueUsers = $messages->pluck('user')->unique('id')->values();
