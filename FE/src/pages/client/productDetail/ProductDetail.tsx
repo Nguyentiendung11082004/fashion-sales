@@ -71,7 +71,7 @@ const ProductDetail = () => {
   // người dùng xóa, sửa bình luận
   // thông tin user đăng nhập
   const { user } = useUser();
-  const idUser = user?.["Infor User"].id;
+  const idUser = user?.InforUser;
 
   const queryClient = useQueryClient();
   const { mutate } = useMutation({

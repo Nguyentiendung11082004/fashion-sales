@@ -24,7 +24,7 @@ const Header = (props: Props) => {
   const { user } = useUser();
   let infoUser;
   if (user) {
-    infoUser = user["Infor User"];
+    infoUser = user?.InforUser;
   }
   const { logout } = useAuth();
   const logoutUser = () => {

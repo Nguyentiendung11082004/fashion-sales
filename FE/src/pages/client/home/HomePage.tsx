@@ -50,7 +50,6 @@ const HomePage = () => {
         <Banner />
 
         <CategoryCarousel />
-
         <section className="container mt-28">
           <div className="custom-heading ">
             <div className="flex items-center mx-auto">
