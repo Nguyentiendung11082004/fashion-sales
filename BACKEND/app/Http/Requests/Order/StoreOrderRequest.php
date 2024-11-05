@@ -30,7 +30,7 @@ class StoreOrderRequest extends FormRequest
     {
         return [
             'payment_method_id' => 'required|integer|exists:payment_methods,id',
-            'payment_status' => 'required|string',
+            // 'payment_status' => 'required|string',
             'user_note' => 'nullable|string|max:255',
             'ship_user_name' => 'required|string|max:255',
             // Validate số điện thoại Việt Nam
