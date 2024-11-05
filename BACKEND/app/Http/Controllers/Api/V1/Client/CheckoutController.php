@@ -587,16 +587,10 @@ class CheckoutController extends Controller
     public function getAvailableServices($request)
     {
         try {
-
-
             $to_district_id = $request["to_district_id"];
             $weight = $request["weight"];
-
             $api_key = '18f28540-8fbc-11ef-839a-16ebf09470c6';
-
-
             $ch = curl_init();
-
             curl_setopt($ch, CURLOPT_URL, "https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/available-services");
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($ch, CURLOPT_POST, 1);
@@ -656,15 +650,10 @@ class CheckoutController extends Controller
             curl_setopt($ch, CURLOPT_POST, 1);
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
                 "shop_id" => 5404595,
-
                 'service_id' => $service_id,
-                // 100039
-                // 53321
-               
                 'to_district_id' => $to_district_id,
                 "to_ward_code" => $to_ward_code,
                 'weight' => $weight,
-
             ]));
             curl_setopt($ch, CURLOPT_HTTPHEADER, [
                 'Token: ' . $api_key,

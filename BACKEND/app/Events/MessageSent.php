@@ -24,6 +24,8 @@ class MessageSent implements ShouldBroadcast
     {
         $this->message = $message;
         $this->conversation = $message->conversation;
+       
+
     }
 
     /**
@@ -34,6 +36,7 @@ class MessageSent implements ShouldBroadcast
   
     public function broadcastOn()
     {
+       
         return new PresenceChannel('conversation.' . $this->conversation->id);
     }
 
