@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\API\V1\Service;
 
 use App\Models\Order;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use App\Models\ProductVariant;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 
@@ -109,8 +111,26 @@ class PaymentController extends Controller
                 }
             } else {
                 $order->update([
-                    'payment_status' => 'Thanh toán online thất bại', // Cập nhật trạng thái
+                    'payment_status' => 'Chưa thanh toán', // Cập nhật trạng thái
+                    'order_status' => 'Hủy',
                 ]);
+                foreach ($order->orderDetails as $detail) {
+                    // Kiểm tra nếu là sản phẩm có biến thể
+                    if ($detail->product_variant_id) {
+                        $variant = ProductVariant::find($detail->product_variant_id);
+                        if ($variant) {
+                            $variant->quantity += $detail->quantity; // Cộng lại số lượng vào biến thể
+                            $variant->save();
+                        }
+                    } else {
+                        // Nếu là sản phẩm đơn
+                        $product = Product::find($detail->product_id);
+                        if ($product) {
+                            $product->quantity += $detail->quantity; // Cộng lại số lượng vào sản phẩm
+                            $product->save();
+                        }
+                    }
+                }
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Thanh toán thất bại!',
