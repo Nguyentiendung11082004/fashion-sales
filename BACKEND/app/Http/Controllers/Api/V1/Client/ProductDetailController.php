@@ -26,10 +26,10 @@ class ProductDetailController extends Controller
                 "galleries",
                 "tags",
                 "comments" => function ($query) {
-                    $query->whereNull('parent_id') 
-                          ->latest('created_at'); 
+                    $query->whereNull('parent_id')
+                        ->latest('created_at');
                 },
-                "comments.user", 
+                "comments.user",
                 "comments.childrenRecursive.user",
                 "variants.attributes"
             ])->findOrFail($id);
@@ -59,11 +59,11 @@ class ProductDetailController extends Controller
             );
         }
     }
-    public function findvariant(Request $request,$id)
+    public function findvariant(Request $request, $id)
     {
         // dd($id);
         try {
-            return DB::transaction(function () use ($request,$id) {
+            return DB::transaction(function () use ($request, $id) {
                 $product = Product::query()->findOrFail($id)->load(["variants.attributes"])->toArray();
                 $productVariant = $request->input('product_variant');
                 $findProductVariant = $this->getUniqueAttributes->findVariantByAttributes($product["variants"], $productVariant);
