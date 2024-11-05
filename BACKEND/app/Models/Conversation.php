@@ -18,7 +18,5 @@ class Conversation extends Model
         return $this->belongsToMany(User::class,"conversation_users","conversation_id","user_id")
         ->withPivot('is_deleted')->wherePivot('is_deleted',false);
     }
-    // protected $casts=[
-    //     "is_deleted"=>"boolean"
-    // ];
+   
 }

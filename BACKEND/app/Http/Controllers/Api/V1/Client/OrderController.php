@@ -46,7 +46,10 @@ class OrderController extends Controller
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
-    public function store(StoreOrderRequest $request)
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store( StoreOrderRequest $request)
     {
         try {
             $data = $request->validated(); // Lấy dữ liệu đã xác thực
