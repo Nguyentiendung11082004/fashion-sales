@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import Loading from "@/common/Loading/Loading";
 import { Itags } from "@/common/types/tags";
-import { deleteTag, getTags } from "@/services/api/tags.api";
+import { deleteTag, getTags } from "@/services/api/admin/tags.api";
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button, Modal, Pagination, Table } from "antd";

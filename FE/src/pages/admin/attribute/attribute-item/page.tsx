@@ -1,6 +1,6 @@
 import Loading from "@/common/Loading/Loading";
 import { Iattribute } from '@/common/types/attribute';
-import { deleteAttributes, getAttributes } from '@/services/api/attribute';
+import { deleteAttributes, getAttributes } from '@/services/api/admin/attribute';
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button, Modal, Pagination, Table } from 'antd';
@@ -12,24 +12,19 @@ const AttributeItem: React.FC = () => {
     const [visible, setVisible] = useState(false);
     const [currentId, setCurrentId] = useState<number | undefined>();
     const queryClient = useQueryClient();
-    
     const { data, isFetching, isError } = useQuery({
         queryKey: ['attributes'],
         queryFn: getAttributes
     });
-
     const [currentPage, setCurrentPage] = useState(1);
     const pageSize = 5;
-
     const openModal = () => {
         setVisible(true);
     };
-
     const closeModal = () => {
         setVisible(false);
         setCurrentId(undefined);
     };
-
     const dataSource = data?.map((item: Iattribute) => ({
         key: item.id,
         ...item,

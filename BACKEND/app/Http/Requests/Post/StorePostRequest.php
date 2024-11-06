@@ -38,14 +38,14 @@ class StorePostRequest extends FormRequest
         return [
             'post_name' => 'required|string|min:3|max:255',  
             'post_content' => 'required|string|min:10',      
-            'post_view' => 'required|integer|min:0',         
+            // 'post_view' => 'required|integer|min:0',         
             'slug' => 'nullable|string|max:255|unique:posts,slug', 
             'img_thumbnail' => 'nullable|string|max:255',  // Thay đổi từ array thành chuỗi ký tự
             // 'description' => 'nullable|string|max:500',      
             'status' => 'required|boolean',                  
             
             'category_id' => 'nullable|exists:categories,id',
-            'featured' => 'nullable|boolean',                
+            'featured' => 'required|boolean',                
         ];
         
 }

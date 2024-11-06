@@ -56,7 +56,7 @@ class AuthController extends Controller
 
             return response()->json([
                 'token' => $token,
-                'message' => 'Login sucessfully!!'
+                'message' => 'Đăng nhập thành công'
             ]);
         } catch (\Throwable $th) {
             if ($th instanceof ValidationException) {
@@ -91,7 +91,7 @@ class AuthController extends Controller
             event(new Registered($user));
 
             return response()->json([
-                'message' => 'Register sucessfully!! Please verify your email.',
+                'message' => 'Đăng ký tài khoản thành công, Vui lòng check mail đẻ xác nhận',
                 'email'   => $user->email
                 // 'token' => $token
             ]);
@@ -219,7 +219,6 @@ class AuthController extends Controller
             $token = Password::createToken($user);
 
             // $url = route('password.reset', ['token' => str($token)]);
-
             $url = "http://localhost:5173/password/reset/" . $token;
 
             // Gửi thông báo qua queue

@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { IUser } from "@/common/types/users";
 import instance from "@/configs/axios";
-import { createClient, updateClient } from "@/services/api/clients";
+import { createClient, updateClient } from "@/services/api/admin/clients";
 import { UploadOutlined } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -231,7 +231,7 @@ const FormEmployee = () => {
             </Select>
           </Form.Item>
           {errors.role_id && (
-            <div className="text-red-600">{errors.gender}</div>
+            <div className="text-red-600">{errors.role_id}</div>
           )}
 
           <Button

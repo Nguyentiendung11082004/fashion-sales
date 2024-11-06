@@ -1,7 +1,12 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 import Loading from "@/common/Loading/Loading";
 import { Icategories } from "@/common/types/categories";
-import { categoriesDestroy, categoriesIndex } from "@/services/api/categories";
+import {
+  categoriesDestroy,
+  categoriesIndex,
+} from "@/services/api/admin/categories";
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button, Modal, Pagination, Table } from "antd";
@@ -14,86 +19,97 @@ const CategoryPage = () => {
   const [pageSize] = useState(5);
   const navigate = useNavigate();
   const [hasError, setHasError] = useState(false);
-  
-  const initialPage = queryClient.getQueryData(['currentCategoryPage']) || 1;
-  const [currentCategoryPage, setcurrentCategoryPage] = useState(Number(initialPage));
-  console.log("currentCategoryPage",currentCategoryPage)
+
+  const initialPage = queryClient.getQueryData(["currentCategoryPage"]) || 1;
+  const [currentCategoryPage, setcurrentCategoryPage] = useState(
+    Number(initialPage)
+  );
   const [visiable, setVisiable] = useState(false);
   const [currentId, setCurrentId] = useState<number | null>(null);
   const { data, isFetching, isError } = useQuery({
-    queryKey: ['categories'],
+    queryKey: ["categories"],
     queryFn: categoriesIndex,
-  })
+  });
   const { mutate } = useMutation({
     mutationFn: categoriesDestroy,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['categories'] });
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
       if (dataSource.length % pageSize === 1 && currentCategoryPage > 1) {
         setcurrentCategoryPage(currentCategoryPage - 1);
       }
-      toast.success('Xoá thành công');
+      toast.success("Xoá thành công");
     },
     onError: () => {
-      toast.error('Xoá thất bại');
-    }
+      toast.error("Xoá thất bại");
+    },
   });
 
   const handleOpen = (id: number) => {
     setVisiable((prev) => !prev);
-    setCurrentId(id)
-  }
+    setCurrentId(id);
+  };
   const hanldeRemove = () => {
     if (currentId) {
-      mutate(currentId)
-      setVisiable(false)
+      mutate(currentId);
+      setVisiable(false);
     }
-  }
+  };
 
   const handleEdit = (id: number) => {
-    navigate(`edit/${id}`, { state: { currentCategoryPage } })
-  }
+    navigate(`edit/${id}`, { state: { currentCategoryPage } });
+  };
 
   const columns = [
     {
-      title: 'Stt',
-      render: (text: any, record: any, index: number) => (<div>{(index + 1) + pageSize * (currentCategoryPage - 1)}</div>),
+      title: "Stt",
+      render: (text: any, record: any, index: number) => (
+        <div>{index + 1 + pageSize * (currentCategoryPage - 1)}</div>
+      ),
     },
     {
-      title: 'Name',
-      dataIndex: 'name',
+      title: "Name",
+      dataIndex: "name",
     },
     {
-      title: 'Img',
-      dataIndex: 'img_thumbnail',
-      render: (text: any, record: Icategories, index: number) => (<img src={record?.img_thumbnail} style={{ height: '60px', margin: '0 auto' }} alt={record?.name} />)
+      title: "Img",
+      dataIndex: "img_thumbnail",
+      render: (text: any, record: Icategories, index: number) => (
+        <img
+          src={record?.img_thumbnail}
+          style={{ height: "60px", margin: "0 auto" }}
+          alt={record?.name}
+        />
+      ),
     },
     {
-      title: 'Description',
-      dataIndex: 'description'
+      title: "Description",
+      dataIndex: "description",
     },
     {
-      title: 'Action',
+      title: "Action",
       render: (text: any, record: Icategories) => (
         <div>
-          <Button className="mx-2 btn-warning"
+          <Button
+            className="mx-2 btn-warning"
             onClick={() => handleEdit(record?.id)}
-          ><EditOutlined /></Button>
-          <Button className="btn-danger"
-            onClick={() => handleOpen(record?.id)}
-          ><DeleteOutlined /></Button>
+          >
+            <EditOutlined />
+          </Button>
+          <Button className="btn-danger" onClick={() => handleOpen(record?.id)}>
+            <DeleteOutlined />
+          </Button>
         </div>
-      )
-    }
-  ]
-  const dataSource = data?.map((item: Icategories, index: number) => (
-    {
+      ),
+    },
+  ];
+  const dataSource =
+    data?.map((item: Icategories, index: number) => ({
       key: index + 1,
-      ...item
-    }
-  )) || [];
+      ...item,
+    })) || [];
   useEffect(() => {
     if (isError && !hasError) {
-      toast.error('Có lỗi xảy ra');
+      toast.error("Có lỗi xảy ra");
       setHasError(true);
     }
   }, [isError, hasError]);
@@ -113,35 +129,38 @@ const CategoryPage = () => {
             </Link>
           </div>
         </div>
-        {
-          isFetching ? <Loading /> :
-            <>
-              <Table
-                className="custom-table"
-                dataSource={dataSource.slice((currentCategoryPage - 1) * pageSize, currentCategoryPage * pageSize)}
-                columns={columns}
-                pagination={false}
-              />
-              <Pagination
-                className="mt-4"
-                align="end"
-                current={currentCategoryPage}
-                total={dataSource.length}
-                pageSize={pageSize}
-                onChange={(page) => {
-                  setcurrentCategoryPage(page);
-                }}
-              />
-            </>
-        }
+        {isFetching ? (
+          <Loading />
+        ) : (
+          <>
+            <Table
+              className="custom-table"
+              dataSource={dataSource.slice(
+                (currentCategoryPage - 1) * pageSize,
+                currentCategoryPage * pageSize
+              )}
+              columns={columns}
+              pagination={false}
+            />
+            <Pagination
+              className="mt-4"
+              align="end"
+              current={currentCategoryPage}
+              total={dataSource.length}
+              pageSize={pageSize}
+              onChange={(page) => {
+                setcurrentCategoryPage(page);
+              }}
+            />
+          </>
+        )}
 
         <Modal
-          title={'Bạn có muốn xoá'}
+          title={"Bạn có muốn xoá"}
           open={visiable}
           onOk={() => hanldeRemove()}
           onCancel={() => setVisiable(false)}
         />
-
       </div>
     </>
   );
