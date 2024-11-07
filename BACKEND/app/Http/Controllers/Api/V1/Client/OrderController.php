@@ -49,9 +49,18 @@ class OrderController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store( StoreOrderRequest $request)
+    public function store( Request $request)
     {
+        echo 1;die;
         try {
+            
+            $test= new PaymentController();
+            
+            return $test->createPayment([
+                "id"=>1,
+                "total"=>1200
+            ]);
+            // StoreOrderRequest
             $data = $request->validated(); // Lấy dữ liệu đã xác thực
             // dd($data);
             // Kiểm tra xem người dùng có muốn mua ngay hay không
