@@ -315,13 +315,29 @@ const ProductDetail = () => {
     addToCart(idProduct, idProductVariant, quantity);
   };
 
-  // selectAttribute
   const [selectedAttributes, setSelectedAttributes] = useState<{
     product_variant: Record<string, string | number>;
   }>({
     product_variant: {},
   });
 
+  const result = product?.variants.map((variant: any) => {
+    if (!variant.attributes) {
+      return {};
+    }
+
+    const attributeObj = variant.attributes.reduce(
+      (acc: { [key: string]: number }, attribute: any) => {
+        acc[attribute.name] = attribute.pivot.attribute_item_id;
+        return acc;
+      },
+      {}
+    );
+    return attributeObj;
+  });
+
+  console.log("result: ", result);
+  
   const [dataAttributes, setAttribute] = useState<any>([]);
 
   const handleAttributeSelect = (attribute: any, id: any) => {
@@ -330,40 +346,6 @@ const ProductDetail = () => {
       [attribute]: id,
     }));
   };
-
-  const result = product?.variants
-    .filter(
-      (variant: any) => variant.attributes && variant.attributes.length > 0
-    )
-    .map((variant: any) => {
-      const attributeObj = variant.attributes.reduce(
-        (acc: { [key: string]: string }, attribute: any) => {
-          acc[attribute.name] = attribute.pivot.attribute_item_id.toString();
-          return acc;
-        },
-        {}
-      );
-      return attributeObj;
-    });
-  // const result = product?.variants.map((variant: any) => {
-  //   if (!variant.attributes) {
-  //     return {};
-  //   }
-
-  //   const attributeObj = variant.attributes.reduce(
-  //     (acc: { [key: string]: number }, attribute: any) => {
-  //       acc[attribute.name] = attribute.pivot.attribute_item_id;
-  //       return acc;
-  //     },
-  //     {}
-  //   );
-  //   attributeObj["quantity"] = variant.quantity;
-  //   return attributeObj;
-  // });
-
-  console.log("Result:", result);
-
-  console.log("getUniqueAttributes", getUniqueAttributes);
 
   const checkDisable = (attribute: string, value: any) => {
     let res = false;
@@ -385,40 +367,6 @@ const ProductDetail = () => {
 
     return res;
   };
-
-  console.log("getUniqueAttributes", getUniqueAttributes);
-
-  // const [isInitialLoad, setIsInitialLoad] = useState(true);
-  // useEffect(() => {
-  //   if (result && result.length > 0 && isInitialLoad) {
-  //     console.log("Setting selected attributes:", result[0]);
-  //     setSelectedAttributes({ product_variant: result[0] });
-  //     setIsInitialLoad(false);
-  //   }
-  // }, [result, isInitialLoad]);
-
-  // useEffect(() => {
-  //   console.log("Updated selectedAttributes:", selectedAttributes);
-  // }, [selectedAttributes]);
-  useEffect(() => {
-    if (getUniqueAttributes) {
-      const initialAttributes: IinitialAttributes = {};
-
-      const keys = Object.keys(getUniqueAttributes);
-
-      keys.forEach((key) => {
-        const value = getUniqueAttributes[key];
-        const firstValueId = Object.keys(value)[0];
-
-        if (firstValueId) {
-          initialAttributes[key] = firstValueId;
-        }
-      });
-
-      setSelectedAttributes({ product_variant: initialAttributes });
-    }
-  }, [getUniqueAttributes]);
-  console.log("setSelectedAttributes", selectedAttributes);
 
   useEffect(() => {
     const fetchProductVariant = async () => {
@@ -453,6 +401,25 @@ const ProductDetail = () => {
       name,
     })),
   }));
+
+  useEffect(() => {
+    if (getUniqueAttributes) {
+      const initialAttributes: IinitialAttributes = {};
+
+      const keys = Object.keys(getUniqueAttributes);
+
+      keys.forEach((key) => {
+        const value = getUniqueAttributes[key];
+        const firstValueId = Object.keys(value)[0];
+
+        if (firstValueId) {
+          initialAttributes[key] = firstValueId;
+        }
+      });
+
+      setSelectedAttributes({ product_variant: initialAttributes });
+    }
+  }, [getUniqueAttributes]);
 
   const [editIdComment, setEditIdComment] = useState<string | null>(null);
   const [InForCommentId, setInForCommentId] = useState<string | null>(null);

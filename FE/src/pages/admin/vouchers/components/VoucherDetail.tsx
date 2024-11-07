@@ -15,6 +15,21 @@ const VoucherDetail = () => {
       }
     },
   });
+  const { data: dataProducts } = useQuery({
+    queryKey: ["products"],
+    queryFn: async () => {
+      try {
+        return await instance.get(`/products`);
+      } catch (error) {
+        throw new Error("Error");
+      }
+    },
+  });
+
+  const listProducts = dataProducts?.data?.data;
+  console.log("listProduct", listProducts);
+
+  console.log("dataProduct: ", dataProducts);
 
   console.log("data detail", data);
   const voucher = data?.data?.data?.voucher;
@@ -96,24 +111,53 @@ const VoucherDetail = () => {
               </h2>
               <span className="font-bold">Đối tượng áp dụng giảm giá: </span>
               <div className="">
-                {meta_data.map((value: any) => (
-                  <div className="p-4 bg-white border border-gray-300 rounded-lg shadow-md mt-2">
-                    <h2 className="text-base">
-                      <h2 className="text-base font-bold">
-                        Danh mục: "{value.meta_key}"
-                      </h2>
-                    </h2>
-                    <div className="grid grid-cols-4 gap-2 mt-2">
-                      {value.category_names.map((name: any) => (
-                        <>
+                {meta_data?.length === 0 ? (
+                  <p>No data available</p>
+                ) : (
+                  meta_data.map((value: any, index: number) => (
+                    <div
+                      key={index}
+                      className="p-4 bg-white border border-gray-300 rounded-lg shadow-md mt-2"
+                    >
+                      <h2 className="text-base font-bold">{value.name}</h2>
+                      <div className="grid grid-cols-4 gap-2 mt-2">
+                        {value.item_names?.map(
+                          (name: any, nameIndex: number) => (
+                            <div
+                              key={nameIndex}
+                              className="flex items-center justify-center p-2 bg-yellow-100 border border-yellow-300 rounded-lg text-center text-sm"
+                            >
+                              {name}
+                            </div>
+                          )
+                        )}
+                        {value.max_discount_amount && (
                           <div className="flex items-center justify-center p-2 bg-yellow-100 border border-yellow-300 rounded-lg text-center text-sm">
-                            {name}
+                            {value.max_discount_amount}
                           </div>
-                        </>
-                      ))}
+                        )}
+
+                        {value.meta_key === "_voucher_product_ids" ||
+                          (value.meta_key ===
+                            "_voucher_exclude_product_ids" && (
+                            <div className="flex items-center justify-center p-2 bg-yellow-100 border border-yellow-300 rounded-lg text-center text-sm">
+                              {meta_data.meta_value?.map((dataMeta: any) =>
+                                listProducts?.map((data: any) =>
+                                  dataMeta === data.id ? (
+                                    <div key={data.id}>
+                                      <p>{data.name}</p>
+                                    </div>
+                                  ) : (
+                                    ""
+                                  )
+                                )
+                              )}
+                            </div>
+                          ))}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
             </div>
           </>

@@ -42,16 +42,8 @@ const HomePage = () => {
       });
   }, []);
 
-
-  
-
   const modalRef = useRef<HTMLDialogElement>(null);
   const modalRefDetail = useRef<HTMLDialogElement>(null);
-
-
-
-
-  
 
   return (
     <>
@@ -545,71 +537,6 @@ const HomePage = () => {
             ))}
           </div>
         </section>
-        {/* <section className="container mt-28">
-          <div className="custom-heading ">
-            <div className="flex-auto items-center mx-auto">
-              <div className="mx-4 text-2xl font-bold text-gray-900">
-                BÀI VIẾT MỚI NHẤT
-              </div>
-            </div>
-          </div>
-          <div className="text-center mx-auto italic mt-2 custom-heading-sub mb-10">
-            <i>Tin tức mới nhất và thú vị nhất</i>
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-3 lg:gap-8 md:grid-cols-3 md:gap-4">
-            <div className="">
-              <div className="overflow-hidden ">
-                <img
-                  src={Blog1}
-                  className="hd-animation-border hover:scale-[1.2] hover:translate-2  transition-all ease-in-out duration-500"
-                />
-              </div>
-              <h3 className="mt-4 font-semibold text-xl text-hover transition-all ease-in-out duration-200">
-                Xu Hướng Xuân – Hè 2020
-              </h3>
-              <p className="mt-2 mb-4">Thêm vào ngày 11 tháng 5 năm 2022</p>
-              <span className="text-[#909090] ">
-                Kiểu chữ là công việc của người sắp chữ, người soạn nhạc, người
-                đánh máy, người đồ họa nhà thiết kế, giám đốc nghệ thuật, manga
-                nghệ sĩ,...
-              </span>
-            </div>
-            <div>
-              <div className="overflow-hidden mt-4 lg:mt-0 md:mt-0">
-                <img
-                  src={Blog2}
-                  className="hd-animation-border hover:scale-[1.2] hover:translate-2 transition-all ease-in-out duration-500"
-                />
-              </div>
-              <h3 className="mt-4 font-semibold text-xl text-hover transition-all ease-in-out duration-200">
-                Cách dễ nhất để đột phá Đứng đầu
-              </h3>
-              <p className="mt-2 mb-4">Thêm vào ngày 11 tháng 5 năm 2022</p>
-              <span className="text-[#909090] ">
-                Kiểu chữ là công việc của người sắp chữ, người soạn nhạc, người
-                đánh máy, người đồ họa nhà thiết kế, giám đốc nghệ thuật, manga
-                nghệ sĩ,...
-              </span>
-            </div>
-            <div>
-              <div className="overflow-hidden mt-4 lg:mt-0 md:mt-0">
-                <img
-                  src={Blog3}
-                  className="hd-animation-border hover:scale-[1.2] hover:translate-2  transition-all ease-in-out duration-500"
-                />
-              </div>
-              <h3 className="mt-4 font-semibold text-xl text-hover transition-all ease-in-out duration-200">
-                Phong cách dành cho cặp đôi
-              </h3>
-              <p className="mt-2 mb-4">Thêm vào ngày 11 tháng 5 năm 2022</p>
-              <span className="text-[#909090] ">
-                Kiểu chữ là công việc của người sắp chữ, người soạn nhạc, người
-                đánh máy, người đồ họa nhà thiết kế, giám đốc nghệ thuật, manga
-                nghệ sĩ,...
-              </span>
-            </div>
-          </div>
-        </section> */}
 
         <Post />
 

@@ -113,7 +113,6 @@ const CommentProduct = ({
     onChange(info) {
       if (info.file.status === "done") {
         setUrlImage(info.file.response.url);
-        // message.success("Upload ảnh thành công");
       } else if (info.file.status === "error") {
         message.error(`${info.file.name} file upload failed.`);
       }
@@ -209,9 +208,18 @@ const CommentProduct = ({
       </Form.Item>
       {errors && <div className="text-red-600">{errors.image}</div>}
 
-      <div className="text-center">
+      <div className="flex justify-center items-center ">
         <Button
-          className="text-center mt-2"
+          className="text-center text-red-500 mr-[20px]"
+          onClick={() => {
+            setEditIdComment(null);
+            setInForCommentId(null);
+          }}
+        >
+          <span className="text-[12px]">Hủy</span>
+        </Button>
+        <Button
+          className="text-center "
           htmlType="submit"
           type="primary"
           loading={isLoading}
