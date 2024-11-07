@@ -33,7 +33,6 @@ const Cart = () => {
     setVisible(false);
   };
   const { token } = useAuth();
-
   const { data, isFetching, isLoading } = useQuery({
     queryKey: ['cart'],
     queryFn: async () => {
@@ -45,7 +44,6 @@ const Cart = () => {
       return res.data;
     },
   });
-
   const updateQuantity = useMutation({
     mutationFn: async ({ idCart, newQuantity, qtyProductVarinat }: { idCart: number; newQuantity: number, qtyProductVarinat: any }) => {
       await instance.put(`/cart/${idCart}`, {
@@ -68,21 +66,6 @@ const Cart = () => {
       })
     }
   });
-  console.log("idCart", idCart)
-  const handleCheckout = () => {
-    if (idCart == "") {
-      MySwal.fire({
-        title: <strong>Cảnh báo</strong>,
-        icon: "error",
-        text: "Mày chưa chon sản phẩm nào để thanh toán",
-        timer: 1500,
-        timerProgressBar: true,
-        showConfirmButton: false,
-      });
-      return;
-    }
-    navigate('/checkout', { state: { cartIds: idCart } });
-  }
   const handleIncrease = (idCart: number, currentQuantity: number, qtyProductVarinat: any) => {
     const newQuantity = currentQuantity + 1;
     updateQuantity.mutate({ idCart, newQuantity, qtyProductVarinat });
@@ -123,12 +106,11 @@ const Cart = () => {
           .map(Number);
         setIdCart(updatedIdCart);
         localStorage.setItem('idCart', JSON.stringify(updatedIdCart)); // Cập nhật localStorage với idCart mới
-        setIsAllChecked(updatedIdCart.length === 0); // Nếu không còn sản phẩm nào thì set là false
+        const isAllCheckedNow = updatedIdCart.length === carts.length; // Nếu tất cả sản phẩm còn lại đều được chọn
+        setIsAllChecked(isAllCheckedNow);
       }
     });
   };
-
-
   const handleAttribute = (idCart: any, variants: any) => {
     setIdCart([idCart]);
     setVisible(true);
@@ -144,7 +126,6 @@ const Cart = () => {
     });
   };
   const carts = data?.cart?.cartitems;
-  const cartsId = carts?.map((e: any) => e.id);
   carts?.map((cartItem: any) => {
     const { id, product_id, product_variant_id, quantity, total_price, product, productvariant } = cartItem;
     const attributesObject = productvariant?.attributes.reduce((acc: any, attribute: any) => {
@@ -165,7 +146,6 @@ const Cart = () => {
 
   const [isAllChecked, setIsAllChecked] = useState<boolean>(false);
   const [checkedItems, setCheckedItems] = useState<{ [key: number]: boolean }>({});
-
   // Khôi phục trạng thái từ localStorage khi component khởi tạo
   useEffect(() => {
     const storedCheckedItems = localStorage.getItem('checkedItems');
@@ -179,7 +159,6 @@ const Cart = () => {
       setIdCart(updatedIdCarts);
     }
   }, []);
-
   const handleCheckAll = () => {
     const newChecked = !isAllChecked;
     setIsAllChecked(newChecked);
@@ -209,8 +188,21 @@ const Cart = () => {
     setIdCart(updatedIdCarts);
     setIsAllChecked(updatedIdCarts.length === carts.length);
   };
-
-
+  const handleCheckout = () => {
+    if (!idCart || idCart.length === 0) {
+      MySwal.fire({
+        title: <strong>Cảnh báo</strong>,
+        icon: "error",
+        text: "Mày chưa chọn sản phẩm nào để thanh toán",
+        timer: 1500,
+        timerProgressBar: true,
+        showConfirmButton: false,
+      });
+    } else {
+      localStorage.setItem('cartIds', JSON.stringify(idCart));
+      navigate('/checkout', { state: { cartIds: idCart } });
+    }
+  }
   return (
     <>
       <main

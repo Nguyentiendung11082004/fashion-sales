@@ -15,9 +15,9 @@ const Thanks = () => {
               Thank you for your interest! Check your email for a link to the
               guide.
             </p>
-            <Link to="" className="inline-flex items-center rounded border border-indigo-600 bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700 focus:outline-none focus:ring">
+            <Link to="/history-order" className="inline-flex items-center rounded border border-indigo-600 bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700 focus:outline-none focus:ring">
              <Smile/>
-              <span className="text-sm font-medium"> Home </span>
+              <span className="text-sm font-medium"> Xem đơn hàng </span>
             </Link>
           </div>
         </div>

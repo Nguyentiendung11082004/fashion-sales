@@ -1,36 +1,32 @@
 import Loading from "@/common/Loading/Loading";
 import { useAuth } from "@/common/context/Auth/AuthContext";
 import { FormatMoney } from "@/common/utils/utils";
-import AddressCheckout from "@/components/icons/checkout/AddressCheckout";
-import CheckoutIcon12 from "@/components/icons/checkout/CheckoutIcon12";
-import CheckoutIcon13 from "@/components/icons/checkout/CheckoutIcon13";
 import CheckoutIcon22 from "@/components/icons/checkout/CheckoutIcon22";
-import CheckoutIcon7 from "@/components/icons/checkout/CheckoutIcon7";
-import CheckoutIcon8 from "@/components/icons/checkout/CheckoutIcon8";
-import CheckoutIcon9 from "@/components/icons/checkout/CheckoutIcon9";
 import Completed from "@/components/icons/checkout/Completed";
-import IconPay from "@/components/icons/checkout/IconPay";
 import Map from "@/components/icons/checkout/Map";
-import User from "@/components/icons/checkout/User";
 import instance from "@/configs/axios";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { Button, Select } from "antd";
-import { ChangeEvent, useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Select } from "antd";
+import { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const Checkout = () => {
   const { Option } = Select;
   const { token } = useAuth();
+  const queryClient = useQueryClient()
   const location = useLocation();
-  const { cartIds } = location.state || {};
-
-  const { cartId } = location.state || {};
+  const navigate = useNavigate();
+  const savedCartIds = localStorage.getItem('cartIds');
+  const cartIds = location.state?.cartIds || (savedCartIds ? JSON.parse(savedCartIds) : []);
+  // const { cartId } = location.state || {};
+  // console.log("cartId",cartId)
+  console.log("cartIds",cartIds)
   const [idTinh, setIdTinh] = useState<number | null>(0)
   const [idQuanHuyen, setIdQuanHuyen] = useState<number | null>(0)
   const [idXa, setIdXa] = useState<number | null>(0)
   const [paymentMethhod, setPaymentMethod] = useState('1');
   const [shiping, setShipPing] = useState('1');
-
   const handleChangeMethod = (e: any) => {
     const newPaymentMethod = e.target.value;
     setPaymentMethod(newPaymentMethod);
@@ -39,19 +35,109 @@ const Checkout = () => {
       payment_method_id: newPaymentMethod,
     }));
   };
-
   const { data: dataCheckout, isLoading } = useQuery({
-    queryKey: ['checkout'],
+    queryKey: ['checkout', cartIds],
     queryFn: async () => {
-      const payload = cartIds ? { cart_item_ids: cartIds || [] } : { product_id: cartId, quantity: 1, };
+      const payload = {cart_item_ids: cartIds || []};
       const { data } = await instance.post(`/checkout`, payload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return data;
+    },
+    enabled: !!(cartIds && cartIds.length),
+  });
+  const [voucher, setVoucher] = useState<any>();
+  const [subTotal, setSubTotal] = useState(); // đấy là giá khi áp dụng voucher
+  const [totalDiscount, setTotalDiscount] = useState();
+  const mutationVoucher = useMutation({
+    mutationFn: async () => {
+      const res = await instance.post(`/checkout`, {
+        cart_item_ids: cartIds,
+        voucher_code: voucher,
+      },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          }
+        }
+      )
+      setTotalDiscount(res?.data?.total_discount)
+      setSubTotal(res?.data?.sub_total)
+      return res.data;
+    },
+  })
+  const qty = dataCheckout?.order_items?.map((e: any) => e?.quantity);
+  const cartItemIds = dataCheckout?.order_items?.map((e: any) => e);
+  const quantityOfCart = cartItemIds?.reduce((acc: any, id: any, index: number) => {
+    acc[id] = qty[index];
+    return acc;
+  }, {});
+  const defaultOrder = {
+    payment_method_id: 1,
+    payment_status: "pending",
+    user_note: "",
+    ship_user_email: '',
+    ship_user_name: '',
+    ship_user_phonenumber: '',
+    ship_user_address: '',
+    shipping_method: shiping,
+    voucher_code: voucher,
+    cart_item_ids: cartIds || [],
+    quantityOfCart: quantityOfCart || {},
+    // id_product: 1,
+    // product_variant_id: 1,
+    // quantity: 1
+  };
+  const [order, setOrder] = useState(defaultOrder);
+  useEffect(() => {
+    if (dataCheckout && dataCheckout.user) {
+      setOrder((prevOrder) => ({
+        ...prevOrder,
+        ship_user_email: dataCheckout.user.email || '',
+        ship_user_name: dataCheckout.user.name || '',
+        ship_user_phonenumber: dataCheckout.user.phone_number || '',
+        ship_user_address: dataCheckout.user.address || '',
+        quantityOfCart: quantityOfCart,
+      }));
+    }
+  }, [dataCheckout]);
+  const setForm = (props: any, value: any) => {
+    setOrder((prev) => ({
+      ...prev,
+      [props]: value
+    }))
+  }
+  const orderMutation = useMutation({
+    mutationFn: async () => {
+      const res = await instance.post(`/order`, order, {
         headers: {
           Authorization: `Bearer ${token}`,
         }
       });
-      return data;
+      return res?.data;
+    },
+    onSuccess: (data: any) => {
+      if (data.payment_url) {
+        window.location.href = data?.payment_url;
+        localStorage.removeItem('checkedItems');
+      } else {
+        navigate('/thank');
+        queryClient.invalidateQueries({
+          queryKey: ['cart']
+        })
+        localStorage.removeItem('checkedItems');
+      }
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message)
     }
   })
+  const handleOrder = () => {
+    orderMutation.mutate();
+  }
+  // xu ly tinh thanh
   const { data: tinhThanh } = useQuery({
     queryKey: ['tinhThanh'],
     queryFn: async () => {
@@ -59,11 +145,9 @@ const Checkout = () => {
       return res.data;
     }
   })
-
   const handleChangeTinh = (e: any) => {
     setIdTinh(Number(e));
   }
-
   const handleChangeQuanHuyen = (e: any) => {
     const value = parseInt(e, 10);
     setIdQuanHuyen(value);
@@ -72,10 +156,9 @@ const Checkout = () => {
     const value = parseInt(e, 10);
     setIdXa(value)
   }
-  const handleChangeShiping = (e:any) => {
+  const handleChangeShiping = (e: any) => {
     setShipPing(e)
   }
-
   const { data: quanHuyen } = useQuery<any>({
     queryKey: ['quanHuyen', idTinh],
     queryFn: async () => {
@@ -92,85 +175,11 @@ const Checkout = () => {
     },
     enabled: !!quanHuyen
   });
-  const mutationVnPay = useMutation({
-    mutationFn: async () => {
-      const res = await instance.post(`/payment/vnpay`, {
-        total_amount: "",
-        order_id: ""
-      })
-    }
-  })
-  const [voucher, setVoucher] = useState<any>();
-  const [subTotal, setSubTotal] = useState();
-  const [totalDiscount, setTotalDiscount] = useState();
-  const mutationVoucher = useMutation({
-    mutationFn: async () => {
-      const res = await instance.post(`/checkout`, {
-        cart_item_ids: cartIds || cartId,
-        voucher_code: voucher,
-      },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          }
-        }
-      )
-      setTotalDiscount(res?.data?.total_discount)
-      setSubTotal(res?.data?.sub_total)
-      return res.data;
-    }
-  })
 
-  const handleVnPay = () => {
-    mutationVnPay.mutate()
-  }
   const handleVoucher = () => {
     mutationVoucher.mutate();
   }
-  // console.log("dataCheckout",dataCheckout)
-
-  const cartItemIds = dataCheckout?.order_items?.map((e:any) => e);
-  const qty = dataCheckout?.order_items?.map((e:any)=> e.quantity);
-  console.log("cartItemIds",cartItemIds)
-  console.log("qty",qty)
-  const quantityOfCart = cartItemIds?.reduce((acc: any, id: any, index: number) => {
-    acc[id] = qty[index]; 
-    return acc;
-  }, {});
-  console.log("cartItemIds",cartItemIds)
-
-  const [order, setOrder] = useState({
-    payment_method_id: 1,
-    payment_status: "pending",
-    user_note: "",
-    ship_user_email: dataCheckout?.user?.email,
-    ship_user_name: dataCheckout?.user?.name,
-    ship_user_phonenumber: dataCheckout?.user?.phone_number,
-    ship_user_address: dataCheckout?.user?.address,
-    shipping_method: shiping,
-    voucher_code: voucher,
-    cart_item_ids: cartIds,
-    quantityOfCart: quantityOfCart, 
-    // id_product: 1,
-    // product_variant_id: 1,
-    // quantity: 1
-  })
-  const setForm = (props: any, value: any) => {
-    setOrder((prev) => ({
-      ...prev,
-      [props]: value
-    }))
-  }
-  const orderMutation = useMutation({
-    mutationFn: async () => {
-      const res = await instance.post(`/order`, order);
-      return res?.data;
-    }
-  })
-  const handleOrder = () => {
-    orderMutation.mutate();
-  }
-  if (isLoading) return <div></div>;
+  if (isLoading) return <div><Loading /></div>;
 
   return (
     <>
@@ -193,7 +202,7 @@ const Checkout = () => {
         <div className="hd-CheckoutPage">
           <main className="container py-16 lg:pb-28 lg:pt-20">
             {
-              <div className="flex flex-col lg:flex-row">
+              isLoading ? <Loading /> : <div className="flex flex-col lg:flex-row">
                 <div className="flex-1">
                   <div className="space-y-8">
                     <div id="hd-ContactInfo" className="scroll-mt-24">
@@ -283,33 +292,33 @@ const Checkout = () => {
                         {/*end hd-top-ShippingAddress*/}
                         <div className="hd-body-ShippingAddress border-t border-slate-200 px-6 py-7 space-y-4 sm:space-y-6 block">
                           {/* <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
-                            <div>
-                              <label
-                                className="hd-Label text-base font-medium text-neutral-900"
-                                data-nc-id="Label"
-                              >
-                                Họ
-                              </label>
-                              <input
-                                className="block w-full outline-0 border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50 focus:border-neutral-200 rounded-2xl font-normal h-11 px-4 py-3 mt-1.5"
-                                type="text"
-                                defaultValue="Thu"
-                              />
-                            </div>
-                            <div>
-                              <label
-                                className="hd-Label text-base font-medium text-neutral-900"
-                                data-nc-id="Label"
-                              >
-                                Tên
-                              </label>
-                              <input
-                                className="block w-full outline-0 border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50 focus:border-neutral-200 rounded-2xl font-normal h-11 px-4 py-3 mt-1.5"
-                                type="text"
-                                defaultValue="Hằng"
-                              />
-                            </div>
-                          </div> */}
+                          <div>
+                            <label
+                              className="hd-Label text-base font-medium text-neutral-900"
+                              data-nc-id="Label"
+                            >
+                              Họ
+                            </label>
+                            <input
+                              className="block w-full outline-0 border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50 focus:border-neutral-200 rounded-2xl font-normal h-11 px-4 py-3 mt-1.5"
+                              type="text"
+                              defaultValue="Thu"
+                            />
+                          </div>
+                          <div>
+                            <label
+                              className="hd-Label text-base font-medium text-neutral-900"
+                              data-nc-id="Label"
+                            >
+                              Tên
+                            </label>
+                            <input
+                              className="block w-full outline-0 border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50 focus:border-neutral-200 rounded-2xl font-normal h-11 px-4 py-3 mt-1.5"
+                              type="text"
+                              defaultValue="Hằng"
+                            />
+                          </div>
+                        </div> */}
                           <div className="sm:flex space-y-4 sm:space-y-0 sm:space-x-3">
                             <div className="flex-1">
                               <label
@@ -320,10 +329,10 @@ const Checkout = () => {
                               </label>
                               <input
                                 className="block w-full outline-0 border border-neutral-200 focus:border-primary-300
-                                 focus:ring focus:ring-primary-200 focus:ring-opacity-50
-                                  bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25
-                                   dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50
-                                    focus:border-neutral-200 rounded-2xl font-normal h-11 px-4 py-3 mt-1.5"
+                               focus:ring focus:ring-primary-200 focus:ring-opacity-50
+                                bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25
+                                 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50
+                                  focus:border-neutral-200 rounded-2xl font-normal h-11 px-4 py-3 mt-1.5"
                                 type="text"
                                 placeholder="Nhập họ và tên"
                               />
@@ -625,20 +634,6 @@ const Checkout = () => {
                         </button>
                       </div>
                     </div>
-                    {/* <div className="mt-4 flex justify-between py-2.5">
-                      <span>Tổng phụ</span>
-                      <span className="font-semibold text-slate-900">
-                        5.000.000đ
-                      </span>
-                    </div>
-                    <div className="flex justify-between py-2.5">
-                      <span>Phí vận chuyển</span>
-                      <span className="font-semibold text-slate-900">5.000.000đ</span>
-                    </div>
-                    <div className="flex justify-between py-2.5">
-                      <span>Thuế</span>
-                      <span className="font-semibold text-slate-900">5.000.000đ</span>
-                    </div> */}
                     <div className="flex justify-between py-2.5 mt-2">
                       <span>Phí ship</span>
                       <span className="font-semibold text-slate-900">0đ</span>
@@ -685,6 +680,9 @@ const Checkout = () => {
                 {/*end-right*/}
               </div>
             }
+
+
+
 
           </main>
         </div>

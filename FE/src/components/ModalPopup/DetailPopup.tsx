@@ -3,36 +3,55 @@ import { Modal as AntModal, Button } from "antd";
 import { CloseOutlined, MinusOutlined } from "@ant-design/icons";
 import HeartBlack from "@/components/icons/detail/HeartBlack";
 import HeartRedPopup from "@/components/icons/detail/HeartRedPopup";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ProductNext } from "../icons";
 import NextImg from "../icons/detail/NextImg";
 import PreImg from "../icons/detail/PreImg";
+import { FormatMoney } from "@/common/utils/utils";
+import Swal from "sweetalert2";
 
-// Component AddToCartModal sử dụng forwardRef để truyền ref từ cha
-const DetailPopup = forwardRef((props, ref) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+type Props = {
+  open: boolean;
+  onClose: () => void;
+  trendProducts: any;
+  productSeeMore: any
+}
+import withReactContent from "sweetalert2-react-content";
+const MySwal = withReactContent(Swal);
+const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
+  const navigate = useNavigate();
+
   const [selectedColor, setSelectedColor] = useState(null);
   const [selectedSize, setSelectedSize] = useState(null);
-
-  // Hàm mở modal
-  const showModal = () => {
-    setIsModalOpen(true);
-  };
-
-  // Hàm đóng modal
-  const handleClose = () => {
-    setIsModalOpen(false);
-  };
-
-  // Dùng useImperativeHandle để truyền hàm showModal cho component cha
-  useImperativeHandle(ref, () => ({
-    showModal,
+  const resultDataAttribute = Object.entries(productSeeMore?.unique_attributes ?? {}).map(([key, value]) => ({
+    attribute: key,
+    attributeValue: Object.entries(value ?? {}).map(([id, name]) => ({
+      id,
+      name,
+    })),
   }));
+  console.log("resultDataAttribute", resultDataAttribute)
 
+  const priceProduct = productSeeMore?.variants?.map((e: any) => e?.price_sale);
+  // const handleCheckout = () => {
+  //   if (!idCart || idCart.length === 0) {
+  //     MySwal.fire({
+  //       title: <strong>Cảnh báo</strong>,
+  //       icon: "error",
+  //       text: "Mày chưa chọn sản phẩm nào để thanh toán",
+  //       timer: 1500,
+  //       timerProgressBar: true,
+  //       showConfirmButton: false,
+  //     });
+  //     return;
+  //   }
+  //   // localStorage.setItem('cartIds', JSON.stringify(idCart));
+  //   navigate('/checkout', { state: { cartIds: idCart } });
+  // }
   return (
     <AntModal
-      open={isModalOpen}
-      onCancel={handleClose}
+      open={open}
+      onCancel={onClose}
       footer={false}
       closable={false}
       maskClosable={false}
@@ -42,30 +61,27 @@ const DetailPopup = forwardRef((props, ref) => {
       <div className="flex">
         {/* Nút đóng ở góc phải */}
         <button
-          onClick={handleClose}
+          onClick={onClose}
           className="absolute -top-2 -right-2 text-white hover:bg-[#56cfe1] bg-black px-3 pt-3 pb-2"
         >
           <CloseOutlined className="text-lg" />
         </button>
-
         {/* Khung chứa ảnh */}
         <div className="w-1/2 relative">
           <div className="absolute w-full flex items-center justify-between top-[50%]">
-            <PreImg />
-            <NextImg />
+            {/* <PreImg />
+            <NextImg /> */}
           </div>
           <img
-            src={ProductNext}
+            src={`${productSeeMore.img_thumbnail}`}
             alt=""
             className="h-full w-full object-cover"
           />
         </div>
-
         <div className="w-1/2 p-2 ml-4">
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">Chân váy</h2>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">{productSeeMore?.name}</h2>
           <div className="flex items-center justify-between">
-            <span className="text-2xl text-[#696969]">200.000 đ</span>
-
+            <span className="text-2xl text-[#696969]">{FormatMoney(productSeeMore?.price_sale || 0)}</span>
             <div className="flex items-center">
               <Link
                 to="#reviews"
@@ -148,45 +164,63 @@ const DetailPopup = forwardRef((props, ref) => {
             </div>
           </div>
           <p className="mt-4 hd-all-text grey  mb-3">
-            Go kalles this summer with this vintage navy and white striped
-            v-neck t-shirt from the Nike. Perfect for pairing with denim and
-            white kicks for a stylish kalles vibe.
+            {productSeeMore?.description}
           </p>
 
           {/* Chọn màu */}
-          <div className="my-4">
-            <p className="font-medium">Màu sắc</p>
+          {
+            resultDataAttribute?.map((e) => (
+              <div className="my-4">
+                <p className="font-medium">{e?.attribute}</p>
+                <div className="flex mt-3 gap-2">
+                  {e?.attributeValue?.map((item: any) => (
+                    console.log("item?.attributeValue", item),
+                    <div
+                      key={item}
+                      className={`relative text-center mt-3 flex-1 max-w-[75px] h-8 sm:h-8 rounded-full border-2 cursor-pointer 
+                    ${selectedColor === item ? "border-black" : ""
+                        }`}
+                      // style={{ backgroundColor: item.toLowerCase() }}
+                      onClick={() => setSelectedColor(item)}
+                    >
+                      <span> {item?.name}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))
+          }
+          {/* <div className="my-4">
+            <p className="font-medium">'Màu sắc '</p>
             <div className="flex mt-3 gap-2">
               {["Red", "Blue", "Green"].map((color: any) => (
                 <div
                   key={color}
-                  className={`relative flex-1 max-w-[75px] h-8 sm:h-8 rounded-full border-2 cursor-pointer ${
-                    selectedColor === color ? "border-black" : ""
-                  }`}
+                  className={`relative flex-1 max-w-[75px] h-8 sm:h-8 rounded-full border-2 cursor-pointer ${selectedColor === color ? "border-black" : ""
+                    }`}
                   style={{ backgroundColor: color.toLowerCase() }}
                   onClick={() => setSelectedColor(color)}
                 />
               ))}
             </div>
-          </div>
+          </div> */}
 
           {/* Chọn kích thước */}
-          <div className="mb-6">
+          {/* <div className="mb-6">
             <p className="font-medium">Kích thước</p>
             <div className="flex mt-3 gap-2">
               {["S", "M", "L"].map((size: any) => (
                 <button
                   key={size}
-                  className={`relative flex-1 max-w-[75px] h-8 sm:h-8 rounded-full border-2 cursor-pointer ${
-                    selectedSize === size ? "border-black bg-gray-100" : ""
-                  }`}
+                  className={`relative flex-1 max-w-[75px] h-8 sm:h-8 rounded-full border-2 cursor-pointer ${selectedSize === size ? "border-black bg-gray-100" : ""
+                    }`}
                   onClick={() => setSelectedSize(size)}
                 >
                   {size}
                 </button>
               ))}
             </div>
-          </div>
+          </div> */}
 
           <div className="hd-quantity-item flex items-center">
             <div className="hd-quantity relative block min-w-[120px] w-[120px] h-10 hd-all-btn">
@@ -222,7 +256,7 @@ const DetailPopup = forwardRef((props, ref) => {
             {/* Nút Add to Cart */}
             <div className="mx-3">
               <Button
-                onClick={handleClose}
+                // onClick={handleClose}
                 className="w-full h-11 rounded-full  bg-[#56cfe1] text-white text-base font-medium hover:bg-[#4bc3d5]"
               >
                 Thêm vào giỏ hàng
@@ -238,7 +272,7 @@ const DetailPopup = forwardRef((props, ref) => {
           </div>
           <div className="my-5">
             <Button
-              onClick={handleClose}
+              // onClick={handleCheckout}
               className="w-full h-11 rounded-full  bg-black text-white text-lg font-medium hover:bg-[#4bc3d5]"
             >
               Mua ngay
@@ -265,6 +299,6 @@ const DetailPopup = forwardRef((props, ref) => {
       </div>
     </AntModal>
   );
-});
+};
 
 export default DetailPopup;
