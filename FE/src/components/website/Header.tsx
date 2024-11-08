@@ -33,7 +33,7 @@ const Header = (props: Props) => {
   }
   const wishlistCount = wishlist.length;
   const { token } = useAuth();
-  const { data, isFetching } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ['cart'],
     queryFn: async () => {
       const res = await instance.get('/cart', {
@@ -54,7 +54,7 @@ const Header = (props: Props) => {
   } else if (cartItems && typeof cartItems === 'object') {
     qty += cartItems.quantity;
   }
-  if (isFetching) return <div></div>
+  if (isLoading) return <div></div>
   return (
     <>
       <div>

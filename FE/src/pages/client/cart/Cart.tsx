@@ -101,16 +101,28 @@ const Cart = () => {
         });
         setCheckedItems(updatedCheckedItems);
         localStorage.setItem('checkedItems', JSON.stringify(updatedCheckedItems));
+
         const updatedIdCart = Object.keys(updatedCheckedItems)
           .filter(key => updatedCheckedItems[Number(key)])
           .map(Number);
         setIdCart(updatedIdCart);
         localStorage.setItem('idCart', JSON.stringify(updatedIdCart)); // Cập nhật localStorage với idCart mới
-        const isAllCheckedNow = updatedIdCart.length === carts.length; // Nếu tất cả sản phẩm còn lại đều được chọn
+        const isAllCheckedNow = updatedIdCart.length === carts.length; // Kiểm tra nếu tất cả sản phẩm còn lại đều được chọn
         setIsAllChecked(isAllCheckedNow);
+
+        // Nếu không còn sản phẩm nào, đặt trạng thái isAllChecked là false
+        if (updatedIdCart.length === 0) {
+          setIsAllChecked(false);
+        }
+      },
+      onError: (message: any) => {
+        toast.error(message?.response?.data?.message, {
+          autoClose: 5000,
+        });
       }
     });
   };
+
   const handleAttribute = (idCart: any, variants: any) => {
     setIdCart([idCart]);
     setVisible(true);
@@ -146,19 +158,8 @@ const Cart = () => {
 
   const [isAllChecked, setIsAllChecked] = useState<boolean>(false);
   const [checkedItems, setCheckedItems] = useState<{ [key: number]: boolean }>({});
-  // Khôi phục trạng thái từ localStorage khi component khởi tạo
-  useEffect(() => {
-    const storedCheckedItems = localStorage.getItem('checkedItems');
-    if (storedCheckedItems) {
-      const parsedCheckedItems = JSON.parse(storedCheckedItems);
-      setCheckedItems(parsedCheckedItems);
-      setIsAllChecked(Object.values(parsedCheckedItems).every(Boolean));
-      const updatedIdCarts = Object.keys(parsedCheckedItems)
-        .filter(key => parsedCheckedItems[Number(key)])
-        .map(Number);
-      setIdCart(updatedIdCarts);
-    }
-  }, []);
+
+  console.log("isAllChecked",isAllChecked)
   const handleCheckAll = () => {
     const newChecked = !isAllChecked;
     setIsAllChecked(newChecked);
@@ -193,16 +194,27 @@ const Cart = () => {
       MySwal.fire({
         title: <strong>Cảnh báo</strong>,
         icon: "error",
-        text: "Mày chưa chọn sản phẩm nào để thanh toán",
+        text: "Bạn chưa chọn sản phẩm nào để thanh toán",
         timer: 1500,
         timerProgressBar: true,
         showConfirmButton: false,
       });
     } else {
-      localStorage.setItem('cartIds', JSON.stringify(idCart));
       navigate('/checkout', { state: { cartIds: idCart } });
     }
   }
+  useEffect(() => {
+    const storedCheckedItems = localStorage.getItem('checkedItems');
+    if (storedCheckedItems) {
+      const parsedCheckedItems = JSON.parse(storedCheckedItems);
+      setCheckedItems(parsedCheckedItems);
+      setIsAllChecked(Object.values(parsedCheckedItems).every(Boolean));
+      const updatedIdCarts = Object.keys(parsedCheckedItems)
+        .filter(key => parsedCheckedItems[Number(key)])
+        .map(Number);
+      setIdCart(updatedIdCarts);
+    }
+  }, []);
   return (
     <>
       <main
@@ -413,13 +425,10 @@ const Cart = () => {
                       </>
                     })) : <p className="text-center mt-12 text-base">Giỏ hàng trống</p>
                   }
-
-
-
                   {/*end-item-1*/}
                 </div>
               </div>
-              <Button onClick={() => handleDeleteCart([idCart])} className="btn-danger mt-5">
+              <Button onClick={() => handleDeleteCart([idCart])} className="btn-danger mt-5 ml-auto" style={{float:'right',padding:'20px 10px'}}>
                 Xoá sản phẩm trong giỏ hàng
               </Button>
               {/*end hd-pagecart-items*/}
