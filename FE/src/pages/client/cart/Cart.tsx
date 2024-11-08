@@ -19,7 +19,9 @@ import { toast } from "react-toastify";
 import { MinusOutlined } from "@ant-design/icons";
 import Loading from "@/common/Loading/Loading";
 import CheckmarkAlert from "@/components/Notification/Toast";
-
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
+const MySwal = withReactContent(Swal);
 const Cart = () => {
   const [visiable, setVisible] = useState(false);
   const [idCart, setIdCart] = useState<any>('');
@@ -31,7 +33,7 @@ const Cart = () => {
     setVisible(false);
   };
   const { token } = useAuth();
-  const { data, isFetching,isLoading } = useQuery({
+  const { data, isFetching, isLoading } = useQuery({
     queryKey: ['cart'],
     queryFn: async () => {
       const res = await instance.get('/cart', {
@@ -42,7 +44,6 @@ const Cart = () => {
       return res.data;
     },
   });
-
   const updateQuantity = useMutation({
     mutationFn: async ({ idCart, newQuantity, qtyProductVarinat }: { idCart: number; newQuantity: number, qtyProductVarinat: any }) => {
       await instance.put(`/cart/${idCart}`, {
@@ -65,15 +66,10 @@ const Cart = () => {
       })
     }
   });
-  const handleCheckout = () => {
-    navigate('/checkout', { state: { cartIds: cartsId } });
-  }
-
   const handleIncrease = (idCart: number, currentQuantity: number, qtyProductVarinat: any) => {
     const newQuantity = currentQuantity + 1;
     updateQuantity.mutate({ idCart, newQuantity, qtyProductVarinat });
   };
-
   const handleDecrease = (idCart: number, currentQuantity: number, qtyProductVarinat: any) => {
     const newQuantity = currentQuantity - 1;
     updateQuantity.mutate({ idCart, newQuantity, qtyProductVarinat });
@@ -97,18 +93,32 @@ const Cart = () => {
     }
   });
   const handleDeleteCart = (idCarts: number[]) => {
-    deleteCart.mutate({ idCarts });
+    deleteCart.mutate({ idCarts }, {
+      onSuccess: () => {
+        const updatedCheckedItems = { ...checkedItems };
+        idCarts.forEach(id => {
+          delete updatedCheckedItems[id];
+        });
+        setCheckedItems(updatedCheckedItems);
+        localStorage.setItem('checkedItems', JSON.stringify(updatedCheckedItems));
+        const updatedIdCart = Object.keys(updatedCheckedItems)
+          .filter(key => updatedCheckedItems[Number(key)])
+          .map(Number);
+        setIdCart(updatedIdCart);
+        localStorage.setItem('idCart', JSON.stringify(updatedIdCart)); // Cập nhật localStorage với idCart mới
+        const isAllCheckedNow = updatedIdCart.length === carts.length; // Nếu tất cả sản phẩm còn lại đều được chọn
+        setIsAllChecked(isAllCheckedNow);
+      }
+    });
   };
-
   const handleAttribute = (idCart: any, variants: any) => {
-    setIdCart(idCart);
+    setIdCart([idCart]);
     setVisible(true);
     setUpdatedAttributes((prev: any) => ({
       ...prev,
       [idCart]: variants,
     }));
   };
-
   const handleUpdateAttributes = (idCart: any, attributes: any) => {
     setUpdatedAttributes({
       ...updatedAttributes,
@@ -116,7 +126,6 @@ const Cart = () => {
     });
   };
   const carts = data?.cart?.cartitems;
-  const cartsId = carts?.map((e: any) => e.id);
   carts?.map((cartItem: any) => {
     const { id, product_id, product_variant_id, quantity, total_price, product, productvariant } = cartItem;
     const attributesObject = productvariant?.attributes.reduce((acc: any, attribute: any) => {
@@ -135,6 +144,65 @@ const Cart = () => {
     };
   });
 
+  const [isAllChecked, setIsAllChecked] = useState<boolean>(false);
+  const [checkedItems, setCheckedItems] = useState<{ [key: number]: boolean }>({});
+  // Khôi phục trạng thái từ localStorage khi component khởi tạo
+  useEffect(() => {
+    const storedCheckedItems = localStorage.getItem('checkedItems');
+    if (storedCheckedItems) {
+      const parsedCheckedItems = JSON.parse(storedCheckedItems);
+      setCheckedItems(parsedCheckedItems);
+      setIsAllChecked(Object.values(parsedCheckedItems).every(Boolean));
+      const updatedIdCarts = Object.keys(parsedCheckedItems)
+        .filter(key => parsedCheckedItems[Number(key)])
+        .map(Number);
+      setIdCart(updatedIdCarts);
+    }
+  }, []);
+  const handleCheckAll = () => {
+    const newChecked = !isAllChecked;
+    setIsAllChecked(newChecked);
+    const newCheckedItems: { [key: number]: boolean } = {};
+    const allIdCarts: number[] = [];
+    carts.forEach((item: any) => {
+      newCheckedItems[item.id] = newChecked;
+      if (newChecked) {
+        allIdCarts.push(item.id);
+      }
+    });
+    setCheckedItems(newCheckedItems);
+    localStorage.setItem('checkedItems', JSON.stringify(newCheckedItems)); // Lưu vào localStorage
+    setIdCart(newChecked ? allIdCarts : []);
+  };
+
+  const handleCheckBoxChange = (cartId: number) => {
+    const updatedCheckedItems = {
+      ...checkedItems,
+      [cartId]: !checkedItems[cartId],
+    };
+    setCheckedItems(updatedCheckedItems);
+    localStorage.setItem('checkedItems', JSON.stringify(updatedCheckedItems)); // Lưu vào localStorage
+    const updatedIdCarts = Object.keys(updatedCheckedItems)
+      .filter(key => updatedCheckedItems[Number(key)])
+      .map(Number);
+    setIdCart(updatedIdCarts);
+    setIsAllChecked(updatedIdCarts.length === carts.length);
+  };
+  const handleCheckout = () => {
+    if (!idCart || idCart.length === 0) {
+      MySwal.fire({
+        title: <strong>Cảnh báo</strong>,
+        icon: "error",
+        text: "Mày chưa chọn sản phẩm nào để thanh toán",
+        timer: 1500,
+        timerProgressBar: true,
+        showConfirmButton: false,
+      });
+    } else {
+      localStorage.setItem('cartIds', JSON.stringify(idCart));
+      navigate('/checkout', { state: { cartIds: idCart } });
+    }
+  }
   return (
     <>
       <main
@@ -154,27 +222,31 @@ const Cart = () => {
         </div>
         {/*end hd-page-head*/}
         <section className="hd-page-body text-[14px] lg:mt-[60px] mt-[30px] block m-0 p-0 border-0 isolate *:box-border">
-   
-
           <div className="hd-container block">
             <form className="hd-form-cart overflow-hidden relative">
               <div className="hd-pagecart-header text-sm uppercase font-semibold pt-5 pb-1.5 border-solid border-b-2">
                 <div className="flex flex-wrap mt-0 !items-center">
-                  <div className="lg:w-5/12 w-full flex-grow-0 flex-shrink-0 basis-auto hd-col-item">
+                  <div className="w-[5%] flex-grow-0 flex-shrink-0 basis-auto hd-col-item">
+                    <input
+                      type="checkbox"
+                      checked={isAllChecked}
+                      onChange={handleCheckAll}
+                    />
+                  </div>
+                  <div className="lg:w-[40%] w-full flex-grow-0 flex-shrink-0 basis-auto hd-col-item">
                     Sản phẩm
                   </div>
-                  <div className="w-3/12 flex-grow-0 flex-shrink-0 basis-auto hd-col-item !text-center hidden lg:block">
+                  <div className="w-[20%] flex-grow-0 flex-shrink-0 basis-auto hd-col-item !text-center hidden lg:block">
                     Giá
                   </div>
-                  <div className="w-2/12 flex-grow-0 flex-shrink-0 basis-auto hd-col-item !text-center hidden lg:block">
+                  <div className="w-[20%] flex-grow-0 flex-shrink-0 basis-auto hd-col-item !text-center hidden lg:block">
                     Số lượng
                   </div>
-                  <div className="w-2/12 flex-grow-0 flex-shrink-0 basis-auto hd-col-item lg:text-end text-right hidden lg:block">
+                  <div className="w-[15%] flex-grow-0 flex-shrink-0 basis-auto hd-col-item lg:text-end text-right hidden lg:block">
                     Tổng
                   </div>
                 </div>
               </div>
-              {/*end hd-pagecart-header*/}
               <div className="hd-pagecart-items">
                 <div className="hd-item relative overflow-hidden">
                   {
@@ -188,6 +260,13 @@ const Cart = () => {
                         <div className="hd-item-row lg:py-[2rem] py-[1rem] !items-center flex flex-wrap border-solid border-b-2">
                           <div className="hd-infor-item lg:w-5/12 w-full hd-col-item">
                             <div className="hd-infor !items-center !flex">
+                              <div className="mr-10">
+                                <input
+                                  type="checkbox"
+                                  checked={checkedItems[e?.id] || false}
+                                  onChange={() => handleCheckBoxChange(e?.id)}
+                                />
+                              </div>
                               <Link
                                 to=""
                                 className="min-w-[120px] max-w-[120px] block overflow-hidden relative w-full touch-manipulation pb-[10px] lg:pb-0"
@@ -201,7 +280,6 @@ const Cart = () => {
                                 >
                                   {e?.product?.name}
                                 </Link>
-
                                 {/*end hd-price-item*/}
                                 {updatedAttributes.dataAttributes && Object.entries(updatedAttributes.dataAttributes).length > 0 ? (
                                   Object.entries(updatedAttributes.dataAttributes).map(([attributeName, attributeValue]) => {
@@ -229,12 +307,10 @@ const Cart = () => {
                                     </Button>
                                   }
 
-                                  <Button onClick={() => handleDeleteCart([e.id])} className="inline-flex border-none">
-                                    <Delete />
-                                  </Button>
                                 </div>
                               </div>
                             </div>
+
                             <ModalCart
                               open={visiable}
                               onClose={closeModal}
@@ -242,6 +318,7 @@ const Cart = () => {
                               onUpdateAttributes={handleUpdateAttributes}
                               attributes={updatedAttributes[idCart] || []}
                             />
+
                             <div className="hd-qty-total block lg:hidden">
                               <div className="flex items-center justify-between border-2 border-slate-200 rounded-full py-[10px] px-[10px]">
                                 <div className="hd-quantity-item relative hd-col-item">
@@ -280,6 +357,7 @@ const Cart = () => {
                               </div>
                             </div>
                           </div>
+
                           {/*end hd-infor-item*/}
                           <div className="hd-price-item !text-center w-3/12 hd-col-item lg:block hidden">
                             <div className="hs-prices">
@@ -341,6 +419,9 @@ const Cart = () => {
                   {/*end-item-1*/}
                 </div>
               </div>
+              <Button onClick={() => handleDeleteCart([idCart])} className="btn-danger mt-5">
+                Xoá sản phẩm trong giỏ hàng
+              </Button>
               {/*end hd-pagecart-items*/}
               <div className="hd-pagecart-footer lg:my-[60px]">
                 <div className="hd-footer lg:flex lg:flex-wrap mt-[30px]">

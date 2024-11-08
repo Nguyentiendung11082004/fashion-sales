@@ -1,25 +1,25 @@
-import Less from "@/components/icons/detail/Less";
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
-import HeartWhite from "@/components/icons/detail/HeartWhite";
-import Eye from "@/components/icons/detail/Eye";
-import CartDetail from "@/components/icons/detail/CartDetail";
-import "rc-slider/assets/index.css";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   colorTranslations,
-  convertColorNameToClass,
 } from "@/common/colors/colorUtils";
 import instance from "@/configs/axios";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import NoDatasIcon from "@/components/icons/products/NoDataIcon";
-import { ResponseData } from "@/common/types/responseDataFilter";
 import unorm from "unorm";
 import { useWishlist } from "@/common/context/Wishlist/WishlistContext";
 import HeartRed from "@/components/icons/detail/HeartRed";
-import { Button, Spin } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 import { useAuth } from "@/common/context/Auth/AuthContext";
 import { useCart } from "@/common/context/Cart/CartContext";
+import { ResponseData } from "@/common/types/responseDataFilter";
+import CartDetail from "@/components/icons/detail/CartDetail";
+import Eye from "@/components/icons/detail/Eye";
+import HeartWhite from "@/components/icons/detail/HeartWhite";
+import Less from "@/components/icons/detail/Less";
+import { Spin } from "antd";
+import "rc-slider/assets/index.css";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 const Products = () => {
   const [growboxDropdownOpen, setGrowboxDropdownOpen] = useState(false);
@@ -55,6 +55,7 @@ const Products = () => {
     sortPrice: null,
     sortAlphaOrder: null,
   });
+  const navigate = useNavigate();
 
   const { mutate } = useMutation({
     mutationFn: async (filters: any) => {
@@ -82,7 +83,6 @@ const Products = () => {
       console.error("Có lỗi xảy ra:", error);
     },
   });
-
   const applyFilters = useCallback(() => {
     const filters = {
       search: searchTerm,
@@ -261,6 +261,9 @@ const Products = () => {
       setToepfeDropdownOpen(false);
     }
   };
+
+ 
+
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
 
@@ -269,11 +272,18 @@ const Products = () => {
     };
   }, []);
 
+  // const [visiable, setVisible] = useState(false);
+  // const closeModal = () => {
+  //   // setIdCart('');
+  //   setVisible(false);
+  // };
   const { isLoading, addToCart } = useCart();
   const handleAddToCart = (idProduct: any, idProductVariant: any) => {
-    addToCart(idProduct, idProductVariant);
-  };
-
+    addToCart(idProduct, idProductVariant)
+  }
+  const buyNow = (idPr: any, qty: number) => {
+    navigate('/checkout', { state: { cartId: idPr } });
+  }
   return (
     <>
       <div>
@@ -1060,6 +1070,7 @@ const Products = () => {
                 ) : ( */}
                 {pro?.products?.map(({ product, getUniqueAttributes }) => {
                   const inWishlist = isInWishlist(product.id);
+
                   return (
                     <div
                       className="nc-ProductCard relative flex flex-col bg-transparent"
@@ -1085,14 +1096,27 @@ const Products = () => {
                             </button>
                           </div>
                           <div className="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100">
-                            <Link to="" className="group/btn relative m-auto">
-                              <button className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]">
-                                <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                                  Xem thêm
-                                </p>
-                                <Eye />
-                              </button>
-                            </Link>
+                            <div className="group/btn relative">
+                              {product.variants.length > 0 ? (
+                                <button className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]">
+                                  <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
+                                    Mua ngay
+                                  </p>
+                                  <Eye />
+                                </button>
+                              ) : (
+                                <button
+                                  onClick={() => buyNow(product?.id, 1)}
+                                  className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]"
+                                >
+                                  <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
+                                    Mua ngay
+                                  </p>
+                                  <Eye />
+                                </button>
+                              )}
+                            </div>
+
                             <Link to="" className="group/btn relative">
                               <button
                                 onClick={() =>

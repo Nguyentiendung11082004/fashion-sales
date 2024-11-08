@@ -36,6 +36,7 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             });
             return res.data;
         },
+        enabled: !!token,
     });
 
     const [urlImage, setUrlImage] = useState<string | null>(null);

@@ -21,7 +21,7 @@ class InforUserController extends Controller
 
             return response()->json([
                 'message'  => 'Thông tin người dùng:',
-                'Infor User' => $user
+                'InforUser' => $user
             ]);
         } catch (\Throwable $th) {
             if ($th instanceof ModelNotFoundException) {
@@ -72,9 +72,9 @@ class InforUserController extends Controller
             'is_active'    => $request->is_active ?? $user->is_active,
             'gender'       => $request->gender,
             'role_id'      => $request->role_id ?? $user->role_id,
-            'avatar'       => $request->avatar ?? $user->avatar //Kiểm tra avatar
+            'avatar'         => $request->avatar ?? $user->avatar //Kiểm tra avatar
             ];
-
+// dd($user);
             $user->update($dataUser);
 
             return response()->json([

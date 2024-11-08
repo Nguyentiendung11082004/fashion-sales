@@ -23,7 +23,9 @@ class Order extends Model
         'user_note',
         'ship_user_name',
         'ship_user_phonenumber',
-        'ship_user_address'
+        'ship_user_address',
+        "voucher_id",
+        "voucher_discount"
     ];
     protected static function boot()
     {

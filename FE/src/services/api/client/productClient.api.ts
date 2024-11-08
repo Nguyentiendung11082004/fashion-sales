@@ -20,16 +20,6 @@ const handleRequest = async (
 export const productShow_client = (id: number | string) =>
   handleRequest("get", `/product-detail/${id}`);
 
-// // // Hàm để tìm biến thể sản phẩm
-// export const findProductVariant = async (
-//   productId: number,
-//   productVariant: any
-// ) => {
-//   const url = `find-variant/${productId}`;
-//   return await handleRequest("get", url, productVariant);
-// };
-
-
 export const findProductVariant = async (
   productId: number,
   productVariant: any
@@ -37,25 +27,6 @@ export const findProductVariant = async (
   const url = `find-variant/${productId}`;
   return await handleRequest("get", url, { params: productVariant });
 };
-
-
-// // Hàm tìm biến thể sản phẩm
-// export const findProductVariant = async (
-//   productId: number,
-//   productVariant: { product_variant: { [key: string]: string | number } }
-// ) => {
-//   return handleRequest("post", `find-variant/${productId}`, productVariant);
-// };
-
-// // Hàm tìm biến thể sản phẩm
-// export const findProductVariant = async (
-//   productId: number,
-//   productVariant: { product_variant: { [key: string]: number } }
-// ) => {
-//   const url = `find-variant/${productId}`;
-
-//   return await handleRequest("post", url, productVariant);
-// };
 
 // Hàm tìm kiếm sản phẩm theo ID
 export const findProduct_id = (id: string | undefined | number) =>

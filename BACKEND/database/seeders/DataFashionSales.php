@@ -20,8 +20,6 @@ class DataFashionSales extends Seeder
      */
     public function run(): void
     {
-        //
-        // tạo danh mục
         Category::query()->insert(
             [
                 [

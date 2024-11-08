@@ -28,6 +28,7 @@ const EmployeePage = () => {
     queryKey: ["employees"],
     queryFn: getEmployees,
   });
+  console.log("data employees",data);
 
   const { mutate } = useMutation({
     mutationFn: deleteEmployee,
@@ -39,6 +40,7 @@ const EmployeePage = () => {
       toast.error("Xoá thất bại");
     },
   });
+
   const handleEdit = (id: number) => {
     navigate(`edit/${id}`, { state: { currentPage } });
   };
