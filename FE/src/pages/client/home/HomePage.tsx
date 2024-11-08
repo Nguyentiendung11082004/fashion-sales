@@ -40,17 +40,24 @@ const HomePage = () => {
         console.error("Có lỗi xảy ra khi lấy sản phẩm", error);
       });
   }, []);
-
   const modalRef = useRef<HTMLDialogElement>(null);
-  const modalRefDetail = useRef<HTMLDialogElement>(null);
 
+
+
+  const [productSeeMore,setProductSeeMore] = useState({})
+  const [visiable, setVisible] = useState(false);
+  const handleOpenSeeMore = (product:any) => {
+    setVisible(true);
+    setProductSeeMore(product)
+  }
+  const closeModal = () => {
+    setVisible(false);
+  };
   return (
     <>
       <div>
         <Banner />
-
         <CategoryCarousel />
-
         <section className="container mt-28">
           <div className="custom-heading ">
             <div className="flex items-center mx-auto">
@@ -93,7 +100,7 @@ const HomePage = () => {
                     <div className="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100">
                       <Link to="" className="group/btn relative m-auto">
                         <button className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]"
-                                onClick={() => modalRefDetail.current?.showModal()}>
+                          onClick={() => handleOpenSeeMore(product)}>
                           <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
                             Xem thêm
                           </p>
@@ -102,7 +109,7 @@ const HomePage = () => {
                       </Link>
                       <Link to="" className="group/btn relative">
                         <button className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]"
-                                onClick={() => modalRef.current?.showModal()}>
+                          onClick={() => modalRef.current?.showModal()}>
                           <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
                             Thêm vào giỏ hàng
                           </p>
@@ -135,14 +142,14 @@ const HomePage = () => {
                     {product.price_regular && (
                       <div>
                         {product.price_sale > 0 &&
-                        product.price_sale < product.price_regular ? (
+                          product.price_sale < product.price_regular ? (
                           <>
                             <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400">
                               -
                               {Math.round(
                                 ((product.price_regular - product.price_sale) /
                                   product.price_regular) *
-                                  100
+                                100
                               )}
                               %
                             </div>
@@ -270,15 +277,13 @@ const HomePage = () => {
             ))}
           </div>
           <CartPopup ref={modalRef} />
-          <DetailPopup ref={modalRefDetail} />
+          <DetailPopup open={visiable} onClose={closeModal} trendProducts={trendProducts} productSeeMore={productSeeMore} />
         </section>
-
         <section className="container my-16 text-center">
           <Link to="">
             <Button className="btn-load">Tải Thêm</Button>
           </Link>
         </section>
-
         <section className="container">
           <div className="grid lg:grid-cols-2 md:grid-cols-2 md:gap-4 lg:gap-8 ">
             <div className="w-[100%] relative overflow-hidden">
@@ -393,14 +398,14 @@ const HomePage = () => {
                     {product.price_regular && (
                       <div>
                         {product.price_sale > 0 &&
-                        product.price_sale < product.price_regular ? (
+                          product.price_sale < product.price_regular ? (
                           <>
                             <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400">
                               -
                               {Math.round(
                                 ((product.price_regular - product.price_sale) /
                                   product.price_regular) *
-                                  100
+                                100
                               )}
                               %
                             </div>

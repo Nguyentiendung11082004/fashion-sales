@@ -118,7 +118,6 @@ const ModalCart = ({ open, onClose, idCart, onUpdateAttributes, attributes }: Pr
     });
     onClose();
   };
-  console.log("cartAttribute?.cart_item?.productvariant?.price_sale", cartAttribute?.cart_item?.productvariant?.price_sale)
   return (
     <AntModal open={open} onCancel={onClose} footer={false} closable={false} maskClosable={false}>
       {isFetching ? (

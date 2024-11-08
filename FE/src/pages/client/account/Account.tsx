@@ -7,7 +7,7 @@ import Phone from "@/components/icons/account/Phone";
 import { Link } from "react-router-dom";
 const Account = () => {
   const { user } = useUser();
-  const dataUser = user?.['Infor User'];
+  const dataUser = user?.InforUser;
   return (
     <main
       id="main-content"
@@ -171,7 +171,7 @@ const Account = () => {
                   </label>
                   <select
                     className="nc-Select h-11 mt-1.5 px-[10px] block w-full outline-0 rounded-2xl border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-50"
-                    value={dataUser.role_id == 1 ? "Nam" : "Nữ"}
+                    value={dataUser?.role_id == 1 ? "Nam" : "Nữ"}
                   >
                     <option value="Nam">Nam</option>
                     <option value="Nữ">Nữ</option>

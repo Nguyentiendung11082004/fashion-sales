@@ -40,6 +40,8 @@ import { Route, Routes } from "react-router-dom";
 import HomePage from "../pages/client/home/HomePage";
 import LayoutWebsite from "../pages/client/layout";
 import { PasswordResetHandler } from "@/pages/client/auth/resetpassword/PasswordResetHandler";
+import Order from "@/pages/client/order";
+import Thanks from "@/pages/client/thanks/Thanks";
 const Router = () => {
   return (
     <>
@@ -54,7 +56,10 @@ const Router = () => {
           <Route path="wishlist" element={<Wishlist />} />
           <Route path="checkout" element={<Checkout />} />
           <Route path="contact" element={<Contact />} />
+          <Route path="thank" element={<Thanks />} />
+
           <Route path="history-order" element={<HistoryOrder />} />
+          <Route path="/order" element={<Order />} />
         </Route>
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />

@@ -97,17 +97,17 @@ class PaymentController extends Controller
                     $order->update([
                         'payment_status' => 'Đã thanh toán', // Cập nhật trạng thái thành công
                     ]);
-                    return response()->json([
+                    return [
                         'status' => 'success',
                         'message' => 'Thanh toán thành công!',
                         'order_id' => $vnp_TxnRef,
                         'amount' => $vnp_Amount / 100,
-                    ]);
+                    ];
                 } else {
-                    return response()->json([
+                    return [
                         'status' => 'error',
                         'message' => 'Không tìm thấy đơn hàng!',
-                    ]);
+                    ];
                 }
             } else {
                 $order->update([
@@ -131,12 +131,12 @@ class PaymentController extends Controller
                         }
                     }
                 }
-                return response()->json([
+                return [
                     'status' => 'error',
                     'message' => 'Thanh toán thất bại!',
                     'order_id' => $vnp_TxnRef,
                     'error_code' => $vnp_ResponseCode,
-                ]);
+                ];
             }
         } else {
             return [

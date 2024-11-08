@@ -46,10 +46,7 @@ class OrderController extends Controller
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store( StoreOrderRequest $request)
+    public function store(StoreOrderRequest $request)
     {
         try {
             $data = $request->validated(); // Lấy dữ liệu đã xác thực
@@ -288,7 +285,7 @@ class OrderController extends Controller
 
                     // Chuyển hướng người dùng đến trang thanh toán
                     return response()->json(['payment_url' => $response['payment_url']], Response::HTTP_OK);
-                }
+                } 
                 return response()->json($order->load('orderDetails')->toArray(), Response::HTTP_CREATED);
             });
             return $response;

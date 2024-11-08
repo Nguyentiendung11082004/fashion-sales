@@ -1310,7 +1310,7 @@ const Products = () => {
                                   <span className="t4s-pr-color__item flex flex-col items-center cursor-pointer">
                                     <span className="t4s-pr-color__value border border-gray-400 w-5 h-5 hover:border-black hover:border-2 rounded-full p-[5px]">
                                       <div
-                                        className={` w-[17px] h-[17px] rounded-full ml-[-4.25px] mt-[-4px] hover:mt-[-5px] hover:ml-[-5px] ${convertColorNameToClass(color)}`}
+                                        className={`w-[17px] h-[17px] rounded-full ml-[-4.25px] mt-[-4px] hover:mt-[-5px] hover:ml-[-5px] ${convertColorNameToClass(color)}`}
                                       ></div>
                                     </span>
                                   </span>
