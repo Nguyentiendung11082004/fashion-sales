@@ -20,6 +20,7 @@ use App\Http\Controllers\Api\V1\Admin\BannerController;
 use App\Http\Controllers\Api\V1\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Api\V1\Admin\PostController;
 use App\Http\Controllers\Api\V1\Admin\VoucherController;
+use App\Http\Controllers\Api\V1\Client\AddressController;
 use App\Http\Controllers\Api\V1\Client\CommentController;
 use App\Http\Controllers\Api\V1\Client\CheckoutController;
 use App\Http\Controllers\Api\V1\Client\WishlistController;
@@ -92,6 +93,7 @@ Route::middleware('auth:sanctum')->prefix('v1/')->group(function () {
     Route::apiResource('wishlist', WishlistController::class);
     Route::get('/user', [InforUserController::class, 'getInforUser']);
     Route::put('/user/update', [InforUserController::class, 'updateInforUser']);
+    Route::apiResource('addresses', AddressController::class);
     Route::post('logout', [AuthController::class, 'logout']);
 
     //  // Tạo hoặc lấy cuộc trò chuyện giữa hai người dùng
