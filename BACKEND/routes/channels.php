@@ -19,3 +19,6 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
 Broadcast::channel('conversation.{conversationId}', function ($user, $conversationId) {
     return $user->conversations()->where('conversations.id', $conversationId)->exists();
 });
+Broadcast::channel('orders', function ($user) {
+    return true;
+});

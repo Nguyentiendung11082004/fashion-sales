@@ -64,7 +64,6 @@ class PaymentController extends Controller
     }
     public function vnpayReturn(Request $request)
     {
-
         $vnp_TxnRef = $request->vnp_TxnRef;
         $vnp_Amount = $request->vnp_Amount;
         $vnp_ResponseCode = $request->vnp_ResponseCode;
