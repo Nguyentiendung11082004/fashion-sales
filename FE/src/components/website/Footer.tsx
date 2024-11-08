@@ -12,6 +12,7 @@ type Props = {};
 
 const Footer = (props: Props) => {
   return (
+    
     <footer className="bg-[#f6f6f8] mt-5 py-16 ">
       <div className="container grid lg:grid-cols-12 md:grid-cols-2 sm:grid-cols-1 gap-4 ">
         <div className=" mt-5 lg:col-span-3 md:col-span-6 md:order-1 lg:order-1">
@@ -232,6 +233,7 @@ const Footer = (props: Props) => {
           </div>
         </div>
       </div>
+      
     </footer>
   );
 };

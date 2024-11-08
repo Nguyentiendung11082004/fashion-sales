@@ -182,7 +182,7 @@ class ProductController extends Controller
                     "attribute_item_id",
                     "product_variant",
                     "gallery",
-                    "tags"
+                    "tags",
                 ]);
 
                 $dataProduct['slug'] = Str::slug($dataProduct["name"]);
@@ -190,7 +190,7 @@ class ProductController extends Controller
                 if (isset($request->gallery)) {
 
                     foreach ($request->gallery as $galleryItem) {
-                        
+
                         if (isset($galleryItem['id']) && isset($galleryItem['image'])) {
 
                             $gallery = ProductGallery::query()->findOrFail($galleryItem['id']);
@@ -200,6 +200,7 @@ class ProductController extends Controller
                         }
                     }
                 }
+
 
                 $product->tags()->sync($request->tags);
 
@@ -211,9 +212,9 @@ class ProductController extends Controller
                     $product->attributes()->sync($syncData);
 
                     // Lấy biến thể hiện tại của sản phẩm từ database
-                   
 
-                   
+
+
                     // Tải các biến thể hiện có của sản phẩm và chuyển đổi thành mảng
                     $existingVariants = $product->load(['variants'])->toArray()['variants'];
 
@@ -227,7 +228,7 @@ class ProductController extends Controller
 
                         // Xử lý hình ảnh
                         if (isset($item["image"])) {
-                           
+
                             $url = $item["image"];
                         } else {
                             // Giữ ảnh cũ nếu không upload ảnh mới
@@ -344,11 +345,11 @@ class ProductController extends Controller
         try {
             $product = Product::query()->findOrFail($id);
             $respone = DB::transaction(function () use ($product) {
-                
+
                 ProductGallery::query()->where('product_id', $product->id)->delete();
                 $product->tags()->sync([]);
                 if ($product->type == 1) {
-                 
+
                     DB::table('product_variant_has_attributes')->whereIn('product_variant_id', function ($query) use ($product) {
                         $query->select('id')
                             ->from('product_variants')

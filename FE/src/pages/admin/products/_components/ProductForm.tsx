@@ -12,6 +12,7 @@ import { UploadFile, UploadProps } from 'antd/es/upload'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
+import { productDestroy } from '@/services/api/admin/products.api'
 type ErrorResponse = {
     [key: string]: string[];
 };
@@ -48,6 +49,7 @@ const ProductForm = () => {
         setValueStatus(e.target.value);
     };
     const [checkedItems, setCheckedItems] = useState<any[]>([]);
+    
     const [variants, setVariants] = useState([
         { image: '', price_regular: '', price_sale: '', quantity: '', sku: '' }
     ]);
@@ -63,6 +65,8 @@ const ProductForm = () => {
     });
 
     const handleChangeAttribute = (value: number) => {
+        if (value === attribute) return;
+
         setAttribute(value);
         setSelectedAttributeChildren([]);
         setIsTableVisible(false);
@@ -173,6 +177,9 @@ const ProductForm = () => {
             }
         },
     });
+
+    const [galleryFileList, setGalleryFileList] = useState<UploadFile[]>([]);
+    const [deletedGalleryIds, setDeletedGalleryIds] = useState<number[]>([]);
     const propsGallery: UploadProps = {
         name: 'file',
         action: 'https://api.cloudinary.com/v1_1/dlvwxauhf/image/upload',
@@ -182,22 +189,52 @@ const ProductForm = () => {
         },
         multiple: true,
         listType: "picture",
+        // fileList: galleryFileList,
         onChange(info: any) {
+            
             if (info.file.status === "done") {
                 const isImage = /^image\//.test(info?.file?.type);
                 if (isImage) {
-                    setImageGaller((prev: any) => [...prev, info.file.response.url]);
+                    const newImageUrl = info.file.response.secure_url || info.file.response.url;
+                    setImageGaller((prev) => [...prev, newImageUrl])
+                    // Cập nhật `imageGallery` nếu chưa có
+                    // setImageGaller((prev) => {
+                    //     if (!prev.includes(newImageUrl)) {
+                    //         return [...prev, newImageUrl];
+                    //     }
+                    //     return prev;
+                    // });
+    
+    
                     message.open({
                         type: 'success',
                         content: 'Upload ảnh thành công',
                     });
                 }
             } else if (info.file.status === "error") {
-                message.error(`${info.file.name} file upload failed.`)
+                message.error(`${info.file.name} file upload failed.`);
             }
+    
+            // Cập nhật `galleryFileList` trước khi upload
+            // if (info.file.status !== "done") {
+            //     setGalleryFileList((prev) => {
+            //         const newFile = {
+            //             ...info.file,
+            //             uid: String(new Date().getTime()), // Tạo uid duy nhất
+            //         };
+            //         return [...prev, newFile];
+            //     });
+            // }
         },
-        
+        onRemove(file) {
+            setImageGaller((prev) => prev.filter((imgUrl) => imgUrl !== file.url));
+            // setGalleryFileList((prev) => prev.filter((f) => f.url !== file.url));
+            message.info(`${file.name} đã bị xóa.`);
+            return true;
+        }
     }
+    
+    
     const [fileList, setFileList] = useState<UploadFile[]>([]);
     const propsImgThumbnail: UploadProps = {
         name: 'file',
@@ -226,8 +263,8 @@ const ProductForm = () => {
             setFileList(info.fileList.slice(-1));
         },
         onRemove(file) {
-            setFileList([]); // Xóa danh sách file
-            setUrlImage(null); // Xóa URL ảnh
+            setFileList([]); 
+            setUrlImage(null); 
             message.info(`${file.name} đã bị xóa.`);
             return true;
         },
@@ -263,7 +300,9 @@ const ProductForm = () => {
             title: 'Ảnh',
             dataIndex: 'image',
             render: (text: any, record: any, index: number) => (
-                <Upload {...getPropsImgThumbnail(index)}>
+                <Upload {...getPropsImgThumbnail(index)}
+                
+                >
                     <Button icon={<UploadOutlined />}>Tải lên ảnh</Button>
                 </Upload>
             )
@@ -325,7 +364,9 @@ const ProductForm = () => {
         },
         enabled: !!id
     });
+    
     const getProduct = (productShow: any) => {
+        console.log("ProductShow:", productShow);
         const productTags = productShow.tags.map((tag: any) => tag.id);
         const productType = productShow.type ? 1 : 0;
         const productAttribute = productShow.attributes.map((attribute: any) => attribute.id);
@@ -334,8 +375,15 @@ const ProductForm = () => {
             return acc;
         }, {});
 
-        // setUrlImage(productShow.img_thumbnail || null);
-        // setImageGaller(productShow.gallery || []); 
+        const initialGalleryFiles = (productShow.galleries || []).map((galleryItem: any, index: number) => ({
+            uid: String(galleryItem.id || index), // Sử dụng `id` từ backend hoặc `index` để đảm bảo `uid` là duy nhất
+            name: galleryItem.image.substring(galleryItem.image.lastIndexOf('/') + 1),
+            status: 'done',
+            url: galleryItem.image,
+        }));        
+        // setGalleryFileList(initialGalleryFiles); 
+        setImageGaller(initialGalleryFiles.map((item: any) => item.url));  
+        // console.log(initialFileList);      
 
         setAttribute(productType);
         setSelectedAttributeChildren(productAttribute);
@@ -356,15 +404,39 @@ const ProductForm = () => {
                 ...itemAttributes
             };
         });
-
         setSelectedItems(initialItems);
+
+        // const initialCheckedItems = productShow.variants.map((variant: any) => variant.isChecked || false);
+        // setCheckedItems(initialCheckedItems);
+
+        const initialVariants = productShow.variants.map((variant: any) => ({
+            image: variant.image || '',
+            price_regular: variant.price_regular || '',
+            price_sale: variant.price_sale || '',
+            quantity: variant.quantity || '',
+            sku: variant.sku || ''
+          }));
+        setVariants(initialVariants);
+
+        setValueStatus(productShow.status ? 1 : 0);
+        setValueHome(productShow.is_show_home ? 1 : 0);
+        setValueTrend(productShow.trend ? 1 : 0);
+        setValueNew(productShow.is_new ? 1 : 0);
+
         form.setFieldsValue({
             ...productShow,
+            status: productShow.status ? 1 : 0,
+            is_show_home: productShow.is_show_home ? 1 : 0,
+            trend: productShow.trend ? 1 : 0,
+            is_new: productShow.is_new ? 1 : 0,
             tags: productTags,
             type: productType,
             attribute_id: productAttribute,
+            gallery: initialGalleryFiles.map((item: any) => item.url),         
+            variants: initialVariants, 
             ...productAttributeValue,
         });
+
         productAttribute.forEach((attrId: any) => {
             const values = productAttributeValue[attrId] || [];
             handleChangeAttributeItem(attrId, values);
@@ -372,8 +444,11 @@ const ProductForm = () => {
     };
     useEffect(() => {
         if (productShow) {
+            // console.log("productShow:", productShow);
             getProduct(productShow);
+            // setImageGaller(productShow.galleries.map((item: any) => item.url))
         }
+        
     }, [productShow, form]);
     const handleErrorResponse = (error: any) => {
         setIsLoading(false);
@@ -384,7 +459,7 @@ const ProductForm = () => {
                 errors: errorFields[key],
             }));
             form.setFields(fields);
-            const allFieldNames = ['name', 'attribute_id', 'tags', 'brand_id', 'category_id', 'slug', 'sku', 'img_thumbnail', 'gallery', 'type', 'price_regular', 'price_sale', 'quantity', 'description', 'description_title'];
+            const allFieldNames = ['name', 'attribute_id', 'tags', 'brand_id', 'category_id', 'slug', 'sku', 'img_thumbnail', 'galleries', 'type', 'price_regular', 'price_sale', 'quantity', 'description', 'description_title'];
             allFieldNames.forEach((field) => {
                 if (!errorFields[field]) {
                     form.setFields([{ name: field, errors: [] }]);
@@ -479,11 +554,11 @@ const ProductForm = () => {
             });
             productVariantData.push({
                 attribute_item_id: attributeItemIds,
-                price_regular: Number(variant.price_regular),
-                price_sale: Number(variant.price_sale),
-                quantity: Number(variant.quantity),
-                image: variant.image,
-                sku: variant.sku,
+                price_regular: Number(variant?.price_regular),
+                price_sale: Number(variant?.price_sale),
+                quantity: Number(variant?.quantity),
+                image: variant?.image,
+                sku: variant?.sku,
                 slug: ''
             });
         });
@@ -518,8 +593,6 @@ const ProductForm = () => {
             }
         }
     };
-
-
 
     return (
         <div className="p-6 min-h-screen">
@@ -597,13 +670,7 @@ const ProductForm = () => {
                             <Form.Item name="img_thumbnail" label="Ảnh sản phẩm" >
                                 <Upload
                                     {...propsImgThumbnail}
-                                    // showUploadList={{
-                                    //     showPreviewIcon: false,
-                                    //     showRemoveIcon: true,
-                                    // }}
-                                    // onRemove={() => {
-                                    //     setUrlImage(null);
-                                    // }}
+                      
                                 >
                                     <Button icon={<UploadOutlined />}>Tải lên ảnh</Button>
                                 </Upload>
@@ -626,13 +693,9 @@ const ProductForm = () => {
                                 label="Chọn mảng nhiều ảnh"
                                 className="col-span-1"
                             >
-
                                 <Upload
                                     {...propsGallery}
-                                    onRemove={(file) => {
-                                        const newGallery = imageGallery.filter((_, idx) => idx !== Number(file.uid));
-                                        setImageGaller(newGallery);
-                                    }}
+                                    // fileList={galleryFileList}
                                 >
                                     <Button icon={<UploadOutlined />}>Tải lên gallery</Button>
                                 </Upload>
@@ -743,7 +806,7 @@ const ProductForm = () => {
                                 {error?.description_title && <div className='text-red-600'>{error.description_title.join(', ')}</div>}
 
                             </Form.Item>
-                            <Form.Item name="status" label="Status" className="col-span-1" initialValue={'1'}>
+                            <Form.Item name="status" label="Status" className="col-span-1">
                                 <div className="border border-gray-300 rounded-lg p-4 flex items-center space-x-4">
                                     <Radio.Group onChange={onChangeStatus} value={valueStatus} className="flex space-x-4">
                                         <Radio
@@ -761,7 +824,7 @@ const ProductForm = () => {
                                     </Radio.Group>
                                 </div>
                             </Form.Item>
-                            <Form.Item name="is_show_home" label="Is Show Home" className="col-span-1" initialValue={'1'}>
+                            <Form.Item name="is_show_home" label="Is Show Home" className="col-span-1" >
                                 <div className="border border-gray-300 rounded-lg p-4 flex items-center space-x-4">
                                     <Radio.Group onChange={onChangeHome} value={valueHome} className="flex space-x-4">
                                         <Radio
@@ -782,7 +845,7 @@ const ProductForm = () => {
                             </Form.Item>
 
 
-                            <Form.Item name="trend" label="Is Trend" className="col-span-1" initialValue={'1'}>
+                            <Form.Item name="trend" label="Is Trend" className="col-span-1" >
                                 <div className="border border-gray-300 rounded-lg p-4 flex items-center space-x-4">
                                     <Radio.Group onChange={onChangeTrend} value={valueTrend} className="flex space-x-4">
                                         <Radio
@@ -800,7 +863,7 @@ const ProductForm = () => {
                                     </Radio.Group>
                                 </div>
                             </Form.Item>
-                            <Form.Item name="is_new" label="Is New" className="col-span-1" initialValue={'1'}>
+                            <Form.Item name="is_new" label="Is New" className="col-span-1" >
                                 <div className="border border-gray-300 rounded-lg p-4 flex items-center space-x-4">
                                     <Radio.Group onChange={onChangeNew} value={valueNew} className="flex space-x-4">
                                         <Radio
