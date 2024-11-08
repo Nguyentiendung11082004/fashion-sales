@@ -48,7 +48,10 @@ class OrderController extends Controller
     }
     public function store(StoreOrderRequest $request)
     {
+        
         try {
+            
+           
             $data = $request->validated(); // Lấy dữ liệu đã xác thực
             // dd($data);
             // Kiểm tra xem người dùng có muốn mua ngay hay không
