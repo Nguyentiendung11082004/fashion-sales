@@ -30,28 +30,25 @@ class StoreOrderRequest extends FormRequest
     {
         return [
             'payment_method_id' => 'required|integer|exists:payment_methods,id',
-            // 'payment_status' => 'required|string',
             'user_note' => 'nullable|string|max:255',
             'ship_user_name' => 'required|string|max:255',
-            // Validate số điện thoại Việt Nam
             'ship_user_phonenumber' => [
                 'required',
                 'regex:/^0[3|5|7|8|9][0-9]{8}$/',
             ],
-            'ship_user_email' => 'nullable|string|max:255',
+            'ship_user_email' => 'nullable|email|max:255',
             'ship_user_address' => 'required|string|max:255',
             'shipping_method' => 'required|string|max:50',
-            // Validate mua ngay
-            'id_product' => 'required_without:cart_item_ids|integer|exists:products,id',
-            'product_variant_id' => 'required_if:is_variant,true|integer|exists:product_variants,id|nullable', // Yêu cầu nếu là biến thể
+            'product_id' => 'required_without:cart_item_ids|integer|exists:products,id',
+            'product_variant_id' => 'required_if:is_variant,true|integer|exists:product_variants,id|nullable',
             'quantity' => 'required_without:cart_item_ids|integer|min:1',
-            // Validate mua theo cart
-            'cart_item_ids' => 'required_without:id_product|array',
-            'cart_item_ids.*' => 'integer|exists:cart_items,id', // Kiểm tra từng ID của cart_item_ids
-            'quantityOfCart.*' => 'required_without:id_product|integer|min:1', // Kiểm tra từng quantity tương ứng với cart_item_ids
+            'cart_item_ids' => 'required_without:product_id|array',
+            'cart_item_ids.*' => 'integer|exists:cart_items,id',
+            'quantityOfCart.*' => 'required_without:product_id|integer|min:1',
             'voucher_code' => 'nullable|string|exists:vouchers,code',
         ];
     }
+
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
@@ -65,13 +62,13 @@ class StoreOrderRequest extends FormRequest
         if ($this->has('product_id')) {
             $product = Product::find($this->product_id);
 
-            if ($product->type) { // Sản phẩm có biến thể
+            if ($product->type) {
                 if (!$this->filled('product_variant_id')) {
                     $validator->errors()->add('product_variant_id', 'Vui lòng chọn biến thể sản phẩm.');
                 } else {
                     $this->validateVariant($validator, $product);
                 }
-            } else { // Sản phẩm đơn
+            } else {
                 if ($this->filled('product_variant_id')) {
                     $validator->errors()->add('product_variant_id', 'Sản phẩm đơn không có biến thể.');
                 }

@@ -82,4 +82,9 @@ class User extends Authenticatable implements MustVerifyEmail
     public function conversations(){
         return $this->belongsToMany(Conversation::class,"conversation_users","user_id","conversation_id")->withPivot('is_deleted');
     }
+
+    public function addresses()
+{
+    return $this->hasMany(Address::class);
+}
 }

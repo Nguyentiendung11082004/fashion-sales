@@ -16,6 +16,7 @@ const ModalCart = ({ open, onClose, idCart, onUpdateAttributes, attributes }: Pr
   const [activeAttributes, setActiveAttributes] = useState<any>({});
   const [currentPrice, setCurrentPrice] = useState<number | null>(null);
   const transformAttributes = (attributes: any) => {
+    console.log("attributes",attributes)
     return attributes?.reduce((acc: any, curr: any) => {
       acc[curr.name] = curr.pivot.attribute_item_id.toString();
       return acc;
