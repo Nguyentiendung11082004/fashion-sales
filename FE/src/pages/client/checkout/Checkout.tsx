@@ -19,14 +19,34 @@ const Checkout = () => {
   const navigate = useNavigate();
   const savedCartIds = localStorage.getItem('cartIds');
   const cartIds = location.state?.cartIds || (savedCartIds ? JSON.parse(savedCartIds) : []);
-  // const { cartId } = location.state || {};
-  // console.log("cartId",cartId)
-  console.log("cartIds",cartIds)
+  const _payload = location.state?._payload
+  console.log("_payload", _payload)
   const [idTinh, setIdTinh] = useState<number | null>(0)
   const [idQuanHuyen, setIdQuanHuyen] = useState<number | null>(0)
   const [idXa, setIdXa] = useState<number | null>(0)
   const [paymentMethhod, setPaymentMethod] = useState('1');
   const [shiping, setShipPing] = useState('1');
+  const [voucher, setVoucher] = useState<any>();
+  const [subTotal, setSubTotal] = useState(); // giá khi áp dụng voucher
+  const [totalDiscount, setTotalDiscount] = useState();
+  const [dataCheckout, setDataCheckout] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true); // Trạng thái loading
+
+  const mutationVoucher = useMutation({
+    mutationFn: async () => {
+      const res = await instance.post(`/checkout`, {
+        cart_item_ids: cartIds,
+        voucher_code: voucher,
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        }
+      });
+      setTotalDiscount(res?.data?.total_discount)
+      setSubTotal(res?.data?.sub_total)
+      return res.data;
+    },
+  });
   const handleChangeMethod = (e: any) => {
     const newPaymentMethod = e.target.value;
     setPaymentMethod(newPaymentMethod);
@@ -35,45 +55,14 @@ const Checkout = () => {
       payment_method_id: newPaymentMethod,
     }));
   };
-  const { data: dataCheckout, isLoading } = useQuery({
-    queryKey: ['checkout', cartIds],
-    queryFn: async () => {
-      const payload = {cart_item_ids: cartIds || []};
-      const { data } = await instance.post(`/checkout`, payload, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      return data;
-    },
-    enabled: !!(cartIds && cartIds.length),
-  });
-  const [voucher, setVoucher] = useState<any>();
-  const [subTotal, setSubTotal] = useState(); // đấy là giá khi áp dụng voucher
-  const [totalDiscount, setTotalDiscount] = useState();
-  const mutationVoucher = useMutation({
-    mutationFn: async () => {
-      const res = await instance.post(`/checkout`, {
-        cart_item_ids: cartIds,
-        voucher_code: voucher,
-      },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          }
-        }
-      )
-      setTotalDiscount(res?.data?.total_discount)
-      setSubTotal(res?.data?.sub_total)
-      return res.data;
-    },
-  })
+
   const qty = dataCheckout?.order_items?.map((e: any) => e?.quantity);
   const cartItemIds = dataCheckout?.order_items?.map((e: any) => e);
   const quantityOfCart = cartItemIds?.reduce((acc: any, id: any, index: number) => {
     acc[id] = qty[index];
     return acc;
   }, {});
+
   const defaultOrder = {
     payment_method_id: 1,
     payment_status: "pending",
@@ -84,12 +73,14 @@ const Checkout = () => {
     ship_user_address: '',
     shipping_method: shiping,
     voucher_code: voucher,
+    // id_product: _payload.id_product,
+    // product_variant_id: _payload.product_variant_id,
+    // quantity: _payload.quantity
     cart_item_ids: cartIds || [],
     quantityOfCart: quantityOfCart || {},
-    // id_product: 1,
-    // product_variant_id: 1,
-    // quantity: 1
+
   };
+
   const [order, setOrder] = useState(defaultOrder);
   useEffect(() => {
     if (dataCheckout && dataCheckout.user) {
@@ -103,12 +94,14 @@ const Checkout = () => {
       }));
     }
   }, [dataCheckout]);
+
   const setForm = (props: any, value: any) => {
     setOrder((prev) => ({
       ...prev,
       [props]: value
-    }))
-  }
+    }));
+  };
+
   const orderMutation = useMutation({
     mutationFn: async () => {
       const res = await instance.post(`/order`, order, {
@@ -126,39 +119,47 @@ const Checkout = () => {
         navigate('/thank');
         queryClient.invalidateQueries({
           queryKey: ['cart']
-        })
+        });
         localStorage.removeItem('checkedItems');
       }
+      localStorage.removeItem('checkedItems');
     },
     onError: (error: any) => {
-      toast.error(error?.response?.data?.message)
+      toast.error(error?.response?.data?.message);
     }
-  })
+  });
+
   const handleOrder = () => {
     orderMutation.mutate();
-  }
-  // xu ly tinh thanh
+  };
+
+  // Xử lý tỉnh thành, quận huyện, phường xã
   const { data: tinhThanh } = useQuery({
     queryKey: ['tinhThanh'],
     queryFn: async () => {
       const res = await instance.get(`/getprovinces`);
       return res.data;
     }
-  })
+  });
+
   const handleChangeTinh = (e: any) => {
     setIdTinh(Number(e));
-  }
+  };
+
   const handleChangeQuanHuyen = (e: any) => {
     const value = parseInt(e, 10);
     setIdQuanHuyen(value);
   };
+
   const handleChangeXa = (e: any) => {
     const value = parseInt(e, 10);
-    setIdXa(value)
-  }
+    setIdXa(value);
+  };
+
   const handleChangeShiping = (e: any) => {
-    setShipPing(e)
-  }
+    setShipPing(e);
+  };
+
   const { data: quanHuyen } = useQuery<any>({
     queryKey: ['quanHuyen', idTinh],
     queryFn: async () => {
@@ -167,6 +168,7 @@ const Checkout = () => {
     },
     enabled: !!tinhThanh
   });
+
   const { data: phuongXa } = useQuery({
     queryKey: ['phuongXa', idQuanHuyen],
     queryFn: async () => {
@@ -178,8 +180,46 @@ const Checkout = () => {
 
   const handleVoucher = () => {
     mutationVoucher.mutate();
-  }
-  if (isLoading) return <div><Loading /></div>;
+  };
+
+  useEffect(() => {
+    if (!_payload) {
+      return;
+    }
+  })
+  useEffect(() => {
+    const fetchData = async () => {
+      const payload = { cart_item_ids: cartIds };
+      try {
+        const response = await fetch('http://127.0.0.1:8000/api/v1/checkout', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        setDataCheckout(data);
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Error:', error);
+        setIsLoading(false);
+      }
+    };
+
+    if (cartIds && cartIds.length > 0) {
+      fetchData();
+
+    }
+  }, [cartIds, token, _payload]);
+  // console.log(loading,"loading")
+  // if (isLoading) return <div><Loading /></div>;
 
   return (
     <>
@@ -202,7 +242,8 @@ const Checkout = () => {
         <div className="hd-CheckoutPage">
           <main className="container py-16 lg:pb-28 lg:pt-20">
             {
-              isLoading ? <Loading /> : <div className="flex flex-col lg:flex-row">
+              isLoading ? <Loading /> : 
+              <div className="flex flex-col lg:flex-row">
                 <div className="flex-1">
                   <div className="space-y-8">
                     <div id="hd-ContactInfo" className="scroll-mt-24">
@@ -516,7 +557,8 @@ const Checkout = () => {
                 <div className="flex-shrink-0 border-t lg:border-t-0 lg:border-l border-slate-200 my-10 lg:my-0 lg:mx-10 xl:lg:mx-14 2xl:mx-16" />
                 <div className="w-full lg:w-[36%]">
                   <h3 className="text-lg font-semibold mb-4">Đặt hàng</h3>
-                  {isLoading ? <Loading /> :
+                  {
+                    isLoading ? <Loading /> :
                     dataCheckout?.order_items.map((e: any) => (
                       <>
                         <div className="relative flex  first:pt-0 last:pb-0">

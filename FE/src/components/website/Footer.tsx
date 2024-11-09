@@ -12,8 +12,7 @@ type Props = {};
 
 const Footer = (props: Props) => {
   return (
-    
-    <footer className="bg-[#f6f6f8] mt-5 py-16 ">
+    <footer className="bg-[#f6f6f8] mt-5 py-16 z-1">
       <div className="container grid lg:grid-cols-12 md:grid-cols-2 sm:grid-cols-1 gap-4 ">
         <div className=" mt-5 lg:col-span-3 md:col-span-6 md:order-1 lg:order-1">
           <img
@@ -23,18 +22,18 @@ const Footer = (props: Props) => {
           />
           <div className="flex mb-5">
             <div className="mr-2">
-            <MapFooter/>
+              <MapFooter />
             </div>
             <p>184 Nam Từ Liêm , Hà Nội</p>
           </div>
           <div className="flex mb-5">
-            <EmailFooter/>
+            <EmailFooter />
             <p>contact@company.com</p>
           </div>
           <div className="flex mb-5">
             <div className="mr-2">
-            
-           <PhoneFooter/>
+
+              <PhoneFooter />
             </div>
             <p>+001 2233 456</p>
           </div>
@@ -204,7 +203,7 @@ const Footer = (props: Props) => {
             </ul>
           </div>
         </div>
-        <div className=" mt-5 lg:col-span-3 md:col-span-6 md:order-2  lg:order-3">
+        <div className=" mt-5 lg:col-span-3 md:col-span-6 md:order-2 lg:order-3">
           <div>
             <h4 className="font-semibold mb-8 mt-2 text-lg text-[#222222] ">
               Đăng ký bản tin
@@ -213,22 +212,25 @@ const Footer = (props: Props) => {
               Đăng ký nhận bản tin của chúng tôi và được giảm giá 10% cho lần
               đầu tiên của bạn mua
             </span>
-            <form className="max-w-md w-full my-5 rounded-lg flex">
-              <div className="relative flex-1">
-                <input
-                  type="email"
-                  className="w-full border-gray-300 border rounded-full py-4 px-3 focus:outline-none focus:ring-2 focus:border-transparent"
-                  placeholder="Emai của bạn"
-                  required
-                />
-                <button
-                  type="submit"
-                  className="absolute hd-all-hoverblue-btn rounded-full right-[5px] top-[5px] bottom-[5px] bg-black text-white px-6"
-                >
-                  Đăng ký
-                </button>
+            <div className="max-w-md w-full my-5 rounded-lg flex">
+              <div className="max-w-md w-full my-5 rounded-lg flex">
+                <div className=" flex-1">
+                  <input
+                    type="email"
+                    className="w-full border-gray-300 border rounded-full py-4 px-3 focus:outline-none focus:ring-2 focus:border-transparent"
+                    placeholder="Email của bạn"
+                    required
+                  />
+                  {/* <button
+                    type="submit"
+                    className="absolute hd-all-hoverblue-btn rounded-full right-[5px] top-[5px] bottom-[5px] bg-black text-white px-6"
+                  >
+                    Đăng ký
+                  </button> */}
+                </div>
               </div>
-            </form>
+
+            </div>
             <img src={imgfooter} />
           </div>
         </div>

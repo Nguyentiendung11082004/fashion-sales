@@ -16,10 +16,10 @@ const ModalCart = ({ open, onClose, idCart, onUpdateAttributes, attributes }: Pr
   const [activeAttributes, setActiveAttributes] = useState<any>({});
   const [currentPrice, setCurrentPrice] = useState<number | null>(null);
   const transformAttributes = (attributes: any) => {
-    return attributes?.reduce((acc: any, curr: any) => {
+    return (Array.isArray(attributes) ? attributes : []).reduce((acc: any, curr: any) => {
       acc[curr.name] = curr.pivot.attribute_item_id.toString();
       return acc;
-    }, {}) || {};
+    }, {});
   };
   const [dataAttributes, setAttribute] = useState<any>(transformAttributes(attributes));
   useEffect(() => {

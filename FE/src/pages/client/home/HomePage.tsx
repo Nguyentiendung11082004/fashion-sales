@@ -73,6 +73,7 @@ const HomePage = () => {
           </div>
           <div className="grid grid-cols-2 gap-4 lg:ml-2.5 lg:grid-cols-3 xl:grid-cols-4 lg:gap-8 xl:gap-8 md:grid-cols-3 md:gap-6 mx-auto">
             {trendProducts.map((product) => (
+             <Link to={`/products/${product?.id}`} >
               <div key={product.id} className="product-item">
                 <div className="lg:mb-[25px] mb-[20px]">
                   <div className="cursor-pointer lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] sm:h-[345px] overflow-hidden">
@@ -108,10 +109,8 @@ const HomePage = () => {
                         </button>
                       </Link>
                       <Link to="" className="group/btn relative">
-                        <button
-                          className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]"
-                          onClick={() => modalRef.current?.showModal()}
-                        >
+                        <button className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]"
+                          onClick={() => modalRef.current?.showModal()}>
                           <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
                             Thêm vào giỏ hàng
                           </p>
@@ -320,7 +319,6 @@ const HomePage = () => {
                       </div>
                     )}
                   </div>
-
                   <div className="t4s-product-colors flex">
                     {product.unique_attributes &&
                       Object.entries(product.unique_attributes)
@@ -396,6 +394,7 @@ const HomePage = () => {
                   </div>
                 </div>
               </div>
+             </Link>
             ))}
           </div>
           <CartPopup ref={modalRef} />

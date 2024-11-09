@@ -1,25 +1,29 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import {
   colorTranslations,
 } from "@/common/colors/colorUtils";
-import instance from "@/configs/axios";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import NoDatasIcon from "@/components/icons/products/NoDataIcon";
-import unorm from "unorm";
-import { useWishlist } from "@/common/context/Wishlist/WishlistContext";
-import HeartRed from "@/components/icons/detail/HeartRed";
-import { LoadingOutlined } from "@ant-design/icons";
-import { useAuth } from "@/common/context/Auth/AuthContext";
-import { useCart } from "@/common/context/Cart/CartContext";
+
 import { ResponseData } from "@/common/types/responseDataFilter";
 import CartDetail from "@/components/icons/detail/CartDetail";
 import Eye from "@/components/icons/detail/Eye";
+
 import HeartWhite from "@/components/icons/detail/HeartWhite";
 import Less from "@/components/icons/detail/Less";
-import { Spin } from "antd";
+import NoDatasIcon from "@/components/icons/products/NoDataIcon";
+import instance from "@/configs/axios";
+
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {Spin} from 'antd';
 import "rc-slider/assets/index.css";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import unorm from "unorm";
+import { useWishlist } from "@/common/context/Wishlist/WishlistContext";
+import HeartRed from "@/components/icons/detail/HeartRed";
+import { Button } from "antd";
+import { LoadingOutlined } from "@ant-design/icons";
+import { useAuth } from "@/common/context/Auth/AuthContext";
+import { useCart } from "@/common/context/Cart/CartContext";
 
 const Products = () => {
   const [growboxDropdownOpen, setGrowboxDropdownOpen] = useState(false);
@@ -30,7 +34,6 @@ const Products = () => {
   const [noProductsMessage, setNoProductsMessage] =
     useState<React.ReactNode>(null);
   const { handleAddToWishlist, isInWishlist } = useWishlist();
-
   const [allproducts, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [suggestions, setSuggestions] = useState<string[]>([]);
@@ -262,7 +265,7 @@ const Products = () => {
     }
   };
 
- 
+
 
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
@@ -844,13 +847,13 @@ const Products = () => {
                         }
                         checked={selectedColors.includes(
                           item.value.charAt(0).toUpperCase() +
-                            item.value.slice(1).toLowerCase()
+                          item.value.slice(1).toLowerCase()
                         )}
                         onChange={() =>
                           handleCheckboxChange(
                             "colors",
                             item.value.charAt(0).toUpperCase() +
-                              item.value.slice(1).toLowerCase()
+                            item.value.slice(1).toLowerCase()
                           )
                         }
                       />
@@ -861,7 +864,7 @@ const Products = () => {
                         <span className="text-slate-900 text-sm font-normal ">
                           {colorTranslations[
                             item.value.charAt(0).toUpperCase() +
-                              item.value.slice(1).toLowerCase()
+                            item.value.slice(1).toLowerCase()
                           ] || "No Size"}
                           {/*Dịch sang TViet và Chữ cái đầu viết hoa */}
                         </span>
@@ -1117,6 +1120,7 @@ const Products = () => {
                               )}
                             </div>
 
+                    
                             <Link to="" className="group/btn relative">
                               <button
                                 onClick={() =>
@@ -1128,7 +1132,7 @@ const Products = () => {
                                 className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]"
                               >
                                 <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                                  Thêm vào giỏ hàng
+                                  Thêm vào giỏ hàng 
                                 </p>
                                 {isLoading ? (
                                   <Spin
@@ -1201,7 +1205,7 @@ const Products = () => {
                           {product.price_regular && (
                             <div>
                               {product.price_sale > 0 &&
-                              product.price_sale < product.price_regular ? (
+                                product.price_sale < product.price_regular ? (
                                 <>
                                   <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400">
                                     -
@@ -1209,7 +1213,7 @@ const Products = () => {
                                       ((product.price_regular -
                                         product.price_sale) /
                                         product.price_regular) *
-                                        100
+                                      100
                                     )}
                                     %
                                   </div>
@@ -1227,131 +1231,100 @@ const Products = () => {
                           </p>
                           {(product?.price_regular ||
                             product?.variants?.length) && (
-                            <div>
-                              {(() => {
-                                const variants = product?.variants || [];
-                                // Tính toán giá bán và giá gốc từ các biến thể
-                                const minPriceSale = Math.min(
-                                  ...variants
-                                    .map((variant: any) => variant.price_sale)
-                                    .filter((price: any) => price >= 0)
-                                );
-                                const minPriceRegular = Math.min(
-                                  ...variants
-                                    .map(
-                                      (variant: any) => variant.price_regular
-                                    )
-                                    .filter((price: any) => price >= 0)
-                                );
-                                const maxPriceRegular = Math.max(
-                                  ...variants
-                                    .map(
-                                      (variant: any) => variant.price_regular
-                                    )
-                                    .filter((price: any) => price > 0)
-                                );
-                                const productPriceSale = product?.price_sale;
-                                const productPriceRegular =
-                                  product?.price_regular;
+                              <div>
+                                {(() => {
+                                  const variants = product?.variants || [];
+                                  // Tính toán giá bán và giá gốc từ các biến thể
+                                  const minPriceSale = Math.min(
+                                    ...variants
+                                      .map((variant: any) => variant.price_sale)
+                                      .filter((price: any) => price >= 0)
+                                  );
+                                  const minPriceRegular = Math.min(
+                                    ...variants
+                                      .map(
+                                        (variant: any) => variant.price_regular
+                                      )
+                                      .filter((price: any) => price >= 0)
+                                  );
+                                  const maxPriceRegular = Math.max(
+                                    ...variants
+                                      .map(
+                                        (variant: any) => variant.price_regular
+                                      )
+                                      .filter((price: any) => price > 0)
+                                  );
+                                  const productPriceSale = product?.price_sale;
+                                  const productPriceRegular =
+                                    product?.price_regular;
 
-                                const pricesSaleVar = variants.map(
-                                  (variant: any) => variant.price_sale
-                                );
-                                const pricesRegularVar = variants.map(
-                                  (variant: any) => variant.price_regular
-                                );
-                                const allSaleEqual = pricesSaleVar.every(
-                                  (price: any) => price === pricesSaleVar[0]
-                                );
-                                const allRegularEqual = pricesRegularVar.every(
-                                  (price: any) => price === pricesRegularVar[0]
-                                );
-
-                                if (minPriceSale > 0) {
-                                  // Nếu có giá sale
-                                  if (
-                                    productPriceSale &&
-                                    productPriceSale < productPriceRegular
-                                  ) {
-                                    return (
-                                      <>
-                                        <del className="mr-1">
-                                          {new Intl.NumberFormat(
-                                            "vi-VN"
-                                          ).format(productPriceRegular)}
-                                          ₫
-                                        </del>
-                                        <span className="text-[red]">
-                                          {new Intl.NumberFormat(
-                                            "vi-VN"
-                                          ).format(productPriceSale)}
-                                          ₫
-                                        </span>
-                                      </>
-                                    );
-                                  } else if (
-                                    productPriceSale &&
-                                    productPriceSale === productPriceRegular
-                                  ) {
-                                    return (
-                                      <span>
-                                        {new Intl.NumberFormat("vi-VN").format(
-                                          productPriceRegular
-                                        )}
-                                        ₫
-                                      </span>
-                                    );
-                                  } else {
-                                    if (allSaleEqual && allRegularEqual) {
-                                      // Nếu tất cả giá sale và giá regular giống nhau
+                                  // Điều kiện hiển thị
+                                  if (minPriceSale >= 0) {
+                                    // Nếu có giá sale
+                                    if (
+                                      productPriceSale &&
+                                      productPriceSale < productPriceRegular
+                                    ) {
                                       return (
                                         <>
                                           <del className="mr-1">
                                             {new Intl.NumberFormat(
                                               "vi-VN"
-                                            ).format(pricesRegularVar[0])}{" "}
+                                            ).format(productPriceRegular)}
                                             ₫
                                           </del>
                                           <span className="text-[red]">
                                             {new Intl.NumberFormat(
                                               "vi-VN"
-                                            ).format(pricesSaleVar[0])}{" "}
+                                            ).format(productPriceSale)}
                                             ₫
                                           </span>
                                         </>
                                       );
+                                    } else if (
+                                      productPriceSale &&
+                                      productPriceSale === productPriceRegular
+                                    ) {
+                                      return (
+                                        <span>
+                                          {new Intl.NumberFormat("vi-VN").format(
+                                            productPriceRegular
+                                          )}
+                                          ₫
+                                        </span>
+                                      );
                                     } else {
                                       return (
                                         <span>
-                                          {new Intl.NumberFormat(
-                                            "vi-VN"
-                                          ).format(minPriceSale)}
+                                          {new Intl.NumberFormat("vi-VN").format(
+                                            minPriceSale
+                                          )}
                                           ₫ -{" "}
-                                          {new Intl.NumberFormat(
-                                            "vi-VN"
-                                          ).format(maxPriceRegular)}
+                                          {new Intl.NumberFormat("vi-VN").format(
+                                            maxPriceRegular
+                                          )}
                                           ₫
                                         </span>
                                       );
                                     }
+                                  } else {
+                                    // Nếu không có giá sale, chỉ hiển thị khoảng giá regular
+                                    return (
+                                      <span>
+                                        {new Intl.NumberFormat("vi-VN").format(
+                                          minPriceRegular
+                                        )}
+                                        ₫ -{" "}
+                                        {new Intl.NumberFormat("vi-VN").format(
+                                          maxPriceRegular
+                                        )}
+                                        ₫
+                                      </span>
+                                    );
                                   }
-                                } else {
-                                  return (
-                                    <span>
-                                      {new Intl.NumberFormat("vi-VN").format(
-                                        minPriceRegular
-                                      )}
-                                      ₫ -{" "}
-                                      {new Intl.NumberFormat("vi-VN").format(
-                                        maxPriceRegular
-                                      )}
-                                      ₫
-                                    </span>
-                                  );
-                                }
-                              })()}
-                            </div>
-                          )}
+                                })()}
+                              </div>
+                            )}
                         </div>
 
                         <div className="t4s-product-colors flex">
