@@ -18,8 +18,8 @@ return new class extends Migration
             $table->id(); // ID đơn hàng
             $table->foreignIdFor(User::class)->constrained()->onDelete('cascade'); // Liên kết với bảng users
             $table->foreignIdFor(PaymentMethod::class)->constrained()->onDelete('cascade'); // Liên kết với bảng payment_methods
-            $table->string('order_status')->default('Chưa Thanh Toán'); // Trạng thái đơn hàng (completed, pending, shipped, v.v.).
-            $table->string('payment_status')->default('Chờ Xác Nhận'); // Trạng thái thanh toán
+            $table->string('order_status')->default('Chờ Xác Nhận'); // Trạng thái đơn hàng (completed, pending, shipped, v.v.).
+            $table->string('payment_status')->default('Chưa Thanh Toán'); // Trạng thái thanh toán
             $table->string('order_code')->unique(); // Mã đơn hàng
             $table->integer('total_quantity'); // Tổng số lượng
             $table->decimal('total', 15, 2); // Tổng giá trị đơn hàng

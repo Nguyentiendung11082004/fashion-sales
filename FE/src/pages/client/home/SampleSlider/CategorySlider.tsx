@@ -28,9 +28,9 @@ const CategoryCarousel = () => {
 
   useEffect(() => {
     axios
-      .get("http://127.0.0.1:8000/api/v1/product-home")
+      .get("http://127.0.0.1:8000/api/v1/category")
       .then((response) => {
-        setCategory(response.data.categories);
+        setCategory(response.data);
       })
       .catch((error) => {
         console.error("Có lỗi xảy ra khi lấy danh mục", error);
