@@ -73,6 +73,7 @@ const HomePage = () => {
           </div>
           <div className="grid grid-cols-2 gap-4 lg:ml-2.5 lg:grid-cols-3 xl:grid-cols-4 lg:gap-8 xl:gap-8 md:grid-cols-3 md:gap-6 mx-auto">
             {trendProducts.map((product) => (
+             <Link to={`/products/${product?.id}`} >
               <div key={product.id} className="product-item">
                 <div className="lg:mb-[25px] mb-[20px]">
                   <div className="cursor-pointer lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] sm:h-[345px] overflow-hidden">
@@ -255,10 +256,9 @@ const HomePage = () => {
                       </div>
                     )}
                   </div>
-
                   <div className="t4s-product-colors flex">
                     {product.unique_attributes.color &&
-                      Object.values(product.unique_attributes.color)
+                      Object.values(product.unique_attributes.color as { [key: string]: string })
                         .filter((color) => typeof color === "string")
                         .map((color, index) => (
                           <div key={index} className="mr-2 mt-1">
@@ -274,6 +274,7 @@ const HomePage = () => {
                   </div>
                 </div>
               </div>
+             </Link>
             ))}
           </div>
           <CartPopup ref={modalRef} />
@@ -514,7 +515,7 @@ const HomePage = () => {
 
                   <div className="t4s-product-colors flex">
                     {product.unique_attributes.color &&
-                      Object.values(product.unique_attributes.color)
+                      Object.values(product.unique_attributes.color as { [key: string]: string })
                         .filter((color) => typeof color === "string")
                         .map((color, index) => (
                           <div key={index} className="mr-2 mt-1">
