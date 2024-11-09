@@ -20,8 +20,8 @@ import { useQuery } from "@tanstack/react-query";
 type Props = {};
 const Header = (props: Props) => {
   const navigator = useNavigate();
-  const { data: wishlist = [] } = useWishlist();
-  const { user } = useUser();
+  const { data :  wishlist = []} = useWishlist();
+  const { user, urlImage } = useUser();
   let infoUser;
   if (user) {
     infoUser = user?.InforUser;
@@ -146,15 +146,11 @@ const Header = (props: Props) => {
             <div className="lg:col-span-2 col-span-4 flex items-center justify-end order-3">
               <div className="flex items-center space-x-4">
                 <div className="relative group">
-
-                  {
-                    user ? <Link to="/account">
-                      {
-                        user ? (<img src={`${infoUser?.avatar}`} className="h-10 w-10 rounded-full object-cover" alt={`${infoUser?.name}`} />) : <UserHome />
-                      }
-                    </Link> : <UserHome />
-                  }
-
+                  <Link to="/account">
+                    {
+                      user ? (<img src={urlImage || infoUser?.avatar} className="h-10 w-10 rounded-full object-cover" alt={infoUser?.name} />) : <UserHome />
+                    }
+                  </Link>
                   <div className="absolute left-[-50px] hidden group-hover:flex flex-col items-start mt-0 space-y-2 p-4 bg-white shadow-lg rounded-lg transition-all duration-300 z-10">
                     {
                       user ? (
