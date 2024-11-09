@@ -45,6 +45,7 @@ import VoucherDetail from "@/pages/admin/vouchers/components/VoucherDetail";
 import FormVoucher from "@/pages/admin/vouchers/components/FormVoucher";
 import Order from "@/pages/client/order";
 import Thanks from "@/pages/client/thanks/Thanks";
+import Permission from "@/pages/client/auth/permission";
 const Router = () => {
   return (
     <>
@@ -54,7 +55,9 @@ const Router = () => {
           <Route path="products" element={<Products />} />
           <Route path="products/:id" element={<ProductDetail />} />
           <Route path="about" element={<About />} />
-          <Route path="cart" element={<Cart />} />
+          <Route path="" element={<Permission />}>
+            <Route path="cart" element={<Cart />} />
+          </Route>
           <Route path="account" element={<Account />} />
           <Route path="wishlist" element={<Wishlist />} />
           <Route path="checkout" element={<Checkout />} />

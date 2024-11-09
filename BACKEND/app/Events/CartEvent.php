@@ -39,4 +39,8 @@ class CartEvent implements ShouldBroadcast
     {
         return new PrivateChannel('cart.' . $this->cartId);
     }
+    public function broadcastAs()
+{
+    return 'CartEvent';  // Tên sự kiện phải trùng với frontend
+}
 }
