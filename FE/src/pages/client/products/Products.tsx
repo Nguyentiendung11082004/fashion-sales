@@ -1126,7 +1126,7 @@ const Products = () => {
                                 className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]"
                               >
                                 <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                                  Thêm vào giỏ hàng
+                                  Thêm vào giỏ hàng 
                                 </p>
                                 {isLoading ? (
                                   <Spin

@@ -27,6 +27,7 @@ const MySwal = withReactContent(Swal);
 const Cart = () => {
   const [visiable, setVisible] = useState(false);
   const [idCart, setIdCart] = useState<any>('');
+  console.log("idCart", idCart)
   const [updatedAttributes, setUpdatedAttributes] = useState<any>({});
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -48,39 +49,51 @@ const Cart = () => {
     refetchOnWindowFocus: true,
     refetchOnMount: true,
   });
+  const pusher = new Pusher('4d3e0d70126f2605977e', {
+    cluster: 'ap1',
+    authEndpoint: 'http://localhost:8000/broadcasting/auth', // Thay bằng URL backend của bạn
+    auth: {
+      headers: {
+        Authorization: `${token}` // Thay thế bằng token của người dùng hiện tại
+      }
+    }
+  });
   useEffect(() => {
     console.log("1");
-    const pusher = new Pusher('4d3e0d70126f2605977e', {
-      cluster: 'ap1',
-    });
-    pusher.connection.bind('connected', () => {
-      console.log('Pusher connected');
-    });
-  
-    pusher.connection.bind('error', (err:any) => {
-      console.error('Pusher connection error:', err);
-    });
-    console.log("2");
-    // Giả sử cartId là id của giỏ hàng hiện tại (có thể lấy từ state hoặc props)
-
-  
-    // Đăng ký vào kênh 'cart.{cartId}'
-    const channel = pusher.subscribe(`cart.${idCart}`);
+    const channel = pusher.subscribe(`private-cart.${9}`);
     console.log("channel", channel);
-  
+
     // Lắng nghe sự kiện 'CartEvent'
-    channel.bind('CartEvent', (data:any) => {
+    channel.bind('CartEvent', (data: any) => {
       console.log("Received cart event:", data);
       queryClient.invalidateQueries({
         queryKey: ['cart']
       });
     });
-  
+
+    pusher.connection.bind('connected', () => {
+      console.log('Pusher connected');
+    });
+
+    pusher.connection.bind('error', (err: any) => {
+      console.error('Pusher connection error:', err);
+    });
+
+    console.log("2");
+
+    // Giả sử cartId là id của giỏ hàng hiện tại
+    console.log("idCart", idCart);
+
+    // Đăng ký vào kênh 'private-cart.{idCart}'
+
+
+    // Huỷ đăng ký kênh khi component bị unmount hoặc khi `idCart` thay đổi
     return () => {
-      pusher.unsubscribe(`cart.${idCart}`);
+      pusher.unsubscribe(`private-cart.${idCart}`);
     };
-  }, [idCart]);  // Đảm bảo rằng cartId không thay đổi khi component mount/unmount
-  
+  }, [data, queryClient]);  // Cập nhật khi idCart hoặc token thay đổi
+  // Đảm bảo rằng cartId không thay đổi khi component mount/unmount
+
   const updateQuantity = useMutation({
     mutationFn: async ({ idCart, newQuantity, qtyProductVarinat }: { idCart: number; newQuantity: number, qtyProductVarinat: any }) => {
       await instance.put(`/cart/${idCart}`, {
