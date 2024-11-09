@@ -31,14 +31,14 @@ const Banner = () => {
 
   const nextSlide = () => {
     setCurrentIndex(
-      (prevIndex) => (prevIndex + 1) % data?.data?.data?.banners.length
+      (prevIndex) => (prevIndex + 1) % data?.data?.data?.banners?.length
     );
   };
 
   const prevSlide = () => {
     setCurrentIndex(
       (prevIndex) =>
-        (prevIndex - 1 + data?.data?.data?.banners.length) %
+        (prevIndex - 1 + data?.data?.data?.banners?.length) %
         data?.data?.data?.banners.length
     );
   };
@@ -127,7 +127,7 @@ const Banner = () => {
           </svg>
         </button>
         <div className="absolute bottom-4 top-[80%] sm:top-[83%] lg:top-[87%] left-1/2 transform -translate-x-1/2 flex justify-center">
-          {data?.data?.data?.banners.map((_: any, index: any) => (
+          {data?.data?.data?.banners?.map((_: any, index: any) => (
             <button
               key={index}
               className={`w-3.5 h-3 mx-2 rounded-full ${

@@ -322,10 +322,8 @@ const ProductDetail = () => {
     product_variant: {},
   });
 
-  const [dataAttributes, setAttribute] = useState<any>([]);
-
   const handleAttributeSelect = (attribute: any, id: any) => {
-    setAttribute((prev: any) => ({
+    setSelectedAttributes((prev: any) => ({
       ...prev,
       [attribute]: id,
     }));
@@ -333,7 +331,10 @@ const ProductDetail = () => {
 
   const result = product?.variants
     .filter(
-      (variant: any) => variant.attributes && variant.attributes.length > 0
+      (variant: any) =>
+        variant.attributes &&
+        variant.attributes.length > 0 &&
+        variant.quantity > 0
     )
     .map((variant: any) => {
       const attributeObj = variant.attributes.reduce(
@@ -345,33 +346,18 @@ const ProductDetail = () => {
       );
       return attributeObj;
     });
-  // const result = product?.variants.map((variant: any) => {
-  //   if (!variant.attributes) {
-  //     return {};
-  //   }
-
-  //   const attributeObj = variant.attributes.reduce(
-  //     (acc: { [key: string]: number }, attribute: any) => {
-  //       acc[attribute.name] = attribute.pivot.attribute_item_id;
-  //       return acc;
-  //     },
-  //     {}
-  //   );
-  //   attributeObj["quantity"] = variant.quantity;
-  //   return attributeObj;
-  // });
-
-  console.log("Result:", result);
-
-  console.log("getUniqueAttributes", getUniqueAttributes);
 
   const checkDisable = (attribute: string, value: any) => {
     let res = false;
 
     let matchingItems = result?.filter((x: any) => {
-      return Object.keys(dataAttributes).every((key) => {
+      return Object.keys(selectedAttributes.product_variant).every((key) => {
         if (key !== attribute) {
-          return x[key] && x[key].toString() === dataAttributes[key].toString();
+          return (
+            x[key] &&
+            x[key].toString() ===
+              selectedAttributes?.product_variant[key].toString()
+          );
         }
         return true;
       });
@@ -386,39 +372,13 @@ const ProductDetail = () => {
     return res;
   };
 
-  console.log("getUniqueAttributes", getUniqueAttributes);
-
-  // const [isInitialLoad, setIsInitialLoad] = useState(true);
-  // useEffect(() => {
-  //   if (result && result.length > 0 && isInitialLoad) {
-  //     console.log("Setting selected attributes:", result[0]);
-  //     setSelectedAttributes({ product_variant: result[0] });
-  //     setIsInitialLoad(false);
-  //   }
-  // }, [result, isInitialLoad]);
-
-  // useEffect(() => {
-  //   console.log("Updated selectedAttributes:", selectedAttributes);
-  // }, [selectedAttributes]);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
   useEffect(() => {
-    if (getUniqueAttributes) {
-      const initialAttributes: IinitialAttributes = {};
-
-      const keys = Object.keys(getUniqueAttributes);
-
-      keys.forEach((key) => {
-        const value = getUniqueAttributes[key];
-        const firstValueId = Object.keys(value)[0];
-
-        if (firstValueId) {
-          initialAttributes[key] = firstValueId;
-        }
-      });
-
-      setSelectedAttributes({ product_variant: initialAttributes });
+    if (result && result.length > 0 && isInitialLoad) {
+      setSelectedAttributes({ product_variant: result[0] });
+      setIsInitialLoad(false);
     }
-  }, [getUniqueAttributes]);
-  console.log("setSelectedAttributes", selectedAttributes);
+  }, [result, isInitialLoad]);
 
   useEffect(() => {
     const fetchProductVariant = async () => {
