@@ -19,12 +19,15 @@ import { toast } from "react-toastify";
 import { MinusOutlined } from "@ant-design/icons";
 import Loading from "@/common/Loading/Loading";
 import CheckmarkAlert from "@/components/Notification/Toast";
+import Pusher from 'pusher-js';
+import Echo from "laravel-echo";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 const MySwal = withReactContent(Swal);
 const Cart = () => {
   const [visiable, setVisible] = useState(false);
   const [idCart, setIdCart] = useState<any>('');
+  console.log("idCart", idCart)
   const [updatedAttributes, setUpdatedAttributes] = useState<any>({});
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -43,7 +46,54 @@ const Cart = () => {
       });
       return res.data;
     },
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
   });
+  const pusher = new Pusher('4d3e0d70126f2605977e', {
+    cluster: 'ap1',
+    authEndpoint: 'http://localhost:8000/broadcasting/auth', // Thay bằng URL backend của bạn
+    auth: {
+      headers: {
+        Authorization: `${token}` // Thay thế bằng token của người dùng hiện tại
+      }
+    }
+  });
+  useEffect(() => {
+    console.log("1");
+    const channel = pusher.subscribe(`private-cart.${9}`);
+    console.log("channel", channel);
+
+    // Lắng nghe sự kiện 'CartEvent'
+    channel.bind('CartEvent', (data: any) => {
+      console.log("Received cart event:", data);
+      queryClient.invalidateQueries({
+        queryKey: ['cart']
+      });
+    });
+
+    pusher.connection.bind('connected', () => {
+      console.log('Pusher connected');
+    });
+
+    pusher.connection.bind('error', (err: any) => {
+      console.error('Pusher connection error:', err);
+    });
+
+    console.log("2");
+
+    // Giả sử cartId là id của giỏ hàng hiện tại
+    console.log("idCart", idCart);
+
+    // Đăng ký vào kênh 'private-cart.{idCart}'
+
+
+    // Huỷ đăng ký kênh khi component bị unmount hoặc khi `idCart` thay đổi
+    return () => {
+      pusher.unsubscribe(`private-cart.${idCart}`);
+    };
+  }, [data, queryClient]);  // Cập nhật khi idCart hoặc token thay đổi
+  // Đảm bảo rằng cartId không thay đổi khi component mount/unmount
+
   const updateQuantity = useMutation({
     mutationFn: async ({ idCart, newQuantity, qtyProductVarinat }: { idCart: number; newQuantity: number, qtyProductVarinat: any }) => {
       await instance.put(`/cart/${idCart}`, {
@@ -159,7 +209,7 @@ const Cart = () => {
   const [isAllChecked, setIsAllChecked] = useState<boolean>(false);
   const [checkedItems, setCheckedItems] = useState<{ [key: number]: boolean }>({});
 
-  console.log("isAllChecked",isAllChecked)
+  console.log("isAllChecked", isAllChecked)
   const handleCheckAll = () => {
     const newChecked = !isAllChecked;
     setIsAllChecked(newChecked);
@@ -262,7 +312,7 @@ const Cart = () => {
               <div className="hd-pagecart-items">
                 <div className="hd-item relative overflow-hidden">
                   {
-                    isLoading ? <Loading /> : carts && carts.length > 0 ? (carts?.map((e: any) => {
+                    isFetching ? <Loading /> : carts && carts.length > 0 ? (carts?.map((e: any) => {
                       const { productvariant } = e;
                       const attributesObject = productvariant?.attributes.reduce((acc: any, attribute: any) => {
                         acc[attribute.name] = attribute.pivot.attribute_item_id;
@@ -428,7 +478,7 @@ const Cart = () => {
                   {/*end-item-1*/}
                 </div>
               </div>
-              <Button onClick={() => handleDeleteCart([idCart])} className="btn-danger mt-5 ml-auto" style={{float:'right',padding:'20px 10px'}}>
+              <Button onClick={() => handleDeleteCart([idCart])} className="btn-danger mt-5 ml-auto" style={{ float: 'right', padding: '20px 10px' }}>
                 Xoá sản phẩm trong giỏ hàng
               </Button>
               {/*end hd-pagecart-items*/}

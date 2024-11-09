@@ -5,12 +5,11 @@ const Loading = () => {
     <div
       className="fixed inset-0 bg-transparent backdrop-blur-sm flex justify-center items-center"
       style={{
-        zIndex: 9999,
+        zIndex: 99999,
       }}
     >
       <Spin size="large" />
     </div>
   );
 };
-
 export default Loading;

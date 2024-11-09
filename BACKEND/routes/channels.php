@@ -24,3 +24,6 @@ Broadcast::channel('cart.{cartId}', function ($user, $cartId) {
     return Cart::where('id', $cartId)->where('user_id', $user->id)->exists();
 });
 
+Broadcast::channel('orders', function ($user) {
+    return true;
+});
