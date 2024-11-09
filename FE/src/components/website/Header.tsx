@@ -24,7 +24,7 @@ const Header = (props: Props) => {
   const { user } = useUser();
   let infoUser;
   if (user) {
-    infoUser = user["Infor User"];
+    infoUser = user?.InforUser;
   }
   const { logout } = useAuth();
   const logoutUser = () => {
@@ -33,7 +33,7 @@ const Header = (props: Props) => {
   }
   const wishlistCount = wishlist.length;
   const { token } = useAuth();
-  const { data } = useQuery({
+  const { data, isFetching } = useQuery({
     queryKey: ['cart'],
     queryFn: async () => {
       const res = await instance.get('/cart', {
@@ -54,6 +54,7 @@ const Header = (props: Props) => {
   } else if (cartItems && typeof cartItems === 'object') {
     qty += cartItems.quantity;
   }
+  if (isFetching) return <div></div>
   return (
     <>
       <div>

@@ -9,6 +9,7 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Attribute;
 use App\Models\AttributeItem;
+use App\Models\PaymentMethod;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -113,18 +114,13 @@ class DataCuong extends Seeder
                     'description' => "đẹp",
                     "parent_id" => 1,
                     "img_thumbnail" => "ao-khoac.jpg",
-
                 ],
                 [
                     "name" => "Giày",
                     'slug' => "giay",
                     'description' => "đẹp",
                     'parent_id' => null,
-
                     "img_thumbnail" => "giay.jpg",
-
-
-                    // 'status'=>,
                 ],
                 [
                     "name" => "Giày thể thao",
@@ -197,6 +193,12 @@ class DataCuong extends Seeder
                 'phone_number' => "0987654322",
                 "address" => "hà nội"
             ],
+        ]);
+        PaymentMethod::query()->insert([
+            [
+                "name" => "COD",
+                "description" => "cod",
+            ]
         ]);
     }
 }

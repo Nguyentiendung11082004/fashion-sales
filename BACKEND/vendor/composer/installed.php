@@ -3,7 +3,7 @@
         'name' => 'laravel/laravel',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => 'cc453994de84aa6aa8f28ba495760e7a2a143501',
+        'reference' => '1a16bf54c12eaa8c7f39e02d8f3bcf674f8b53d9',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -140,9 +140,9 @@
             'dev_requirement' => false,
         ),
         'guzzlehttp/promises' => array(
-            'pretty_version' => '2.0.3',
-            'version' => '2.0.3.0',
-            'reference' => '6ea8dd08867a2a42619d65c3deb2c0fcbf81c8f8',
+            'pretty_version' => '2.0.4',
+            'version' => '2.0.4.0',
+            'reference' => 'f9c436286ab2892c7db7be8c8da4ef61ccf7b455',
             'type' => 'library',
             'install_path' => __DIR__ . '/../guzzlehttp/promises',
             'aliases' => array(),
@@ -391,10 +391,7 @@
         'laravel/laravel' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-
-            'reference' => '71dd86852bac7048156adcda81f6192000d46a3a',
-
-
+            'reference' => '1a16bf54c12eaa8c7f39e02d8f3bcf674f8b53d9',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -496,15 +493,6 @@
             'reference' => '2d6702ff215bf922936ccc1ad31007edc76451b9',
             'type' => 'library',
             'install_path' => __DIR__ . '/../league/mime-type-detection',
-            'aliases' => array(),
-            'dev_requirement' => false,
-        ),
-        'mews/purifier' => array(
-            'pretty_version' => '3.4.2',
-            'version' => '3.4.2.0',
-            'reference' => 'd4d3830267eeda7b385d61dd680ace14dcf142df',
-            'type' => 'package',
-            'install_path' => __DIR__ . '/../mews/purifier',
             'aliases' => array(),
             'dev_requirement' => false,
         ),
@@ -825,9 +813,9 @@
             'dev_requirement' => false,
         ),
         'pusher/pusher-php-server' => array(
-            'pretty_version' => '7.2.4',
-            'version' => '7.2.4.0',
-            'reference' => 'de2f72296808f9cafa6a4462b15a768ff130cddb',
+            'pretty_version' => '7.2.6',
+            'version' => '7.2.6.0',
+            'reference' => 'd89e9997191d18fb0fe03a956fa3ccfe0af524ea',
             'type' => 'library',
             'install_path' => __DIR__ . '/../pusher/pusher-php-server',
             'aliases' => array(),

@@ -46,7 +46,7 @@ class CommentController extends Controller
         ]);
         //  Kiểm tra xem người dùng đã mua sản phẩm này chưa
         $userHasPurchased = Order::where('user_id', Auth::id())
-        ->where('order_status', 'completed')
+        ->where('order_status', 'Giao hàng thành công')
         ->whereHas('orderDetails', function($query) use ($validated) { 
             $query->where('product_id', $validated['product_id']);
         })

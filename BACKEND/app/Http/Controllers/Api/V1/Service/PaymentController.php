@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\API\V1\Service;
 
 use App\Models\Order;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use App\Models\ProductVariant;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 
@@ -16,6 +18,7 @@ class PaymentController extends Controller
     public function createPayment($request)
     {
         try {
+         
             $vnp_TmnCode = $this->vnp_TmnCode;
             $vnp_HashSecret = $this->vnp_HashSecret;
             $vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
@@ -62,7 +65,6 @@ class PaymentController extends Controller
     }
     public function vnpayReturn(Request $request)
     {
-
         $vnp_TxnRef = $request->vnp_TxnRef;
         $vnp_Amount = $request->vnp_Amount;
         $vnp_ResponseCode = $request->vnp_ResponseCode;
@@ -95,34 +97,59 @@ class PaymentController extends Controller
                     $order->update([
                         'payment_status' => 'Đã thanh toán', // Cập nhật trạng thái thành công
                     ]);
-                    return response()->json([
-                        'status' => 'success',
-                        'message' => 'Thanh toán thành công!',
-                        'order_id' => $vnp_TxnRef,
-                        'amount' => $vnp_Amount / 100,
-                    ]);
+                    // return [
+                    //     'status' => 'success',
+                    //     'message' => 'Thanh toán thành công!',
+                    //     'order_id' => $vnp_TxnRef,
+                    //     'amount' => $vnp_Amount / 100,
+                    // ];
+                    return redirect()->away("http://localhost:5173/payment-result?status=success&message=Payment_successful!&order_id=$vnp_TxnRef&amount=" . ($vnp_Amount / 100));
                 } else {
-                    return response()->json([
-                        'status' => 'error',
-                        'message' => 'Không tìm thấy đơn hàng!',
-                    ]);
+                    // return [
+                    //     'status' => 'error',
+                    //     'message' => 'Không tìm thấy đơn hàng!',
+                    // ];
+                    return redirect()->away("http://localhost:5173/payment-result?status=error&message=Order_not_found!");
                 }
             } else {
                 $order->update([
-                    'payment_status' => 'Thanh toán online thất bại', // Cập nhật trạng thái
+                    'payment_status' => 'Chưa thanh toán', // Cập nhật trạng thái
+                    'order_status' => 'Hủy',
                 ]);
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Thanh toán thất bại!',
-                    'order_id' => $vnp_TxnRef,
-                    'error_code' => $vnp_ResponseCode,
-                ]);
+                foreach ($order->orderDetails as $detail) {
+                    // Kiểm tra nếu là sản phẩm có biến thể
+                    if ($detail->product_variant_id) {
+                        $variant = ProductVariant::find($detail->product_variant_id);
+                        if ($variant) {
+                            $variant->quantity += $detail->quantity; // Cộng lại số lượng vào biến thể
+                            $variant->save();
+                        }
+                    } else {
+                        // Nếu là sản phẩm đơn
+                        $product = Product::find($detail->product_id);
+                        if ($product) {
+                            $product->quantity += $detail->quantity; // Cộng lại số lượng vào sản phẩm
+                            $product->save();
+                        }
+                    }
+                }
+                // return [
+                //     'status' => 'error',
+                //     'message' => 'Thanh toán thất bại!',
+                //     'order_id' => $vnp_TxnRef,
+                //     'error_code' => $vnp_ResponseCode,
+                // ];
+            return redirect()->away("http://localhost:5173/payment-result?status=error&message=Payment_failed!&order_id=$vnp_TxnRef&error_code=$vnp_ResponseCode");
+                
             }
         } else {
-            return [
-                'status' => 'error',
-                'message' => 'Xác thực không hợp lệ!',
-            ];
+            // return [
+            //     'status' => 'error',
+            //     'message' => 'Xác thực không hợp lệ!',
+            // ];
+            return redirect()->away("http://localhost:5173/payment-result?status=error&message=Invalid_authentication!");
+
+            
         }
     }
 }

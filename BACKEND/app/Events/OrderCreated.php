@@ -2,7 +2,6 @@
 
 namespace App\Events;
 
-use App\Models\Message;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -11,21 +10,16 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class MessageSent implements ShouldBroadcast
+class OrderCreated implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
      * Create a new event instance.
      */
-    public $message;
-    public $conversation;
-    public function __construct(Message $message)
+    public function __construct(public $order)
     {
-        $this->message = $message;
-        $this->conversation = $message->conversation;
-       
-
+        //
     }
 
     /**
@@ -33,17 +27,10 @@ class MessageSent implements ShouldBroadcast
      *
      * @return array<int, \Illuminate\Broadcasting\Channel>
      */
-  
-    public function broadcastOn()
-    {
-       
-        return new PresenceChannel('conversation.' . $this->conversation->id);
-    }
-
-    public function broadcastWith()
+    public function broadcastOn(): array
     {
         return [
-            'message' => $this->message->load('user'),
+            new Channel('orders'),
         ];
     }
 }

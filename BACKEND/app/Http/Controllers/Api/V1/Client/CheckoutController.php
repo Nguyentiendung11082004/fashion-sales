@@ -18,7 +18,8 @@ use App\Http\Requests\Checkout\StoreCheckoutRequest;
 
 class CheckoutController extends Controller
 {
-    public function store(StoreCheckoutRequest $request)
+    // v1 store(StoreCheckoutRequest $request)
+    /**public function store(StoreCheckoutRequest $request)
     {
         try {
             $data = $request->validated(); // Lấy dữ liệu đã xác thực
@@ -306,8 +307,213 @@ class CheckoutController extends Controller
             'ineligible_products' => $ineligible_products,
             'total_discount' => $voucher_discount, // Tổng số tiền giảm
         ];
+    }*/
+    // v2 store(StoreCheckoutRequest $request)
+    public function store(StoreCheckoutRequest $request)
+    {
+        try {
+            $data = $request->validated();
+            $isImmediatePurchase = isset($data['product_id']) && isset($data['quantity']);
+            $isCartPurchase = isset($data['cart_item_ids']) && is_array($data['cart_item_ids']) && count($data['cart_item_ids']) > 0;
+
+            if (!$isImmediatePurchase && !$isCartPurchase || ($isImmediatePurchase && $isCartPurchase)) {
+                return response()->json(['message' => 'Phải chọn mua ngay hoặc mua từ giỏ hàng.'], Response::HTTP_BAD_REQUEST);
+            }
+
+            $sub_total = 0;
+            $total_items = 0;
+            $order_items = [];
+            $voucher_discount = 0;
+
+            $user = auth('sanctum')->check() ? User::findOrFail(auth('sanctum')->id())->only(['id', 'name', 'email', 'address', 'phone_number']) : null;
+
+            if ($isCartPurchase) {
+                $cart = Cart::where('user_id', $user['id'] ?? null)
+                    ->with([
+                        'cartitems' => fn($query) => $query->whereIn('id', $data['cart_item_ids']),
+                        'cartitems.product',
+                        'cartitems.productvariant.attributes'
+                    ])->first();
+
+                if (!$cart || $cart->cartitems->isEmpty()) {
+                    return response()->json(['message' => 'Sản phẩm không tồn tại trong giỏ hàng'], 400);
+                }
+
+                $invalid_items = array_diff($data['cart_item_ids'], $cart->cartitems->pluck('id')->toArray());
+                if ($invalid_items) {
+                    return response()->json(['message' => 'Sản phẩm không tồn tại trong giỏ hàng', 'invalid_items' => $invalid_items], 400);
+                }
+
+                foreach ($cart->cartitems as $cart_item) {
+                    $quantity = $cart_item->quantity;
+                    $price = $cart_item->productvariant ? $cart_item->productvariant->price_sale : $cart_item->product->price_sale;
+                    $total_price = $price * $quantity;
+
+                    $sub_total += $total_price;
+                    $total_items++;
+                    $order_items[] = [
+                        'quantity' => $quantity,
+                        'total_price' => $total_price,
+                        'product' => $cart_item->product,
+                        'variant' => $cart_item->productvariant ?? null
+                    ];
+                }
+            } elseif ($isImmediatePurchase) {
+                $product = Product::with('variants.attributes')->findOrFail($data['product_id']);
+                $quantity = $data['quantity'];
+                $variant = $product->type == 1 ? $product->variants()->with('attributes')->findOrFail($data['product_variant_id']) : null;
+
+                if ($product->type == 1 && !isset($data['product_variant_id'])) {
+                    return response()->json(['message' => 'Sản phẩm này có biến thể. Vui lòng chọn biến thể.'], Response::HTTP_BAD_REQUEST);
+                }
+
+                $price = $variant ? $variant->price_sale : $product->price_sale;
+                $total_price = $price * $quantity;
+                $sub_total = $total_price;
+                $total_items++;
+                $order_items[] = [
+                    'quantity' => $quantity,
+                    'total_price' => $total_price,
+                    'product' => $product,
+                    'variant' => $variant
+                ];
+            } else {
+                return response()->json(['message' => 'Bạn cần đăng nhập để mua từ giỏ hàng.'], Response::HTTP_BAD_REQUEST);
+            }
+
+            if (isset($data['voucher_code']) && $user) {
+                $voucher_result = $this->applyVoucher($data['voucher_code'], $order_items);
+
+                if (isset($voucher_result['error'])) {
+                    return response()->json(['error' => $voucher_result['error']], 400);
+                }
+
+                $total_discount = $voucher_result['total_discount'] ?? 0;
+                $sub_total -= $total_discount;
+                $order_items = array_merge($voucher_result['eligible_products'], $voucher_result['ineligible_products']);
+            }
+
+            return response()->json([
+                'message' => 'Dữ liệu thành công',
+                'user' => $user,
+                'sub_total' => $sub_total,
+                'total_items' => $total_items,
+                'voucher_discount' => $voucher_result['voucher_description'] ?? null,
+                'total_discount' => $total_discount ?? 0,
+                'order_items' => $order_items,
+            ], Response::HTTP_OK);
+        } catch (\Exception $ex) {
+            return response()->json(['message' => $ex->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
+    protected function applyVoucher($voucher_code, $order_items)
+    {
+        $voucher = Voucher::active()->where('code', $voucher_code)->first();
+
+        if (!$voucher) {
+            return ['error' => 'Voucher không hợp lệ hoặc đã hết hạn.'];
+        }
+
+        $voucher_metas = VoucherMeta::where('voucher_id', $voucher->id)->pluck('meta_value', 'meta_key')->toArray();
+        $eligible_products = [];
+        $ineligible_products = [];
+        $sub_total = 0;
+
+        foreach ($order_items as $item) {
+            $product_id = $item['product']->id;
+            $is_eligible = $this->isProductEligibleForVoucher($product_id, $item['product']->category_id, $voucher_metas);
+
+            if ($is_eligible['eligible']) {
+                $eligible_products[] = $item;
+                $sub_total += $item['total_price'];
+            } else {
+                $item['reason'] = $is_eligible['reason'];
+                $ineligible_products[] = $item;
+            }
+        }
+
+        if (isset($voucher_metas['_voucher_min_order_value']) && $sub_total < $voucher_metas['_voucher_min_order_value']) {
+            return [
+                'error' => "Tổng giá trị đơn hàng phải lớn hơn " . $voucher_metas['_voucher_min_order_value'] . " để áp dụng voucher này.",
+                'ineligible_products' => $ineligible_products,
+            ];
+        }
+
+        return $this->calculateVoucherDiscount($voucher, $voucher_metas, $eligible_products, $ineligible_products, $sub_total);
+    }
+
+    protected function isProductEligibleForVoucher($product_id, $category_id, $voucher_metas)
+    {
+        $reason = [];
+        $eligible = true;
+
+        if (isset($voucher_metas['_voucher_category_ids']) && !in_array($category_id, json_decode($voucher_metas['_voucher_category_ids'], true))) {
+            $eligible = false;
+            $reason[] = 'Sản phẩm này không nằm trong danh mục được áp dụng voucher.';
+        }
+        if (isset($voucher_metas['_voucher_exclude_category_ids']) && in_array($category_id, json_decode($voucher_metas['_voucher_exclude_category_ids'], true))) {
+            $eligible = false;
+            $reason[] = 'Sản phẩm này thuộc danh mục bị loại trừ khỏi voucher.';
+        }
+        if (isset($voucher_metas['_voucher_product_ids']) && !in_array($product_id, json_decode($voucher_metas['_voucher_product_ids'], true))) {
+            $eligible = false;
+            $reason[] = 'Sản phẩm này không nằm trong danh sách sản phẩm được áp dụng voucher.';
+        }
+        if (isset($voucher_metas['_voucher_exclude_product_ids']) && in_array($product_id, json_decode($voucher_metas['_voucher_exclude_product_ids'], true))) {
+            $eligible = false;
+            $reason[] = 'Sản phẩm này nằm trong danh sách sản phẩm bị loại trừ khỏi voucher.';
+        }
+
+        return ['eligible' => $eligible, 'reason' => implode(' ', $reason)];
+    }
+
+    protected function calculateVoucherDiscount($voucher, $voucher_metas, $eligible_products, $ineligible_products, $sub_total)
+    {
+        $voucher_discount = 0;
+        $voucher_description = '';
+
+        if (isset($voucher_metas['_voucher_applies_to_total']) && $voucher_metas['_voucher_applies_to_total']) {
+            if ($voucher->discount_type == 'percent') {
+                $voucher_discount = ($voucher->discount_value / 100) * $sub_total;
+                $voucher_description = "{$voucher->discount_value} percent";
+            } elseif ($voucher->discount_type == 'fixed') {
+                $voucher_discount = min($voucher->discount_value, $sub_total);
+                $voucher_description = "{$voucher->discount_value} fixed";
+            }
+
+            return [
+                'voucher_discount' => $voucher_discount,
+                'voucher_description' => $voucher_description,
+                'eligible_products' => $eligible_products,
+                'ineligible_products' => $ineligible_products,
+                'total_discount' => $voucher_discount,
+                'sub_total_after_discount' => $sub_total - $voucher_discount,
+            ];
+        }
+
+        foreach ($eligible_products as &$item) {
+            $item_discount = 0;
+            if ($voucher->discount_type == 'percent') {
+                $item_discount = ($voucher->discount_value / 100) * $item['total_price'];
+                $voucher_description = "{$voucher->discount_value} percent";
+            } elseif ($voucher->discount_type == 'fixed') {
+                $item_discount = min($voucher->discount_value, $item['total_price']);
+                $voucher_description = "{$voucher->discount_value} fixed";
+            }
+            $voucher_discount += $item_discount;
+            $item['voucher_discount'] = $item_discount;
+            $item['price_after_discount'] = $item['total_price'] - $item_discount;
+        }
+
+        return [
+            'voucher_discount' => $voucher_discount,
+            'voucher_description' => $voucher_description,
+            'eligible_products' => $eligible_products,
+            'ineligible_products' => $ineligible_products,
+            'total_discount' => $voucher_discount,
+        ];
+    }
     public function getProvinces()
     {
         try {
@@ -338,6 +544,7 @@ class CheckoutController extends Controller
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+    // lấy thông tin quận/ huyện
     public function getDistricts(Request $request)
     {
         try {
@@ -374,6 +581,7 @@ class CheckoutController extends Controller
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+    // lấy thông tin xã
     public function getWards(Request $request)
     {
         try {
@@ -416,22 +624,16 @@ class CheckoutController extends Controller
     public function getAvailableServices($request)
     {
         try {
-
-            $from_district_id = $request["from_district_id"];
             $to_district_id = $request["to_district_id"];
             $weight = $request["weight"];
-          
             $api_key = '18f28540-8fbc-11ef-839a-16ebf09470c6';
-
-
             $ch = curl_init();
-
             curl_setopt($ch, CURLOPT_URL, "https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/available-services");
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($ch, CURLOPT_POST, 1);
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
                 'shop_id' => 5404595,  // Thay YOUR_SHOP_ID bằng mã shop GHN của bạn
-                'from_district' => $from_district_id,
+                'from_district' => 1804, //đan phượng
                 'to_district' => $to_district_id,
                 'weight' => $weight
             ]));
@@ -444,31 +646,39 @@ class CheckoutController extends Controller
             curl_close($ch);
 
             $services = json_decode($response, true)['data'][0];
-           
-            return  $services ;
+            // dd($services);
+
+            return  $services;
         } catch (\Exception $ex) {
             return response()->json([
                 "message" => $ex->getMessage()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+    // tính phí vận chuyển
     public function calculateShippingFee(Request $request)
     {
         try {
-           
+
             $request->validate([
-                "from_district_id" => "required",
+               
                 "to_district_id" => "required",
+                "to_ward_code" => "required|string",
                 "weight" => "required", //đơn vị tính g
-                
+
             ]);
-            
-           
-            $from_district_id = $request->from_district_id;
+
+
+            // $from_district_id = $request->from_district_id;
             $to_district_id = $request->to_district_id;
+            $to_ward_code = $request->to_ward_code;
+
             $weight = $request->weight;
-            $services=$this->getAvailableServices($request);
-            $service_id = $services["service_id"]; 
+
+
+            $services = $this->getAvailableServices($request);
+            // dd($services);
+            $service_id = $services["service_id"];
             $api_key = '18f28540-8fbc-11ef-839a-16ebf09470c6';
             $ch = curl_init();
 
@@ -476,12 +686,11 @@ class CheckoutController extends Controller
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($ch, CURLOPT_POST, 1);
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
+                "shop_id" => 5404595,
                 'service_id' => $service_id,
-                
-                'from_district_id' => $from_district_id,
                 'to_district_id' => $to_district_id,
+                "to_ward_code" => $to_ward_code,
                 'weight' => $weight,
-               
             ]));
             curl_setopt($ch, CURLOPT_HTTPHEADER, [
                 'Token: ' . $api_key,

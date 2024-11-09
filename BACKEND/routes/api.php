@@ -1,12 +1,13 @@
 <?php
 
+use App\Events\CartEvent;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\Admin\TagController;
 use App\Http\Controllers\Api\V1\Admin\BrandController;
 use App\Http\Controllers\Api\V1\Client\AuthController;
 use App\Http\Controllers\Api\V1\Client\CartController;
-use App\Http\Controllers\Api\V1\Client\ConversationController;
-use App\Http\Controllers\Api\V1\Client\MessageController;
+// use App\Http\Controllers\Api\V1\Client\ConversationController;
+// use App\Http\Controllers\Api\V1\Client\MessageController;
 use App\Http\Controllers\Api\V1\Admin\ClientController;
 use App\Http\Controllers\Api\V1\Client\OrderController;
 use App\Http\Controllers\Api\V1\Admin\ProductController;
@@ -16,8 +17,10 @@ use App\Http\Controllers\Api\V1\Admin\EmployeeController;
 use App\Http\Controllers\Api\V1\Admin\AttributeController;
 use App\Http\Controllers\Api\V1\Admin\AttributeItemController;
 use App\Http\Controllers\Api\V1\Admin\BannerController;
+use App\Http\Controllers\Api\V1\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Api\V1\Admin\PostController;
 use App\Http\Controllers\Api\V1\Admin\VoucherController;
+use App\Http\Controllers\Api\V1\Client\AddressController;
 use App\Http\Controllers\Api\V1\Client\CommentController;
 use App\Http\Controllers\Api\V1\Client\CheckoutController;
 use App\Http\Controllers\Api\V1\Client\WishlistController;
@@ -26,6 +29,7 @@ use App\Http\Controllers\Api\V1\Client\ProductShopController;
 use App\Http\Controllers\Api\V1\Client\ChatController;
 use App\Http\Controllers\Api\V1\Client\ProductDetailController;
 use App\Http\Controllers\Api\V1\Client\InforUserController;
+use App\Http\Controllers\Api\V1\Client\TryOnController;
 use App\Http\Controllers\API\V1\Service\PaymentController;
 
 /*
@@ -63,6 +67,7 @@ Route::prefix("v1/")->group(function () {
     Route::resource('order', OrderController::class);
     Route::resource('checkout', CheckoutController::class);
     Route::apiResource('posts', PostController::class);
+    Route::apiResource('order-status', AdminOrderController::class);
     //Gửi mail
     Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
         ->middleware(['signed'])->name('verification.verify');
@@ -79,10 +84,11 @@ Route::prefix("v1/")->group(function () {
     Route::post("getwards",[CheckoutController::class,"getWards"]);
     Route::post("getavailableservices",[CheckoutController::class,"getAvailableServices"]);
     Route::post("calculateshippingfee",[CheckoutController::class,"calculateShippingFee"]);
-    Route::post('/payment/vnpay', [PaymentController::class, 'createPayment']);
-    Route::get('/payment/vnpay-return', [PaymentController::class, 'vnpayReturn']);
+    Route::post('payment/vnpay', [PaymentController::class, 'createPayment']);
+    Route::get('payment/vnpay-return', [PaymentController::class, 'vnpayReturn']);
 
-
+    Route::post('try-on', [TryOnController::class, 'tryOn']);
+    
 });
 
 Route::middleware('auth:sanctum')->prefix('v1/')->group(function () {
@@ -90,23 +96,26 @@ Route::middleware('auth:sanctum')->prefix('v1/')->group(function () {
     Route::apiResource('wishlist', WishlistController::class);
     Route::get('/user', [InforUserController::class, 'getInforUser']);
     Route::put('/user/update', [InforUserController::class, 'updateInforUser']);
+    Route::apiResource('addresses', AddressController::class);
     Route::post('logout', [AuthController::class, 'logout']);
 
-     // Tạo hoặc lấy cuộc trò chuyện giữa hai người dùng
-     Route::post('conversations', [ConversationController::class, 'store']);
+    //  // Tạo hoặc lấy cuộc trò chuyện giữa hai người dùng
+    //  Route::post('conversations', [ConversationController::class, 'store']);
 
-     // Lấy tất cả các cuộc trò chuyện của người dùng
-     Route::get('conversations', [ConversationController::class, 'index']);
+    //  // Lấy tất cả các cuộc trò chuyện của người dùng
+    //  Route::get('conversations', [ConversationController::class, 'index']);
  
-     // Lấy tin nhắn trong một cuộc trò chuyện
-     Route::get('conversations/messages/{conversation}', [MessageController::class, 'index']);
+    //  // Lấy tin nhắn trong một cuộc trò chuyện
+    //  Route::get('conversations/messages/{conversation}', [MessageController::class, 'index']);
  
-     // Gửi tin nhắn trong một cuộc trò chuyện
-     Route::post('conversations/messages/{conversation}', [MessageController::class, 'store']);
-     Route::post('conversations/messages', [MessageController::class, 'store']);
+    //  // Gửi tin nhắn trong một cuộc trò chuyện
+    //  Route::post('conversations/messages/{conversation}', [MessageController::class, 'store']);
+    //  Route::post('conversations/messages', [MessageController::class, 'store']);
      Route::resource("chat",ChatController::class);
      Route::delete('chat-message/{conversation}',[ChatController::class,"deleteMessage"]);
 
     Route::apiResource('comment', CommentController::class);
+    
+    
    
 });

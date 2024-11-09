@@ -43,6 +43,8 @@ import { PasswordResetHandler } from "@/pages/client/auth/resetpassword/Password
 import Vouchers from "@/pages/admin/vouchers/Vouchers";
 import VoucherDetail from "@/pages/admin/vouchers/components/VoucherDetail";
 import FormVoucher from "@/pages/admin/vouchers/components/FormVoucher";
+import Order from "@/pages/client/order";
+import Thanks from "@/pages/client/thanks/Thanks";
 const Router = () => {
   return (
     <>
@@ -57,7 +59,10 @@ const Router = () => {
           <Route path="wishlist" element={<Wishlist />} />
           <Route path="checkout" element={<Checkout />} />
           <Route path="contact" element={<Contact />} />
+          <Route path="thank" element={<Thanks />} />
+
           <Route path="history-order" element={<HistoryOrder />} />
+          <Route path="/order" element={<Order />} />
         </Route>
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
