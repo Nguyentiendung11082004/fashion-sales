@@ -330,12 +330,31 @@ class DataCuong extends Seeder
         // Simple Products
         $simpleProducts = [
             [
+                'name' => 'Áo khoác nam',
+                'sku' => 'sku-ao-khoac-don',
+                'img_thumbnail' => 'aokhoac.png',
+                'price_regular' => 300000,
+                'price_sale' => 270000,
+                'slug' => 'ao-khoac-nam-don',
+                'category_id' => 3,
+            ],
+            [
+                'name' => 'Áo sơ mi nam',
+                'sku' => 'sku-ao-so-mi-don',
+                'img_thumbnail' => 'aosomi.png',
+                'price_regular' => 250000,
+                'price_sale' => 220000,
+                'slug' => 'ao-so-mi-nam-don',
+                'category_id' => 2,
+            ],
+            [
                 'name' => 'Giày công sở nam',
                 'sku' => 'sku-giay-cong-so',
                 'img_thumbnail' => 'giaycongso.png',
                 'price_regular' => 500000,
                 'price_sale' => 450000,
                 'slug' => 'giay-cong-so-nam',
+                'category_id' => 6,
             ],
             [
                 'name' => 'Giày thể thao nam',
@@ -344,13 +363,14 @@ class DataCuong extends Seeder
                 'price_regular' => 600000,
                 'price_sale' => 550000,
                 'slug' => 'giay-the-thao-nam',
+                'category_id' => 5,
             ],
         ];
 
         foreach ($simpleProducts as $product) {
             $productId = DB::table('products')->insertGetId([
                 'brand_id' => 1,
-                'category_id' => 4,
+                'category_id' => $product['category_id'],
                 'type' => 0,
                 'sku' => $product['sku'],
                 'name' => $product['name'],
@@ -358,7 +378,7 @@ class DataCuong extends Seeder
                 'img_thumbnail' => $product['img_thumbnail'],
                 'price_regular' => $product['price_regular'],
                 'price_sale' => $product['price_sale'],
-                'quantity' => 10,
+                'quantity' => 100,
                 'description' => $product['name'] . ' rất đẹp',
                 'description_title' => $product['name'] . ' rất đẹp',
                 'status' => 1,
