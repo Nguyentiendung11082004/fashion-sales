@@ -441,6 +441,7 @@ class OrderController extends Controller
 
         return ['total_discount' => $voucher_discount, 'voucher_description' => "{$voucher->discount_value} " . $voucher->discount_type];
     }*/
+    //
     // Hàm `store` xử lý việc lưu đơn hàng, bao gồm xác thực dữ liệu, tạo người dùng nếu cần, và xử lý các sản phẩm được đặt hàng.
     public function store(StoreOrderRequest $request)
     {
@@ -676,11 +677,10 @@ class OrderController extends Controller
             ->whereDate('start_date', '<=', now())
             ->whereDate('end_date', '>=', now())
             ->first();
-
         if (!$voucher) {
             return ['error' => 'Voucher không hợp lệ hoặc đã hết hạn.'];
         }
-
+        $voucher->increment('used_count');
         $voucher_metas = VoucherMeta::where('voucher_id', $voucher->id)->pluck('meta_value', 'meta_key')->toArray();
         $eligible_products = [];
         $ineligible_products = [];
@@ -782,7 +782,7 @@ class OrderController extends Controller
     }
 
     // Hàm `calculateDiscount` tính toán tổng số tiền được giảm giá cho đơn hàng dựa trên thông tin voucher và các sản phẩm đủ điều kiện.
-    protected function calculateDiscount($voucher, $sub_total, $voucher_metas, &$eligible_products)
+    protected function calculateDiscount($voucher, $sub_total, $voucher_metas, $eligible_products)
     {
         $voucher_discount = 0;
         $voucher_description = '';
@@ -865,28 +865,28 @@ class OrderController extends Controller
         if (!auth('sanctum')->check()) {
             return response()->json(['message' => 'Không có quyền truy cập'], 403);
         }
-    
+
         $user_id = auth('sanctum')->id();
-    
+
         // Kiểm tra xem đơn hàng có thuộc về người dùng đã xác thực không
         if ($order->user_id !== $user_id) {
             return response()->json(['message' => 'Không có quyền truy cập'], 403);
         }
-    
+
         // Kiểm tra trạng thái đơn hàng
         if ($order->order_status === 'Hủy') {
             return response()->json(['message' => 'Đơn hàng đã được hủy.'], 400);
         }
-    
+
         // Lấy trạng thái mới và ghi chú từ request
         $order_status = $request->input('order_status');
         $user_note = $request->input('user_note');
-    
+
         if ($order_status === 'Hủy') {
             if (empty($user_note)) {
                 return response()->json(['message' => 'Ghi chú là bắt buộc khi hủy đơn hàng.'], 400);
             }
-    
+
             // Xử lý hủy đơn hàng
             $this->handleOrderCancellation($order, $user_note);
         } else {
@@ -894,13 +894,13 @@ class OrderController extends Controller
             if (!empty($user_note)) {
                 $order->user_note = $user_note;
             }
-    
+
             // Cập nhật trạng thái đơn hàng
             $order->order_status = $order_status;
         }
-    
+
         $order->save();
-    
+
         // Trả về thông báo cập nhật thành công
         return response()->json([
             'message' => 'Trạng thái đơn hàng đã được cập nhật thành công.',
@@ -911,7 +911,7 @@ class OrderController extends Controller
     {
         // Cập nhật lý do hủy
         $order->user_note = $user_note;
-    
+
         // Trả lại số lượng sản phẩm về kho
         foreach ($order->orderDetails as $detail) {
             // Kiểm tra nếu là sản phẩm có biến thể
@@ -929,5 +929,4 @@ class OrderController extends Controller
             }
         }
     }
-    
 }
