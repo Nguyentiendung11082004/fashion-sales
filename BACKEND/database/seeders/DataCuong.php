@@ -15,6 +15,7 @@ use App\Models\VoucherMeta;
 use App\Models\AttributeItem;
 use App\Models\PaymentMethod;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
@@ -230,7 +231,7 @@ class DataCuong extends Seeder
                 "title" => "Giảm 10% toàn bộ đơn hàng",
                 "description" => "Giảm giá 10% áp dụng cho tổng giá trị đơn hàng.",
                 "code" => "SALE10OFF",
-                "discount_type" => "percentage",
+                "discount_type" => "percent",
                 "discount_value" => "10.00",
                 "start_date" => Carbon::now(),
                 "end_date" => Carbon::now()->addMonth(),
@@ -262,7 +263,7 @@ class DataCuong extends Seeder
                 "title" => "Voucher giới hạn giảm giá tối đa",
                 "description" => "Giảm giá áp dụng với giới hạn số tiền giảm tối đa.",
                 "code" => "MAX100K",
-                "discount_type" => "percentage",
+                "discount_type" => "percent",
                 "discount_value" => "15.00",
                 "start_date" => "2024-11-10 00:00:00",
                 "end_date" => "2024-12-31 23:59:59",
@@ -324,49 +325,165 @@ class DataCuong extends Seeder
                 "updated_at" => now(),
             ],
         ]);
-        Product::query()->insert([
-            // Sản phẩm 1: Áo sơ mi nam (Sản phẩm đơn)
+
+        // Products: Giày công sở nam (simple), Giày thể thao nam (simple), Áo khoác nam (variant), Áo sơ mi nam (variant)
+        // Simple Products
+        $simpleProducts = [
             [
-                "brand_id" => 1,
-                "category_id" => 2, // Danh mục: Áo sơ mi nam
-                "tags" => [1, 2],
-                "gallery" => ["shirt-gallery-1", "shirt-gallery-2"],
-                "type" => 0, // Sản phẩm đơn
-                "sku" => "sku-ao-so-mi",
-                "name" => "Áo sơ mi nam trắng",
-                "views" => 50,
-                "img_thumbnail" => "ao-so-mi-trang.png",
-                "price_regular" => 250000,
-                "price_sale" => 200000,
-                "quantity" => 30,
-                "description" => "Áo sơ mi nam trắng, chất liệu cotton thoáng mát.",
-                "description_title" => "Áo sơ mi trắng",
-                "status" => 1,
-                "is_show_home" => 1,
-                "trend" => 1,
-                "is_new" => 1,
+                'name' => 'Giày công sở nam',
+                'sku' => 'sku-giay-cong-so',
+                'img_thumbnail' => 'giaycongso.png',
+                'price_regular' => 500000,
+                'price_sale' => 450000,
+                'slug' => 'giay-cong-so-nam',
             ],
-            // Sản phẩm 2: Áo khoác nam (Sản phẩm đơn)
             [
-                "brand_id" => 2,
-                "category_id" => 3, // Danh mục: Áo khoác nam
-                "tags" => [2],
-                "gallery" => ["jacket-gallery-1"],
-                "type" => 0,
-                "sku" => "sku-ao-khoac",
-                "name" => "Áo khoác nam mùa đông",
-                "views" => 100,
-                "img_thumbnail" => "ao-khoac-mua-dong.png",
-                "price_regular" => 500000,
-                "price_sale" => 450000,
-                "quantity" => 20,
-                "description" => "Áo khoác nam ấm áp, chất liệu dày dặn, thích hợp cho mùa đông.",
-                "description_title" => "Áo khoác mùa đông",
-                "status" => 1,
-                "is_show_home" => 1,
-                "trend" => 1,
-                "is_new" => 0,
+                'name' => 'Giày thể thao nam',
+                'sku' => 'sku-giay-the-thao',
+                'img_thumbnail' => 'giaythethao.png',
+                'price_regular' => 600000,
+                'price_sale' => 550000,
+                'slug' => 'giay-the-thao-nam',
             ],
-        ]);
+        ];
+
+        foreach ($simpleProducts as $product) {
+            $productId = DB::table('products')->insertGetId([
+                'brand_id' => 1,
+                'category_id' => 4,
+                'type' => 0,
+                'sku' => $product['sku'],
+                'name' => $product['name'],
+                'views' => 1,
+                'img_thumbnail' => $product['img_thumbnail'],
+                'price_regular' => $product['price_regular'],
+                'price_sale' => $product['price_sale'],
+                'quantity' => 10,
+                'description' => $product['name'] . ' rất đẹp',
+                'description_title' => $product['name'] . ' rất đẹp',
+                'status' => 1,
+                'is_show_home' => 1,
+                'trend' => 1,
+                'is_new' => 1,
+                'slug' => $product['slug'],
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            // Insert product galleries
+            DB::table('product_galleries')->insert([
+                'product_id' => $productId,
+                'image' => $product['img_thumbnail'],
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            // Insert product tags
+            DB::table('product_tags')->insert([
+                'product_id' => $productId,
+                'tag_id' => 1,
+            ]);
+        }
+        /*
+        $variantProducts = [
+            [
+                'name' => 'Áo khoác nam',
+                'sku' => 'sku-ao-khoac',
+                'img_thumbnail' => 'aokhoac.png',
+                'slug' => 'ao-khoac-nam',
+                'variants' => [
+                    [
+                        'attribute_item_id' => [["id" => 1, "value" => "S"], ["id" => 7, "value" => "Cotton"]],
+                        'price_regular' => 300000,
+                        'price_sale' => 270000,
+                        'quantity' => 5,
+                        'sku' => 'sku-ao-khoac-s',
+                    ],
+                    [
+                        'attribute_item_id' => [["id" => 2, "value" => "M"], ["id" => 7, "value" => "Cotton"]],
+                        'price_regular' => 300000,
+                        'price_sale' => 270000,
+                        'quantity' => 5,
+                        'sku' => 'sku-ao-khoac-m',
+                    ],
+                ],
+            ],
+            [
+                'name' => 'Áo sơ mi nam',
+                'sku' => 'sku-ao-so-mi',
+                'img_thumbnail' => 'aosomi.png',
+                'slug' => 'ao-so-mi-nam',
+                'variants' => [
+                    [
+                        'attribute_item_id' => [["id" => 1, "value" => "S"], ["id" => 7, "value" => "Cotton"]],
+                        'price_regular' => 250000,
+                        'price_sale' => 220000,
+                        'quantity' => 5,
+                        'sku' => 'sku-ao-so-mi-s',
+                    ],
+                    [
+                        'attribute_item_id' => [["id" => 2, "value" => "M"], ["id" => 7, "value" => "Cotton"]],
+                        'price_regular' => 250000,
+                        'price_sale' => 220000,
+                        'quantity' => 5,
+                        'sku' => 'sku-ao-so-mi-m',
+                    ],
+                ],
+            ],
+        ];
+        foreach ($variantProducts as $product) {
+            $productId = DB::table('products')->insertGetId([
+                'brand_id' => 1,
+                'category_id' => 4,
+                'type' => 1,
+                'sku' => $product['sku'],
+                'name' => $product['name'],
+                'views' => 1,
+                'img_thumbnail' => $product['img_thumbnail'],
+                'price_regular' => null,
+                'price_sale' => null,
+                'quantity' => null,
+                'description' => $product['name'] . ' rất đẹp',
+                'description_title' => $product['name'] . ' rất đẹp',
+                'status' => 1,
+                'is_show_home' => 1,
+                'trend' => 1,
+                'is_new' => 1,
+                'slug' => $product['slug'],
+            ]);
+
+            // Insert product galleries
+            DB::table('product_galleries')->insert([
+                'product_id' => $productId,
+                'image' => $product['img_thumbnail'],
+            ]);
+
+            // Insert product tags
+            DB::table('product_tags')->insert([
+                'product_id' => $productId,
+                'tag_id' => 1,
+            ]);
+
+            foreach ($product['variants'] as $variant) {
+                $variantId = DB::table('product_variants')->insertGetId([
+                    'product_id' => $productId,
+                    'price_regular' => $variant['price_regular'],
+                    'price_sale' => $variant['price_sale'],
+                    'quantity' => $variant['quantity'],
+                    'image' => $product['img_thumbnail'],
+                    'sku' => $variant['sku'],
+                ]);
+
+                foreach ($variant['attribute_item_id'] as $attributeItem) {
+                    DB::table('product_variant_has_attributes')->insert([
+                        'product_variant_id' => $variantId,
+                        'attribute_item_id' => $attributeItem['id'],
+                        'attribute_id' => $attributeItem['id'],
+                        'value' => $attributeItem['value'],
+                    ]);
+                }
+            }
+        }
+    */
     }
 }
