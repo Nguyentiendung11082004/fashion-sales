@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import instance from "@/configs/axios";
 import { useQuery } from "@tanstack/react-query";
@@ -19,7 +19,6 @@ const Banner = () => {
       }
     },
   });
-
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -84,7 +83,6 @@ const Banner = () => {
           className="absolute left-1 sm:left-1 top-[40%] sm:top-[40%] lg:top-[40%] xl:top-1/2 flex items-center justify-center"
           onClick={prevSlide}
         >
-          {/* <HomeIcon5 /> */}
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -107,7 +105,6 @@ const Banner = () => {
           className="absolute right-1 sm:right-1 top-[40%] sm:top-[40%] lg:top-[40%] xl:top-1/2 flex items-center justify-center"
           onClick={nextSlide}
         >
-          {/* <HomeIcon6 /> */}
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -127,7 +124,7 @@ const Banner = () => {
           </svg>
         </button>
         <div className="absolute bottom-4 top-[80%] sm:top-[83%] lg:top-[87%] left-1/2 transform -translate-x-1/2 flex justify-center">
-          {data?.data?.data?.banners?.map((_: any, index: any) => (
+          {data?.data?.data?.banners.map((_: any, index: any) => (
             <button
               key={index}
               className={`w-3.5 h-3 mx-2 rounded-full ${

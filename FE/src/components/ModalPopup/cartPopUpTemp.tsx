@@ -4,47 +4,36 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useCart } from "@/common/context/Cart/CartContext";
 import HeartBlack from "@/components/icons/detail/HeartBlack";
-import {
-  findProductVariant,
-  productShow_client,
-} from "@/services/api/client/productClient.api";
+import instance from "@/configs/axios";
+import { productShow_client } from "@/services/api/client/productClient.api";
 import { CloseOutlined, MinusOutlined } from "@ant-design/icons";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Modal as AntModal, Button } from "antd";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 
 const CartPopup = forwardRef((props: any, ref) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { idProduct, setIdProduct }: any = props;
-  const [product, setProduct] = useState<any>();
+  const { idProduct }: any = props;
 
   const [selectedAttributes, setSelectedAttributes] = useState<{
     product_variant: Record<string, string | number>;
   }>({
     product_variant: {},
   });
+
   const { data, isLoading } = useQuery({
     queryKey: ["product", idProduct],
     queryFn: async () => {
-      if (!idProduct) {
-        return;
-      }
       try {
         return await productShow_client(`${idProduct}`);
       } catch (error) {
         throw new Error("Không có sản phẩm nào phù hợp");
       }
     },
-    enabled: !!idProduct,
   });
 
-  const getUniqueAttributes = data?.getUniqueAttributes;
-
-  useEffect(() => {
-    if (data && data.product) {
-      setProduct(data.product);
-    }
-  }, [data]);
+  console.log("product data:", data);
+  console.log("id product:", idProduct);
 
   const handleAttributeSelect = (attribute: any, id: any) => {
     setSelectedAttributes((prev: any) => ({
@@ -52,83 +41,9 @@ const CartPopup = forwardRef((props: any, ref) => {
       [attribute]: id,
     }));
   };
-
-  const result = product?.variants
-    .filter(
-      (variant: any) =>
-        variant.attributes &&
-        variant.attributes.length > 0 &&
-        variant.quantity > 0
-    )
-    .map((variant: any) => {
-      const attributeObj = variant.attributes.reduce(
-        (acc: { [key: string]: string }, attribute: any) => {
-          acc[attribute.name] = attribute.pivot.attribute_item_id.toString();
-          return acc;
-        },
-        {}
-      );
-      return attributeObj;
-    });
-  const checkDisable = (attribute: string, value: any) => {
-    let res = false;
-
-    let matchingItems = result?.filter((x: any) => {
-      return Object.keys(selectedAttributes.product_variant).every((key) => {
-        if (key !== attribute) {
-          return (
-            x[key] &&
-            x[key].toString() ===
-              selectedAttributes?.product_variant[key].toString()
-          );
-        }
-        return true;
-      });
-    });
-
-    let isAttributeValid = matchingItems?.some(
-      (x: any) => x[attribute] && x[attribute].toString() === value.toString()
-    );
-
-    res = !isAttributeValid;
-
-    return res;
-  };
-
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
-  useEffect(() => {
-    setIsInitialLoad(true);
-  }, [idProduct]);
-
-  useEffect(() => {
-    if (result && result.length > 0 && isInitialLoad) {
-      setSelectedAttributes({ product_variant: result[0] });
-      setIsInitialLoad(false);
-    }
-  }, [result, isInitialLoad, idProduct]);
-
-  useEffect(() => {
-    const fetchProductVariant = async () => {
-      if (!idProduct) {
-        return;
-      }
-      try {
-        const variant = await findProductVariant(idProduct, selectedAttributes);
-        if (variant.findProductVariant) {
-          setProduct((prevProduct: any) => ({
-            ...prevProduct,
-            ...variant.findProductVariant,
-          }));
-        }
-      } catch (error) {
-        console.log("Call api thất bại", error);
-      }
-    };
-    fetchProductVariant();
-  }, [selectedAttributes]);
-
+  console.log("setSelectedAttributes 12345  ", selectedAttributes);
   const resultGetUniqueAttribute = Object.entries(
-    getUniqueAttributes ?? {}
+    data?.getUniqueAttributes ?? {}
   ).map(([key, value]) => ({
     attribute: key,
     attributeValue: Object.entries(value ?? {}).map(([id, name]) => ({
@@ -136,27 +51,116 @@ const CartPopup = forwardRef((props: any, ref) => {
       name,
     })),
   }));
+  const productVariant = data?.product?.variants;
+  console.log("productVarriant: ", productVariant);
 
-  // Thêm vào giỏ hàng
+  console.log("resultGetUniqueAttribute", resultGetUniqueAttribute);
+  const formattedAttributes = data?.product?.variants
+    ? data.product.variants
+        .filter((item: any) => item.quantity > 0)
+        .map((item: any) => {
+          const attributeObj: { [key: string]: number } = {};
+          item.attributes.forEach((attribute: any) => {
+            attributeObj[attribute.name] =
+              attribute.pivot.attribute_item_id.toString();
+          });
+          return {
+            ...attributeObj,
+            price_sale: item.price_sale,
+          };
+        })
+    : [];
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    setIsInitialLoad(true);
+  }, [idProduct]);
+
+  useEffect(() => {
+    if (
+      formattedAttributes &&
+      formattedAttributes.length > 0 &&
+      isInitialLoad
+    ) {
+      setSelectedAttributes({ product_variant: formattedAttributes[0] });
+      setIsInitialLoad(false);
+    }
+  }, [formattedAttributes, isInitialLoad]);
+
+  console.log("formattedAttributes", formattedAttributes);
+  // const checkDisable = (attribute: string, value: any) => {
+  //   let res = false;
+
+  //   let matchingItems = formattedAttributes?.filter((x: any) => {
+  //     return Object.keys(selectedAttributes?.product_variant).every((key) => {
+  //       if (key !== attribute) {
+  //         return (
+  //           x[key] &&
+  //           x[key].toString() ===
+  //             selectedAttributes?.product_variant[key].toString()
+  //         );
+  //       }
+  //       return true;
+  //     });
+  //   });
+
+  //   let isAttributeValid = matchingItems?.some(
+  //     (x: any) => x[attribute] && x[attribute].toString() === value.toString()
+  //   );
+
+  //   res = !isAttributeValid;
+
+  //   return res;
+  // };
+
+  // thêm vào giỏ hàng
+  const { addToCart } = useCart();
+  const checkDisable = (attribute: string, value: any) => {
+    const matchingItems = formattedAttributes?.filter((item: any) => {
+      return Object.keys(selectedAttributes.product_variant).every((key) => {
+        if (key !== attribute && key !== "price_sale") {
+          return (
+            item[key] &&
+            item[key].toString() ===
+              selectedAttributes.product_variant[key].toString()
+          );
+        }
+        return true;
+      });
+    });
+
+    const isAttributeValid = matchingItems?.some(
+      (item: any) =>
+        item[attribute] && item[attribute].toString() === value.toString()
+    );
+
+    return !isAttributeValid;
+  };
+
+  const onHandleAddToCart = (
+    idProduct: any,
+    idProductVariant: any,
+    quantity: any
+  ) => {
+    console.log("add to cart: ");
+    console.log("idProduct: ", idProduct);
+    console.log("idProductVariant: ", idProductVariant);
+    console.log("quantity: ", quantity);
+    if (data?.getUniqueAttributes == 0) {
+      idProductVariant = undefined;
+    }
+    addToCart(idProduct, idProductVariant, quantity);
+  };
 
   const [quantity, setQuantity] = useState<number>(1);
 
   const increaseQuantity = () => {
     setQuantity((prev) => prev + 1);
   };
-  const { addToCart } = useCart();
+
   const decreaseQuantity = () => {
     setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
-  };
-  const onHandleAddToCart = (
-    idProduct: any,
-    idProductVariant: any,
-    quantity: any
-  ) => {
-    if (data.getUniqueAttributes == 0) {
-      idProductVariant = undefined;
-    }
-    addToCart(idProduct, idProductVariant, quantity);
   };
 
   const showModal = () => {
@@ -164,13 +168,13 @@ const CartPopup = forwardRef((props: any, ref) => {
   };
   const handleClose = () => {
     setIsModalOpen(false);
-    setSelectedAttributes({ product_variant: {} });
-    setQuantity(1);
-    setIdProduct("");
   };
   useImperativeHandle(ref, () => ({
     showModal,
   }));
+
+  console.log("thêm giỏ hàng: ", selectedAttributes);
+  console.log("id variant  12345: : ", selectedAttributes?.product_variant);
 
   return (
     <AntModal
@@ -195,7 +199,8 @@ const CartPopup = forwardRef((props: any, ref) => {
               {data?.product?.name}
             </h2>
             <span className="text-2xl text-[#696969]">
-              {product?.price_sale} VNĐ
+              {selectedAttributes?.product_variant?.price_sale ||
+                data?.product?.price_sale}
             </span>
             {/* Chọn màu */}
             {resultGetUniqueAttribute?.map((value: any) => (
@@ -299,8 +304,11 @@ const CartPopup = forwardRef((props: any, ref) => {
             <Button
               onClick={() => {
                 handleClose();
-                console.log("số lượng : ", quantity);
-                onHandleAddToCart(idProduct, product?.id, quantity);
+                console.log(
+                  "Selected variant ID: ",
+                  selectedAttributes?.product_variant?.id
+                );
+                onHandleAddToCart(idProduct, productVariant?.id, quantity);
               }}
               className="h-12 w-full mt-4 rounded-full bg-[#56cfe1] text-white text-lg font-medium hover:bg-[#4bc3d5]"
             >

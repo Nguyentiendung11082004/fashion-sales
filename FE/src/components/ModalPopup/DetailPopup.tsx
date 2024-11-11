@@ -1,26 +1,24 @@
-import React, { useState, useImperativeHandle, forwardRef } from "react";
-import { Modal as AntModal, Button } from "antd";
-import { CloseOutlined, MinusOutlined } from "@ant-design/icons";
-import HeartBlack from "@/components/icons/detail/HeartBlack";
-import HeartRedPopup from "@/components/icons/detail/HeartRedPopup";
-import { Link, useNavigate } from "react-router-dom";
-import { ProductNext } from "../icons";
-import NextImg from "../icons/detail/NextImg";
-import PreImg from "../icons/detail/PreImg";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { FormatMoney } from "@/common/utils/utils";
+import HeartBlack from "@/components/icons/detail/HeartBlack";
+import { CloseOutlined, MinusOutlined } from "@ant-design/icons";
+import { Modal as AntModal, Button } from "antd";
+import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
 
 type Props = {
   open: boolean;
   onClose: () => void;
   trendProducts: any;
-  productSeeMore: any
-}
-import withReactContent from "sweetalert2-react-content";
+  productSeeMore: any;
+};
 const MySwal = withReactContent(Swal);
 const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
   const navigate = useNavigate();
-  const resultDataAttribute = Object.entries(productSeeMore?.unique_attributes ?? {}).map(([key, value]) => ({
+  const resultDataAttribute = Object.entries(
+    productSeeMore?.unique_attributes ?? {}
+  ).map(([key, value]) => ({
     attribute: key,
     attributeValue: Object.entries(value ?? {}).map(([id, name]) => ({
       id,
@@ -28,18 +26,19 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
     })),
   }));
   const priceProduct = productSeeMore?.variants?.map((e: any) => e?.price_sale);
-  const minPrice = priceProduct && priceProduct.length > 0 ? Math.min(...priceProduct) : null;
-  const maxPrice = priceProduct && priceProduct.length > 0 ? Math.max(...priceProduct) : null
-  const _payload =  {
-      product_id: productSeeMore.id,
-      product_variant_id: productSeeMore?.variants?.map((e: any) => e.id)?.[0],
-      quantity: 1
-    }
-  
-  console.log("_payload", _payload)
+  const minPrice =
+    priceProduct && priceProduct.length > 0 ? Math.min(...priceProduct) : null;
+  const maxPrice =
+    priceProduct && priceProduct.length > 0 ? Math.max(...priceProduct) : null;
+  const _payload = {
+    product_id: productSeeMore.id,
+    product_variant_id: productSeeMore?.variants?.map((e: any) => e.id)?.[0],
+    quantity: 1,
+  };
+
   const handleCheckout = () => {
-    navigate('/checkout', { state: { _payload: _payload } });
-  }
+    navigate("/checkout", { state: { _payload: _payload } });
+  };
 
   return (
     <AntModal
@@ -72,14 +71,14 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
           />
         </div>
         <div className="w-1/2 p-2 ml-4">
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">{productSeeMore?.name}</h2>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">
+            {productSeeMore?.name}
+          </h2>
           <div className="flex items-center justify-between">
             <span className="text-xl text-[#696969]">
-              {
-                minPrice !== null && maxPrice !== null
-                  ? `${FormatMoney(minPrice)} - ${FormatMoney(maxPrice)}`
-                  : FormatMoney(productSeeMore?.price_sale || 0)
-              }
+              {minPrice !== null && maxPrice !== null
+                ? `${FormatMoney(minPrice)} - ${FormatMoney(maxPrice)}`
+                : FormatMoney(productSeeMore?.price_sale || 0)}
             </span>
             <div className="flex items-center">
               <Link
@@ -167,29 +166,29 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
           </p>
 
           {/* Chọn màu */}
-          {
-            resultDataAttribute?.map((e) => (
-              <div className="my-4" key={e?.attribute}>
-                <p className="font-medium">{e?.attribute}</p>
-                <div className="flex mt-3 gap-2">
-                  {e?.attributeValue?.map((item: any) => (
-                    e.attribute.toLowerCase() === 'color' ? (
-                      <div
-                        key={item.id}
-                        className="flex-1 max-w-[75px] h-8 sm:h-8 rounded-full border-2 cursor-pointer "
-                        style={{ backgroundColor: item.name.toLowerCase() }}
-                      ></div>
-                    ) : (
-                      <p key={item.id} className="text-center  flex-1 max-w-[75px] pt-1 sm:h-8 rounded-full border-2 cursor-pointer items-center justify-center h-full text-sm">
-                        {item.name}
-                      </p>
-                    )
-                  ))}
-                </div>
+          {resultDataAttribute?.map((e) => (
+            <div className="my-4" key={e?.attribute}>
+              <p className="font-medium">{e?.attribute}</p>
+              <div className="flex mt-3 gap-2">
+                {e?.attributeValue?.map((item: any) =>
+                  e.attribute.toLowerCase() === "color" ? (
+                    <div
+                      key={item.id}
+                      className="flex-1 max-w-[75px] h-8 sm:h-8 rounded-full border-2 cursor-pointer "
+                      style={{ backgroundColor: item.name.toLowerCase() }}
+                    ></div>
+                  ) : (
+                    <p
+                      key={item.id}
+                      className="text-center  flex-1 max-w-[75px] pt-1 sm:h-8 rounded-full border-2 cursor-pointer items-center justify-center h-full text-sm"
+                    >
+                      {item.name}
+                    </p>
+                  )
+                )}
               </div>
-            ))
-
-          }
+            </div>
+          ))}
           {/* <div className="my-4">
             <p className="font-medium">'Màu sắc '</p>
             <div className="flex mt-3 gap-2">

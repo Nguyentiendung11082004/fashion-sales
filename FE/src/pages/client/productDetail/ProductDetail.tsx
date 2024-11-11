@@ -5,10 +5,10 @@
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import dayjs from "dayjs";
 import { useAuth } from "@/common/context/Auth/AuthContext";
 import { useCart } from "@/common/context/Cart/CartContext";
 import { useUser } from "@/common/context/User/UserContext";
+import instance from "@/configs/axios";
 import { categoriesShow } from "@/services/api/admin/categories";
 import {
   findProductVariant,
@@ -16,13 +16,13 @@ import {
 } from "@/services/api/client/productClient.api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button, Popconfirm, Skeleton } from "antd";
+import dayjs from "dayjs";
 import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 import Less from "../../../components/icons/detail/Less";
 import CommentProduct from "./CommentProduct";
 import RelatedProducts from "./RelatedProducts";
-import instance from "@/configs/axios";
-import { toast } from "react-toastify";
 import ReplyComment from "./ReplyComment";
 
 interface IinitialAttributes {
@@ -34,7 +34,7 @@ const ProductDetail = () => {
   const [product, setProduct] = useState<any>();
   const [selectedImage, setSelectedImage] = useState<string>();
 
-  const { data, isLoading, isError, error } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["product", id],
     queryFn: async () => {
       try {
@@ -282,7 +282,8 @@ const ProductDetail = () => {
 
   useEffect(() => {
     if (imgPr) {
-      setMainImage(imgPr);
+      // setMainImage(imgPr);
+      setSelectedImage(imgPr);
     }
   }, [imgPr, galleryImages]);
 
@@ -373,6 +374,7 @@ const ProductDetail = () => {
   };
 
   const [isInitialLoad, setIsInitialLoad] = useState(true);
+
   useEffect(() => {
     if (result && result.length > 0 && isInitialLoad) {
       setSelectedAttributes({ product_variant: result[0] });
@@ -400,7 +402,6 @@ const ProductDetail = () => {
         console.log("Call api thất bại", error);
       }
     };
-
     fetchProductVariant();
   }, [selectedAttributes]);
 
@@ -413,6 +414,9 @@ const ProductDetail = () => {
       name,
     })),
   }));
+
+  console.log("resultGetUniqueAttribute", resultGetUniqueAttribute);
+  console.log("getUniqueAttributes", getUniqueAttributes);
 
   const [editIdComment, setEditIdComment] = useState<string | null>(null);
   const [InForCommentId, setInForCommentId] = useState<string | null>(null);
@@ -490,7 +494,8 @@ const ProductDetail = () => {
                     alt="product detail"
                     data-nimg="fill"
                     className="w-full lg:h-[100%] h-full lg:w-[550px] object-cover transition-transform ease-in-out duration-300 group-hover:scale-150"
-                    src={mainImage || selectedImage}
+                    // src={mainImage || selectedImage}
+                    src={selectedImage}
                   />
                 </div>
               </div>
@@ -603,13 +608,14 @@ const ProductDetail = () => {
                             return (
                               <div
                                 key={item.id}
-                                className={`relative flex-1 max-w-[60px] h-8 sm:h-9 rounded-full cursor-pointer flex items-center justify-center ${
-                                  isSelected
-                                    ? "border-gray-800 border-4"
-                                    : isDisabled
-                                      ? "border-gray-200 border-2 opacity-50 cursor-not-allowed"
-                                      : ""
-                                }`}
+                                className={`relative flex-1 max-w-[60px] h-8 sm:h-9 rounded-full cursor-pointer flex items-center justify-center
+                                   ${
+                                     isSelected
+                                       ? "border-gray-800 border-4"
+                                       : isDisabled
+                                         ? "border-gray-200 border-2 opacity-50 cursor-not-allowed"
+                                         : ""
+                                   }`}
                                 style={{
                                   backgroundColor:
                                     key.attribute === "color"
@@ -706,7 +712,9 @@ const ProductDetail = () => {
                 </div>
 
                 <Button
-                  onClick={() => onHandleAddToCart(id, product?.id, quantity)}
+                  onClick={() => {
+                    onHandleAddToCart(id, product?.id, quantity);
+                  }}
                   className={`h-11 w-full px-2 py-2 rounded-full ...`}
                   disabled={isLoading}
                 >

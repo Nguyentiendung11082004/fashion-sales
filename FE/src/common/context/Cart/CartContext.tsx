@@ -5,7 +5,6 @@ import { ReactNode, createContext, useContext } from "react";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { useAuth } from "../Auth/AuthContext";
-import Pusher from 'pusher-js';
 const MySwal = withReactContent(Swal);
 
 interface CartContextType {
@@ -95,16 +94,12 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     },
   });
 
-  const addToCart = (idProduct: number, idProductVariant: number) => {
-    addCartMutation.mutate({ idProduct, idProductVariant });
-    const pusher = new Pusher('4d3e0d70126f2605977e', {
-      cluster: 'ap1',
-    });
-    const channel = pusher.subscribe(`private-cart.${data.id}`); // data.id là id giỏ hàng của người dùng
-    channel.trigger('CartEvent', {
-      message: 'Product added to cart',
-      cartId: data.id, 
-    });
+  const addToCart = (
+    idProduct: number,
+    idProductVariant: number,
+    quantity: number
+  ) => {
+    addCartMutation.mutate({ idProduct, idProductVariant, quantity });
   };
 
   const updateQuantity = useMutation({

@@ -51,7 +51,7 @@ const Post = () => {
           className="mySwiper grid grid-cols-1 lg:grid-cols-3 lg:gap-8 md:grid-cols-3 md:gap-4"
         >
           {data?.data?.data.map((value: any) => (
-            <SwiperSlide>
+            <SwiperSlide key={value.id}>
               <div className="overflow-hidden mt-4 lg:mt-0 md:mt-0 border relative h-[400px]">
                 <img
                   src={value.img_thumbnail}

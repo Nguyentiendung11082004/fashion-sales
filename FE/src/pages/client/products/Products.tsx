@@ -16,7 +16,7 @@ import NoDatasIcon from "@/components/icons/products/NoDataIcon";
 import instance from "@/configs/axios";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {Spin} from 'antd';
+import { Spin } from "antd";
 import "rc-slider/assets/index.css";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -27,6 +27,7 @@ import { Button } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 import { useAuth } from "@/common/context/Auth/AuthContext";
 import { useCart } from "@/common/context/Cart/CartContext";
+import CartPopup from "@/components/ModalPopup/CartPopup";
 
 const Products = () => {
   const [growboxDropdownOpen, setGrowboxDropdownOpen] = useState(false);
@@ -234,6 +235,7 @@ const Products = () => {
       fetchSuggestions();
     }
   };
+  const [idProduct, setIdProduct] = useState<any>();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -249,7 +251,6 @@ const Products = () => {
       return response.data;
     },
   });
-  // console.log(pro);
 
   const toggleGrowboxDropdown = () => {
     setGrowboxDropdownOpen(!growboxDropdownOpen);
@@ -267,8 +268,18 @@ const Products = () => {
       setToepfeDropdownOpen(false);
     }
   };
-
-
+  // thêm vào giỏ hàng
+  const { addToCart } = useCart();
+  const onHandleAddToCart = (
+    idProduct: any,
+    idProductVariant: any,
+    quantity: any
+  ) => {
+    // if (data.getUniqueAttributes == 0) {
+    //   idProductVariant = undefined;
+    // }
+    addToCart(idProduct, idProductVariant, quantity);
+  };
 
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
@@ -278,17 +289,17 @@ const Products = () => {
     };
   }, []);
 
-  // const [visiable, setVisible] = useState(false);
-  // const closeModal = () => {
-  //   // setIdCart('');
-  //   setVisible(false);
-  // };
-  const { isLoading, addToCart } = useCart();
-  const handleAddToCart = (idProduct: any, idProductVariant: any) => {
-    addToCart(idProduct, idProductVariant);
-  };
   const buyNow = (idPr: any, qty: number) => {
     navigate("/checkout", { state: { cartId: idPr } });
+  };
+  const modalRef = useRef<HTMLDialogElement | null>(null); // ref để điều khiển modal
+  const [isModalOpen, setIsModalOpen] = useState(false); // state để kiểm soát việc mở modal
+
+  const handleOpenModal = () => {
+    setIsModalOpen(true); // Mở modal khi nhấn nút
+    if (modalRef.current) {
+      modalRef.current.showModal(); // Sử dụng showModal để hiển thị modal
+    }
   };
   return (
     <>
@@ -850,13 +861,13 @@ const Products = () => {
                         }
                         checked={selectedColors.includes(
                           item.value.charAt(0).toUpperCase() +
-                          item.value.slice(1).toLowerCase()
+                            item.value.slice(1).toLowerCase()
                         )}
                         onChange={() =>
                           handleCheckboxChange(
                             "colors",
                             item.value.charAt(0).toUpperCase() +
-                            item.value.slice(1).toLowerCase()
+                              item.value.slice(1).toLowerCase()
                           )
                         }
                       />
@@ -867,7 +878,7 @@ const Products = () => {
                         <span className="text-slate-900 text-sm font-normal ">
                           {colorTranslations[
                             item.value.charAt(0).toUpperCase() +
-                            item.value.slice(1).toLowerCase()
+                              item.value.slice(1).toLowerCase()
                           ] || "No Size"}
                           {/*Dịch sang TViet và Chữ cái đầu viết hoa */}
                         </span>
@@ -1078,168 +1089,157 @@ const Products = () => {
                   const inWishlist = isInWishlist(product.id);
 
                   return (
-                    // <Link to={`/products/${product.id}`}>
-                    // </Link>
-
-                    <div
-                      className="nc-ProductCard relative flex flex-col bg-transparent"
-                      key={product.id}
-                    >
-                      <div className="lg:mb-[25px] mb-[20px]">
-                        <div className="cursor-pointer lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] sm:h-[345px] overflow-hidden">
-                          <img
-                            className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover/image:opacity-0 object-cover "
-                            src={product.img_thumbnail}
-                          />
-                          <img
-                            className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover/image:opacity-100 object-cover"
-                            src={product.img_thumbnail}
-                          />
-                          <div className="absolute inset-0 bg-black opacity-0 transition-opacity duration-300 ease-in-out group-hover:opacity-10"></div>
-                          <div>
-                            <button
-                              className="absolute left-5 top-5 cursor-pointer"
-                              onClick={() => handleAddToWishlist(product)}
+                    <>
+                      <div
+                        className="nc-ProductCard relative flex flex-col bg-transparent"
+                        key={product.id}
+                      >
+                        <div className="lg:mb-[25px] mb-[20px]">
+                          <div className="cursor-pointer lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] sm:h-[345px] overflow-hidden">
+                            <Link
+                              to={`/products/${product?.id}`}
+                              className="absolute inset-0"
                             >
-                              {inWishlist ? <HeartRed /> : <HeartWhite />}
-                            </button>
-                          </div>
-                          <div className="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100">
-                            <div className="group/btn relative">
-                              {product.variants.length > 0 ? (
-                                <button className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]">
-                                  <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                                    Mua ngay
-                                  </p>
-                                  <Eye />
-                                </button>
-                              ) : (
-                                <button
-                                  onClick={() => buyNow(product?.id, 1)}
-                                  className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]"
-                                >
-                                  <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                                    Mua ngay
-                                  </p>
-                                  <Eye />
-                                </button>
-                              )}
-                            </div>
-
-                    
-                            <Link to="" className="group/btn relative">
-                              <button
-                                onClick={() =>
-                                  handleAddToCart(
-                                    product?.id,
-                                    product?.variants[0]?.id
-                                  )
-                                }
-                                className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]"
-                              >
-                                <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                                  Thêm vào giỏ hàng 
-                                </p>
-                                {isLoading ? (
-                                  <Spin
-                                    indicator={
-                                      <LoadingOutlined
-                                        style={{
-                                          fontSize: 28,
-                                          color: "#fff",
-                                        }}
-                                      />
-                                    }
-                                    className="translate-y-[-12px]"
-                                  />
-                                ) : (
-                                  <CartDetail />
-                                )}
-                              </button>
+                              <img
+                                className="group-hover:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover:opacity-0 object-cover"
+                                src={product.img_thumbnail}
+                                alt="Product"
+                              />
+                              <img
+                                className="group-hover:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover:opacity-100 object-cover"
+                                src={product.img_thumbnail}
+                                alt="Product"
+                              />
                             </Link>
-                          </div>
-                          <div className="flex justify-center">
-                            <div
-                              className="absolute bottom-2 text-center text-white
+                            <div className="image-overlay"></div>
+                            {/* <div className="absolute inset-0 bg-black opacity-0 transition-opacity duration-300 ease-in-out group-hover:opacity-10"></div> */}
+                            <div>
+                              <button
+                                className="absolute left-5 top-5 cursor-pointer"
+                                onClick={() => handleAddToWishlist(product)}
+                              >
+                                {inWishlist ? <HeartRed /> : <HeartWhite />}
+                              </button>
+                            </div>
+                            <div className="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100">
+                              <div className="group/btn relative">
+                                {product.variants.length > 0 ? (
+                                  <button className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]">
+                                    <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
+                                      Mua ngay
+                                    </p>
+                                    <Eye />
+                                  </button>
+                                ) : (
+                                  <button
+                                    onClick={() => buyNow(product?.id, 1)}
+                                    className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]"
+                                  >
+                                    <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
+                                      Mua ngay
+                                    </p>
+                                    <Eye />
+                                  </button>
+                                )}
+                              </div>
+
+                              <Link to="" className="group/btn relative">
+                                <button
+                                  className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]"
+                                  onClick={() => {
+                                    modalRef.current?.showModal();
+                                    setIdProduct(product.id);
+                                  }}
+                                >
+                                  <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
+                                    Thêm vào giỏ hàng
+                                  </p>
+                                  <CartDetail />
+                                </button>
+                              </Link>
+                            </div>
+                            <div className="flex justify-center">
+                              <div
+                                className="absolute bottom-2 text-center text-white
               -translate-y-7 transform 
                 transition-all duration-500 ease-in-out 
                 group-hover:translate-y-0
                 opacity-0
                 group-hover:opacity-100
               "
-                            >
-                              <ul className="flex">
-                                {getUniqueAttributes &&
-                                  Object.entries(getUniqueAttributes)
-                                    .filter(([key, value]) => {
-                                      // Hàm kiểm tra xem giá trị có phải là kích thước hay không
-                                      const isSizeValue = (v: any) => {
-                                        return (
-                                          /^[SMLX]{1,3}$/.test(v) ||
-                                          /^[0-9]+(\.\d+)?\s?(cm|inch|mm|kg)?$/.test(
-                                            v
-                                          ) ||
-                                          /^[0-9]+$/.test(v)
-                                        );
-                                      };
+                              >
+                                <ul className="flex">
+                                  {getUniqueAttributes &&
+                                    Object.entries(getUniqueAttributes)
+                                      .filter(([key, value]) => {
+                                        // Hàm kiểm tra xem giá trị có phải là kích thước hay không
+                                        const isSizeValue = (v: any) => {
+                                          return (
+                                            /^[SMLX]{1,3}$/.test(v) ||
+                                            /^[0-9]+(\.\d+)?\s?(cm|inch|mm|kg)?$/.test(
+                                              v
+                                            ) ||
+                                            /^[0-9]+$/.test(v)
+                                          );
+                                        };
 
-                                      if (Array.isArray(value)) {
-                                        return value.every(isSizeValue); // Nếu là mảng, kiểm tra từng phần tử
-                                      }
-                                      if (
-                                        typeof value === "object" &&
-                                        value !== null
-                                      ) {
-                                        return Object.values(value).every(
-                                          isSizeValue
-                                        ); // Nếu là object, kiểm tra từng giá trị
-                                      }
-                                      return isSizeValue(value); // Nếu là giá trị đơn lẻ
-                                    })
-                                    .map(([key, value]) => (
-                                      <li key={key}>
-                                        {Array.isArray(value)
-                                          ? value.join(", ") // Nếu là mảng
-                                          : typeof value === "object" &&
-                                              value !== null
-                                            ? Object.values(value).join(", ") // Nếu là object
-                                            : String(value)}{" "}
-                                        {/* Nếu là giá trị đơn lẻ*/}
-                                      </li>
-                                    ))}
-                              </ul>
+                                        if (Array.isArray(value)) {
+                                          return value.every(isSizeValue); // Nếu là mảng, kiểm tra từng phần tử
+                                        }
+                                        if (
+                                          typeof value === "object" &&
+                                          value !== null
+                                        ) {
+                                          return Object.values(value).every(
+                                            isSizeValue
+                                          ); // Nếu là object, kiểm tra từng giá trị
+                                        }
+                                        return isSizeValue(value); // Nếu là giá trị đơn lẻ
+                                      })
+                                      .map(([key, value]) => (
+                                        <li key={key}>
+                                          {Array.isArray(value)
+                                            ? value.join(", ") // Nếu là mảng
+                                            : typeof value === "object" &&
+                                                value !== null
+                                              ? Object.values(value).join(", ") // Nếu là object
+                                              : String(value)}{" "}
+                                          {/* Nếu là giá trị đơn lẻ*/}
+                                        </li>
+                                      ))}
+                                </ul>
+                              </div>
                             </div>
-                          </div>
 
-                          {product.price_regular && (
-                            <div>
-                              {product.price_sale > 0 &&
+                            {product.price_regular && (
+                              <div>
+                                {product.price_sale > 0 &&
                                 product.price_sale < product.price_regular ? (
-                                <>
-                                  <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400">
-                                    -
-                                    {Math.round(
-                                      ((product.price_regular -
-                                        product.price_sale) /
-                                        product.price_regular) *
-                                      100
-                                    )}
-                                    %
-                                  </div>
-                                </>
-                              ) : (
-                                <div></div>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                        <div>
-                          <p className="text-base font-medium text-black mb-1 cursor-pointer hd-all-hover-bluelight">
-                            {product.name.charAt(0).toUpperCase() +
-                              product.name.slice(1).toLowerCase()}
-                          </p>
-                          {(product?.price_regular ||
-                            product?.variants?.length) && (
+                                  <>
+                                    <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400">
+                                      -
+                                      {Math.round(
+                                        ((product.price_regular -
+                                          product.price_sale) /
+                                          product.price_regular) *
+                                          100
+                                      )}
+                                      %
+                                    </div>
+                                  </>
+                                ) : (
+                                  <div></div>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                          <div>
+                            <p className="text-base font-medium text-black mb-1 cursor-pointer hd-all-hover-bluelight">
+                              {product.name.charAt(0).toUpperCase() +
+                                product.name.slice(1).toLowerCase()}
+                            </p>
+                            {(product?.price_regular ||
+                              product?.variants?.length) && (
                               <div>
                                 {(() => {
                                   const variants = product?.variants || [];
@@ -1296,22 +1296,22 @@ const Products = () => {
                                     ) {
                                       return (
                                         <span>
-                                          {new Intl.NumberFormat("vi-VN").format(
-                                            productPriceRegular
-                                          )}
+                                          {new Intl.NumberFormat(
+                                            "vi-VN"
+                                          ).format(productPriceRegular)}
                                           ₫
                                         </span>
                                       );
                                     } else {
                                       return (
                                         <span>
-                                          {new Intl.NumberFormat("vi-VN").format(
-                                            minPriceSale
-                                          )}
+                                          {new Intl.NumberFormat(
+                                            "vi-VN"
+                                          ).format(minPriceSale)}
                                           ₫ -{" "}
-                                          {new Intl.NumberFormat("vi-VN").format(
-                                            maxPriceRegular
-                                          )}
+                                          {new Intl.NumberFormat(
+                                            "vi-VN"
+                                          ).format(maxPriceRegular)}
                                           ₫
                                         </span>
                                       );
@@ -1334,26 +1334,36 @@ const Products = () => {
                                 })()}
                               </div>
                             )}
-                        </div>
+                          </div>
 
-                        <div className="t4s-product-colors flex">
-                          {getUniqueAttributes?.color &&
-                            Object.values(getUniqueAttributes.color as { [key: string]: string })
-                              .filter((color) => typeof color === "string")
-                              .map((color, index) => (
-                                <div key={index} className="mr-2 mt-1">
-                                  <span className="t4s-pr-color__item flex flex-col items-center cursor-pointer">
-                                    <span className="t4s-pr-color__value border border-gray-400 w-5 h-5 hover:border-black hover:border-2 rounded-full p-[5px]">
-                                      <div
-                                        className={`w-[17px] h-[17px] rounded-full ml-[-4.25px] mt-[-4px] hover:mt-[-5px] hover:ml-[-5px] ${convertColorNameToClass(color)}`}
-                                      ></div>
+                          <div className="t4s-product-colors flex">
+                            {getUniqueAttributes?.color &&
+                              Object.values(
+                                getUniqueAttributes.color as {
+                                  [key: string]: string;
+                                }
+                              )
+                                .filter((color) => typeof color === "string")
+                                .map((color, index) => (
+                                  <div key={index} className="mr-2 mt-1">
+                                    <span className="t4s-pr-color__item flex flex-col items-center cursor-pointer">
+                                      <span className="t4s-pr-color__value border border-gray-400 w-5 h-5 hover:border-black hover:border-2 rounded-full p-[5px]">
+                                        <div
+                                          className={`w-[17px] h-[17px] rounded-full ml-[-4.25px] mt-[-4px] hover:mt-[-5px] hover:ml-[-5px] ${convertColorNameToClass(color)}`}
+                                        ></div>
+                                      </span>
                                     </span>
-                                  </span>
-                                </div>
-                              ))}
+                                  </div>
+                                ))}
+                          </div>
                         </div>
                       </div>
-                    </div>
+                      <CartPopup
+                        idProduct={idProduct}
+                        ref={modalRef}
+                        setIdProduct={setIdProduct}
+                      />
+                    </>
                   );
                 })}
               </div>

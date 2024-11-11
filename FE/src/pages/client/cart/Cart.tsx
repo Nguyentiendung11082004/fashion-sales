@@ -1,28 +1,24 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // import { useAuth } from "@/common/context/Auth/AuthContext";
-import { Product3 } from "@/components/icons";
 import AddCount from "@/components/icons/cart/AddCount";
 
+import { useAuth } from "@/common/context/Auth/AuthContext";
+import Loading from "@/common/Loading/Loading";
+import { FormatMoney } from "@/common/utils/utils";
 import Car from "@/components/icons/cart/Car";
-import Delete from "@/components/icons/cart/Delete";
 import Gift from "@/components/icons/cart/Gift";
 import Note from "@/components/icons/cart/Note";
-import ReduceProduct from "@/components/icons/cart/ReducrPro";
-import { useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Button, Skeleton } from "antd";
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import ModalCart from "./_components/Modal";
 import instance from "@/configs/axios";
-import { useAuth } from "@/common/context/Auth/AuthContext";
-import { FormatMoney } from "@/common/utils/utils";
-import { toast } from "react-toastify";
 import { MinusOutlined } from "@ant-design/icons";
-import Loading from "@/common/Loading/Loading";
-import CheckmarkAlert from "@/components/Notification/Toast";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Button, Skeleton } from "antd";
 import Pusher from 'pusher-js';
-import Echo from "laravel-echo";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
+import ModalCart from "./_components/Modal";
 const MySwal = withReactContent(Swal);
 const Cart = () => {
   const [visiable, setVisible] = useState(false);
