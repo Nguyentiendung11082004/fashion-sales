@@ -529,7 +529,7 @@ const ProductForm = () => {
                 </h1>
             </div>
             {
-                isFetching ? (<Skeleton />)
+                isFetching ? (<Loading />)
                     : (
                         <Form layout='vertical' className="grid grid-cols-1 md:grid-cols-3 gap-4"
                             onFinish={onFinish}
