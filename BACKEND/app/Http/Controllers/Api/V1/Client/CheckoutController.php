@@ -313,6 +313,7 @@ class CheckoutController extends Controller
     {
         try {
             $data = $request->validated();
+            $listVoucher = Voucher::query()->with('meta')->get();
             $isImmediatePurchase = isset($data['product_id']) && isset($data['quantity']);
             $isCartPurchase = isset($data['cart_item_ids']) && is_array($data['cart_item_ids']) && count($data['cart_item_ids']) > 0;
 
@@ -395,6 +396,7 @@ class CheckoutController extends Controller
 
             return response()->json([
                 'message' => 'Dữ liệu thành công',
+                'listVoucher' => $listVoucher,
                 'user' => $user,
                 'sub_total' => $sub_total,
                 'total_items' => $total_items,
