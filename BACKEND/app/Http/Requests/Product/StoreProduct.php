@@ -31,6 +31,7 @@ class StoreProduct extends FormRequest
             'gallery.*' => 'string',
             'type' => 'required|integer|in:0,1', // Type chỉ có 2 loại: 0 (simple) và 1 (variant)
             'sku' => 'required|string|max:255|unique:products,sku',
+            'weight'=>"required",
             'name' => 'required|string|max:255|unique:products,name',
             // img_thumbnail
             'img_thumbnail' => 'required|string',

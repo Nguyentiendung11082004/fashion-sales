@@ -14,6 +14,7 @@ class Product extends Model
         'type',
         'slug',
         'sku',
+        'weight',
         'name',
         "views",
         'img_thumbnail',
@@ -26,7 +27,6 @@ class Product extends Model
         'is_show_home',
         'trend',
         'is_new',
-
     ];
 
     public function brand()
@@ -61,6 +61,9 @@ class Product extends Model
     }
     public function cartitems(){
         return $this->hasMany(CartItem::class);
+    }
+    public function orderDetails(){
+        return $this->hasMany(OrderDetail::class);
     }
     protected $casts = [
         'type' => "boolean",

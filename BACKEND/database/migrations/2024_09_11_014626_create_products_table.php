@@ -20,6 +20,7 @@ return new class extends Migration
             $table->boolean('type')->default(false)->comment("loại sản phẩm 1-productvariant|0-simpleproduct");
             $table->string('slug');
             $table->string('sku');
+            $table->decimal('weight')->comment('cân nặng tính bằng gam');
             $table->string('name')->unique();
             $table->integer("views")->default(0);
             $table->string('img_thumbnail');

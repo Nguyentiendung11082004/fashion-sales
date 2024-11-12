@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\V1\Admin\AttributeItemController;
 use App\Http\Controllers\Api\V1\Admin\BannerController;
 use App\Http\Controllers\Api\V1\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Api\V1\Admin\PostController;
+use App\Http\Controllers\Api\V1\Admin\StatisticsController;
 use App\Http\Controllers\Api\V1\Admin\VoucherController;
 use App\Http\Controllers\Api\V1\Client\AddressController;
 use App\Http\Controllers\Api\V1\Client\CommentController;
@@ -88,6 +89,9 @@ Route::prefix("v1/")->group(function () {
     Route::get('payment/vnpay-return', [PaymentController::class, 'vnpayReturn']);
 
     Route::post('try-on', [TryOnController::class, 'tryOn']);
+
+    // thống kê
+    Route::get('statistics',[StatisticsController::class,"getProductStatistics"]);
     
 });
 
