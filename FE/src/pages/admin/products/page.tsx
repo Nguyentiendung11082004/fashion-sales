@@ -87,11 +87,6 @@ const ProductPageManager = () => {
       },
     },
     {
-      title: "slug",
-      dataIndex: "slug",
-    },
-
-    {
       title: "status",
       dataIndex: "status",
       render: (status) => (

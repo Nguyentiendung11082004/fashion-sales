@@ -1126,7 +1126,7 @@ const Products = () => {
                                 className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]"
                               >
                                 <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                                  Thêm vào giỏ hàng 
+                                  Thêm vào giỏ hàng
                                 </p>
                                 {isLoading ? (
                                   <Spin
@@ -1155,21 +1155,43 @@ const Products = () => {
                             >
                               <ul className="flex">
                                 {getUniqueAttributes &&
-                                  Object.entries(getUniqueAttributes).map(
-                                    ([key, value]) => (
+                                  Object.entries(getUniqueAttributes)
+                                    .filter(([key, value]) => {
+                                      // Hàm kiểm tra xem giá trị có phải là kích thước hay không
+                                      const isSizeValue = (v: any) => {
+                                        return (
+                                          /^[SMLX]{1,3}$/.test(v) ||
+                                          /^[0-9]+(\.\d+)?\s?(cm|inch|mm|kg)?$/.test(
+                                            v
+                                          ) ||
+                                          /^[0-9]+$/.test(v)
+                                        );
+                                      };
+
+                                      if (Array.isArray(value)) {
+                                        return value.every(isSizeValue); // Nếu là mảng, kiểm tra từng phần tử
+                                      }
+                                      if (
+                                        typeof value === "object" &&
+                                        value !== null
+                                      ) {
+                                        return Object.values(value).every(
+                                          isSizeValue
+                                        ); // Nếu là object, kiểm tra từng giá trị
+                                      }
+                                      return isSizeValue(value); // Nếu là giá trị đơn lẻ
+                                    })
+                                    .map(([key, value]) => (
                                       <li key={key}>
-                                        {/* {key}:  */}
                                         {Array.isArray(value)
-                                          ? value
-                                            .map((v) => v.size || v)
-                                            .join(", ") // Lấy thuộc tính 'size' hoặc hiển thị giá trị trực tiếp
+                                          ? value.join(", ") // Nếu là mảng
                                           : typeof value === "object" &&
                                             value !== null
-                                            ? Object.values(value).join(", ") // Hiển thị các giá trị của object
-                                            : String(value)}
+                                            ? Object.values(value).join(", ") // Nếu là object
+                                            : String(value)}{" "}
+                                        {/* Nếu là giá trị đơn lẻ*/}
                                       </li>
-                                    )
-                                  )}
+                                    ))}
                               </ul>
                             </div>
                           </div>

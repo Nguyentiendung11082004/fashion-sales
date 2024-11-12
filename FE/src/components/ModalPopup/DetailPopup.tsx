@@ -1,15 +1,11 @@
-import React, { useState, useImperativeHandle, forwardRef } from "react";
+import React, { useState, useImperativeHandle, forwardRef, useEffect } from "react";
 import { Modal as AntModal, Button } from "antd";
 import { CloseOutlined, MinusOutlined } from "@ant-design/icons";
 import HeartBlack from "@/components/icons/detail/HeartBlack";
-import HeartRedPopup from "@/components/icons/detail/HeartRedPopup";
+
 import { Link, useNavigate } from "react-router-dom";
-import { ProductNext } from "../icons";
-import NextImg from "../icons/detail/NextImg";
-import PreImg from "../icons/detail/PreImg";
 import { FormatMoney } from "@/common/utils/utils";
 import Swal from "sweetalert2";
-
 type Props = {
   open: boolean;
   onClose: () => void;
@@ -20,6 +16,16 @@ import withReactContent from "sweetalert2-react-content";
 const MySwal = withReactContent(Swal);
 const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
   const navigate = useNavigate();
+  const attributes = productSeeMore?.variants;
+  const transformAttributes = (variants: any) => {
+    return (Array.isArray(variants) ? variants : []).reduce((acc: any, variant: any) => {
+      variant?.attributes?.forEach((attribute: any) => {
+        acc[attribute.name.toLowerCase()] = attribute.pivot.attribute_item_id.toString();
+      });
+      return acc;
+    }, {});
+  };
+  const [dataAttribute, setDataAttribute] = useState<any>(transformAttributes(attributes));
   const resultDataAttribute = Object.entries(productSeeMore?.unique_attributes ?? {}).map(([key, value]) => ({
     attribute: key,
     attributeValue: Object.entries(value ?? {}).map(([id, name]) => ({
@@ -30,21 +36,68 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
   const priceProduct = productSeeMore?.variants?.map((e: any) => e?.price_sale);
   const minPrice = priceProduct && priceProduct.length > 0 ? Math.min(...priceProduct) : null;
   const maxPrice = priceProduct && priceProduct.length > 0 ? Math.max(...priceProduct) : null
-  const _payload =  {
-      product_id: productSeeMore.id,
-      product_variant_id: productSeeMore?.variants?.map((e: any) => e.id)?.[0],
-      quantity: 1
+  const [selectedVariantId, setSelectedVariantId] = useState<any>(null);
+  const [error, setError] = useState('')
+
+  const getVariants = (data: any) => {
+  }
+  const findMatchingVariant = () => {
+    const matchingVariant = productSeeMore?.variants?.find((variant: any) => {
+      // Kiểm tra tất cả các thuộc tính trong dataAttribute
+      return Object.keys(dataAttribute).every(attrKey => {
+        // Tìm thuộc tính trong variant.attributes tương ứng với mỗi key trong dataAttribute
+        const attribute = variant.attributes.find(
+          (attr: any) => attr.name === attrKey && attr.pivot.value === dataAttribute[attrKey]
+        );
+        return attribute !== undefined; // Nếu tìm thấy thuộc tính khớp thì trả về true
+      });
+    });
+
+    if (matchingVariant) {
+      console.log('matchingVariant', matchingVariant);
+      setSelectedVariantId(matchingVariant.id);
     }
-  
-  console.log("_payload", _payload)
+  };
+
+  const getAttribute = (attribute: any, id: any) => {
+    setDataAttribute((prev: any) => ({
+      ...prev,
+      [attribute]: id,
+    }));
+    findMatchingVariant();
+
+  };
+  console.log("selectedVariantId", selectedVariantId);
+  console.log('productSeeMore', productSeeMore.variants);
+  console.log("dataAttribute", dataAttribute);
+
+  const _payload = {
+    product_id: productSeeMore.id,
+    product_variant_id: selectedVariantId,
+    quantity: 1
+  }
+  const styles = {
+    disable: {
+      opacity: 0.2,
+    }
+  }
+  const handleClose = () => {
+    setDataAttribute({});
+    setSelectedVariantId(null);
+    onClose();
+  };
+
   const handleCheckout = () => {
+    // if (!selectedVariantId) {
+    //   setError('Vui lòng chọn loại sản phẩm');
+    //   return;
+    // }
     navigate('/checkout', { state: { _payload: _payload } });
   }
-
   return (
     <AntModal
       open={open}
-      onCancel={onClose}
+      onCancel={handleClose}
       footer={false}
       closable={false}
       maskClosable={false}
@@ -54,17 +107,13 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
       <div className="flex">
         {/* Nút đóng ở góc phải */}
         <button
-          onClick={onClose}
+          onClick={handleClose}
           className="absolute -top-2 -right-2 text-white hover:bg-[#56cfe1] bg-black px-3 pt-3 pb-2"
         >
           <CloseOutlined className="text-lg" />
         </button>
         {/* Khung chứa ảnh */}
-        <div className="w-1/2 relative">
-          <div className="absolute w-full flex items-center justify-between top-[50%]">
-            {/* <PreImg />
-            <NextImg /> */}
-          </div>
+        <div className="w-1/2 h-[450px] relative">
           <img
             src={`${productSeeMore.img_thumbnail}`}
             alt=""
@@ -165,63 +214,42 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
           <p className="mt-4 hd-all-text grey  mb-3">
             {productSeeMore?.description}
           </p>
-
-          {/* Chọn màu */}
           {
-            resultDataAttribute?.map((e) => (
-              <div className="my-4" key={e?.attribute}>
-                <p className="font-medium">{e?.attribute}</p>
-                <div className="flex mt-3 gap-2">
-                  {e?.attributeValue?.map((item: any) => (
-                    e.attribute.toLowerCase() === 'color' ? (
-                      <div
-                        key={item.id}
-                        className="flex-1 max-w-[75px] h-8 sm:h-8 rounded-full border-2 cursor-pointer "
-                        style={{ backgroundColor: item.name.toLowerCase() }}
-                      ></div>
-                    ) : (
-                      <p key={item.id} className="text-center  flex-1 max-w-[75px] pt-1 sm:h-8 rounded-full border-2 cursor-pointer items-center justify-center h-full text-sm">
-                        {item.name}
-                      </p>
-                    )
-                  ))}
+            resultDataAttribute?.map((e) => {
+              return (
+                <div className="my-4" key={e?.attribute}>
+                  <p className="font-medium">{e?.attribute}</p>
+                  <div className="flex mt-3 gap-2 " >
+                    {e?.attributeValue?.map((item: any) => {
+                      const isActive = dataAttribute[e.attribute.toLowerCase()] === item.id;
+                      return (
+                        <div
+                          key={item.id}
+                          className={`relative flex-1 max-w-[75px] h-8 sm:h-8 rounded-full border-2 cursor-pointer p-2
+                          ${isActive ? 'border-black' : ''}`}
+                          style={isActive ? { backgroundColor: item.name.toLowerCase() } : {}}
+                          onClick={() => getAttribute(e.attribute.toLowerCase(), item.id)}
+                        >
+                          {e.attribute.toLowerCase() === 'color' ? (
+                            <div
+                              className="absolute inset-0.5 rounded-full overflow-hidden"
+                              style={{ backgroundColor: item.name.toLowerCase() }}
+                              onClick={() => getVariants(e)}
+                            ></div>
+                          ) : (
+                            <p className="flex items-center justify-center h-full text-sm">
+                              {item.name}
+                            </p>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
                 </div>
-              </div>
-            ))
-
+              )
+            })
           }
-          {/* <div className="my-4">
-            <p className="font-medium">'Màu sắc '</p>
-            <div className="flex mt-3 gap-2">
-              {["Red", "Blue", "Green"].map((color: any) => (
-                <div
-                  key={color}
-                  className={`relative flex-1 max-w-[75px] h-8 sm:h-8 rounded-full border-2 cursor-pointer ${selectedColor === color ? "border-black" : ""
-                    }`}
-                  style={{ backgroundColor: color.toLowerCase() }}
-                  onClick={() => setSelectedColor(color)}
-                />
-              ))}
-            </div>
-          </div> */}
-
-          {/* Chọn kích thước */}
-          {/* <div className="mb-6">
-            <p className="font-medium">Kích thước</p>
-            <div className="flex mt-3 gap-2">
-              {["S", "M", "L"].map((size: any) => (
-                <button
-                  key={size}
-                  className={`relative flex-1 max-w-[75px] h-8 sm:h-8 rounded-full border-2 cursor-pointer ${selectedSize === size ? "border-black bg-gray-100" : ""
-                    }`}
-                  onClick={() => setSelectedSize(size)}
-                >
-                  {size}
-                </button>
-              ))}
-            </div>
-          </div> */}
-
+          <span style={{ color: 'red' }}> {error ? error : ''}</span>
           <div className="hd-quantity-item flex items-center">
             <div className="hd-quantity relative block min-w-[120px] w-[120px] h-10 hd-all-btn">
               <button
@@ -256,13 +284,13 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
             {/* Nút Add to Cart */}
             <div className="mx-3">
               <Button
-                // onClick={handleClose}
-                className="w-full h-11 rounded-full  bg-[#56cfe1] text-white text-base font-medium hover:bg-[#4bc3d5]"
+                onClick={handleCheckout}
+                style={{ width: '200px' }}
+                className=" h-11 rounded-full bg-[#56cfe1] text-white text-base font-medium hover:bg-[#4bc3d5]"
               >
-                Thêm vào giỏ hàng
+                Mua Ngay
               </Button>
             </div>
-
             <div className="mt-2">
               <button>
                 <HeartBlack />
@@ -270,15 +298,14 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
               </button>
             </div>
           </div>
-          <div className="my-5">
+          {/* <div className="my-5">
             <Button
-              onClick={handleCheckout}
               className="w-full h-11 rounded-full  bg-black text-white text-lg font-medium hover:bg-[#4bc3d5]"
             >
               Mua ngay
             </Button>
-          </div>
-          <div className="flex">
+          </div> */}
+          <div className="flex mt-2">
             <p className="mr-1 font-medium">Xem chi tiết</p>
             <svg
               xmlns="http://www.w3.org/2000/svg"
