@@ -1193,11 +1193,7 @@ const Products = () => {
                                         {Array.isArray(value)
                                           ? value.join(", ") // Nếu là mảng
                                           : typeof value === "object" &&
-<<<<<<< HEAD
-                                              value !== null
-=======
                                             value !== null
->>>>>>> dung
                                             ? Object.values(value).join(", ") // Nếu là object
                                             : String(value)}{" "}
                                         {/* Nếu là giá trị đơn lẻ*/}
