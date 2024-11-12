@@ -13,7 +13,7 @@ class TryOnController extends Controller
     public function __construct(TryOnService $tryOnService)
     {
         $this->tryOnService = $tryOnService;
-        dd($this->tryOnService);
+        // dd($this->tryOnService);
     }
 
     public function tryOn(Request $request)
