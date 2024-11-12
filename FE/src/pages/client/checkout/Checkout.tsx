@@ -73,12 +73,11 @@ const Checkout = () => {
     ship_user_address: '',
     shipping_method: shiping,
     voucher_code: voucher,
-    // id_product: _payload.id_product,
-    // product_variant_id: _payload.product_variant_id,
-    // quantity: _payload.quantity
-    cart_item_ids: cartIds || [],
-    quantityOfCart: quantityOfCart || {},
-
+    id_product: _payload?.id_product || [],
+    product_variant_id: _payload.product_variant_id || [],
+    quantity: _payload.quantity || [],
+    // cart_item_ids: cartIds || [],
+    // quantityOfCart: quantityOfCart || {},
   };
 
   const [order, setOrder] = useState(defaultOrder);
@@ -189,7 +188,8 @@ const Checkout = () => {
   })
   useEffect(() => {
     const fetchData = async () => {
-      const payload = { cart_item_ids: cartIds };
+      const payload = _payload;
+      // setIsLoading(true);
       try {
         const response = await fetch('http://127.0.0.1:8000/api/v1/checkout', {
           method: 'POST',
@@ -211,15 +211,16 @@ const Checkout = () => {
         console.error('Error:', error);
         setIsLoading(false);
       }
+      finally {
+        setIsLoading(false);
+      }
     };
 
-    if (cartIds && cartIds.length > 0) {
+    if (cartIds && cartIds.length > 0 || _payload) {
       fetchData();
-
     }
   }, [cartIds, token, _payload]);
-  // console.log(loading,"loading")
-  // if (isLoading) return <div><Loading /></div>;
+
 
   return (
     <>
@@ -242,7 +243,7 @@ const Checkout = () => {
         <div className="hd-CheckoutPage">
           <main className="container py-16 lg:pb-28 lg:pt-20">
             {
-              isLoading ? <Loading /> : 
+              // isLoading ? <Loading /> : 
               <div className="flex flex-col lg:flex-row">
                 <div className="flex-1">
                   <div className="space-y-8">
@@ -558,7 +559,7 @@ const Checkout = () => {
                 <div className="w-full lg:w-[36%]">
                   <h3 className="text-lg font-semibold mb-4">Đặt hàng</h3>
                   {
-                    isLoading ? <Loading /> :
+                    // isLoading ? <Loading /> :
                     dataCheckout?.order_items.map((e: any) => (
                       <>
                         <div className="relative flex  first:pt-0 last:pb-0">

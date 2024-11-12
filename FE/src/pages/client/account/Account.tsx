@@ -19,7 +19,7 @@ const Account = () => {
   const [newAvatar, setNewAvatar] = useState<string | null>(null);
   const [tempName, setTempName] = useState<string | undefined>(dataUser?.name);
   const [tempEmail, setTempEmail] = useState<string | undefined>(dataUser?.email);
-
+  const [errors, setErrors] = useState<{ [key: string]: string[] }>({});
 
   // State lưu trữ thông tin người dùng
   const [formData, setFormData] = useState<Partial<IUser>>({
@@ -85,7 +85,10 @@ const Account = () => {
       setUrlImage(newAvatar);
     }
     },
-    onError: (error) => {
+    onError: (error: any) => {
+      if (error?.response && error?.response.data.errors) {
+        setErrors(error?.response.data.errors); // Lưu lỗi vào trạng thái
+      }
       toast.success("Cập nhật thất bại");
       console.error("Có lỗi xảy ra:", error);
     },
@@ -270,7 +273,11 @@ const Account = () => {
                       name="email"
                     />
                   </div>
+                  {errors.email && (
+                    <span className="text-red-500 text-sm">{errors.email[0]}</span>
+                  )}
                 </div>
+
                 <div className="max-w-lg mt-5">
                   <label
                     className="nc-Label text-base font-medium"
@@ -357,6 +364,9 @@ const Account = () => {
                       name="phone_number"
                     />
                   </div>
+                  {errors.phone_number && (
+                    <span className="text-red-500 text-sm">{errors.phone_number[0]}</span>
+                  )}
                 </div>
                 <div className="mt-5">
                   <label
