@@ -364,11 +364,7 @@ const ProductForm = () => {
         },
         enabled: !!id
     });
-<<<<<<< HEAD
-    console.log('productShow',productShow)
-=======
     
->>>>>>> hangdev
     const getProduct = (productShow: any) => {
         console.log("ProductShow:", productShow);
         const productTags = productShow.tags.map((tag: any) => tag.id);
@@ -379,9 +375,6 @@ const ProductForm = () => {
             return acc;
         }, {});
 
-<<<<<<< HEAD
-      
-=======
         const initialGalleryFiles = (productShow.galleries || []).map((galleryItem: any, index: number) => ({
             uid: String(galleryItem.id || index), // Sử dụng `id` từ backend hoặc `index` để đảm bảo `uid` là duy nhất
             name: galleryItem.image.substring(galleryItem.image.lastIndexOf('/') + 1),
@@ -391,7 +384,6 @@ const ProductForm = () => {
         // setGalleryFileList(initialGalleryFiles); 
         setImageGaller(initialGalleryFiles.map((item: any) => item.url));  
         // console.log(initialFileList);      
->>>>>>> hangdev
 
         setAttribute(productType);
         setSelectedAttributeChildren(productAttribute);
@@ -467,11 +459,7 @@ const ProductForm = () => {
                 errors: errorFields[key],
             }));
             form.setFields(fields);
-<<<<<<< HEAD
-            const allFieldNames = ['name', 'attribute_id', 'tags', 'brand_id', 'category_id', 'weight', 'sku', 'img_thumbnail', 'galleries', 'type', 'price_regular', 'price_sale', 'quantity', 'description', 'description_title'];
-=======
             const allFieldNames = ['name', 'attribute_id', 'tags', 'brand_id', 'category_id', 'slug', 'sku', 'img_thumbnail', 'galleries', 'type', 'price_regular', 'price_sale', 'quantity', 'description', 'description_title'];
->>>>>>> hangdev
             allFieldNames.forEach((field) => {
                 if (!errorFields[field]) {
                     form.setFields([{ name: field, errors: [] }]);
@@ -564,21 +552,11 @@ const ProductForm = () => {
             });
             productVariantData.push({
                 attribute_item_id: attributeItemIds,
-<<<<<<< HEAD
-                price_regular: Number(variant.price_regular),
-                price_sale: Number(variant.price_sale),
-                quantity: Number(variant.quantity),
-                image: variant.image,
-                sku: variant.sku,
-                // id: 0
-=======
                 price_regular: Number(variant?.price_regular),
                 price_sale: Number(variant?.price_sale),
                 quantity: Number(variant?.quantity),
                 image: variant?.image,
                 sku: variant?.sku,
-                slug: ''
->>>>>>> hangdev
             });
         });
 
