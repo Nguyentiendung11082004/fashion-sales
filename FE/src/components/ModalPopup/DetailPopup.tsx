@@ -20,9 +20,6 @@ import withReactContent from "sweetalert2-react-content";
 const MySwal = withReactContent(Swal);
 const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
   const navigate = useNavigate();
-
-  const [selectedColor, setSelectedColor] = useState(null);
-  const [selectedSize, setSelectedSize] = useState(null);
   const resultDataAttribute = Object.entries(productSeeMore?.unique_attributes ?? {}).map(([key, value]) => ({
     attribute: key,
     attributeValue: Object.entries(value ?? {}).map(([id, name]) => ({
@@ -30,24 +27,20 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
       name,
     })),
   }));
-  console.log("resultDataAttribute", resultDataAttribute)
-
   const priceProduct = productSeeMore?.variants?.map((e: any) => e?.price_sale);
-  // const handleCheckout = () => {
-  //   if (!idCart || idCart.length === 0) {
-  //     MySwal.fire({
-  //       title: <strong>Cảnh báo</strong>,
-  //       icon: "error",
-  //       text: "Mày chưa chọn sản phẩm nào để thanh toán",
-  //       timer: 1500,
-  //       timerProgressBar: true,
-  //       showConfirmButton: false,
-  //     });
-  //     return;
-  //   }
-  //   // localStorage.setItem('cartIds', JSON.stringify(idCart));
-  //   navigate('/checkout', { state: { cartIds: idCart } });
-  // }
+  const minPrice = priceProduct && priceProduct.length > 0 ? Math.min(...priceProduct) : null;
+  const maxPrice = priceProduct && priceProduct.length > 0 ? Math.max(...priceProduct) : null
+  const _payload =  {
+      product_id: productSeeMore.id,
+      product_variant_id: productSeeMore?.variants?.map((e: any) => e.id)?.[0],
+      quantity: 1
+    }
+  
+  console.log("_payload", _payload)
+  const handleCheckout = () => {
+    navigate('/checkout', { state: { _payload: _payload } });
+  }
+
   return (
     <AntModal
       open={open}
@@ -56,7 +49,7 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
       closable={false}
       maskClosable={false}
       className="rounded-xl"
-      width={900}
+      width={1100}
     >
       <div className="flex">
         {/* Nút đóng ở góc phải */}
@@ -81,7 +74,13 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
         <div className="w-1/2 p-2 ml-4">
           <h2 className="text-2xl font-bold text-gray-800 mb-2">{productSeeMore?.name}</h2>
           <div className="flex items-center justify-between">
-            <span className="text-2xl text-[#696969]">{FormatMoney(productSeeMore?.price_sale || 0)}</span>
+            <span className="text-xl text-[#696969]">
+              {
+                minPrice !== null && maxPrice !== null
+                  ? `${FormatMoney(minPrice)} - ${FormatMoney(maxPrice)}`
+                  : FormatMoney(productSeeMore?.price_sale || 0)
+              }
+            </span>
             <div className="flex items-center">
               <Link
                 to="#reviews"
@@ -170,25 +169,26 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
           {/* Chọn màu */}
           {
             resultDataAttribute?.map((e) => (
-              <div className="my-4">
+              <div className="my-4" key={e?.attribute}>
                 <p className="font-medium">{e?.attribute}</p>
                 <div className="flex mt-3 gap-2">
                   {e?.attributeValue?.map((item: any) => (
-                    console.log("item?.attributeValue", item),
-                    <div
-                      key={item}
-                      className={`relative text-center mt-3 flex-1 max-w-[75px] h-8 sm:h-8 rounded-full border-2 cursor-pointer 
-                    ${selectedColor === item ? "border-black" : ""
-                        }`}
-                      // style={{ backgroundColor: item.toLowerCase() }}
-                      onClick={() => setSelectedColor(item)}
-                    >
-                      <span> {item?.name}</span>
-                    </div>
+                    e.attribute.toLowerCase() === 'color' ? (
+                      <div
+                        key={item.id}
+                        className="flex-1 max-w-[75px] h-8 sm:h-8 rounded-full border-2 cursor-pointer "
+                        style={{ backgroundColor: item.name.toLowerCase() }}
+                      ></div>
+                    ) : (
+                      <p key={item.id} className="text-center  flex-1 max-w-[75px] pt-1 sm:h-8 rounded-full border-2 cursor-pointer items-center justify-center h-full text-sm">
+                        {item.name}
+                      </p>
+                    )
                   ))}
                 </div>
               </div>
             ))
+
           }
           {/* <div className="my-4">
             <p className="font-medium">'Màu sắc '</p>
@@ -272,7 +272,7 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
           </div>
           <div className="my-5">
             <Button
-              // onClick={handleCheckout}
+              onClick={handleCheckout}
               className="w-full h-11 rounded-full  bg-black text-white text-lg font-medium hover:bg-[#4bc3d5]"
             >
               Mua ngay

@@ -103,13 +103,13 @@ class PaymentController extends Controller
                     //     'order_id' => $vnp_TxnRef,
                     //     'amount' => $vnp_Amount / 100,
                     // ];
-                    return redirect()->away("http://localhost:5173/payment-result?status=success&message=Payment_successful!&order_id=$vnp_TxnRef&amount=" . ($vnp_Amount / 100));
+                    return redirect()->away("http://localhost:5173/thank?status=success&message=Payment_successful!&order_id=$vnp_TxnRef&amount=" . ($vnp_Amount / 100));
                 } else {
                     // return [
                     //     'status' => 'error',
                     //     'message' => 'Không tìm thấy đơn hàng!',
                     // ];
-                    return redirect()->away("http://localhost:5173/payment-result?status=error&message=Order_not_found!");
+                    return redirect()->away("http://localhost:5173/thank?status=error&message=Order_not_found!");
                 }
             } else {
                 $order->update([
@@ -139,7 +139,7 @@ class PaymentController extends Controller
                 //     'order_id' => $vnp_TxnRef,
                 //     'error_code' => $vnp_ResponseCode,
                 // ];
-            return redirect()->away("http://localhost:5173/payment-result?status=error&message=Payment_failed!&order_id=$vnp_TxnRef&error_code=$vnp_ResponseCode");
+            return redirect()->away("http://localhost:5173/thank?status=error&message=Payment_failed!&order_id=$vnp_TxnRef&error_code=$vnp_ResponseCode");
                 
             }
         } else {
@@ -147,9 +147,7 @@ class PaymentController extends Controller
             //     'status' => 'error',
             //     'message' => 'Xác thực không hợp lệ!',
             // ];
-            return redirect()->away("http://localhost:5173/payment-result?status=error&message=Invalid_authentication!");
-
-            
+            return redirect()->away("http://localhost:5173/thank?status=error&message=Invalid_authentication!");
         }
     }
 }
