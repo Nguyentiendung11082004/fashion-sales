@@ -1,7 +1,6 @@
 
 import {
   colorTranslations,
-  convertColorNameToClass,
 } from "@/common/colors/colorUtils";
 
 import { ResponseData } from "@/common/types/responseDataFilter";
@@ -1329,20 +1328,80 @@ const Products = () => {
                         </div>
 
                         <div className="t4s-product-colors flex">
-                          {getUniqueAttributes?.color &&
-                            Object.values(getUniqueAttributes.color as { [key: string]: string })
-                              .filter((color) => typeof color === "string")
-                              .map((color, index) => (
-                                <div key={index} className="mr-2 mt-1">
-                                  <span className="t4s-pr-color__item flex flex-col items-center cursor-pointer">
-                                    <span className="t4s-pr-color__value border border-gray-400 w-5 h-5 hover:border-black hover:border-2 rounded-full p-[5px]">
-                                      <div
-                                        className={`w-[17px] h-[17px] rounded-full ml-[-4.25px] mt-[-4px] hover:mt-[-5px] hover:ml-[-5px] ${convertColorNameToClass(color)}`}
-                                      ></div>
-                                    </span>
-                                  </span>
-                                </div>
-                              ))}
+                          {getUniqueAttributes &&
+                            Object.entries(getUniqueAttributes)
+                              .filter(([key, value]) => {
+                                // Hàm kiểm tra xem giá trị có phải là màu sắc không
+                                const isColorValue = (v: any) => {
+                                  // Kiểm tra tên màu hợp lệ bằng cách tạo một phần tử DOM
+                                  const isValidColorName = (color: string) => {
+                                    const s = new Option().style;
+                                    s.color = color;
+                                    return s.color !== ""; // Nếu gán thành công và không rỗng thì là màu hợp lệ
+                                  };
+
+                                  // Kiểm tra mã hex
+                                  const isHexColor = (color: string) =>
+                                    /^#[0-9A-F]{3}$|^#[0-9A-F]{6}$/i.test(
+                                      color
+                                    );
+
+                                  // Kiểm tra mã RGB/RGBA
+                                  const isRgbColor = (color: string) =>
+                                    /^rgba?\(\s?(\d{1,3}),\s?(\d{1,3}),\s?(\d{1,3})(,\s?([01](\.\d+)?))?\)$/.test(
+                                      color
+                                    );
+
+                                  // Kiểm tra mã HSL
+                                  const isHslColor = (color: string) =>
+                                    /^hsla?\(\s?(\d{1,3}),\s?(\d{1,3})%,\s?(\d{1,3})%(,\s?([01](\.\d+)?))?\)$/.test(
+                                      color
+                                    );
+
+                                  return (
+                                    isValidColorName(v) ||
+                                    isHexColor(v) ||
+                                    isRgbColor(v) ||
+                                    isHslColor(v)
+                                  );
+                                };
+
+                                return Array.isArray(value)
+                                  ? value.every(isColorValue)
+                                  : typeof value === "object" && value !== null
+                                    ? Object.values(value).every(isColorValue)
+                                    : isColorValue(value);
+                              })
+
+                              .map(([key, value]) => {
+                                // console.log(value);
+                                const colors = Array.isArray(value)
+                                  ? value
+                                  : typeof value === "object" && value !== null
+                                    ? Object.values(value)
+                                    : [value];
+
+                                return (
+                                  <div key={key} className="mt-1 flex">
+                                    {colors.map((color, index) => (
+                                      <span
+                                        key={index}
+                                        className="t4s-pr-color__item flex flex-col items-center cursor-pointer mr-1"
+                                      >
+                                        <span className="t4s-pr-color__value border border-gray-400 w-5 h-5 hover:border-black hover:border-2 rounded-full p-[5px]">
+                                          <div
+                                            className={`w-[17px] h-[17px] rounded-full ml-[-4.25px] mt-[-4px] hover:mt-[-5px] hover:ml-[-5px]`}
+                                            style={{
+                                              backgroundColor:
+                                                color.toLowerCase(), 
+                                            }}
+                                          ></div>
+                                        </span>
+                                      </span>
+                                    ))}
+                                  </div>
+                                );
+                              })}
                         </div>
                       </div>
                     </div>

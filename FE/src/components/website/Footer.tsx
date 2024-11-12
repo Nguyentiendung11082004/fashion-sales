@@ -235,6 +235,7 @@ const Footer = (props: Props) => {
           </div>
         </div>
       </div>
+      
     </footer>
   );
 };

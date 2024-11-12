@@ -195,7 +195,7 @@ class ProductController extends Controller
                     "attribute_item_id",
                     "product_variant",
                     "gallery",
-                    "tags"
+                    "tags",
                 ]);
 
                 $dataProduct['slug'] = Str::slug($dataProduct["name"]);
@@ -213,6 +213,7 @@ class ProductController extends Controller
                         }
                     }
                 }
+
 
                 $product->tags()->sync($request->tags);
 
