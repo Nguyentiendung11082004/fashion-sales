@@ -49,7 +49,7 @@ const ProductForm = () => {
         setValueStatus(e.target.value);
     };
     const [checkedItems, setCheckedItems] = useState<any[]>([]);
-    
+
     const [variants, setVariants] = useState([
         { image: '', price_regular: '', price_sale: '', quantity: '', sku: '' }
     ]);
@@ -71,11 +71,11 @@ const ProductForm = () => {
         setSelectedAttributeChildren([]);
         setIsTableVisible(false);
         setSelectedItems([]);
-    
+
         // Reset giá trị đã chọn
         const newCheckedItems = Array(variants.length).fill(false);
         setCheckedItems(newCheckedItems);
-    
+
         if (value === 0) {
             form.resetFields(['price_regular', 'price_sale', 'quantity']);
             const fieldsToClear = selectedAttributeChildren.concat(['attribute_id']);
@@ -165,7 +165,7 @@ const ProductForm = () => {
             if (info.file.status === "done") {
                 const isImage = /^image\//.test(info.file.type);
                 if (isImage) {
-                    console.log("isImage",isImage)
+                    console.log("isImage", isImage)
                     const imageUrl = info.file.response.url;
                     const newVariants = [...variants];
                     newVariants[index] = { ...newVariants[index], image: imageUrl };
@@ -177,9 +177,6 @@ const ProductForm = () => {
             }
         },
     });
-
-    const [galleryFileList, setGalleryFileList] = useState<UploadFile[]>([]);
-    const [deletedGalleryIds, setDeletedGalleryIds] = useState<number[]>([]);
     const propsGallery: UploadProps = {
         name: 'file',
         action: 'https://api.cloudinary.com/v1_1/dlvwxauhf/image/upload',
@@ -189,9 +186,7 @@ const ProductForm = () => {
         },
         multiple: true,
         listType: "picture",
-        // fileList: galleryFileList,
         onChange(info: any) {
-            
             if (info.file.status === "done") {
                 const isImage = /^image\//.test(info?.file?.type);
                 if (isImage) {
@@ -204,8 +199,6 @@ const ProductForm = () => {
                     //     }
                     //     return prev;
                     // });
-    
-    
                     message.open({
                         type: 'success',
                         content: 'Upload ảnh thành công',
@@ -214,27 +207,13 @@ const ProductForm = () => {
             } else if (info.file.status === "error") {
                 message.error(`${info.file.name} file upload failed.`);
             }
-    
-            // Cập nhật `galleryFileList` trước khi upload
-            // if (info.file.status !== "done") {
-            //     setGalleryFileList((prev) => {
-            //         const newFile = {
-            //             ...info.file,
-            //             uid: String(new Date().getTime()), // Tạo uid duy nhất
-            //         };
-            //         return [...prev, newFile];
-            //     });
-            // }
         },
         onRemove(file) {
             setImageGaller((prev) => prev.filter((imgUrl) => imgUrl !== file.url));
-            // setGalleryFileList((prev) => prev.filter((f) => f.url !== file.url));
             message.info(`${file.name} đã bị xóa.`);
             return true;
         }
     }
-    
-    
     const [fileList, setFileList] = useState<UploadFile[]>([]);
     const propsImgThumbnail: UploadProps = {
         name: 'file',
@@ -263,8 +242,8 @@ const ProductForm = () => {
             setFileList(info.fileList.slice(-1));
         },
         onRemove(file) {
-            setFileList([]); 
-            setUrlImage(null); 
+            setFileList([]);
+            setUrlImage(null);
             message.info(`${file.name} đã bị xóa.`);
             return true;
         },
@@ -301,7 +280,6 @@ const ProductForm = () => {
             dataIndex: 'image',
             render: (text: any, record: any, index: number) => (
                 <Upload {...getPropsImgThumbnail(index)}
-                
                 >
                     <Button icon={<UploadOutlined />}>Tải lên ảnh</Button>
                 </Upload>
@@ -364,7 +342,7 @@ const ProductForm = () => {
         },
         enabled: !!id
     });
-    
+
     const getProduct = (productShow: any) => {
         console.log("ProductShow:", productShow);
         const productTags = productShow.tags.map((tag: any) => tag.id);
@@ -380,9 +358,9 @@ const ProductForm = () => {
             name: galleryItem.image.substring(galleryItem.image.lastIndexOf('/') + 1),
             status: 'done',
             url: galleryItem.image,
-        }));        
+        }));
         // setGalleryFileList(initialGalleryFiles); 
-        setImageGaller(initialGalleryFiles.map((item: any) => item.url));  
+        setImageGaller(initialGalleryFiles.map((item: any) => item.url));
         // console.log(initialFileList);      
 
         setAttribute(productType);
@@ -415,7 +393,7 @@ const ProductForm = () => {
             price_sale: variant.price_sale || '',
             quantity: variant.quantity || '',
             sku: variant.sku || ''
-          }));
+        }));
         setVariants(initialVariants);
 
         setValueStatus(productShow.status ? 1 : 0);
@@ -432,8 +410,8 @@ const ProductForm = () => {
             tags: productTags,
             type: productType,
             attribute_id: productAttribute,
-            gallery: initialGalleryFiles.map((item: any) => item.url),         
-            variants: initialVariants, 
+            gallery: initialGalleryFiles.map((item: any) => item.url),
+            variants: initialVariants,
             ...productAttributeValue,
         });
 
@@ -444,11 +422,8 @@ const ProductForm = () => {
     };
     useEffect(() => {
         if (productShow) {
-            // console.log("productShow:", productShow);
             getProduct(productShow);
-            // setImageGaller(productShow.galleries.map((item: any) => item.url))
         }
-        
     }, [productShow, form]);
     const handleErrorResponse = (error: any) => {
         setIsLoading(false);
@@ -565,14 +540,14 @@ const ProductForm = () => {
                 updateProductMutation.mutate({
                     ...values,
                     img_thumbnail: urlImage,
-                    gallery : imageGallery,
+                    gallery: imageGallery,
 
                 })
             } else {
                 createProductMutation.mutate({
                     ...values,
                     img_thumbnail: urlImage,
-                    gallery : imageGallery,
+                    gallery: imageGallery,
                 });
             }
         } else {
@@ -605,7 +580,7 @@ const ProductForm = () => {
                         <Form layout='vertical' className="grid grid-cols-1 md:grid-cols-3 gap-4"
                             onFinish={onFinish}
                             form={form}
-                            
+
                         >
                             <Form.Item name="name" label="Tên sản phẩm" className="col-span-1"
                             >
@@ -665,7 +640,7 @@ const ProductForm = () => {
                             <Form.Item name="img_thumbnail" label="Ảnh sản phẩm" >
                                 <Upload
                                     {...propsImgThumbnail}
-                      
+
                                 >
                                     <Button icon={<UploadOutlined />}>Tải lên ảnh</Button>
                                 </Upload>
@@ -690,10 +665,30 @@ const ProductForm = () => {
                             >
                                 <Upload
                                     {...propsGallery}
-                                    // fileList={galleryFileList}
                                 >
                                     <Button icon={<UploadOutlined />}>Tải lên galleries</Button>
                                 </Upload>
+                                {
+                                    // imageGallery ? (
+                                    //     <>
+                                    //         {
+                                    //             imageGallery?.map((e) => (
+                                    //                 <img src={e} alt="Uploaded" style={{ marginTop: 16, width: 100, marginBottom: '10px' }} />
+                                    //             ))
+                                    //         }
+                                    //     </>
+                                    // ) : (
+                                        productShow?.galleries && (
+                                            <>
+                                                {
+                                                    productShow?.galleries?.map((e:any) => (
+                                                        <img src={e.image} alt="Uploaded" style={{ marginTop: 16, width: 100, marginBottom: '10px' }} />
+                                                    ))
+                                                }
+                                            </>
+                                        )
+                                    // )
+                                }
                                 {error?.galleries && <div className='text-red-600'>{error.galleries.join(', ')}</div>}
 
                             </Form.Item>
