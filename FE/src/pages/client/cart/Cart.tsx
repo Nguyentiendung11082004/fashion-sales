@@ -27,7 +27,6 @@ const MySwal = withReactContent(Swal);
 const Cart = () => {
   const [visiable, setVisible] = useState(false);
   const [idCart, setIdCart] = useState<any>('');
-  console.log("idCart", idCart)
   const [updatedAttributes, setUpdatedAttributes] = useState<any>({});
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -59,30 +58,22 @@ const Cart = () => {
     }
   });
   useEffect(() => {
-    console.log("1");
     const channel = pusher.subscribe(`private-cart.${9}`);
-    console.log("channel", channel);
-
     // Lắng nghe sự kiện 'CartEvent'
     channel.bind('CartEvent', (data: any) => {
-      console.log("Received cart event:", data);
       queryClient.invalidateQueries({
         queryKey: ['cart']
       });
     });
 
     pusher.connection.bind('connected', () => {
-      console.log('Pusher connected');
     });
 
     pusher.connection.bind('error', (err: any) => {
-      console.error('Pusher connection error:', err);
     });
 
-    console.log("2");
 
     // Giả sử cartId là id của giỏ hàng hiện tại
-    console.log("idCart", idCart);
 
     // Đăng ký vào kênh 'private-cart.{idCart}'
 
@@ -209,7 +200,6 @@ const Cart = () => {
   const [isAllChecked, setIsAllChecked] = useState<boolean>(false);
   const [checkedItems, setCheckedItems] = useState<{ [key: number]: boolean }>({});
 
-  console.log("isAllChecked", isAllChecked)
   const handleCheckAll = () => {
     const newChecked = !isAllChecked;
     setIsAllChecked(newChecked);
@@ -222,7 +212,7 @@ const Cart = () => {
       }
     });
     setCheckedItems(newCheckedItems);
-    localStorage.setItem('checkedItems', JSON.stringify(newCheckedItems)); // Lưu vào localStorage
+    localStorage.setItem('checkedItems', JSON.stringify(newCheckedItems)); 
     setIdCart(newChecked ? allIdCarts : []);
   };
 
@@ -232,7 +222,7 @@ const Cart = () => {
       [cartId]: !checkedItems[cartId],
     };
     setCheckedItems(updatedCheckedItems);
-    localStorage.setItem('checkedItems', JSON.stringify(updatedCheckedItems)); // Lưu vào localStorage
+    localStorage.setItem('checkedItems', JSON.stringify(updatedCheckedItems)); 
     const updatedIdCarts = Object.keys(updatedCheckedItems)
       .filter(key => updatedCheckedItems[Number(key)])
       .map(Number);
@@ -312,7 +302,8 @@ const Cart = () => {
               <div className="hd-pagecart-items">
                 <div className="hd-item relative overflow-hidden">
                   {
-                    isFetching ? <Loading /> : carts && carts.length > 0 ? (carts?.map((e: any) => {
+                    // isFetching ? <Loading /> :
+                     carts && carts.length > 0 ? (carts?.map((e: any) => {
                       const { productvariant } = e;
                       const attributesObject = productvariant?.attributes.reduce((acc: any, attribute: any) => {
                         acc[attribute.name] = attribute.pivot.attribute_item_id;

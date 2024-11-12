@@ -325,6 +325,7 @@ const ProductForm = () => {
         },
         enabled: !!id
     });
+    console.log('productShow',productShow)
     const getProduct = (productShow: any) => {
         const productTags = productShow.tags.map((tag: any) => tag.id);
         const productType = productShow.type ? 1 : 0;
@@ -334,8 +335,7 @@ const ProductForm = () => {
             return acc;
         }, {});
 
-        // setUrlImage(productShow.img_thumbnail || null);
-        // setImageGaller(productShow.gallery || []); 
+      
 
         setAttribute(productType);
         setSelectedAttributeChildren(productAttribute);
@@ -384,7 +384,7 @@ const ProductForm = () => {
                 errors: errorFields[key],
             }));
             form.setFields(fields);
-            const allFieldNames = ['name', 'attribute_id', 'tags', 'brand_id', 'category_id', 'slug', 'sku', 'img_thumbnail', 'gallery', 'type', 'price_regular', 'price_sale', 'quantity', 'description', 'description_title'];
+            const allFieldNames = ['name', 'attribute_id', 'tags', 'brand_id', 'category_id', 'weight', 'sku', 'img_thumbnail', 'galleries', 'type', 'price_regular', 'price_sale', 'quantity', 'description', 'description_title'];
             allFieldNames.forEach((field) => {
                 if (!errorFields[field]) {
                     form.setFields([{ name: field, errors: [] }]);
@@ -445,7 +445,6 @@ const ProductForm = () => {
         onError: handleErrorResponse,
     })
     const onFinish = (values: Iproduct) => {
-        console.log("values",values)
         const productVariantData: IProductVariant[] = [];
         const attributeData: { [key: string]: number[] } = {};
         selectedAttributeChildren.forEach(attrId => {
@@ -467,7 +466,6 @@ const ProductForm = () => {
         combine([], 0);
         combinations.forEach((combination, index) => {
             const variant = variants[index % variants.length];
-
             const attributeItemIds = combination.map((itemId, idx) => {
                 const attrId = attributeKeys[idx];
                 const item = data?.attribute.find((attr: any) => attr.id === Number(attrId))
@@ -484,7 +482,7 @@ const ProductForm = () => {
                 quantity: Number(variant.quantity),
                 image: variant.image,
                 sku: variant.sku,
-                slug: ''
+                // id: 0
             });
         });
 
@@ -493,13 +491,14 @@ const ProductForm = () => {
                 updateProductMutation.mutate({
                     ...values,
                     img_thumbnail: urlImage,
-                    gallery: imageGallery,
+                    gallery : imageGallery,
+
                 })
             } else {
                 createProductMutation.mutate({
                     ...values,
                     img_thumbnail: urlImage,
-                    gallery: imageGallery,
+                    gallery : imageGallery,
                 });
             }
         } else {
@@ -507,7 +506,7 @@ const ProductForm = () => {
             const productPayload = {
                 ...values,
                 img_thumbnail: urlImage,
-                gallery: imageGallery,
+                galleries: imageGallery,
                 attribute_item_id: attributeData,
                 product_variant: filteredVariants,
             };
@@ -529,7 +528,7 @@ const ProductForm = () => {
                 </h1>
             </div>
             {
-                isFetching ? (<Skeleton />)
+                isFetching ? (<Loading />)
                     : (
                         <Form layout='vertical' className="grid grid-cols-1 md:grid-cols-3 gap-4"
                             onFinish={onFinish}
@@ -557,7 +556,6 @@ const ProductForm = () => {
                                 />
 
                                 {error?.tags && <div className='text-red-600'>{error.tags.join(', ')}</div>}
-
                             </Form.Item>
                             <Form.Item name="brand_id" label="Thương hiệu" className="col-span-1">
                                 <Select
@@ -566,7 +564,6 @@ const ProductForm = () => {
                                         value: item.id,
                                         label: item.name
                                     }))}
-
                                     placeholder="Chọn thương hiệu"
                                     placement="bottomLeft" className='w-full' />
                                 {error?.brand_id && <div className='text-red-600'>{error.brand_id.join(', ')}</div>}
@@ -582,11 +579,10 @@ const ProductForm = () => {
                                     placeholder="Chọn danh mục"
                                     placement="bottomLeft" className='w-full' />
                                 {error?.category_id && <div className='text-red-600'>{error.category_id.join(', ')}</div>}
-
                             </Form.Item>
-                            <Form.Item name="slug" label="Slug" className="col-span-1">
-                                <Input size='large' />
-                                {error?.slug && <div className='text-red-600'>{error.slug.join(', ')}</div>}
+                            <Form.Item name="weight" label="Cân nặng sản phẩm" className="col-span-1">
+                                <InputNumber size='large' />
+                                {error?.weight && <div className='text-red-600'>{error.weight.join(', ')}</div>}
 
                             </Form.Item>
                             <Form.Item name="sku" label="SKU" className="col-span-1">
@@ -622,11 +618,10 @@ const ProductForm = () => {
 
                             </Form.Item>
                             <Form.Item
-                                name="gallery"
+                                name="galleries"
                                 label="Chọn mảng nhiều ảnh"
                                 className="col-span-1"
                             >
-
                                 <Upload
                                     {...propsGallery}
                                     onRemove={(file) => {
@@ -634,9 +629,9 @@ const ProductForm = () => {
                                         setImageGaller(newGallery);
                                     }}
                                 >
-                                    <Button icon={<UploadOutlined />}>Tải lên gallery</Button>
+                                    <Button icon={<UploadOutlined />}>Tải lên galleries</Button>
                                 </Upload>
-                                {error?.gallery && <div className='text-red-600'>{error.gallery.join(', ')}</div>}
+                                {error?.galleries && <div className='text-red-600'>{error.galleries.join(', ')}</div>}
 
                             </Form.Item>
                             <Form.Item name="type" label="Kiểu sản phẩm" className="col-span-3">

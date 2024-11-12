@@ -6,7 +6,7 @@ export interface IProductVariant {
   quantity: number;
   sku: string;
   image: string;
-  id: number;
+  // id: number;
 }
 export interface IProductGalleries {
   id: number;
@@ -22,9 +22,11 @@ export interface Iproduct {
   img_thumbnail: string;
   image: string;
   galleries: IProductGalleries[];
+  gallery: IProductGalleries[];
   slug: string;
   price_regular: number;
   price_sale: number;
+  weigth: number;
   sku: string;
   rate: number;
   description: string;
