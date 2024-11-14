@@ -13,6 +13,7 @@ import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
+import Loading from "@/common/Loading/Loading";
 
 const FormVoucher = () => {
   const [form] = Form.useForm();
@@ -29,6 +30,7 @@ const FormVoucher = () => {
     queryKey: ["categories"],
     queryFn: categoriesIndex,
   });
+  console.log("danh sách danh mục : ", listCategories);
   const { data: listProducts } = useQuery({
     queryKey: ["product"],
     queryFn: productsIndex,
@@ -93,6 +95,54 @@ const FormVoucher = () => {
       setIsLoading(false);
     },
   });
+  // useEffect(() => {
+  //   if (voucherDetail) {
+  //     console.log("voucherDetail", voucherDetail);
+  //     let metaDataValues = {};
+  //     const appliesToTotalMeta = voucherDetail?.meta_data?.find(
+  //       (meta: any) => meta?.meta_key === "_voucher_applies_to_total"
+  //     );
+
+  //     const initialVoucherAppliesToTotal = appliesToTotalMeta
+  //       ? "true"
+  //       : "false";
+  //     setVoucher_applies_to_total(initialVoucherAppliesToTotal);
+
+  //     if (initialVoucherAppliesToTotal === "false") {
+  //       metaDataValues = voucherDetail?.meta_data?.reduce(
+  //         (acc: any, meta: any) => {
+  //           if (
+  //             meta?.meta_key !== "_voucher_applies_to_total" &&
+  //             meta?.meta_key &&
+  //             meta?.meta_value !== undefined
+  //           ) {
+  //             // acc[meta.meta_key] = meta.item_names;
+  //             acc[meta.meta_key] = meta.id;
+  //           }
+  //           if (meta?.meta_key === "_voucher_max_discount_amount") {
+  //             acc[meta.meta_key] = meta.meta_value;
+  //           }
+  //           return acc;
+  //         },
+  //         {}
+  //       );
+  //     }
+
+  //     console.log("metaDataValues", metaDataValues);
+
+  //     const initialValues = {
+  //       ...voucherDetail?.voucher,
+  //       _voucher_applies_to_total: initialVoucherAppliesToTotal,
+  //       start_date: dayjs(voucherDetail?.voucher?.start_date),
+  //       end_date: dayjs(voucherDetail?.voucher?.end_date),
+  //       discount_value: parseFloat(voucherDetail?.voucher?.discount_value),
+  //       min_order_value: parseFloat(voucherDetail?.voucher?.min_order_value),
+  //       ...(initialVoucherAppliesToTotal === "false" ? metaDataValues : {}),
+  //     };
+
+  //     form.setFieldsValue(initialValues);
+  //   }
+  // }, [voucherDetail, form]);
   useEffect(() => {
     if (voucherDetail) {
       console.log("voucherDetail", voucherDetail);
@@ -114,8 +164,16 @@ const FormVoucher = () => {
               meta?.meta_key &&
               meta?.meta_value !== undefined
             ) {
-              // acc[meta.meta_key] = meta.item_names;
-              acc[meta.meta_key] = meta.id;
+              if (
+                meta?.meta_key === "_voucher_category_ids" ||
+                meta?.meta_key === "_voucher_exclude_category_ids" ||
+                meta?.meta_key === "_voucher_exclude_product_ids" ||
+                meta?.meta_key === "_voucher_product_ids"
+              ) {
+                acc[meta.meta_key] = JSON.parse(meta.meta_value);
+              } else {
+                acc[meta.meta_key] = meta.meta_value;
+              }
             }
             if (meta?.meta_key === "_voucher_max_discount_amount") {
               acc[meta.meta_key] = meta.meta_value;
@@ -141,52 +199,6 @@ const FormVoucher = () => {
       form.setFieldsValue(initialValues);
     }
   }, [voucherDetail, form]);
-
-  // useEffect(() => {
-  //   if (voucherDetail) {
-  //     let metaDataValues = {};
-  //     console.log("");
-  //     const appliesToTotalMeta = voucherDetail?.meta_data?.find(
-  //       (meta: any) => meta?.meta_key === "_voucher_applies_to_total"
-  //     );
-
-  //     const initialVoucherAppliesToTotal = appliesToTotalMeta
-  //       ? "true"
-  //       : "false";
-  //     setVoucher_applies_to_total(initialVoucherAppliesToTotal);
-  //     if (initialVoucherAppliesToTotal === "false") {
-  //       metaDataValues = voucherDetail?.meta_data?.reduce(
-  //         (acc: any, meta: any) => {
-  //           if (
-  //             meta?.meta_key !== "_voucher_applies_to_total" &&
-  //             meta?.meta_key &&
-  //             meta?.meta_value !== undefined
-  //           ) {
-  //             acc[meta.meta_key] = meta.item_names;
-  //           }
-  //           if (meta?.meta_key === "_voucher_max_discount_amount") {
-  //             acc[meta.meta_key] = meta.meta_value;
-  //           }
-  //           return acc;
-  //         },
-  //         {}
-  //       );
-  //     }
-
-  //     console.log("metaDataValues", metaDataValues);
-
-  //     const initialValues = {
-  //       ...voucherDetail?.voucher,
-  //       _voucher_applies_to_total: initialVoucherAppliesToTotal,
-  //       start_date: dayjs(voucherDetail?.voucher?.start_date),
-  //       end_date: dayjs(voucherDetail?.voucher?.end_date),
-  //       discount_value: parseFloat(voucherDetail?.voucher?.discount_value),
-  //       min_order_value: parseFloat(voucherDetail?.voucher?.min_order_value),
-  //       ...(initialVoucherAppliesToTotal === "false" ? metaDataValues : {}),
-  //     };
-  //     form.setFieldsValue(initialValues);
-  //   }
-  // }, [voucherDetail, form]);
 
   const onFinish = (value: any) => {
     console.log("value submit: ", value);
@@ -354,7 +366,7 @@ const FormVoucher = () => {
       </div>
 
       {isFetching ? (
-        <Skeleton />
+        <Loading />
       ) : (
         <Form form={form} layout="vertical" onFinish={onFinish}>
           <Form.Item name="title" label="Tên voucher">

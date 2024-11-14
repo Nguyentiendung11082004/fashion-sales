@@ -24,6 +24,7 @@ import Less from "../../../components/icons/detail/Less";
 import CommentProduct from "./CommentProduct";
 import RelatedProducts from "./RelatedProducts";
 import ReplyComment from "./ReplyComment";
+import Loading from "@/common/Loading/Loading";
 
 interface IinitialAttributes {
   [key: string]: string;
@@ -463,7 +464,7 @@ const ProductDetail = () => {
     }
   };
 
-  if (isLoading) return <Skeleton className="container py-10 lg:flex" />;
+  if (isLoading) return <Loading />;
   // if (isError) return <p>{error.message}</p>;
 
   return (

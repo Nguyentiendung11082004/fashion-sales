@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Loading from "@/common/Loading/Loading";
 import { IOrder } from "@/common/types/order";
@@ -166,7 +167,7 @@ const OrderPage = () => {
       </div>
       <div className="">
         {isFetching ? (
-          <Skeleton />
+          <Loading />
         ) : (
           <>
             <Table

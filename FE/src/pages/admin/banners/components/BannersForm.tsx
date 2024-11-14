@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { IBanner } from "@/common/types/banners";
+import Loading from "@/common/Loading/Loading";
+
 import instance from "@/configs/axios";
 import { bannerCreate, bannerUpdate } from "@/services/api/admin/banners";
 import { UploadOutlined } from "@ant-design/icons";
@@ -150,7 +152,7 @@ const BannersForm = () => {
       </div>
 
       {isFetching ? (
-        <Skeleton />
+        <Loading />
       ) : (
         <Form
           form={form}

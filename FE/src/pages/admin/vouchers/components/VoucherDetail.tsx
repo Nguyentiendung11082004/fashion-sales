@@ -263,12 +263,12 @@ const VoucherDetail = () => {
                     {value.name}
                   </h4>
                   <div className="flex flex-wrap gap-2">
-                    {value.item_names?.map((name: any, idx: number) => (
+                    {value.items?.map((name: any, idx: number) => (
                       <span
                         key={idx}
                         className="px-3 py-1 bg-indigo-200 text-indigo-800 rounded-full text-sm"
                       >
-                        {name}
+                        {name?.name}
                       </span>
                     ))}
                     {value.max_discount_amount && (

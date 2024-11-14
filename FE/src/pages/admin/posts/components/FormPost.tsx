@@ -14,6 +14,8 @@ import {
   Upload,
   UploadProps,
 } from "antd";
+import Loading from "@/common/Loading/Loading";
+
 
 import { useAuth } from "@/common/context/Auth/AuthContext";
 import { IPost } from "@/common/types/post";
@@ -163,7 +165,7 @@ const FormPost = () => {
       </div>
 
       {isFetching ? (
-        <Skeleton />
+        <Loading />
       ) : (
         <Form
           form={form}
