@@ -3,6 +3,7 @@ import React, { Suspense, lazy } from "react";
 import { Route, Routes } from "react-router-dom";
 // Lazy load các trang
 const HomePage = lazy(() => import("../pages/client/home/HomePage"));
+const Wishlist = lazy(() => import("@/pages/client/wishlist/Wishlist"));
 const Products = lazy(() => import("@/pages/client/products/Products"));
 const ProductDetail = lazy(() => import("@/pages/client/productDetail/ProductDetail"));
 const About = lazy(() => import("@/pages/client/about/About"));
@@ -59,7 +60,7 @@ const Router = () => {
             <Route path="cart" element={<Cart />} />
           </Route>
           <Route path="account" element={<Account />} />
-          {/* <Route path="wishlist" element={<Wishlist />} /> */}
+          <Route path="wishlist" element={<Wishlist />} />
           <Route path="checkout" element={<Checkout />} />
           <Route path="contact" element={<Contact />} />
           <Route path="thank" element={<Thanks />} />

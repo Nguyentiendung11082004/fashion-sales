@@ -8,7 +8,7 @@ import Gift from "@/components/icons/cart/Gift";
 import Note from "@/components/icons/cart/Note";
 import ReduceProduct from "@/components/icons/cart/ReducrPro";
 import { useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Button, Skeleton } from "antd";
+import { Button } from "antd";
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import ModalCart from "./_components/Modal";

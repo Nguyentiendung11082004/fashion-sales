@@ -1,6 +1,9 @@
 import Loading from "@/common/Loading/Loading";
 import { useAuth } from "@/common/context/Auth/AuthContext";
+import { useUser } from "@/common/context/User/UserContext";
+import { IAddresses } from "@/common/types/addressO";
 import { FormatMoney } from "@/common/utils/utils";
+import AddressPopup from "@/components/ModalPopup/AddressPopup";
 import CheckoutIcon22 from "@/components/icons/checkout/CheckoutIcon22";
 import Completed from "@/components/icons/checkout/Completed";
 import Map from "@/components/icons/checkout/Map";
@@ -16,7 +19,7 @@ import ModalAddress from "./_components/Address";
 const Checkout = () => {
   const { Option } = Select;
   const { token } = useAuth();
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
   const location = useLocation();
   const navigate = useNavigate();
   const savedCartIds = localStorage.getItem('cartIds');
@@ -36,16 +39,20 @@ const Checkout = () => {
   const [idAddress, setIdAddress] = useState('')
   const mutationVoucher = useMutation({
     mutationFn: async () => {
-      const res = await instance.post(`/checkout`, {
-        cart_item_ids: cartIds,
-        voucher_code: voucher,
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const res = await instance.post(
+        `/checkout`,
+        {
+          cart_item_ids: cartIds,
+          voucher_code: voucher,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-      });
-      setTotalDiscount(res?.data?.total_discount)
-      setSubTotal(res?.data?.sub_total)
+      );
+      setTotalDiscount(res?.data?.total_discount);
+      setSubTotal(res?.data?.sub_total);
       return res.data;
     },
   });
@@ -60,19 +67,22 @@ const Checkout = () => {
 
   const qty = dataCheckout?.order_items?.map((e: any) => e?.quantity);
   const cartItemIds = dataCheckout?.order_items?.map((e: any) => e);
-  const quantityOfCart = cartItemIds?.reduce((acc: any, id: any, index: number) => {
-    acc[id] = qty[index];
-    return acc;
-  }, {});
+  const quantityOfCart = cartItemIds?.reduce(
+    (acc: any, id: any, index: number) => {
+      acc[id] = qty[index];
+      return acc;
+    },
+    {}
+  );
 
   const defaultOrder = {
     payment_method_id: 1,
     payment_status: "pending",
     user_note: "",
-    ship_user_email: '',
-    ship_user_name: '',
-    ship_user_phonenumber: '',
-    ship_user_address: '',
+    ship_user_email: "",
+    ship_user_name: "",
+    ship_user_phonenumber: "",
+    ship_user_address: "",
     shipping_method: shiping,
     voucher_code: voucher,
     // id_product: _payload?.id_product || [],
@@ -87,10 +97,10 @@ const Checkout = () => {
     if (dataCheckout && dataCheckout.user) {
       setOrder((prevOrder) => ({
         ...prevOrder,
-        ship_user_email: dataCheckout.user.email || '',
-        ship_user_name: dataCheckout.user.name || '',
-        ship_user_phonenumber: dataCheckout.user.phone_number || '',
-        ship_user_address: dataCheckout.user.address || '',
+        ship_user_email: dataCheckout.user.email || "",
+        ship_user_name: dataCheckout.user.name || "",
+        ship_user_phonenumber: dataCheckout.user.phone_number || "",
+        ship_user_address: dataCheckout.user.address || "",
         quantityOfCart: quantityOfCart,
       }));
     }
@@ -99,7 +109,7 @@ const Checkout = () => {
   const setForm = (props: any, value: any) => {
     setOrder((prev) => ({
       ...prev,
-      [props]: value
+      [props]: value,
     }));
   };
 
@@ -108,26 +118,26 @@ const Checkout = () => {
       const res = await instance.post(`/order`, order, {
         headers: {
           Authorization: `Bearer ${token}`,
-        }
+        },
       });
       return res?.data;
     },
     onSuccess: (data: any) => {
       if (data.payment_url) {
         window.location.href = data?.payment_url;
-        localStorage.removeItem('checkedItems');
+        localStorage.removeItem("checkedItems");
       } else {
-        navigate('/thank');
+        navigate("/thank");
         queryClient.invalidateQueries({
-          queryKey: ['cart']
+          queryKey: ["cart"],
         });
-        localStorage.removeItem('checkedItems');
+        localStorage.removeItem("checkedItems");
       }
-      localStorage.removeItem('checkedItems');
+      localStorage.removeItem("checkedItems");
     },
     onError: (error: any) => {
       toast.error(error?.response?.data?.message);
-    }
+    },
   });
 
   const handleOrder = () => {
@@ -180,25 +190,25 @@ const Checkout = () => {
     if (!_payload) {
       return;
     }
-  })
+  });
   useEffect(() => {
     const fetchData = async () => {
       const payload = { cart_item_ids: cartIds };
       // hoặc là _payload khi checkout sản phẩm từ xem thêm 
       // setIsLoading(true);
       try {
-        const response = await fetch('http://127.0.0.1:8000/api/v1/checkout', {
-          method: 'POST',
+        const response = await fetch("http://127.0.0.1:8000/api/v1/checkout", {
+          method: "POST",
           headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+            Accept: "application/json",
           },
           body: JSON.stringify(payload),
         });
 
         if (!response.ok) {
-          throw new Error('Network response was not ok');
+          throw new Error("Network response was not ok");
         }
         const data = await response.json();
         setDataCheckout(data);
@@ -422,7 +432,6 @@ const Checkout = () => {
                               </div>
 
                             </div>
-
                           </div>
                           {/*end hd-body-ShippingAddress*/}
                         </div>
