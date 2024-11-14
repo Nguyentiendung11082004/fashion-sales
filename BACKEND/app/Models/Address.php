@@ -18,11 +18,14 @@ class Address extends Model
         'phone',
         'is_default',
     ];
-    public function user(){
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
-    protected $casts=[
-        "is_default"=>"boolean"
+    protected $casts = [
+        "is_default" => "boolean",
+        'city' => 'json',
+        'district' => 'json',
+        'ward' => 'json',
     ];
-
 }
