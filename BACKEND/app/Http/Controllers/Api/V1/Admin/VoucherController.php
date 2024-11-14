@@ -137,6 +137,9 @@ class VoucherController extends Controller
                             if (is_array($metaValue) && empty($metaValue)) {
                                 continue;
                             }
+                            if ($metaKey === '_voucher_max_discount_amount' && $metaValue == 0) {
+                                continue; // Bỏ qua meta này và không lưu vào DB
+                            }
                             // Bỏ qua nếu `_voucher_applies_to_total` là `false`
                             if ($metaKey === '_voucher_applies_to_total' && $metaValue === false) {
                                 continue; // Bỏ qua và chuyển sang meta tiếp theo
@@ -184,58 +187,70 @@ class VoucherController extends Controller
     public function show(string $id)
     {
         try {
-            // Tìm voucher theo ID  
+            // Tìm voucher theo ID
             $voucher = Voucher::findOrFail($id);
 
-            // Lấy thông tin meta của voucher  
+            // Lấy thông tin meta của voucher
             $metaData = VoucherMeta::where('voucher_id', $voucher->id)->get();
 
-            // Tạo một mảng ánh xạ cho meta_key và tên tương ứng (bao gồm tên cho applies_to_total)  
+            // Tạo một mảng ánh xạ cho meta_key và tên tương ứng (bao gồm tên cho applies_to_total)
             $metaKeyNames = [
                 '_voucher_category_ids' => 'Danh mục được áp dụng giảm giá',
                 '_voucher_exclude_category_ids' => 'Danh mục không được áp dụng giảm giá',
                 '_voucher_product_ids' => 'Sản phẩm được áp dụng giảm giá',
                 '_voucher_exclude_product_ids' => 'Sản phẩm không được áp dụng giảm giá',
                 '_voucher_max_discount_amount' => 'Số tiền giảm tối đa',
-                '_voucher_applies_to_total' => 'Tổng số được áp dụng giảm giá',  // Chỉnh sửa key đây  
-                // Thêm các meta_key và tên tương ứng khác nếu cần  
+                '_voucher_applies_to_total' => 'Áp dụng cho toàn bộ đơn hàng(true) HOẶC sản phẩm/danh mục ',  // Chỉnh sửa key đây
+                // Thêm các meta_key và tên tương ứng khác nếu cần
             ];
 
-            // Duyệt qua metaData để lấy tên tương ứng  
+            // Duyệt qua metaData để lấy tên tương ứng
             foreach ($metaData as $meta) {
-                // Thêm tên tương ứng  
+                // Thêm tên tương ứng
                 if (array_key_exists($meta->meta_key, $metaKeyNames)) {
                     $meta->name = $metaKeyNames[$meta->meta_key];
                 }
 
                 if ($meta->meta_key === '_voucher_category_ids') {
                     $categoryIds = json_decode($meta->meta_value);
-                    $names = Category::whereIn('id', $categoryIds)
-                        ->pluck('name')->toArray();
-                    // Cập nhật metaData để bao gồm tên danh mục  
-                    $meta->item_names = $names;
+                    $categories = Category::whereIn('id', $categoryIds)->get();
+                    $meta->items = $categories->map(function ($category) {
+                        return [
+                            'id' => $category->id,
+                            'name' => $category->name
+                        ];
+                    });
                 } elseif ($meta->meta_key === '_voucher_exclude_category_ids') {
                     $excludedCategoryIds = json_decode($meta->meta_value);
-                    $names = Category::whereIn('id', $excludedCategoryIds)
-                        ->pluck('name')->toArray();
-                    // Cập nhật metaData để bao gồm tên danh mục loại trừ  
-                    $meta->item_names = $names;
+                    $categories = Category::whereIn('id', $excludedCategoryIds)->get();
+                    $meta->items = $categories->map(function ($category) {
+                        return [
+                            'id' => $category->id,
+                            'name' => $category->name
+                        ];
+                    });
                 } elseif ($meta->meta_key === '_voucher_product_ids') {
                     $productIds = json_decode($meta->meta_value);
-                    $names = Product::whereIn('id', $productIds)
-                        ->pluck('name')->toArray();
-                    // Cập nhật metaData để bao gồm tên sản phẩm  
-                    $meta->item_names = $names;
+                    $products = Product::whereIn('id', $productIds)->get();
+                    $meta->items = $products->map(function ($product) {
+                        return [
+                            'id' => $product->id,
+                            'name' => $product->name
+                        ];
+                    });
                 } elseif ($meta->meta_key === '_voucher_exclude_product_ids') {
                     $excludedProductIds = json_decode($meta->meta_value);
-                    $names = Product::whereIn('id', $excludedProductIds)
-                        ->pluck('name')->toArray();
-                    // Cập nhật metaData để bao gồm tên sản phẩm loại trừ  
-                    $meta->item_names = $names;
+                    $products = Product::whereIn('id', $excludedProductIds)->get();
+                    $meta->items = $products->map(function ($product) {
+                        return [
+                            'id' => $product->id,
+                            'name' => $product->name
+                        ];
+                    });
                 } elseif ($meta->meta_key === '_voucher_max_discount_amount') {
-                    $meta->max_discount_amount = $meta->meta_value; // Lưu số tiền giảm giá tối đa  
+                    $meta->max_discount_amount = $meta->meta_value; // Lưu số tiền giảm giá tối đa
                 } elseif ($meta->meta_key === '_voucher_applies_to_total') {
-                    $meta->applies_to_total = $meta->meta_value; // Lưu giá trị tổng được áp dụng giảm giá  
+                    $meta->applies_to_total = $meta->meta_value; // Lưu giá trị tổng được áp dụng giảm giá
                 }
             }
 
@@ -300,6 +315,12 @@ class VoucherController extends Controller
                         if ($metaKey === '_voucher_max_discount_amount') {
                             if (!is_numeric($metaValue) || $metaValue < 0) {
                                 throw new \Exception('The value for _voucher_max_discount_amount must be a number greater than or equal to 0.');
+                            }
+                            if ($metaValue === 0) {
+                                VoucherMeta::where('voucher_id', $voucher->id)
+                                    ->where('meta_key', '_voucher_max_discount_amount')
+                                    ->delete();
+                                continue; // Bỏ qua việc thêm mới meta này vào database
                             }
                         }
 
