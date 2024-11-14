@@ -50,10 +50,10 @@ const Cart = () => {
   });
   const pusher = new Pusher('4d3e0d70126f2605977e', {
     cluster: 'ap1',
-    authEndpoint: 'http://localhost:8000/broadcasting/auth', // Thay bằng URL backend của bạn
+    authEndpoint: 'http://localhost:8000/broadcasting/auth', 
     auth: {
       headers: {
-        Authorization: `${token}` // Thay thế bằng token của người dùng hiện tại
+        Authorization: `${token}`
       }
     }
   });
