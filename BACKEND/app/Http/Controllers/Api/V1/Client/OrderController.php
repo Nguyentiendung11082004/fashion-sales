@@ -54,7 +54,10 @@ class OrderController extends Controller
     /*
     public function store(StoreOrderRequest $request)
     {
+        
         try {
+            
+           
             $data = $request->validated(); // Lấy dữ liệu đã xác thực
             // dd($data);
             // Kiểm tra xem người dùng có muốn mua ngay hay không
@@ -291,7 +294,7 @@ class OrderController extends Controller
 
                     // Chuyển hướng người dùng đến trang thanh toán
                     return response()->json(['payment_url' => $response['payment_url']], Response::HTTP_OK);
-                }
+                } 
                 return response()->json($order->load('orderDetails')->toArray(), Response::HTTP_CREATED);
             });
             return $response;

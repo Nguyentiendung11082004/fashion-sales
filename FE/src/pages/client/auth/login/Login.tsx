@@ -1,16 +1,15 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { useAuth } from "@/common/context/Auth/AuthContext";
 import { LogoClient } from "@/components/icons";
 import BackgroundLogin from "@/components/icons/login/Background";
 import LoginIcon1 from "@/components/icons/login/LoginIcon1";
+import instance from "@/configs/axios";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button, Form, Input } from "antd";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { useAuth } from "@/common/context/Auth/AuthContext";
-import instance from "@/configs/axios";
-import Loading from "@/common/Loading/Loading";
 const Login = () => {
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<any>('');
@@ -63,7 +62,8 @@ const Login = () => {
         />
         <div className="absolute lg:right-[12%] top-[10%]">
           {/* {
-            loading ? <Loading /> : ''
+            loading 
+            ? <Loading /> : ''
           } */}
           <div className="w-full m-9 p-[50px] lg:w-[450px] shadow-2xl border">
             <h2 className="text-2xl font-semibold text-gray-700 text-center">Đăng nhập</h2>

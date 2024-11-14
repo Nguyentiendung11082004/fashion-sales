@@ -7,6 +7,8 @@ import { Flex, Spin } from 'antd';
 import Loading from '@/common/Loading/Loading';
 interface UserContextType {
     user: any;
+    urlImage: string | null; 
+    setUrlImage: any; 
     loading: boolean;
     error: string | null;
 }
@@ -36,12 +38,25 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         },
         enabled: !!token,
     });
-    // if (isFetching) return <div><Loading /></div>
+
+    const [urlImage, setUrlImage] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (user && user["Infor User"]) {
+            // console.log("User data:", user["Infor User"]);
+            // console.log("Setting urlImage to:", user["Infor User"].avatar);
+            setUrlImage(user["Infor User"].avatar);
+        }
+    }, [user]);
+    
+
+    if (isFetching) return <div></div>
 
     return (
-        <UserContext.Provider value={{ user, loading, error }}>
-            { 
-            isFetching ? <Loading /> : children
+        <UserContext.Provider value={{ user, urlImage, setUrlImage, loading, error }}>
+            {
+                // isFetching ? <Loading /> : 
+                children
             }
         </UserContext.Provider>
     );

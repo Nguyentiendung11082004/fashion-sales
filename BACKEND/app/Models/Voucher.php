@@ -30,7 +30,7 @@ class Voucher extends Model
     }
 
     // Liên kết đến bảng voucher_uses
-    public function uses()
+    public function users()
     {
         return $this->hasMany(VoucherUser::class);
     }
@@ -41,9 +41,18 @@ class Voucher extends Model
         $totalUses = $this->uses()->sum('times_used');
         return $this->usage_limit - $totalUses;
     }
-      // Liên kết đến voucher_logs
-      public function logs()
-      {
-          return $this->hasMany(VoucherLog::class);
-      }
+    // Liên kết đến voucher_logs
+    public function logs()
+    {
+        return $this->hasMany(VoucherLog::class);
+    }
+
+    public function checkUsageLimit()
+    {
+        if ($this->usage_count >= $this->usage_limit) {
+            $this->is_active = false;
+            $this->save();
+        }
+    }
+
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1\Client;
 
+use App\Events\CartEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Helper\Product\GetUniqueAttribute;
 use App\Http\Requests\Cart\StoreCart;
@@ -123,7 +124,7 @@ class CartController extends Controller
                     $cartItem->save();
                 } else {
                     // Tạo mới mục giỏ hàng
-                    CartItem::create([
+                    $cartItem=CartItem::create([
                         'cart_id' => $cart->id,
                         'product_id' => $product->id,
                         'product_variant_id' => $variant ? $variant->id : null,
@@ -131,6 +132,9 @@ class CartController extends Controller
 
                     ]);
                 }
+
+                broadcast(new CartEvent($cart->id, $cartItem));
+                // ->toOthers();
 
 
                 return response()->json(['message' => 'Thêm vào giỏ hàng thành công'], Response::HTTP_OK);
@@ -200,10 +204,7 @@ class CartController extends Controller
                 }
 
                 if ($cart_item->product_variant_id) {
-                    // $request->validate([
-                    //     "product_variant" => "required|array",
-                    //     "product_variant.*"=>"integer|min:1"
-                    // ]);
+                   
                     $getUniqueAttributes = new GetUniqueAttribute();
                     $product_variant = Product::query()->findOrFail($cart_item->product_id)->load(["variants", "variants.attributes"])->toArray();
 
@@ -222,7 +223,7 @@ class CartController extends Controller
                     $cart_item->quantity = $request->input("quantity");
                 }
                 $cart_item->save();
-
+                
                 return response()->json(["message" => "cập nhật giỏ hàng thành công."], Response::HTTP_OK);
             });
         } catch (\Exception $ex) {

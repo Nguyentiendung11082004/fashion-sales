@@ -1,17 +1,30 @@
+/* eslint-disable react-hooks/rules-of-hooks */
+/* eslint-disable prefer-const */
+/* eslint-disable no-prototype-builtins */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import Less from "../../../components/icons/detail/Less";
-import { Link, useParams } from "react-router-dom";
-import { useEffect, useRef, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { productShow } from "@/services/api/admin/products.api";
-import RelatedProducts from "./RelatedProducts";
+import dayjs from "dayjs";
+import { useAuth } from "@/common/context/Auth/AuthContext";
+import { useCart } from "@/common/context/Cart/CartContext";
+import { useUser } from "@/common/context/User/UserContext";
 import { categoriesShow } from "@/services/api/admin/categories";
-import CommentPageDetail from "./CommentPageDetail";
-import { Skeleton } from "antd";
-import { findProductVariant } from "@/services/api/client/productClient.api";
+import {
+  findProductVariant,
+  productShow_client,
+} from "@/services/api/client/productClient.api";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Button, Popconfirm, Skeleton } from "antd";
+import { useEffect, useRef, useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import Less from "../../../components/icons/detail/Less";
+import CommentProduct from "./CommentProduct";
+import RelatedProducts from "./RelatedProducts";
+import instance from "@/configs/axios";
+import { toast } from "react-toastify";
+import ReplyComment from "./ReplyComment";
+
 interface IinitialAttributes {
   [key: string]: string;
 }
@@ -25,14 +38,12 @@ const ProductDetail = () => {
     queryKey: ["product", id],
     queryFn: async () => {
       try {
-        return await productShow(`${id}`);
+        return await productShow_client(`${id}`);
       } catch (error) {
         throw new Error("Không có sản phẩm nào phù hợp");
       }
     },
   });
-
-  console.log("data detail : ", data);
 
   const getUniqueAttributes = data?.getUniqueAttributes;
   useEffect(() => {
@@ -53,29 +64,218 @@ const ProductDetail = () => {
 
   const categoryName = categoryData?.name || "";
 
-  // Slideshow
-  const imgRef = useRef<HTMLImageElement>(null);
+  // Hiển thị bình luận của khách hàng về sản phẩm
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    const img = imgRef.current;
-    if (img) {
-      const rect = img.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      const xPercent = (x / rect.width) * 100;
-      const yPercent = (y / rect.height) * 100;
-      img.style.transformOrigin = `${xPercent}% ${yPercent}%`;
+  const comments = data?.product?.comments;
+
+  // người dùng xóa, sửa bình luận
+  // thông tin user đăng nhập
+  const { user } = useUser();
+  const idUser = user?.InforUser;
+
+  const queryClient = useQueryClient();
+  const { mutate } = useMutation({
+    mutationFn: async (commentId) => {
+      await instance.delete(`/comment/${commentId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    },
+    onSuccess: (commentId) => {
+      queryClient.invalidateQueries({ queryKey: ["product"] });
+      toast.success("Xoá thành công");
+    },
+    onError: () => {
+      toast.error("Xoá thất bại");
+    },
+  });
+
+  // Phân trang
+  const [currentPage, setCurrentPage] = useState(1); // Trang hiện tại
+  const commentsPerPage = 3; // Số lượng bình luận mỗi trang
+
+  // Xác định vị trí của các bình luận trên trang hiện tại
+  const indexOfLastComment = currentPage * commentsPerPage;
+  const indexOfFirstComment = indexOfLastComment - commentsPerPage;
+  const currentComments = comments?.slice(
+    indexOfFirstComment,
+    indexOfLastComment
+  ); // Các bình luận hiển thị trên trang hiện tại
+
+  const totalPages = Math.ceil(comments?.length / commentsPerPage); // Tổng số trang
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
     }
   };
 
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
-    if (containerRef.current) {
-      containerRef.current.scrollTop += e.deltaY;
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
     }
   };
 
+  // Trạng thái lưu các bình luận cha đã mở
+  const [openComments, setOpenComments] = useState(new Set());
+
+  const toggleChildComments = (commentId: any) => {
+    const updatedOpenComments = new Set(openComments);
+    if (updatedOpenComments.has(commentId)) {
+      updatedOpenComments.delete(commentId);
+    } else {
+      updatedOpenComments.add(commentId);
+    }
+    setOpenComments(updatedOpenComments);
+  };
+
+  // Hàm render bình luận
+  const renderComments = (
+    comments: any,
+    level = 0,
+    displayedComments = new Set(),
+    parentName = ""
+  ) => {
+    if (!Array.isArray(comments)) return null;
+
+    const sortedComments = [...comments].sort((a, b) => {
+      if (a.user_id === idUser && b.user_id !== idUser) return -1;
+      else if (a.user_id !== idUser && b.user_id === idUser) return 1;
+      return 0;
+    });
+
+    return sortedComments.map((comment) => {
+      if (displayedComments.has(comment.id)) return null;
+      displayedComments.add(comment.id);
+
+      const isChild = level >= 3;
+      const hasChildren =
+        comment.children_recursive && comment.children_recursive.length > 0;
+      const isOpen = openComments.has(comment.id);
+
+      return (
+        <div key={comment.id} className="">
+          <div
+            className={`py-4 mb-2 ${isChild ? "mt-2 border-none" : "border-2 border-gray-200"}`}
+            style={{ marginLeft: isChild ? "0px" : `${level * 50}px` }}
+          >
+            {/* Bình luận cha */}
+            <div className="flex items-start">
+              <img
+                className={`w-10 h-10 border-black rounded-full mr-4 border-2`}
+                alt="avatar-user"
+                src={comment?.user?.avatar || "https://via.placeholder.com/40"}
+              />
+              <div className="flex flex-col">
+                <p className="font-bold mr-2">{comment?.user?.name}</p>
+                {level === 0 && (
+                  <p className="text-xs">
+                    {comment?.created_at
+                      ? dayjs(comment.created_at).format("DD-MM-YYYY")
+                      : ""}
+                  </p>
+                )}
+                {level === 0 && (
+                  <div className="flex">
+                    {[...Array(comment?.rating || 0)].map((_, index) => (
+                      <span key={index} className="text-yellow-500">
+                        ★
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <p className="mt-2">
+                  {level > 0 && parentName && (
+                    <span className="font-bold">{parentName} </span>
+                  )}
+                  {comment?.content}
+                </p>
+                {comment?.image && (
+                  <img
+                    className="my-4 w-[150px] h-[150px]"
+                    alt="Hình ảnh từ người mua"
+                    src={comment.image}
+                  />
+                )}
+              </div>
+            </div>
+
+            {/* Các nút chức năng cho người dùng */}
+            <div className="pl-[60px]">
+              {comment?.user_id === idUser ? (
+                <>
+                  <button
+                    onClick={() => onHandleEdit(comment?.id, comment)}
+                    className="font-bold text-[12px] text-blue-500 mr-2"
+                  >
+                    Sửa
+                  </button>
+                  <Popconfirm
+                    title="Xóa sản phẩm"
+                    description="Bạn chắc chắn muốn xóa không?"
+                    onConfirm={() => mutate(comment?.id)}
+                    okText="Có"
+                    cancelText="Không"
+                  >
+                    <button className="font-bold text-[12px] text-blue-500 mr-2">
+                      Xóa
+                    </button>
+                  </Popconfirm>
+                </>
+              ) : (
+                <button
+                  onClick={() =>
+                    handleReplyClick(comment?.id, comment?.parent_id)
+                  }
+                  className="font-bold text-[12px] text-blue-500 mr-2"
+                >
+                  Trả lời
+                </button>
+              )}
+            </div>
+
+            {/* Hiện nút trả lời */}
+            {replyToCommentId === comment.id && (
+              <ReplyComment
+                productId={productId}
+                InForCommentId={InForCommentId}
+                setReplyToCommentId={setReplyToCommentId}
+                replyToCommentId={replyToCommentId}
+              />
+            )}
+
+            {/* Hiển thị nút ẩn/hiện các bình luận con */}
+            {hasChildren && (
+              <button
+                onClick={() => toggleChildComments(comment.id)}
+                className="text-blue-500 mt-2 pl-[59px] text-sm font-semibold"
+              >
+                {isOpen
+                  ? "Ẩn phản hồi"
+                  : `Hiện ${comment.children_recursive.length} phản hồi`}
+              </button>
+            )}
+
+            {/* Render các bình luận con nếu mở */}
+            {isOpen &&
+              hasChildren &&
+              comment.children_recursive.map((childComment: any) => (
+                <div key={childComment.id}>
+                  {renderComments(
+                    [childComment],
+                    level + 1,
+                    displayedComments,
+                    comment.user.name
+                  )}
+                </div>
+              ))}
+          </div>
+        </div>
+      );
+    });
+  };
+  // console.log("data detail: ", data)
   const [activeButton, setActiveButton] = useState("details");
 
   const handleButtonClick = (buttonName: string) => {
@@ -98,16 +298,25 @@ const ProductDetail = () => {
     setMainImage(image);
     // setPriceProduct({ priceMax: undefined, priceMin: undefined });
   };
+  const { token } = useAuth();
 
   // thêm vào giỏ hàng
+
   const [quantity, setQuantity] = useState<number>(1);
 
   const increaseQuantity = () => {
     setQuantity((prev) => prev + 1);
   };
-
+  const { addToCart } = useCart();
   const decreaseQuantity = () => {
     setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
+  };
+  const onHandleAddToCart = (idProduct: any, idProductVariant: any) => {
+    if (data.getUniqueAttributes == 0) {
+      idProductVariant = undefined;
+    }
+
+    addToCart(idProduct, idProductVariant);
   };
 
   const [selectedAttributes, setSelectedAttributes] = useState<{
@@ -115,26 +324,6 @@ const ProductDetail = () => {
   }>({
     product_variant: {},
   });
-
-  // const priceRegulars: number[] =
-  //   product?.variants.map((variant: any) => variant.price_regular) || [];
-  // const [priceProduct, setPriceProduct] = useState<{
-  //   priceMin: number | undefined;
-  //   priceMax: number | undefined;
-  // } | null>(null);
-  // useEffect(() => {
-  //   if (product?.variants && product.variants.length > 0) {
-  //     const priceRegulars: number[] = product.variants.map(
-  //       (variant: any) => variant.price_regular
-  //     );
-
-  //     if (priceRegulars.length > 0) {
-  //       const priceMin = Math.min(...priceRegulars);
-  //       const priceMax = Math.max(...priceRegulars);
-  //       setPriceProduct({ priceMin, priceMax });
-  //     }
-  //   }
-  // }, [product]);
 
   const result = product?.variants.map((variant: any) => {
     if (!variant.attributes) {
@@ -148,133 +337,44 @@ const ProductDetail = () => {
       },
       {}
     );
-
     return attributeObj;
   });
 
-  let keySelectedAttributes = Object.keys(selectedAttributes.product_variant);
+  const [dataAttributes, setAttribute] = useState<any>([]);
 
-
-
-  if (keySelectedAttributes.length === 0) {
-    keySelectedAttributes = [];
-  } else if (keySelectedAttributes.length === 1) {
-    keySelectedAttributes = [keySelectedAttributes[0]];
-  } else {
-    keySelectedAttributes = keySelectedAttributes.slice(0, -1);
-  }
-
-
-
-  const matchedPivots = result?.filter((data: any) => {
-    const objectVariant = selectedAttributes?.product_variant || {};
-    const variantKeys = Object.keys(objectVariant);
-
-    if (variantKeys.length === 0) {
-      return true;
-    }
-
-    const attributesToCompare =
-      variantKeys.length > 1
-        ? variantKeys.slice(0, variantKeys.length - 1)
-        : variantKeys;
-
-    return attributesToCompare.every((key) => {
-      return objectVariant[key] == data[key];
-    });
-  });
-
-  console.log("Trả về các sản phẩm khớp:", matchedPivots);
-
-
-  const valuesArrayNumber = Array.isArray(matchedPivots)
-    ? matchedPivots.flatMap((pivot) => Object.values(pivot))
-    : [];
-
-  // Chuyển đổi các giá trị trong mảng về kiểu chuỗi
-  const valuesArray = valuesArrayNumber.map((value) => String(value));
-
-  console.log("Mảng giá trị valueArray", valuesArray);
-
-  // console.log("log disable trước khi click: ", disableIdAttribute);
-  const disableIdAttribute: any[] = [];
-  const combinedValuesArray: any[] = [];
-  keySelectedAttributes.map((value: any) => {
-    const keyGetUniqueAttribute = Object.keys(getUniqueAttributes);
-    console.log("keyGetUniqueAttribute", keyGetUniqueAttribute);
-    const getIDAttribute: any = [];
-    keyGetUniqueAttribute.map((valueKeysGetAttribute: any) => {
-      if (value === valueKeysGetAttribute) {
-        const objectGetAttribute: object =
-          getUniqueAttributes?.[valueKeysGetAttribute];
-        console.log("objectGetAttribute", objectGetAttribute);
-        getIDAttribute.push(objectGetAttribute);
-
-        // Lấy các khóa từ objectGetAttribute và chuyển đổi thành chuỗi nếu cần
-        const newAttributes = Object.keys(objectGetAttribute);
-
-        // Kết hợp valuesArray với newAttributes, chỉ thêm những giá trị chưa có
-        const combinedValuesArray = valuesArray.concat(
-          newAttributes.filter((id) => !valuesArray.includes(String(id))) // Chuyển id sang chuỗi
-        );
-
-        // Loại bỏ các giá trị trùng lặp nếu cần
-        const uniqueCombinedValuesArray = [...new Set(combinedValuesArray)];
-
-        console.log("Mảng giá trị đã kết hợp:", uniqueCombinedValuesArray);
-
-        console.log("getIDAttribute", getIDAttribute);
-      } else {
-        const keyRemaining = getUniqueAttributes?.[valueKeysGetAttribute];
-        console.log("keyRemaining", keyRemaining);
-
-        const idAttributeRemaining = Object.keys(keyRemaining);
-        console.log("idAttributeRemaining", idAttributeRemaining);
-        // valuesArray.push(idAttributeRemaining);
-        // Hoặc sử dụng toán tử spread
-        // const combinedValuesArray = [...valuesArray, ...idAttributeRemaining];
-
-        // Lặp qua từng idAttributeRemaining để kiểm tra
-        idAttributeRemaining.map((idValue: any) => {
-          // Kiểm tra nếu idValue không có trong valuesArray
-          const isDisabled = !valuesArray.includes(idValue);
-          if (isDisabled) {
-            disableIdAttribute.push(idValue); // Chỉ thêm nếu không nằm trong valuesArray
-          }
-        });
-      }
-    });
-  });
-
-  // In ra giá trị disable
-  console.log("log disable:", disableIdAttribute);
-
-  // const detructeringMatchedPivotes=
-  const handleAttributeSelect = (key: string, valueId: string | number) => {
-    console.log("254",key,valueId)
-    if (disableIdAttribute.includes(valueId)) {
-      return; // Prevent selecting a disabled attribute
-    }
-
-    setSelectedAttributes((prev) => {
-      const updatedAttributes = { ...prev.product_variant };
-
-      if (updatedAttributes[key] === valueId) {
-        delete updatedAttributes[key];
-      } else {
-        updatedAttributes[key] = valueId;
-      }
-
-      return { product_variant: updatedAttributes };
-    });
+  const handleAttributeSelect = (attribute: any, id: any) => {
+    setAttribute((prev: any) => ({
+      ...prev,
+      [attribute]: id,
+    }));
   };
+
+  const checkDisable = (attribute: string, value: any) => {
+    let res = false;
+
+    let matchingItems = result?.filter((x: any) => {
+      return Object.keys(dataAttributes).every((key) => {
+        if (key !== attribute) {
+          return x[key] && x[key].toString() === dataAttributes[key].toString();
+        }
+        return true;
+      });
+    });
+
+    let isAttributeValid = matchingItems?.some(
+      (x: any) => x[attribute] && x[attribute].toString() === value.toString()
+    );
+
+    res = !isAttributeValid;
+
+    return res;
+  };
+
   useEffect(() => {
     const fetchProductVariant = async () => {
       try {
         const variant = await findProductVariant(productId, selectedAttributes);
-
         if (variant.findProductVariant) {
-          // Nếu tìm thấy variant
           setProduct((prevProduct: any) => ({
             ...prevProduct,
             ...variant.findProductVariant,
@@ -293,6 +393,16 @@ const ProductDetail = () => {
 
     fetchProductVariant();
   }, [selectedAttributes]);
+
+  const resultGetUniqueAttribute = Object.entries(
+    getUniqueAttributes ?? {}
+  ).map(([key, value]) => ({
+    attribute: key,
+    attributeValue: Object.entries(value ?? {}).map(([id, name]) => ({
+      id,
+      name,
+    })),
+  }));
 
   useEffect(() => {
     if (getUniqueAttributes) {
@@ -313,10 +423,53 @@ const ProductDetail = () => {
     }
   }, [getUniqueAttributes]);
 
-  if (isLoading) return <Skeleton className="container py-10 lg:flex" />;
-  if (isError) return <p>{error.message}</p>;
+  const [editIdComment, setEditIdComment] = useState<string | null>(null);
+  const [InForCommentId, setInForCommentId] = useState<string | null>(null);
 
-  console.log("kiểm tra getUnique", getUniqueAttributes);
+  const onHandleEdit = (id: any, value: any) => {
+    if (value.parent_id) {
+      setReplyToCommentId(id);
+    } else {
+      setActiveButton("comment");
+      setEditIdComment(id);
+    }
+    setInForCommentId(value);
+  };
+
+  const [replyToCommentId, setReplyToCommentId] = useState(null);
+
+  const handleReplyClick = (commentId: any, parent_id: any) => {
+    setReplyToCommentId(commentId);
+    if (parent_id) {
+      setReplyToCommentId(commentId);
+    }
+    setInForCommentId("");
+  };
+
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    const img = imgRef.current;
+    if (img) {
+      const rect = img.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const xPercent = (x / rect.width) * 100;
+      const yPercent = (y / rect.height) * 100;
+      img.style.transformOrigin = `${xPercent}% ${yPercent}%`;
+    }
+  };
+
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+    if (containerRef.current) {
+      containerRef.current.scrollTop += e.deltaY;
+    }
+  };
+
+  if (isLoading) return <Skeleton className="container py-10 lg:flex" />;
+  // if (isError) return <p>{error.message}</p>;
 
   return (
     <>
@@ -388,15 +541,6 @@ const ProductDetail = () => {
                 <div className="flex items-center mt-5 lg:mx-[15%] sm:mx-[42%] xl:mx-0 sm:mt-2 space-x-4">
                   <div className="">
                     <span className="lg:text-xl sm:text-[25px] text-lg text-[#747474] my-2">
-                      {/* {priceProduct &&
-                      priceProduct.priceMin !== undefined &&
-                      priceProduct.priceMax !== undefined ? (
-                        <>
-                          {priceProduct.priceMin} - {priceProduct.priceMax} VNĐ
-                        </>
-                      ) : (
-                        <>{product?.price_regular} VNĐ</>
-                      )} */}
                       {product?.price_sale} VNĐ
                     </span>
                   </div>
@@ -433,69 +577,88 @@ const ProductDetail = () => {
                 </p>
               </div>
               <div>
-                {getUniqueAttributes && (
-                  <div className="mt-2">
-                    {Object.keys(getUniqueAttributes).map((key) => {
-                      const value = getUniqueAttributes[key];
+                <div className="mt-2">
+                  {resultGetUniqueAttribute.map((key) => {
+                    return (
+                      <div key={key.attribute} className="mb-4">
+                        <label className="flex items-center">
+                          <span className="font-medium">{key.attribute}:</span>
+                          {selectedAttributes.product_variant[key.attribute] !==
+                            undefined && (
+                            <span className="ml-2">
+                              {key.attributeValue
+                                .find(
+                                  (item) =>
+                                    item.id ===
+                                    selectedAttributes.product_variant[
+                                      key.attribute
+                                    ]
+                                )
+                                ?.name.toLowerCase()}
+                            </span>
+                          )}
+                        </label>
+                        <div className="flex mt-3 gap-2">
+                          {key.attributeValue.map((item) => {
+                            const isDisabled = checkDisable(
+                              key.attribute,
+                              item.id
+                            );
+                            const isSelected =
+                              selectedAttributes.product_variant[
+                                key.attribute
+                              ] === item.id;
 
-                      return (
-                        <div key={key} className="mb-4">
-                          <label className="flex items-center">
-                            <span className="font-medium">{key}:</span>
-                            {selectedAttributes.product_variant[key] !==
-                              undefined && (
-                                <span className="ml-2">
-                                  {value[
-                                    selectedAttributes.product_variant[key]
-                                  ].toLowerCase()}
-                                </span>
-                              )}
-                          </label>
-                          <div className="flex mt-3 gap-2">
-                            {Object.keys(value).map((valueId) => {
-                              const valueName = value[valueId];
-
-                              const isDisabled =
-                                disableIdAttribute.includes(valueId);
-
-                              return (
-                                <div
-                                  key={valueId}
-                                  className={`relative flex-1 max-w-[60px] h-8 sm:h-9 rounded-full cursor-pointer flex items-center justify-center ${selectedAttributes.product_variant[key] ===
-                                      valueId
-                                      ? "border-gray-700 border-4"
-                                      : "border-gray-200 border-2"
-                                    } ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}`}
-                                  style={{
-                                    backgroundColor:
-                                      key === "color"
-                                        ? valueName
-                                        : "transparent",
-                                  }}
-                                  onClick={() =>
-                                    !isDisabled &&
-                                    handleAttributeSelect(key, valueId)
+                            return (
+                              <div
+                                key={item.id}
+                                className={`relative flex-1 max-w-[60px] h-8 sm:h-9 rounded-full cursor-pointer flex items-center justify-center ${
+                                  isSelected
+                                    ? "border-gray-800 border-4"
+                                    : isDisabled
+                                      ? "border-gray-200 border-2 opacity-50 cursor-not-allowed"
+                                      : ""
+                                }`}
+                                style={{
+                                  backgroundColor:
+                                    key.attribute === "color"
+                                      ? item.name
+                                      : "transparent",
+                                }}
+                                onClick={() => {
+                                  if (!isDisabled) {
+                                    handleAttributeSelect(
+                                      key.attribute,
+                                      item.id
+                                    );
+                                    setSelectedAttributes((prev) => ({
+                                      ...prev,
+                                      product_variant: {
+                                        ...prev.product_variant,
+                                        [key.attribute]: item.id,
+                                      },
+                                    }));
                                   }
-                                >
-                                  {key !== "color" && (
-                                    <div className="absolute inset-0 rounded-full flex items-center justify-center overflow-hidden z-0 bg-gray-300 text-sm md:text-base text-center">
-                                      {valueName}
-                                    </div>
-                                  )}
-                                  {key === "color" && (
-                                    <div className="absolute inset-0 rounded-full overflow-hidden z-0 object-cover bg-cover border-2 border-gray-200">
-                                      <span className="text-sm md:text-base text-center"></span>
-                                    </div>
-                                  )}
-                                </div>
-                              );
-                            })}
-                          </div>
+                                }}
+                              >
+                                {key.attribute !== "color" && (
+                                  <div className="absolute inset-0 rounded-full flex items-center justify-center overflow-hidden z-0 bg-gray-300 text-sm md:text-base text-center">
+                                    {item.name}
+                                  </div>
+                                )}
+                                {key.attribute === "color" && (
+                                  <div className="absolute inset-0 rounded-full overflow-hidden z-0 object-cover bg-cover border-2 border-gray-200">
+                                    <span className="text-sm md:text-base text-center"></span>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
                         </div>
-                      );
-                    })}
-                  </div>
-                )}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
 
               <div className="font-medium mt-2 mb-2">số lượng: </div>
@@ -550,7 +713,12 @@ const ProductDetail = () => {
                     </div>
                   </div>
                 </div>
-                <button className="h-11 w-full   px-2 py-2 rounded-full test nc-Button relative right-2  inline-flex items-center justify-center  text-sm sm:text-base font-medium sm:py-3.5 sm:px-2 lg:px-2 shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0  animate-bounce focus:animate-none hover:animate-none text-md  mt-3  border bg-[#56cfe1] text-white">
+
+                <Button
+                  onClick={() => onHandleAddToCart(id, product?.id)}
+                  className={`h-11 w-full px-2 py-2 rounded-full ...`}
+                  disabled={isLoading}
+                >
                   <svg
                     className="hidden lg:hidden xl:block sm:inline-block w-5 h-5 mb-0.5"
                     viewBox="0 0 9 9"
@@ -571,7 +739,8 @@ const ProductDetail = () => {
                   <span className="xl:ml-3 ml-1 lg:text-base xl:text-base">
                     Thêm vào giỏ hàng
                   </span>
-                </button>
+                </Button>
+
                 <br />
                 <div className="flex border border-slate-600 rounded-full items-center px-2 h-10 hover:border-red-500 hover:text-red-500">
                   <svg
@@ -607,28 +776,31 @@ const ProductDetail = () => {
             <div className="w-[100%] text-center m-auto flex justify-center">
               <button
                 onClick={() => handleButtonClick("details")}
-                className={`${activeButton === "details"
+                className={`${
+                  activeButton === "details"
                     ? "border-black text-black border-2"
                     : " text-[#8e8e8e]"
-                  } font-medium cursor-pointer lg:text-base text-[10px] lg:py-2 lg:px-6 px-2 py-2 rounded-full`}
+                } font-medium cursor-pointer lg:text-base text-[10px] lg:py-2 lg:px-6 px-2 py-2 rounded-full`}
               >
                 Chi tiết sản phẩm
               </button>
               <button
                 onClick={() => handleButtonClick("reviews")}
-                className={`${activeButton === "reviews"
+                className={`${
+                  activeButton === "reviews"
                     ? "border-black text-black border-2"
                     : "border-black text-[#8e8e8e]"
-                  } btn_cmt text-[10px] lg:text-base font-medium cursor-pointer lg:py-2 lg:px-6 px-2 py-2 rounded-full`}
+                } btn_cmt text-[10px] lg:text-base font-medium cursor-pointer lg:py-2 lg:px-6 px-2 py-2 rounded-full`}
               >
                 Xem đánh giá sản phẩm
               </button>
               <button
                 onClick={() => handleButtonClick("comment")}
-                className={`${activeButton === "comment"
+                className={`${
+                  activeButton === "comment"
                     ? "border-black text-black border-2"
                     : "border-black text-[#8e8e8e]"
-                  } btn_cmt text-[10px] lg:text-base font-medium cursor-pointer lg:py-2 lg:px-6 px-2 py-2 rounded-full`}
+                } btn_cmt text-[10px] lg:text-base font-medium cursor-pointer lg:py-2 lg:px-6 px-2 py-2 rounded-full`}
               >
                 Viết bình luận
               </button>
@@ -682,17 +854,43 @@ const ProductDetail = () => {
               )}
               {activeButton === "reviews" && (
                 <div className="w-full">
-                  <div>
+                  {comments?.length === 0 ? (
+                    <p>Chưa có bình luận nào.</p>
+                  ) : (
                     <div>
-                      <CommentPageDetail productId={Number(product!.id)} />
+                      <div>{renderComments(currentComments)}</div>
+
+                      <div className="flex justify-center mt-4">
+                        <button
+                          onClick={handlePrevPage}
+                          disabled={currentPage === 1}
+                        >
+                          Trang trước
+                        </button>
+                        <span className="mx-4">
+                          Trang {currentPage} / {totalPages}
+                        </span>
+                        <button
+                          onClick={handleNextPage}
+                          disabled={currentPage === totalPages}
+                        >
+                          Trang tiếp
+                        </button>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               )}
+
               {activeButton === "comment" && (
-                // bình luận sản phẩm
-                //  <CommentProduct />
-                <div></div>
+                <CommentProduct
+                  productId={productId}
+                  setEditIdComment={setEditIdComment}
+                  editIdComment={editIdComment}
+                  InForCommentId={InForCommentId}
+                  setInForCommentId={setInForCommentId}
+                  dataProductIdQuery={data}
+                />
               )}
             </div>
           </div>

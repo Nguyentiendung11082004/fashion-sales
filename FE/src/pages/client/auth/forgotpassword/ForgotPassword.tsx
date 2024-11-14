@@ -3,25 +3,33 @@ import BackgroundLogin from "@/components/icons/login/Background";
 import instance from "@/configs/axios";
 import { useMutation } from "@tanstack/react-query";
 import { Button, Form, Input } from "antd";
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const ForgotPassword = () => {
+  const [loading, setLoading] = useState<boolean>(false)
+
   const emailMutation = useMutation({
     mutationFn: async (email) => {
       const data = await instance.post(`/password/forgot`, email);
       return data;
     },
+    onMutate: () => {
+      setLoading(true);
+    },
     onSuccess: (data: any) => {
-      toast.success(data.message)
+      console.log("data", data)
+      toast.success(data?.data?.message)
     },
     onError: () => {
-      toast.error("That bai")
+      toast.error("Thất bại")
+    },
+    onSettled: () => {
+      setLoading(false);
     }
   })
   const onSubmit = (value: any) => {
-    console.log(value)
     emailMutation.mutate(value);
   }
   return (
@@ -56,7 +64,7 @@ const ForgotPassword = () => {
 
               </div>
               <div className="mt-8">
-                <Button htmlType="submit" className="bg-gray-700 text-white font-bold p-6 w-full rounded hover:bg-gray-600">
+                <Button loading={loading} htmlType="submit" className="bg-gray-700 text-white font-bold p-6 w-full rounded hover:bg-gray-600">
                   Gửi
                 </Button>
               </div>

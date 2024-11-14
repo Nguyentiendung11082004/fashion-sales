@@ -23,7 +23,7 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        
+
         try {
             $request->validate([
                 'email'    => 'required|email',
@@ -130,13 +130,19 @@ class AuthController extends Controller
 
             // Kiểm tra xem email đã được xác thực chưa
             if ($user->hasVerifiedEmail()) {
+               
                 return response()->json([
                     'message' => 'Email already verified.'
                 ], 400);
+                // ->redirect("http://localhost:5173/")
+
+                
             }
 
             // Xác thực email
             $user->markEmailAsVerified();
+
+            // return redirect("http://localhost:5173/");
 
             // Gửi sự kiện đã xác thực email
             event(new Verified($user));
@@ -148,7 +154,7 @@ class AuthController extends Controller
         } catch (\Throwable $th) {
             return response()->json([
                 'errors' => $th->getMessage()
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+            ], Response::HTTP_INTERNAL_SERVER_ERROR)->redirect("http://localhost:5173/login");
         }
     }
 
@@ -212,15 +218,16 @@ class AuthController extends Controller
             // Tạo token reset mật khẩu
             $token = Password::createToken($user);
 
-            $url = route('password.reset', ['token' => str($token)]);
+            // $url = route('password.reset', ['token' => str($token)]);
+            $url = "http://localhost:5173/password/reset/" . $token;
 
             // Gửi thông báo qua queue
             Notification::send($user, new ResetPasswordNotification($url, $token));
 
             return response()->json([
                 'message' => 'Reset password email sent successfully!',
-                // 'token'   => $token,
-                // 'url'     => $url
+                'token'   => $token,
+                'url'     => $url
             ], 200);
         } catch (\Exception $e) {
             // Handle error when sending email
@@ -290,7 +297,7 @@ class AuthController extends Controller
             } else {
                 return response()->json([
                     'message' => 'Không thể đặt lại mật khẩu. Vui lòng kiểm tra lại thông tin.',
-                    'response_code' => $response 
+                    'response_code' => $response
                 ], 500); // 500 Internal Server Error
             }
         } catch (\Exception $e) {
