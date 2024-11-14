@@ -113,6 +113,9 @@ class PaymentController extends Controller
                     'payment_status' => 'Chưa thanh toán', // Cập nhật trạng thái
                     'order_status' => 'Hủy',
                 ]);
+                // if($order->voucher_id){
+
+                // }
                 foreach ($order->orderDetails as $detail) {
                     // Kiểm tra nếu là sản phẩm có biến thể
                     if ($detail->product_variant_id) {

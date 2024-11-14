@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\User;
+use App\Models\Order;
 use App\Models\Voucher;
 use App\Models\PaymentMethod;
 use Illuminate\Support\Facades\Schema;
@@ -18,8 +19,8 @@ return new class extends Migration
             $table->id(); // ID đơn hàng
             $table->foreignIdFor(User::class)->constrained()->onDelete('cascade'); // Liên kết với bảng users
             $table->foreignIdFor(PaymentMethod::class)->constrained()->onDelete('cascade'); // Liên kết với bảng payment_methods
-            $table->enum('order_status', ['Đang chờ xác nhận', 'Đã xác nhận', 'Giao hàng thất bại', 'Giao hàng thành công', 'Đã hủy'])->default('Đang chờ Xác Nhận'); // Trạng thái đơn hàng (completed, pending, shipped, v.v.).
-            $table->enum('payment_status', ['Chưa Thanh Toán', 'Đã thanh toán'])->default('Chưa Thanh Toán'); // Trạng thái thanh toán
+            $table->enum('order_status', \App\Models\Order::getOrderStatuses())->default(\App\Models\Order::STATUS_PENDING); // Trạng thái đơn hàng (completed, pending, shipped, v.v.).
+            $table->enum('payment_status', \App\Models\Order::getPaymentStatuses())->default(\App\Models\Order::PAYMENT_PENDING); // Trạng thái thanh toán
             $table->string('order_code')->unique(); // Mã đơn hàng
             $table->integer('total_quantity'); // Tổng số lượng
             $table->decimal('total', 15, 2); // Tổng giá trị đơn hàng
