@@ -46,6 +46,12 @@ const CartPopup = forwardRef((props: any, ref) => {
     }
   }, [data]);
 
+  useEffect(() => {
+    setSelectedAttributes({ product_variant: {} });
+    setQuantity(1);
+    setProduct(undefined);
+  }, [idProduct]);
+
   const handleAttributeSelect = (attribute: any, id: any) => {
     setSelectedAttributes((prev: any) => ({
       ...prev,
@@ -70,6 +76,7 @@ const CartPopup = forwardRef((props: any, ref) => {
       );
       return attributeObj;
     });
+
   const checkDisable = (attribute: string, value: any) => {
     let res = false;
 
@@ -161,11 +168,10 @@ const CartPopup = forwardRef((props: any, ref) => {
 
   const showModal = () => {
     setIsModalOpen(true);
+    // setSelectedAttributes({ product_variant: result[0] });
   };
   const handleClose = () => {
     setIsModalOpen(false);
-    setSelectedAttributes({ product_variant: {} });
-    setQuantity(1);
     setIdProduct("");
   };
   useImperativeHandle(ref, () => ({

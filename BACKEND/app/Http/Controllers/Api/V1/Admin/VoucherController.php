@@ -197,7 +197,7 @@ if ($metaKey === '_voucher_applies_to_total') {
                 '_voucher_product_ids' => 'Sản phẩm được áp dụng giảm giá',
                 '_voucher_exclude_product_ids' => 'Sản phẩm không được áp dụng giảm giá',
                 '_voucher_max_discount_amount' => 'Số tiền giảm tối đa',
-                '_voucher_applies_to_total' => 'Tổng số được áp dụng giảm giá',  // Chỉnh sửa key đây  
+                '_voucher_applies_to_total' => 'Tất cả các đơn hàng',  // Chỉnh sửa key đây  
                 // Thêm các meta_key và tên tương ứng khác nếu cần  
             ];
 
@@ -314,7 +314,7 @@ if ($metaKey === '_voucher_applies_to_total') {
                             VoucherMeta::where('voucher_id', $voucher->id)
                                 ->where('meta_key', '_voucher_applies_to_total')
                                 ->delete();
-                            continue; // Bỏ qua lưu vào database khi metaValue là false
+continue; // Bỏ qua lưu vào database khi metaValue là false
                         }
                         //Kết thúc bổ sung sẽ xóa bản ghi nếu từ true sang false
 
@@ -369,7 +369,7 @@ if ($metaKey === '_voucher_applies_to_total') {
                     throw new \Exception('The selected categories cannot be included in both Applicable Product and Excluded Product');
                 }
                 if (!empty(array_intersect($categoryIds, $excludeCategoryIds))) {
-                    throw new \Exception('The selected categories cannot be included in both Applicable Categories and Excluded Categories');
+throw new \Exception('The selected categories cannot be included in both Applicable Categories and Excluded Categories');
                 }
 
                 if (!empty($metaData)) {

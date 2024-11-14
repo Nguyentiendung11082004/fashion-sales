@@ -46,6 +46,7 @@ import FormVoucher from "@/pages/admin/vouchers/components/FormVoucher";
 import Order from "@/pages/client/order";
 import Thanks from "@/pages/client/thanks/Thanks";
 import Permission from "@/pages/client/auth/permission";
+import OrderDetail from "@/pages/admin/order/components/OrderDetail";
 const Router = () => {
   return (
     <>
@@ -98,7 +99,6 @@ const Router = () => {
           <Route path="brands" element={<Brands />} />
           <Route path="brands/create" element={<BrandForm />} />
           <Route path="brands/edit/:id" element={<BrandForm />} />
-          <Route path="order" element={<OrderPage />} />
           <Route path="tags" element={<Tags />} />
           <Route path="tags/create" element={<FormTag />} />
           <Route path="tags/edit/:id" element={<FormTag />} />
@@ -118,6 +118,8 @@ const Router = () => {
           <Route path="vouchers/:id" element={<VoucherDetail />} />
           <Route path="vouchers/create" element={<FormVoucher />} />
           <Route path="vouchers/edit/:id" element={<FormVoucher />} />
+          <Route path="orders" element={<OrderPage />} />
+          <Route path="orders/:id" element={<OrderDetail />} />
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>

@@ -76,6 +76,15 @@ const LayoutAdmin: React.FC = () => {
               ),
             },
             {
+              key: "12",
+              icon: <ShoppingCartOutlined />,
+              label: (
+                <NavLink className="text-white" to="/admin/orders">
+                  Đơn hàng
+                </NavLink>
+              ),
+            },
+            {
               key: "3",
               icon: <UploadOutlined />,
               label: (
@@ -108,6 +117,7 @@ const LayoutAdmin: React.FC = () => {
                 </NavLink>
               ),
             },
+
             {
               key: "4",
               icon: <OrderedListOutlined />,
@@ -232,15 +242,7 @@ const LayoutAdmin: React.FC = () => {
                 </NavLink>
               ),
             },
-            {
-              key: "12",
-              icon: <ShoppingCartOutlined />,
-              label: (
-                <NavLink className="text-white" to="/admin/order">
-                  Đơn hàng
-                </NavLink>
-              ),
-            },
+
             {
               key: "13",
               icon: <TagsOutlined />,

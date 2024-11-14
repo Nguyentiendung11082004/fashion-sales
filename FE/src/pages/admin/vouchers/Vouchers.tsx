@@ -34,7 +34,7 @@ const Vouchers = () => {
     },
   });
 
-  console.log("data", data);
+  // console.log("data", data);
   const dataVoucher = data?.data?.dataVouchers;
 
   const dataSource =
@@ -70,6 +70,7 @@ const Vouchers = () => {
       setVisiable(false);
     }
   };
+  
   const columns: ColumnType<IVouchers>[] = [
     {
       title: "Stt",

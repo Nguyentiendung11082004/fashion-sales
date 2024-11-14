@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { IBanner } from "@/common/types/banners";
+import { IVouchers } from "@/common/types/vouchers";
 import instance from "@/configs/axios";
-import { bannerCreate, bannerUpdate } from "@/services/api/admin/banners";
 import { categoriesIndex } from "@/services/api/admin/categories";
+import { productsIndex } from "@/services/api/admin/products.api";
+import { voucherCreate, voucherUpdate } from "@/services/api/admin/voucher";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Button, DatePicker, Form, Input, Select, Skeleton } from "antd";
+import { Button, DatePicker, Form, Input, Radio, Select, Skeleton } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import { Option } from "antd/es/mentions";
 import dayjs from "dayjs";
@@ -20,69 +21,66 @@ const FormVoucher = () => {
   const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<any>("");
+  const [voucher_applies_to_total, setVoucher_applies_to_total] = useState<
+    string | null
+  >(null);
 
   const { data: listCategories } = useQuery({
     queryKey: ["categories"],
     queryFn: categoriesIndex,
   });
-  console.log("categories: ", listCategories);
-
+  const { data: listProducts } = useQuery({
+    queryKey: ["product"],
+    queryFn: productsIndex,
+  });
   const { data, refetch, isFetching } = useQuery({
-    queryKey: ["banners", id],
+    queryKey: ["vouchers", id],
     queryFn: async () => {
-      if (!id) return "";
-      const response = await instance.get(`/banners/${id}`);
-      return response.data.data;
+      try {
+        return await instance.get(`/vouchers/${id}`);
+      } catch (error) {
+        throw new Error("Error");
+      }
     },
-    enabled: !!id,
   });
 
-  useEffect(() => {
-    if (data) {
-      form.setFieldsValue({
-        ...data,
-        start_date: data?.start_date
-          ? dayjs(data?.start_date, "YYYY-MM-DD")
-          : "",
-        end_date: data?.end_date ? dayjs(data?.end_date, "YYYY-MM-DD") : "",
-      });
-    }
-  }, [data, form]);
+  const voucherDetail = data?.data?.data;
 
-  // const createBanner = useMutation({
-  //   mutationFn: bannerCreate,
-  //   onMutate: () => {
-  //     setIsLoading(true);
-  //     setErrors({});
-  //   },
-  //   onSuccess: () => {
-  //     queryClient.invalidateQueries({ queryKey: ["banners"] });
-  //     toast.success("Thêm thành công");
-  //     form.resetFields();
-  //     navigate("/admin/banners");
-  //   },
-  //   onError: (error: any) => {
-  //     setErrors(error.response.data.errors);
-  //     toast.error("Thêm thất bại");
-  //     setIsLoading(false);
-  //   },
-  // });
+  const createVoucher = useMutation({
+    mutationFn: voucherCreate,
+    onMutate: () => {
+      setIsLoading(true);
+      setErrors({});
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["vouchers"] });
+      toast.success("Thêm voucher thành công");
+      form.resetFields();
+      navigate("/admin/vouchers");
+    },
+    onError: (error: any) => {
+      setErrors(error.response.data.errors);
+      toast.error("Thêm voucher thất bại");
+      setIsLoading(false);
+    },
+  });
+
   const location = useLocation();
   const currentPage = location.state?.currentPage || 1;
 
-  const updateBanner = useMutation({
-    mutationFn: (data: IBanner) => bannerUpdate(Number(id), data),
+  const updateVoucher = useMutation({
+    mutationFn: (data: IVouchers) => voucherUpdate(Number(id), data),
     onMutate: () => {
       setIsLoading(true);
       setErrors({});
     },
     onSuccess: () => {
       queryClient.setQueryData(["currentPage"], currentPage);
-
+      queryClient.setQueryData(["vouchers", id], id);
       refetch();
       setIsLoading(false);
-      toast.success("Cập nhật thành công");
-      navigate("/admin/banners");
+      toast.success("Cập nhật voucher thành công");
+      navigate("/admin/vouchers");
     },
     onError: (error: any) => {
       console.error(error);
@@ -91,42 +89,260 @@ const FormVoucher = () => {
       } else {
         setErrors("Đã có lỗi xảy ra, vui lòng thử lại sau.");
       }
-      toast.error("Cập nhật thất bại");
+      toast.error(error.response.data.errors);
       setIsLoading(false);
     },
   });
-
   useEffect(() => {
-    if (data) {
-      form.setFieldsValue({
-        ...data,
-        start_date: data?.start_date
-          ? dayjs(data.start_date, "YYYY-MM-DD")
-          : "",
-        end_date: data?.end_date ? dayjs(data.end_date, "YYYY-MM-DD") : "",
-      });
+    if (voucherDetail) {
+      console.log("voucherDetail", voucherDetail);
+      let metaDataValues = {};
+      const appliesToTotalMeta = voucherDetail?.meta_data?.find(
+        (meta: any) => meta?.meta_key === "_voucher_applies_to_total"
+      );
+
+      const initialVoucherAppliesToTotal = appliesToTotalMeta
+        ? "true"
+        : "false";
+      setVoucher_applies_to_total(initialVoucherAppliesToTotal);
+
+      if (initialVoucherAppliesToTotal === "false") {
+        metaDataValues = voucherDetail?.meta_data?.reduce(
+          (acc: any, meta: any) => {
+            if (
+              meta?.meta_key !== "_voucher_applies_to_total" &&
+              meta?.meta_key &&
+              meta?.meta_value !== undefined
+            ) {
+              // acc[meta.meta_key] = meta.item_names;
+              acc[meta.meta_key] = meta.id;
+            }
+            if (meta?.meta_key === "_voucher_max_discount_amount") {
+              acc[meta.meta_key] = meta.meta_value;
+            }
+            return acc;
+          },
+          {}
+        );
+      }
+
+      console.log("metaDataValues", metaDataValues);
+
+      const initialValues = {
+        ...voucherDetail?.voucher,
+        _voucher_applies_to_total: initialVoucherAppliesToTotal,
+        start_date: dayjs(voucherDetail?.voucher?.start_date),
+        end_date: dayjs(voucherDetail?.voucher?.end_date),
+        discount_value: parseFloat(voucherDetail?.voucher?.discount_value),
+        min_order_value: parseFloat(voucherDetail?.voucher?.min_order_value),
+        ...(initialVoucherAppliesToTotal === "false" ? metaDataValues : {}),
+      };
+
+      form.setFieldsValue(initialValues);
     }
-  }, [data, form]);
+  }, [voucherDetail, form]);
+
+  // useEffect(() => {
+  //   if (voucherDetail) {
+  //     let metaDataValues = {};
+  //     console.log("");
+  //     const appliesToTotalMeta = voucherDetail?.meta_data?.find(
+  //       (meta: any) => meta?.meta_key === "_voucher_applies_to_total"
+  //     );
+
+  //     const initialVoucherAppliesToTotal = appliesToTotalMeta
+  //       ? "true"
+  //       : "false";
+  //     setVoucher_applies_to_total(initialVoucherAppliesToTotal);
+  //     if (initialVoucherAppliesToTotal === "false") {
+  //       metaDataValues = voucherDetail?.meta_data?.reduce(
+  //         (acc: any, meta: any) => {
+  //           if (
+  //             meta?.meta_key !== "_voucher_applies_to_total" &&
+  //             meta?.meta_key &&
+  //             meta?.meta_value !== undefined
+  //           ) {
+  //             acc[meta.meta_key] = meta.item_names;
+  //           }
+  //           if (meta?.meta_key === "_voucher_max_discount_amount") {
+  //             acc[meta.meta_key] = meta.meta_value;
+  //           }
+  //           return acc;
+  //         },
+  //         {}
+  //       );
+  //     }
+
+  //     console.log("metaDataValues", metaDataValues);
+
+  //     const initialValues = {
+  //       ...voucherDetail?.voucher,
+  //       _voucher_applies_to_total: initialVoucherAppliesToTotal,
+  //       start_date: dayjs(voucherDetail?.voucher?.start_date),
+  //       end_date: dayjs(voucherDetail?.voucher?.end_date),
+  //       discount_value: parseFloat(voucherDetail?.voucher?.discount_value),
+  //       min_order_value: parseFloat(voucherDetail?.voucher?.min_order_value),
+  //       ...(initialVoucherAppliesToTotal === "false" ? metaDataValues : {}),
+  //     };
+  //     form.setFieldsValue(initialValues);
+  //   }
+  // }, [voucherDetail, form]);
 
   const onFinish = (value: any) => {
+    console.log("value submit: ", value);
+
     if (value.start_date) {
       value.start_date = value.start_date.format("YYYY-MM-DD");
     } else {
       value.start_date = "";
     }
+
     if (value.end_date) {
       value.end_date = value.end_date.format("YYYY-MM-DD");
     } else {
       value.end_date = "";
     }
 
-    if (id) {
-      updateBanner.mutate(value);
+    let meta = [];
+
+    if (voucher_applies_to_total === "true") {
+      meta = [
+        { meta_key: "_voucher_category_ids", meta_value: "[]" },
+        { meta_key: "_voucher_exclude_category_ids", meta_value: "[]" },
+        { meta_key: "_voucher_product_ids", meta_value: "[]" },
+        { meta_key: "_voucher_exclude_product_ids", meta_value: "[]" },
+        { meta_key: "_voucher_max_discount_amount", meta_value: "0" },
+        { meta_key: "_voucher_applies_to_total", meta_value: "true" },
+      ];
     } else {
-      createBanner.mutate({
+      meta = [{ meta_key: "_voucher_applies_to_total", meta_value: "false" }];
+
+      if (
+        value._voucher_category_ids &&
+        value._voucher_category_ids.length > 0
+      ) {
+        meta.push({
+          meta_key: "_voucher_category_ids",
+          meta_value: JSON.stringify(
+            value._voucher_category_ids.map((item: any) => item.id || item)
+          ),
+        });
+      }
+
+      if (
+        value._voucher_exclude_category_ids &&
+        value._voucher_exclude_category_ids.length > 0
+      ) {
+        meta.push({
+          meta_key: "_voucher_exclude_category_ids",
+          meta_value: JSON.stringify(
+            value._voucher_exclude_category_ids.map(
+              (item: any) => item.id || item
+            )
+          ),
+        });
+      }
+
+      if (value._voucher_product_ids && value._voucher_product_ids.length > 0) {
+        meta.push({
+          meta_key: "_voucher_product_ids",
+          meta_value: JSON.stringify(
+            value._voucher_product_ids.map((item: any) => item.id || item)
+          ),
+        });
+      }
+
+      if (
+        value._voucher_exclude_product_ids &&
+        value._voucher_exclude_product_ids.length > 0
+      ) {
+        meta.push({
+          meta_key: "_voucher_exclude_product_ids",
+          meta_value: JSON.stringify(
+            value._voucher_exclude_product_ids.map(
+              (item: any) => item.id || item
+            )
+          ),
+        });
+      }
+
+      if (value._voucher_max_discount_amount) {
+        meta.push({
+          meta_key: "_voucher_max_discount_amount",
+          meta_value: value._voucher_max_discount_amount || 0,
+        });
+      }
+    }
+    console.log("meta after processing: ", meta);
+
+    if (id) {
+      console.log("update:", value);
+      console.log("meta kiểm tra:", meta);
+      updateVoucher.mutate({ ...value, meta });
+    } else {
+      createVoucher.mutate({
         ...value,
+        meta,
       });
     }
+  };
+
+  const validateSelectedCategories =
+    (inputName: any, otherInputName: any) => (_: any, value: any) => {
+      const otherSelectedCategories = form.getFieldValue(otherInputName) || [];
+
+      const duplicateCategoryIds =
+        value?.filter((categoryId: any) =>
+          otherSelectedCategories.includes(categoryId)
+        ) || [];
+
+      if (duplicateCategoryIds.length > 0) {
+        const duplicateCategoryNames = duplicateCategoryIds
+          .map(
+            (id: any) =>
+              listCategories.find((category: any) => category.id === id)?.name
+          )
+          .filter(Boolean)
+          .join(", ");
+
+        return Promise.reject(
+          `Danh mục ${duplicateCategoryNames} đã được chọn ở ô input khác`
+        );
+      }
+
+      return Promise.resolve();
+    };
+
+  const validateSelectedProducts =
+    (inputName: any, otherInputName: any) => (_: any, value: any) => {
+      const otherSelectedProducts = form.getFieldValue(otherInputName) || [];
+
+      const duplicateProductIds =
+        value?.filter((productId: any) =>
+          otherSelectedProducts.includes(productId)
+        ) || [];
+
+      if (duplicateProductIds.length > 0) {
+        const duplicateProductNames = duplicateProductIds
+          .map(
+            (id: any) =>
+              listProducts?.data?.find((product: any) => product.id === id)
+                ?.name
+          )
+          .filter(Boolean)
+          .join(", ");
+
+        // Return the error message
+        return Promise.reject(
+          `Sản phẩm ${duplicateProductNames} đã được chọn ở ô input khác`
+        );
+      }
+
+      return Promise.resolve();
+    };
+
+  const handleRadioChange = (e: any) => {
+    setVoucher_applies_to_total(e.target.value);
   };
 
   return (
@@ -140,16 +356,7 @@ const FormVoucher = () => {
       {isFetching ? (
         <Skeleton />
       ) : (
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={onFinish}
-          initialValues={{
-            ...data,
-            start_date: data?.start_date ? dayjs(data.start_date) : "",
-            end_date: data?.end_date ? dayjs(data.end_date) : "",
-          }}
-        >
+        <Form form={form} layout="vertical" onFinish={onFinish}>
           <Form.Item name="title" label="Tên voucher">
             <Input placeholder="Tên voucher" />
           </Form.Item>
@@ -163,76 +370,189 @@ const FormVoucher = () => {
           ) : (
             ""
           )}
-
-          <Form.Item label="Giá trị sẽ giảm" name="discount_value">
+          <Form.Item
+            className="ml-[30px]"
+            label="Loại giảm giá"
+            name="discount_type"
+          >
+            <Select placeholder="Chọn">
+              <Select.Option value="fixed">
+                Giảm theo giá trị tuyệt đối (VNĐ)
+              </Select.Option>
+              <Select.Option value="percent">
+                Giảm theo giá trị tương đối (%)
+              </Select.Option>
+            </Select>
+            {errors.discount_type && (
+              <div className=" mt-2 text-red-600">{errors.discount_type}</div>
+            )}
+          </Form.Item>
+          <Form.Item name="discount_value" label="Giá trị sẽ giảm">
             <Input />
           </Form.Item>
-          {errors.discount_value && (
-            <div className="text-red-600">{errors.discount_value}</div>
+          {errors ? (
+            <div className=" text-red-600">{errors.discount_value}</div>
+          ) : (
+            ""
           )}
-
-          <Form.Item label="Đơn vị giảm giá" name="discount_type">
-            <Select placeholder="Chọn">
-              <Option value="fixed">VNĐ</Option>
-              <Option value="percent">%</Option>
-            </Select>
-          </Form.Item>
-          {errors.discount_type && (
-            <div className="text-red-600">{errors.discount_type}</div>
-          )}
-
           <Form.Item label="Giá trị đơn hàng tối thiểu" name="min_order_value">
             <Input />
           </Form.Item>
           {errors.min_order_value && (
             <div className="text-red-600">{errors.min_order_value}</div>
           )}
+
           <Form.Item label="Số lượng voucher" name="usage_limit">
             <Input />
           </Form.Item>
           {errors.usage_limit && (
             <div className="text-red-600">{errors.usage_limit}</div>
           )}
-          <p>Đối tượng giảm giá: </p>
 
-          <Form.Item label="Danh mục" name="_voucher_category_ids">
-            <Select
-              size="large"
-              allowClear={false}
-              // value={selectedAttributeChildren}
-              options={
-                listCategories?.map((item: any) => ({
-                  value: item.id,
-                  label: item.name,
-                })) || []
-              }
-              mode="multiple"
-              // onChange={handleChangeAttributeChildren}
-            />
+          <Form.Item name="_voucher_applies_to_total">
+            <Radio.Group
+              onChange={handleRadioChange}
+              value={voucher_applies_to_total}
+            >
+              <Radio value="true">Áp dụng cho tất cả đơn hàng</Radio>
+              <Radio value="false">Áp dụng cho từng mục...</Radio>
+            </Radio.Group>
           </Form.Item>
-          {errors._voucher_category_ids && (
-            <div className="text-red-600">{errors._voucher_category_ids}</div>
+
+          {voucher_applies_to_total === "false" && (
+            <>
+              <Form.Item
+                label="Danh mục"
+                name="_voucher_category_ids"
+                rules={[
+                  {
+                    validator: validateSelectedCategories(
+                      "_voucher_category_ids",
+                      "_voucher_exclude_category_ids"
+                    ),
+                  },
+                ]}
+              >
+                <Select
+                  size="large"
+                  allowClear={false}
+                  options={
+                    listCategories?.map((item: any) => ({
+                      value: item.id,
+                      label: item.name,
+                    })) || []
+                  }
+                  mode="multiple"
+                  onChange={() =>
+                    form.validateFields(["_voucher_exclude_category_ids"])
+                  }
+                />
+              </Form.Item>
+
+              <Form.Item
+                label="Loại trừ danh mục"
+                name="_voucher_exclude_category_ids"
+                rules={[
+                  {
+                    validator: validateSelectedCategories(
+                      "_voucher_exclude_category_ids",
+                      "_voucher_category_ids"
+                    ),
+                  },
+                ]}
+              >
+                <Select
+                  size="large"
+                  allowClear={false}
+                  options={
+                    listCategories?.map((item: any) => ({
+                      value: item.id,
+                      label: item.name,
+                    })) || []
+                  }
+                  // value={}
+                  mode="multiple"
+                  onChange={() =>
+                    form.validateFields(["_voucher_category_ids"])
+                  }
+                />
+              </Form.Item>
+
+              <Form.Item
+                label="Sản phẩm"
+                name="_voucher_product_ids"
+                rules={[
+                  {
+                    validator: validateSelectedProducts(
+                      "_voucher_product_ids",
+                      "_voucher_exclude_product_ids"
+                    ),
+                  },
+                ]}
+              >
+                <Select
+                  size="large"
+                  allowClear={false}
+                  options={
+                    listProducts?.data?.map((item: any) => ({
+                      value: item.id,
+                      label: item.name,
+                    })) || []
+                  }
+                  mode="multiple"
+                  onChange={() =>
+                    form.validateFields(["_voucher_exclude_product_ids"])
+                  }
+                />
+              </Form.Item>
+
+              <Form.Item
+                label="Loại trừ sản phẩm"
+                name="_voucher_exclude_product_ids"
+                rules={[
+                  {
+                    validator: validateSelectedProducts(
+                      "_voucher_exclude_product_ids",
+                      "_voucher_product_ids"
+                    ),
+                  },
+                ]}
+              >
+                <Select
+                  size="large"
+                  allowClear={false}
+                  options={
+                    listProducts?.data?.map((item: any) => ({
+                      value: item.id,
+                      label: item.name,
+                    })) || []
+                  }
+                  mode="multiple"
+                  onChange={() => form.validateFields(["_voucher_product_ids"])}
+                />
+              </Form.Item>
+
+              <Form.Item
+                label="Số tiền giảm giá tối đa"
+                name="_voucher_max_discount_amount"
+                rules={[
+                  {
+                    required: false,
+                    validator: (_, value) => {
+                      if (value && (isNaN(value) || Number(value) < 0)) {
+                        return Promise.reject(
+                          "The voucher max discount amount field must be an integer and at least 1."
+                        );
+                      }
+                      return Promise.resolve();
+                    },
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+            </>
           )}
-
-          {/*           
-          <Form.Item label="Sản phẩm" name="_voucher_product_ids">
-            <Select
-              size="large"
-              allowClear={false}
-              // value={selectedAttributeChildren}
-              options={
-                listCategories?.map((item: any) => ({
-                  value: item.id,
-                  label: item.name,
-                })) || []
-              }
-              mode="multiple"
-              // onChange={handleChangeAttributeChildren}
-            />
-          </Form.Item>
-          {errors._voucher_category_ids && (
-            <div className="text-red-600">{errors._voucher_category_ids}</div>
-          )} */}
 
           <Form.Item label="Ngày bắt đầu" name="start_date">
             <DatePicker format="DD/MM/YYYY" placeholder="Chọn" />

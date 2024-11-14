@@ -714,6 +714,9 @@ const ProductForm = () => {
                                     />
                                 )}
                             </Form.Item>
+
+
+                            
                             {attribute === 0 && <>
                                 <Form.Item name="price_regular" label="Price Regular" className="col-span-1">
                                     <InputNumber size='large' />

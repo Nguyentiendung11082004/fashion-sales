@@ -44,11 +44,11 @@ const BannersForm = () => {
       form.setFieldsValue({
         ...data,
         start_date: data?.start_date
-          ? dayjs(data?.start_date, "YYYY-MM-DD")
+          ? dayjs(data.start_date, "YYYY-MM-DD")
           : "",
-        end_date: data?.end_date ? dayjs(data?.end_date, "YYYY-MM-DD") : "",
+        end_date: data?.end_date ? dayjs(data.end_date, "YYYY-MM-DD") : "",
       });
-      setUrlImage(data.image);
+      setUrlImage(data?.image);
     }
   }, [data, form]);
 
@@ -81,7 +81,6 @@ const BannersForm = () => {
     },
     onSuccess: () => {
       queryClient.setQueryData(["currentPage"], currentPage);
-
       refetch();
       setIsLoading(false);
       toast.success("Cập nhật thành công");
@@ -115,19 +114,6 @@ const BannersForm = () => {
       }
     },
   };
-
-  useEffect(() => {
-    if (data) {
-      form.setFieldsValue({
-        ...data,
-        start_date: data?.start_date
-          ? dayjs(data.start_date, "YYYY-MM-DD")
-          : "",
-        end_date: data?.end_date ? dayjs(data.end_date, "YYYY-MM-DD") : "",
-      });
-      setUrlImage(data?.image);
-    }
-  }, [data, form]);
 
   const onFinish = (value: any) => {
     if (value.start_date) {

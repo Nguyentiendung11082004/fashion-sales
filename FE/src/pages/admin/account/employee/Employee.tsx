@@ -28,7 +28,7 @@ const EmployeePage = () => {
     queryKey: ["employees"],
     queryFn: getEmployees,
   });
-  console.log("data employees",data);
+  console.log("data employees", data);
 
   const { mutate } = useMutation({
     mutationFn: deleteEmployee,
@@ -115,11 +115,10 @@ const EmployeePage = () => {
       },
     },
     {
-      title: "Create At",
-      dataIndex: "create_at",
-      render: (create_at: string) => {
-        const date = dayjs(create_at);
-        return date.isValid() ? date.format("DD/MM/YYYY HH:mm:ss") : "N/A";
+      title: "Chức vụ",
+      dataIndex: "role_id",
+      render: (role: number) => {
+        return role === 3 ? "Shipper" : "MemberShip";
       },
     },
     {
