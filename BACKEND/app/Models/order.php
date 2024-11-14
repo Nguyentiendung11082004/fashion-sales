@@ -26,6 +26,7 @@ class Order extends Model
         'ship_user_address',
         'voucher_id',
         'voucher_discount',
+        'return_notes'
     ];
     // Order status constants
     const STATUS_PENDING = 'Đang chờ xác nhận';
@@ -33,7 +34,6 @@ class Order extends Model
     const STATUS_FAILED = 'Giao hàng thất bại';
     const STATUS_SUCCESS = 'Giao hàng thành công';
     const STATUS_CANCELED = 'Đã hủy';
-
     const STATUS_RETURNED = 'Trả hàng';
 
     // Payment status constants
