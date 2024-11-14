@@ -636,6 +636,11 @@ class OrderController extends Controller
             if ($voucher->discount_type == 'percent') {
                 $voucher_discount = ($voucher->discount_value / 100) * $sub_total;
                 $voucher_description = "{$voucher->discount_value} percent";
+                if (isset($voucher_metas['_voucher_max_discount_amount']) && $voucher_metas['_voucher_max_discount_amount']) {
+                    if ($voucher_metas['_voucher_max_discount_amount'] < $voucher_discount) {
+                        $voucher_discount = $voucher_metas['_voucher_max_discount_amount'];
+                    }
+                }
             } elseif ($voucher->discount_type == 'fixed') {
                 $voucher_discount = min($voucher->discount_value, $sub_total);
                 $voucher_description = "{$voucher->discount_value} fixed";
@@ -643,7 +648,7 @@ class OrderController extends Controller
             return ['total_discount' => $voucher_discount, 'voucher_description' => $voucher_description];
         }
 
-        foreach ($eligible_products as &$item) {
+        foreach ($eligible_products as $item) {
             $item_discount = $voucher->discount_type == 'percent'
                 ? ($voucher->discount_value / 100) * $item['total_price']
                 : min($voucher->discount_value, $item['total_price']);
@@ -655,33 +660,33 @@ class OrderController extends Controller
         return ['total_discount' => $voucher_discount, 'voucher_description' => "{$voucher->discount_value} " . $voucher->discount_type];
     }
     function getUser($data)
-{
-    if (auth('sanctum')->check()) {
-        $user_id = auth('sanctum')->id();
-    } else {
-        if (!isset($data['ship_user_email'])) {
-            throw new \Exception('Vui lòng cung cấp email giao hàng', Response::HTTP_BAD_REQUEST);
-        }
-        $existingUser = User::where('email', $data['ship_user_email'])->first();
-
-        if ($existingUser) {
-            throw new \Exception('Email đã tồn tại', Response::HTTP_BAD_REQUEST);
+    {
+        if (auth('sanctum')->check()) {
+            $user_id = auth('sanctum')->id();
         } else {
-            $user = User::create([
-                'name' => $data['ship_user_name'],
-                'email' => $data['ship_user_email'],
-                'password' => bcrypt('12345678'),
-                'address' => $data['ship_user_address'],
-                'phone_number' => $data['ship_user_phonenumber'],
-                'role_id' => 1,
-                'is_active' => 0,
-            ]);
-            $user_id = $user->id;
-        }
-    }
+            if (!isset($data['ship_user_email'])) {
+                throw new \Exception('Vui lòng cung cấp email giao hàng', Response::HTTP_BAD_REQUEST);
+            }
+            $existingUser = User::where('email', $data['ship_user_email'])->first();
 
-    return User::findOrFail($user_id)->only(['id', 'name', 'email', 'address', 'phone_number']);
-}
+            if ($existingUser) {
+                throw new \Exception('Email đã tồn tại', Response::HTTP_BAD_REQUEST);
+            } else {
+                $user = User::create([
+                    'name' => $data['ship_user_name'],
+                    'email' => $data['ship_user_email'],
+                    'password' => bcrypt('12345678'),
+                    'address' => $data['ship_user_address'],
+                    'phone_number' => $data['ship_user_phonenumber'],
+                    'role_id' => 1,
+                    'is_active' => 0,
+                ]);
+                $user_id = $user->id;
+            }
+        }
+
+        return User::findOrFail($user_id)->only(['id', 'name', 'email', 'address', 'phone_number']);
+    }
 
     protected function createOrder($data, $user)
     {
