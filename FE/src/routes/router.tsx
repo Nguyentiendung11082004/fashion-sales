@@ -44,7 +44,7 @@ const BannersForm = lazy(() => import("@/pages/admin/banners/components/BannersF
 const Posts = lazy(() => import("@/pages/admin/posts/Posts"));
 const FormPost = lazy(() => import("@/pages/admin/posts/components/FormPost"));
 const Chatbox = lazy(() => import("@/pages/admin/chatbox/Chatbox"));
-const CommentPage = lazy(() => import("@/pages/admin/comments/Comments"));
+// const CommentPage = lazy(() => import("@/pages/admin/comments/Comments"));
 
 const Router = () => {
   return (
