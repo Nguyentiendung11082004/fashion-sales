@@ -13,7 +13,7 @@ import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 const Account = () => {
   const { user, urlImage, setUrlImage } = useUser();
-  const dataUser = user?.["Infor User"];
+  const dataUser = user?.InforUser;
   const { token } = useAuth();
   const queryClient = useQueryClient();
   const [newAvatar, setNewAvatar] = useState<string | null>(null);
@@ -188,10 +188,10 @@ const Account = () => {
               <Link to="account.html" className="hd-account-menu-item">
                 Thông tin tài khoản
               </Link>
-              <Link to="#" className="hd-account-menu-item">
+              <Link to="/wishlist" className="hd-account-menu-item">
                 Yêu thích
               </Link>
-              <Link to="history-order.html" className="hd-account-menu-item">
+              <Link to="/history-order" className="hd-account-menu-item">
                 Lịch sử mua hàng
               </Link>
               <Link

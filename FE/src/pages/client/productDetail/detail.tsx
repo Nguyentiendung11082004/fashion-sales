@@ -15,7 +15,7 @@ import {
   productShow_client,
 } from "@/services/api/client/productClient.api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Button, Popconfirm, Skeleton } from "antd";
+import { Button, Popconfirm} from "antd";
 import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import Less from "../../../components/icons/detail/Less";
@@ -24,6 +24,7 @@ import RelatedProducts from "./RelatedProducts";
 import instance from "@/configs/axios";
 import { toast } from "react-toastify";
 import ReplyComment from "./ReplyComment";
+import Loading from "@/common/Loading/Loading";
 
 interface IinitialAttributes {
   [key: string]: string;
@@ -441,7 +442,7 @@ const ProductDetail = () => {
     }
   };
 
-  if (isLoading) return <Skeleton className="container py-10 lg:flex" />;
+  if (isLoading) return <Loading />;
   // if (isError) return <p>{error.message}</p>;
 
   return (

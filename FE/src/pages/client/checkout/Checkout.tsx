@@ -1,6 +1,9 @@
 import Loading from "@/common/Loading/Loading";
 import { useAuth } from "@/common/context/Auth/AuthContext";
+import { useUser } from "@/common/context/User/UserContext";
+import { IAddresses } from "@/common/types/addressO";
 import { FormatMoney } from "@/common/utils/utils";
+import AddressPopup from "@/components/ModalPopup/AddressPopup";
 import CheckoutIcon22 from "@/components/icons/checkout/CheckoutIcon22";
 import Completed from "@/components/icons/checkout/Completed";
 import Map from "@/components/icons/checkout/Map";
@@ -14,36 +17,55 @@ import { toast } from "react-toastify";
 const Checkout = () => {
   const { Option } = Select;
   const { token } = useAuth();
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
   const location = useLocation();
   const navigate = useNavigate();
-  const savedCartIds = localStorage.getItem('cartIds');
-  const cartIds = location.state?.cartIds || (savedCartIds ? JSON.parse(savedCartIds) : []);
-  const _payload = location.state?._payload
-  console.log("_payload", _payload)
-  const [idTinh, setIdTinh] = useState<number | null>(0)
-  const [idQuanHuyen, setIdQuanHuyen] = useState<number | null>(0)
-  const [idXa, setIdXa] = useState<number | null>(0)
-  const [paymentMethhod, setPaymentMethod] = useState('1');
-  const [shiping, setShipPing] = useState('1');
+  const savedCartIds = localStorage.getItem("cartIds");
+  const cartIds =
+    location.state?.cartIds || (savedCartIds ? JSON.parse(savedCartIds) : []);
+  const _payload = location.state?._payload;
+  console.log("_payload", _payload);
+  const [idTinh, setIdTinh] = useState<number | null>(0);
+  const [idQuanHuyen, setIdQuanHuyen] = useState<number | null>(0);
+  const [idXa, setIdXa] = useState<number | null>(0);
+  const [paymentMethhod, setPaymentMethod] = useState("1");
+  const [shiping, setShipPing] = useState("1");
   const [voucher, setVoucher] = useState<any>();
   const [subTotal, setSubTotal] = useState(); // giá khi áp dụng voucher
   const [totalDiscount, setTotalDiscount] = useState();
   const [dataCheckout, setDataCheckout] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true); // Trạng thái loading
+  const { user } = useUser();
+  const dataUser = user?.InforUser;
+  const [addressInfor, setAddressInfor] = useState({});
+  const [confirmedAddress, setConfirmedAddress] = useState<IAddresses | null>(
+    null
+  );
+  const [visiable, setVisible] = useState(false);
+  const handleOpenSeeMore = () => {
+    setVisible(true);
+    setAddressInfor(dataUser);
+  };
+  const closeModal = () => {
+    setVisible(false);
+  };
 
   const mutationVoucher = useMutation({
     mutationFn: async () => {
-      const res = await instance.post(`/checkout`, {
-        cart_item_ids: cartIds,
-        voucher_code: voucher,
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const res = await instance.post(
+        `/checkout`,
+        {
+          cart_item_ids: cartIds,
+          voucher_code: voucher,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-      });
-      setTotalDiscount(res?.data?.total_discount)
-      setSubTotal(res?.data?.sub_total)
+      );
+      setTotalDiscount(res?.data?.total_discount);
+      setSubTotal(res?.data?.sub_total);
       return res.data;
     },
   });
@@ -58,19 +80,22 @@ const Checkout = () => {
 
   const qty = dataCheckout?.order_items?.map((e: any) => e?.quantity);
   const cartItemIds = dataCheckout?.order_items?.map((e: any) => e);
-  const quantityOfCart = cartItemIds?.reduce((acc: any, id: any, index: number) => {
-    acc[id] = qty[index];
-    return acc;
-  }, {});
+  const quantityOfCart = cartItemIds?.reduce(
+    (acc: any, id: any, index: number) => {
+      acc[id] = qty[index];
+      return acc;
+    },
+    {}
+  );
 
   const defaultOrder = {
     payment_method_id: 1,
     payment_status: "pending",
     user_note: "",
-    ship_user_email: '',
-    ship_user_name: '',
-    ship_user_phonenumber: '',
-    ship_user_address: '',
+    ship_user_email: "",
+    ship_user_name: "",
+    ship_user_phonenumber: "",
+    ship_user_address: "",
     shipping_method: shiping,
     voucher_code: voucher,
     // id_product: _payload.id_product,
@@ -78,7 +103,6 @@ const Checkout = () => {
     // quantity: _payload.quantity
     cart_item_ids: cartIds || [],
     quantityOfCart: quantityOfCart || {},
-
   };
 
   const [order, setOrder] = useState(defaultOrder);
@@ -86,10 +110,10 @@ const Checkout = () => {
     if (dataCheckout && dataCheckout.user) {
       setOrder((prevOrder) => ({
         ...prevOrder,
-        ship_user_email: dataCheckout.user.email || '',
-        ship_user_name: dataCheckout.user.name || '',
-        ship_user_phonenumber: dataCheckout.user.phone_number || '',
-        ship_user_address: dataCheckout.user.address || '',
+        ship_user_email: dataCheckout.user.email || "",
+        ship_user_name: dataCheckout.user.name || "",
+        ship_user_phonenumber: dataCheckout.user.phone_number || "",
+        ship_user_address: dataCheckout.user.address || "",
         quantityOfCart: quantityOfCart,
       }));
     }
@@ -98,7 +122,7 @@ const Checkout = () => {
   const setForm = (props: any, value: any) => {
     setOrder((prev) => ({
       ...prev,
-      [props]: value
+      [props]: value,
     }));
   };
 
@@ -107,26 +131,26 @@ const Checkout = () => {
       const res = await instance.post(`/order`, order, {
         headers: {
           Authorization: `Bearer ${token}`,
-        }
+        },
       });
       return res?.data;
     },
     onSuccess: (data: any) => {
       if (data.payment_url) {
         window.location.href = data?.payment_url;
-        localStorage.removeItem('checkedItems');
+        localStorage.removeItem("checkedItems");
       } else {
-        navigate('/thank');
+        navigate("/thank");
         queryClient.invalidateQueries({
-          queryKey: ['cart']
+          queryKey: ["cart"],
         });
-        localStorage.removeItem('checkedItems');
+        localStorage.removeItem("checkedItems");
       }
-      localStorage.removeItem('checkedItems');
+      localStorage.removeItem("checkedItems");
     },
     onError: (error: any) => {
       toast.error(error?.response?.data?.message);
-    }
+    },
   });
 
   const handleOrder = () => {
@@ -135,11 +159,11 @@ const Checkout = () => {
 
   // Xử lý tỉnh thành, quận huyện, phường xã
   const { data: tinhThanh } = useQuery({
-    queryKey: ['tinhThanh'],
+    queryKey: ["tinhThanh"],
     queryFn: async () => {
       const res = await instance.get(`/getprovinces`);
       return res.data;
-    }
+    },
   });
 
   const handleChangeTinh = (e: any) => {
@@ -161,21 +185,23 @@ const Checkout = () => {
   };
 
   const { data: quanHuyen } = useQuery<any>({
-    queryKey: ['quanHuyen', idTinh],
+    queryKey: ["quanHuyen", idTinh],
     queryFn: async () => {
       const res = await instance.post(`/getdistricts`, { province_id: idTinh });
       return res?.data;
     },
-    enabled: !!tinhThanh
+    enabled: !!tinhThanh,
   });
 
   const { data: phuongXa } = useQuery({
-    queryKey: ['phuongXa', idQuanHuyen],
+    queryKey: ["phuongXa", idQuanHuyen],
     queryFn: async () => {
-      const res = await instance.post(`/getwards`, { district_id: idQuanHuyen });
+      const res = await instance.post(`/getwards`, {
+        district_id: idQuanHuyen,
+      });
       return res.data;
     },
-    enabled: !!quanHuyen
+    enabled: !!quanHuyen,
   });
 
   const handleVoucher = () => {
@@ -186,36 +212,35 @@ const Checkout = () => {
     if (!_payload) {
       return;
     }
-  })
+  });
   useEffect(() => {
     const fetchData = async () => {
       const payload = { cart_item_ids: cartIds };
       try {
-        const response = await fetch('http://127.0.0.1:8000/api/v1/checkout', {
-          method: 'POST',
+        const response = await fetch("http://127.0.0.1:8000/api/v1/checkout", {
+          method: "POST",
           headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+            Accept: "application/json",
           },
           body: JSON.stringify(payload),
         });
 
         if (!response.ok) {
-          throw new Error('Network response was not ok');
+          throw new Error("Network response was not ok");
         }
         const data = await response.json();
         setDataCheckout(data);
         setIsLoading(false);
       } catch (error) {
-        console.error('Error:', error);
+        console.error("Error:", error);
         setIsLoading(false);
       }
     };
 
     if (cartIds && cartIds.length > 0) {
       fetchData();
-
     }
   }, [cartIds, token, _payload]);
   // console.log(loading,"loading")
@@ -241,8 +266,9 @@ const Checkout = () => {
         {/*end hd-page-head*/}
         <div className="hd-CheckoutPage">
           <main className="container py-16 lg:pb-28 lg:pt-20">
-            {
-              isLoading ? <Loading /> : 
+            {isLoading ? (
+              <Loading />
+            ) : (
               <div className="flex flex-col lg:flex-row">
                 <div className="flex-1">
                   <div className="space-y-8">
@@ -259,17 +285,36 @@ const Checkout = () => {
                               </span>
                               <Completed />
                             </h3>
-                            <div className="font-semibold mt-1 text-sm">
-                              <span>{dataCheckout?.user?.name}</span>
-                              <span className="ml-3 tracking-tighter">
-                                {dataCheckout?.user?.phone_number}
-                              </span>
-                            </div>
-                            <div className="mt-2">
-                              Miêu Nha, Tây Mỗ ,Nam Từ Liêm , Hà Nội
-                            </div>
+                            {confirmedAddress ? (
+                              <div>
+                                <div className="font-semibold mt-1 text-sm">
+                                  {confirmedAddress.label} <span>|</span>
+                                  <span className="ml-2 tracking-tighter">
+                                    {confirmedAddress.phone}
+                                  </span>
+                                </div>
+                                <div className="mt-2">
+                                  {confirmedAddress.address},{" "}
+                                  {confirmedAddress.ward},{" "}
+                                  {confirmedAddress.district},{" "}
+                                  {confirmedAddress.city}
+                                </div>
+                              </div>
+                            ) : (
+                              <div>
+                                <div className="font-semibold mt-1 text-sm">
+                                  {dataUser.name} <span>|</span>
+                                  <span className="ml-2 tracking-tighter">
+                                    {dataUser.phone_number}
+                                  </span>
+                                </div>
+                                <div className="mt-2">{dataUser.address}</div>
+                              </div>
+                            )}
                           </div>
-                          <button className="py-2 px-4 bg-slate-50 hover:bg-slate-100 mt-5 sm:mt-0 sm:ml-auto text-sm font-medium rounded-lg">
+                          <button
+                            className="py-2 px-4 bg-slate-50 hover:bg-slate-100 mt-5 sm:mt-0 sm:ml-auto text-sm font-medium rounded-lg"
+                          >
                             Thay đổi
                           </button>
                         </div>
@@ -329,7 +374,6 @@ const Checkout = () => {
                     {/*end ContactInfo*/}
                     <div id="hd-ShippingAddress" className="scroll-mt-24">
                       <div className="border border-slate-200 rounded-xl">
-
                         {/*end hd-top-ShippingAddress*/}
                         <div className="hd-body-ShippingAddress border-t border-slate-200 px-6 py-7 space-y-4 sm:space-y-6 block">
                           {/* <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
@@ -378,7 +422,6 @@ const Checkout = () => {
                                 placeholder="Nhập họ và tên"
                               />
                             </div>
-
                           </div>
                           <div className="sm:flex space-y-4 sm:space-y-0 sm:space-x-3">
                             <div className="flex-1">
@@ -388,19 +431,15 @@ const Checkout = () => {
                               >
                                 Shiping
                               </label>
-                              <Select onChange={handleChangeShiping} className="hd-Select  outline-0 h-11 mt-1.5 block w-full text-sm rounded-2xl border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:bg-neutral-50 dark:focus:ring-primary-6000 dark:focus:ring-opacity-25">
-                                <Option value="1">
-                                  Tiêu chuẩn
-                                </Option>
-                                <Option value="2">
-                                  Hoả tốc
-                                </Option>
-                                <Option value="3">
-                                  Nhận tại cửa hàng
-                                </Option>
+                              <Select
+                                onChange={handleChangeShiping}
+                                className="hd-Select  outline-0 h-11 mt-1.5 block w-full text-sm rounded-2xl border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:bg-neutral-50 dark:focus:ring-primary-6000 dark:focus:ring-opacity-25"
+                              >
+                                <Option value="1">Tiêu chuẩn</Option>
+                                <Option value="2">Hoả tốc</Option>
+                                <Option value="3">Nhận tại cửa hàng</Option>
                               </Select>
                             </div>
-
                           </div>
 
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
@@ -414,15 +453,14 @@ const Checkout = () => {
                               <Select
                                 onChange={handleChangeTinh}
                                 // showSearch
-                                className="hd-Select  outline-0 h-11 mt-1.5 block w-full text-sm rounded-2xl border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:bg-neutral-50 dark:focus:ring-primary-6000 dark:focus:ring-opacity-25">
-                                {
-                                  tinhThanh?.provinces?.map((e: any) => (
-                                    <Option value={e?.ProvinceID}>{e?.ProvinceName}</Option>
-                                  ))
-                                }
-
+                                className="hd-Select  outline-0 h-11 mt-1.5 block w-full text-sm rounded-2xl border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:bg-neutral-50 dark:focus:ring-primary-6000 dark:focus:ring-opacity-25"
+                              >
+                                {tinhThanh?.provinces?.map((e: any) => (
+                                  <Option value={e?.ProvinceID}>
+                                    {e?.ProvinceName}
+                                  </Option>
+                                ))}
                               </Select>
-
                             </div>
                             <div>
                               <label
@@ -433,12 +471,16 @@ const Checkout = () => {
                               </label>
                               <Select
                                 onChange={handleChangeXa}
-                                className="hd-Select outline-0 h-11 mt-1.5 block w-full text-sm rounded-2xl border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:bg-neutral-50 dark:focus:ring-primary-6000 dark:focus:ring-opacity-25">
-                                {
-                                  phuongXa?.wards?.map((e: any) => (
-                                    <Option key={e?.WardCode} value={`${e?.WardCode}`}>{e?.WardName}</Option>
-                                  ))
-                                }
+                                className="hd-Select outline-0 h-11 mt-1.5 block w-full text-sm rounded-2xl border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:bg-neutral-50 dark:focus:ring-primary-6000 dark:focus:ring-opacity-25"
+                              >
+                                {phuongXa?.wards?.map((e: any) => (
+                                  <Option
+                                    key={e?.WardCode}
+                                    value={`${e?.WardCode}`}
+                                  >
+                                    {e?.WardName}
+                                  </Option>
+                                ))}
                               </Select>
                             </div>
                           </div>
@@ -450,14 +492,18 @@ const Checkout = () => {
                               >
                                 Quận/Huyện
                               </label>
-                              <Select onChange={handleChangeQuanHuyen} className="hd-Select  outline-0 h-11 mt-1.5 block w-full text-sm rounded-2xl border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:bg-neutral-50 dark:focus:ring-primary-6000 dark:focus:ring-opacity-25">
-                                {
-                                  quanHuyen?.districts?.map((quan: any) => (
-                                    <Option key={quan.DistrictID} value={quan.DistrictID}>
-                                      {quan.DistrictName}
-                                    </Option>
-                                  ))
-                                }
+                              <Select
+                                onChange={handleChangeQuanHuyen}
+                                className="hd-Select  outline-0 h-11 mt-1.5 block w-full text-sm rounded-2xl border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:bg-neutral-50 dark:focus:ring-primary-6000 dark:focus:ring-opacity-25"
+                              >
+                                {quanHuyen?.districts?.map((quan: any) => (
+                                  <Option
+                                    key={quan.DistrictID}
+                                    value={quan.DistrictID}
+                                  >
+                                    {quan.DistrictName}
+                                  </Option>
+                                ))}
                                 <option value=""></option>
                               </Select>
                             </div>
@@ -471,7 +517,9 @@ const Checkout = () => {
                               <input
                                 className="block w-full outline-0 border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50 focus:border-neutral-200 rounded-2xl font-normal h-11 px-4 py-3 mt-1.5"
                                 type="text"
-                                onChange={(e) => setForm("ship_user_address", e.target.value)}
+                                onChange={(e) =>
+                                  setForm("ship_user_address", e.target.value)
+                                }
                               />
                             </div>
                           </div>
@@ -486,13 +534,13 @@ const Checkout = () => {
                               <input
                                 className="block w-full outline-0 border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50 focus:border-neutral-200 rounded-2xl font-normal h-11 px-4 py-3 mt-1.5"
                                 type="text"
-                                onChange={(e) => setForm("user_note", e.target.value)}
+                                onChange={(e) =>
+                                  setForm("user_note", e.target.value)
+                                }
                                 placeholder="Ghi chú"
                               />
                             </div>
-
                           </div>
-
                         </div>
                         {/*end hd-body-ShippingAddress*/}
                       </div>
@@ -514,8 +562,8 @@ const Checkout = () => {
                             defaultValue="Address-type-home"
                             defaultChecked
                             name="Address-type"
-                            value={'1'}
-                            checked={paymentMethhod == '1'}
+                            value={"1"}
+                            checked={paymentMethhod == "1"}
                             onChange={handleChangeMethod}
                           />
                           <label
@@ -524,7 +572,6 @@ const Checkout = () => {
                           >
                             <span className="text-sm font-medium">
                               Thanh toán khi nhận hàng
-
                             </span>
                           </label>
                         </div>
@@ -535,8 +582,8 @@ const Checkout = () => {
                             type="radio"
                             defaultValue="Address-type-office"
                             name="Address-type"
-                            value={'2'}
-                            checked={paymentMethhod == '2'}
+                            value={"2"}
+                            checked={paymentMethhod == "2"}
                             onChange={handleChangeMethod}
                           />
                           <label
@@ -557,8 +604,9 @@ const Checkout = () => {
                 <div className="flex-shrink-0 border-t lg:border-t-0 lg:border-l border-slate-200 my-10 lg:my-0 lg:mx-10 xl:lg:mx-14 2xl:mx-16" />
                 <div className="w-full lg:w-[36%]">
                   <h3 className="text-lg font-semibold mb-4">Đặt hàng</h3>
-                  {
-                    isLoading ? <Loading /> :
+                  {isLoading ? (
+                    <Loading />
+                  ) : (
                     dataCheckout?.order_items.map((e: any) => (
                       <>
                         <div className="relative flex  first:pt-0 last:pb-0">
@@ -570,10 +618,16 @@ const Checkout = () => {
                               data-nimg="fill"
                               className="w-full object-contain object-center rounded-xl"
                               sizes="150px"
-                              src={e?.variant?.image ? e?.variant?.image : e?.product?.img_thumbnail}
-
+                              src={
+                                e?.variant?.image
+                                  ? e?.variant?.image
+                                  : e?.product?.img_thumbnail
+                              }
                             />
-                            <Link className="absolute inset-0" to="/product-detail" />
+                            <Link
+                              className="absolute inset-0"
+                              to="/product-detail"
+                            />
                           </div>
                           <div className="ml-3 sm:ml-6 flex flex-1 flex-col">
                             <div>
@@ -586,18 +640,19 @@ const Checkout = () => {
                                   </h3>
                                   <div className="mt-1.5  flex text-sm text-slate-600">
                                     <div className="flex items-center ">
-
-                                      {
-                                        e?.variant?.attributes?.map((z: any, index: number) => (
-                                          <span >
+                                      {e?.variant?.attributes?.map(
+                                        (z: any, index: number) => (
+                                          <span>
                                             {z.pivot.value}
-                                            {index < e.variant.attributes.length - 1 && <span className="mx-2">/</span>}
+                                            {index <
+                                              e.variant.attributes.length -
+                                                1 && (
+                                              <span className="mx-2">/</span>
+                                            )}
                                           </span>
-                                        ))
-                                      }
+                                        )
+                                      )}
                                     </div>
-
-
                                   </div>
                                   <div className="mt-3 flex justify-between w-full sm:hidden relative">
                                     <select
@@ -627,7 +682,11 @@ const Checkout = () => {
                                   <div className="mt-[1.7px]">
                                     <div className="flex items-center text-sm font-medium">
                                       {/* <del className="mr-1">{FormatMoney(e.variant.price_regular)}</del> */}
-                                      <span className="text-[red]">{e?.variant?.price_sale ? FormatMoney(e.variant.price_sale) : FormatMoney(e?.product?.price_sale)}</span>
+                                      <span className="text-[red]">
+                                        {e?.variant?.price_sale
+                                          ? FormatMoney(e.variant.price_sale)
+                                          : FormatMoney(e?.product?.price_sale)}
+                                      </span>
                                     </div>
                                   </div>
                                 </div>
@@ -636,26 +695,24 @@ const Checkout = () => {
                             <div className="flex items-end mt-6 justify-between text-sm">
                               <div className="hidden sm:block text-center relative">
                                 <div className="flex items-center">
-                                  <span>Số lượng:  </span><p className="font-bold ml-2 text-base">{e?.quantity}</p>
+                                  <span>Số lượng: </span>
+                                  <p className="font-bold ml-2 text-base">
+                                    {e?.quantity}
+                                  </p>
                                 </div>
                               </div>
                               <Link
                                 to="##"
                                 className="relative z-10 flex items-center mt-3 font-medium hover:text-[#00BADB] text-sm"
-                              >
-
-                              </Link>
+                              ></Link>
                             </div>
                           </div>
                         </div>
-
                       </>
-                    ))}
+                    ))
+                  )}
 
-                  <div className="hd-checkout-pro mt-8 divide-y divide-slate-200/70">
-
-
-                  </div>
+                  <div className="hd-checkout-pro mt-8 divide-y divide-slate-200/70"></div>
                   {/*end hd-checkout-pro*/}
                   <div className="hd-checkout-text-count mt-10 pt-6 text-sm text-slate-500 border-t border-slate-200/70 dark:border-slate-700">
                     <div>
@@ -671,7 +728,10 @@ const Checkout = () => {
                           type="text"
                           onChange={(e) => setVoucher(e.target.value)}
                         />
-                        <button onClick={() => handleVoucher()} className="text-gray-800 outline-0 border border-neutral-200 hover:bg-neutral-100 rounded-2xl px-4 ml-3 font-medium text-sm bg-neutral-200/70 dark:hover:bg-neutral-100 w-24 flex justify-center items-center transition-colors">
+                        <button
+                          onClick={() => handleVoucher()}
+                          className="text-gray-800 outline-0 border border-neutral-200 hover:bg-neutral-100 rounded-2xl px-4 ml-3 font-medium text-sm bg-neutral-200/70 dark:hover:bg-neutral-100 w-24 flex justify-center items-center transition-colors"
+                        >
                           Áp dụng
                         </button>
                       </div>
@@ -682,15 +742,24 @@ const Checkout = () => {
                     </div>
                     <div className="flex justify-between py-2.5">
                       <span>Voucher</span>
-                      <span className="font-semibold text-slate-900">{totalDiscount || 0}đ</span>
+                      <span className="font-semibold text-slate-900">
+                        {totalDiscount || 0}đ
+                      </span>
                     </div>
                     <div className="flex justify-between font-semibold text-slate-900 text-base pt-4">
                       <span>Tổng tiền</span>
-                      <span>{FormatMoney(subTotal ? subTotal : dataCheckout?.sub_total)}</span>
+                      <span>
+                        {FormatMoney(
+                          subTotal ? subTotal : dataCheckout?.sub_total
+                        )}
+                      </span>
                     </div>
                   </div>
                   {/*end hd-checkout-text-count*/}
-                  <button onClick={handleOrder} className="nc-Button relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm sm:text-base font-medium py-3 px-4 sm:py-3.5 sm:px-6 ttnc-ButtonPrimary disabled:bg-opacity-90 bg-[#00BADB] hover:bg-[#23b6cd] text-white shadow-xl mt-8 w-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0">
+                  <button
+                    onClick={handleOrder}
+                    className="nc-Button relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm sm:text-base font-medium py-3 px-4 sm:py-3.5 sm:px-6 ttnc-ButtonPrimary disabled:bg-opacity-90 bg-[#00BADB] hover:bg-[#23b6cd] text-white shadow-xl mt-8 w-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0"
+                  >
                     Xác nhận đơn hàng
                   </button>
                   {/*end hd-checkout-btn*/}
@@ -721,11 +790,7 @@ const Checkout = () => {
                 </div>
                 {/*end-right*/}
               </div>
-            }
-
-
-
-
+            )}
           </main>
         </div>
         {/*end hd-CheckoutPage*/}

@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from "react";
 import slide1 from "@/assets/images/slider1.png";
 import slide2 from "@/assets/images/slider2.png";
 import slide3 from "@/assets/images/slider3.png"; 
-import { Skeleton } from "antd";
 
 
 const slides = [

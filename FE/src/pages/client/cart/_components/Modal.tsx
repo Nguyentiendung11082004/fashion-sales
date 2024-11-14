@@ -1,8 +1,9 @@
 import { useAuth } from '@/common/context/Auth/AuthContext';
+import Loading from '@/common/Loading/Loading';
 import { FormatMoney } from '@/common/utils/utils';
 import instance from '@/configs/axios';
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Modal as AntModal, Button, Skeleton } from 'antd';
+import { Modal as AntModal, Button } from 'antd';
 import { useEffect, useState } from 'react';
 type Props = {
   open: boolean;
@@ -121,7 +122,7 @@ const ModalCart = ({ open, onClose, idCart, onUpdateAttributes, attributes }: Pr
   return (
     <AntModal open={open} onCancel={onClose} footer={false} closable={false} maskClosable={false}>
       {isFetching ? (
-        <Skeleton />
+        <Loading />
       ) : (
         <div>
           <h2 className='text-2xl font-bold text-gray-800 mb-2'>{cartAttribute?.cart_item?.product?.name}</h2>

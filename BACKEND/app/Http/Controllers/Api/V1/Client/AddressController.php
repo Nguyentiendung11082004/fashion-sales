@@ -40,10 +40,11 @@ class AddressController extends Controller
             $user = auth()->user();
 
             // // Nếu người dùng thêm địa chỉ mặc định, kiểm tra xem đã có địa chỉ mặc định chưa
-            // if ($request->is_default) {
-            //     // Đánh dấu địa chỉ trước đó là không phải mặc định
-            //     $user->addresses->update(['is_default' => false]);
-            // };
+           // Cập nhật tất cả các địa chỉ của người dùng và đặt `is_default = false`
+            if ($request->is_default) {
+                $user->addresses()->update(['is_default' => false]);
+            }
+
             $dataAddress =   [
                 'label' => $request->label,
                 'address' => $request->address,

@@ -6,7 +6,7 @@ import instance from '@/configs/axios'
 import { productCreate, productStore, productUpdate } from '@/services/api/admin/products.api'
 import { UploadOutlined } from '@ant-design/icons'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Button, Form, Input, InputNumber, Radio, RadioChangeEvent, Select, Skeleton, Switch, Table, Upload, message } from 'antd'
+import { Button, Form, Input, InputNumber, Radio, RadioChangeEvent, Select, Table, Upload, message } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
 import { UploadFile, UploadProps } from 'antd/es/upload'
 import { useEffect, useState } from 'react'
@@ -406,8 +406,8 @@ const ProductForm = () => {
         });
         setSelectedItems(initialItems);
 
-        // const initialCheckedItems = productShow.variants.map((variant: any) => variant.isChecked || false);
-        // setCheckedItems(initialCheckedItems);
+        const initialCheckedItems = productShow.variants.map((variant: any) => variant.sku || false);
+        setCheckedItems(initialCheckedItems);
 
         const initialVariants = productShow.variants.map((variant: any) => ({
             image: variant.image || '',
@@ -602,7 +602,7 @@ const ProductForm = () => {
                 </h1>
             </div>
             {
-                isFetching ? (<Skeleton />)
+                isFetching ? (<Loading />)
                     : (
                         <Form layout='vertical' className="grid grid-cols-1 md:grid-cols-3 gap-4"
                             onFinish={onFinish}

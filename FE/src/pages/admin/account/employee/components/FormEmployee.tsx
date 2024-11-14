@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import Loading from "@/common/Loading/Loading";
 import { IUser } from "@/common/types/users";
 import instance from "@/configs/axios";
 import { createClient, updateClient } from "@/services/api/admin/clients";
@@ -12,7 +13,6 @@ import {
   Input,
   message,
   Select,
-  Skeleton,
   Upload,
   UploadProps,
 } from "antd";
@@ -142,7 +142,7 @@ const FormEmployee = () => {
       </div>
 
       {isFetching ? (
-        <Skeleton />
+        <Loading />
       ) : (
         <Form
           form={form}
