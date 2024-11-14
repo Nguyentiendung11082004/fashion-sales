@@ -26,6 +26,7 @@ class Order extends Model
         'ship_user_address',
         'voucher_id',
         'voucher_discount',
+        'return_notes'
     ];
     // Order status constants
     const STATUS_PENDING = 'Đang chờ xác nhận';
