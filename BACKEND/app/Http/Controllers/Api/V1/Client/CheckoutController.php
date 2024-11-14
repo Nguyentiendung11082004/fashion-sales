@@ -46,8 +46,7 @@ class CheckoutController extends Controller
             // Kiểm tra thông tin người dùng nếu đã đăng nhập
             if (auth('sanctum')->check()) {
                 $user_id = auth('sanctum')->id();
-                $user = User::findOrFail($user_id)->only(['id', 'name', 'email', 'address', 'phone_number']);
-
+                $user = User::with('addresses')->findOrFail($user_id)->makeHidden(['role_id', 'email_verified_at', 'password', 'is_active', 'remember_toke', 'created_at', 'updated_at']);
                 if ($isCartPurchase) {
                     // Handle cart purchase logic for logged-in users
                     $cart = Cart::query()
@@ -154,7 +153,6 @@ class CheckoutController extends Controller
                     return response()->json(['message' => 'Bạn cần đăng nhập để mua từ giỏ hàng.'], Response::HTTP_BAD_REQUEST);
                 }
             }
-            // dd($order_items);
             // Kiểm tra và áp dụng voucher chỉ nếu người dùng đã đăng nhập
             if (isset($data['voucher_code'])) {
                 if (auth('sanctum')->check()) {
@@ -270,12 +268,16 @@ class CheckoutController extends Controller
         if (isset($voucher_metas['_voucher_applies_to_total']) && $voucher_metas['_voucher_applies_to_total']) {
             if ($voucher->discount_type == 'percent') {
                 $voucher_discount = ($voucher->discount_value / 100) * $sub_total;
-                $voucher_description = "{$voucher->discount_value} percent"; // Mô tả cho voucher phần trăm
+                $voucher_description = "{$voucher->discount_value} percent"; // Mô tả cho voucher phần trăm            
+                if (isset($voucher_metas['_voucher_max_discount_amount']) && $voucher_metas['_voucher_max_discount_amount']) {
+                    if ($voucher_metas['_voucher_max_discount_amount'] < $voucher_discount) {
+                        $voucher_discount = $voucher_metas['_voucher_max_discount_amount'];
+                    }
+                }
             } elseif ($voucher->discount_type == 'fixed') {
                 $voucher_discount = min($voucher->discount_value, $sub_total);
                 $voucher_description = "{$voucher->discount_value} fixed"; // Mô tả cho voucher cố định
             }
-
             return [
                 'voucher_discount' => $voucher_discount,
                 'voucher_description' => $voucher_description,
@@ -456,7 +458,7 @@ class CheckoutController extends Controller
         try {
 
             $request->validate([
-               
+
                 "to_district_id" => "required",
                 "to_ward_code" => "required|string",
                 "weight" => "required", //đơn vị tính g
