@@ -31,6 +31,7 @@ class Order extends Model
     // Order status constants
     const STATUS_PENDING = 'Đang chờ xác nhận';
     const STATUS_CONFIRMED = 'Đã xác nhận';
+    const STATUS_SHIPPING = 'Đang vận chuyển';
     const STATUS_FAILED = 'Giao hàng thất bại';
     const STATUS_SUCCESS = 'Giao hàng thành công';
     const STATUS_CANCELED = 'Đã hủy';
@@ -45,6 +46,7 @@ class Order extends Model
         return [
             self::STATUS_PENDING,
             self::STATUS_CONFIRMED,
+            self::STATUS_SHIPPING,
             self::STATUS_FAILED,
             self::STATUS_SUCCESS,
             self::STATUS_CANCELED,

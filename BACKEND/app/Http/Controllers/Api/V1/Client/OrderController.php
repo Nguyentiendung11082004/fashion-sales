@@ -527,7 +527,7 @@ class OrderController extends Controller
         if (!$voucher) {
             return ['error' => 'Voucher không hợp lệ hoặc đã hết hạn.'];
         }
-
+        $voucher->increment('used_count');
         $voucher_metas = VoucherMeta::where('voucher_id', $voucher->id)->pluck('meta_value', 'meta_key')->toArray();
         $eligible_products = [];
         $ineligible_products = [];
@@ -885,44 +885,56 @@ class OrderController extends Controller
         }
 
         // Kiểm tra trạng thái đơn hàng
-        if ($order->order_status === 'Hủy') {
+        if ($order->order_status === Order::STATUS_CANCELED) {
             return response()->json(['message' => 'Đơn hàng đã được hủy.'], 400);
         }
 
-        // Lấy trạng thái mới và ghi chú từ request
+        // Lấy trạng thái mới từ request
         $order_status = $request->input('order_status');
-        $user_note = $request->input('user_note');
 
-        if ($order_status === 'Hủy') {
+        // Chỉ cho phép hủy đơn hàng khi trạng thái hiện tại là "Đang chờ xác nhận" hoặc "Đã xác nhận"
+        if ($order_status === Order::STATUS_CANCELED) {
+            if (!in_array($order->order_status, [Order::STATUS_PENDING, Order::STATUS_CONFIRMED])) {
+                return response()->json([
+                    'message' => 'Chỉ có thể hủy đơn hàng khi đơn hàng đang ở trạng thái Đang chờ xác nhận hoặc Đã xác nhận.'
+                ], 400);
+            }
+
+            // Lấy lý do hủy từ request
+            $user_note = $request->input('user_note');
+
+            // Kiểm tra lý do hủy
             if (empty($user_note)) {
                 return response()->json(['message' => 'Ghi chú là bắt buộc khi hủy đơn hàng.'], 400);
             }
-
-            // Xử lý hủy đơn hàng
+            // Xử lý hủy đơn hàng và lưu lý do hủy
             $this->handleOrderCancellation($order, $user_note);
-        } else {
-            // Nếu không hủy, cho phép cập nhật ghi chú
-            if (!empty($user_note)) {
-                $order->user_note = $user_note;
-            }
+            // Kiểm tra nếu đơn hàng có sử dụng voucher
+            $voucher_logs = VoucherLog::query()
+                ->where('user_id', '=', $user_id)
+                ->where('order_id', '=', $order->id)
+                ->first();
 
-            // Cập nhật trạng thái đơn hàng
+            if ($voucher_logs) {
+                // Cập nhật trạng thái hành động của voucher
+                $voucher_logs->update([
+                    'action' => 'reverted',
+                ]);
+            }
             $order->order_status = $order_status;
         }
-
         $order->save();
-
         // Trả về thông báo cập nhật thành công
         return response()->json([
             'message' => 'Trạng thái đơn hàng đã được cập nhật thành công.',
             'order' => $order->load('orderDetails'),
         ]);
     }
+
     protected function handleOrderCancellation(Order $order, string $user_note)
     {
-        // Cập nhật lý do hủy
-        $order->user_note = $user_note;
-
+        // Lưu lý do hủy vào ghi chú
+        $order->return_notes = $user_note;
         // Trả lại số lượng sản phẩm về kho
         foreach ($order->orderDetails as $detail) {
             // Kiểm tra nếu là sản phẩm có biến thể
