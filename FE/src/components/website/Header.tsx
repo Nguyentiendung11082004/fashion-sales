@@ -17,6 +17,7 @@ import { Button } from "antd";
 import { useWishlist } from "@/common/context/Wishlist/WishlistContext";
 import instance from "@/configs/axios";
 import { useQuery } from "@tanstack/react-query";
+import Loading from "@/common/Loading/Loading";
 type Props = {};
 const Header = (props: Props) => {
   const navigator = useNavigate();
@@ -54,7 +55,7 @@ const Header = (props: Props) => {
   } else if (cartItems && typeof cartItems === 'object') {
     qty += cartItems.quantity;
   }
-  if (isLoading) return <div></div>
+  if (isLoading) return <Loading />
   return (
     <>
       <div>
@@ -99,8 +100,8 @@ const Header = (props: Props) => {
           </div>
         </section>
         
-        <div className="w-[100%] bg-[#fff] sticky top-0 left-0 right-0 z-20">
-          <header className="lg:mx-10 bg-[#fff] h-[70px] grid grid-cols-12 gap-4 sticky top-0 z-30">
+        <div className="w-[100%] bg-[#fff] sticky top-0 left-0 right-0 z-10">
+          <header className="lg:mx-10 bg-[#fff] h-[70px] grid grid-cols-12 gap-4 top-0 z-40">
             <div className="lg:col-span-2 col-span-4 flex justify-center items-center md:items-center md:justify-center lg:justify-start  order-2 lg:order-1">
               <img src={LogoClient} alt="" className="h-[40px]" />
             </div>
@@ -144,7 +145,7 @@ const Header = (props: Props) => {
                 </li>
               </ul>
             </div>
-            <div className="lg:col-span-2 col-span-4 flex items-center justify-end order-3">
+            <div className="lg:col-span-2 col-span-4 flex items-center justify-end order-3 z">
               <div className="flex items-center space-x-4">
                 <div className="relative group">
                   <Link to="/account">
@@ -152,7 +153,7 @@ const Header = (props: Props) => {
                       user ? (<img src={urlImage || infoUser?.avatar} className="h-10 w-10 rounded-full object-cover" alt={infoUser?.name} />) : <UserHome />
                     }
                   </Link>
-                  <div className="absolute left-[-50px] hidden group-hover:flex flex-col items-start mt-0 space-y-2 p-4 bg-white shadow-lg rounded-lg transition-all duration-300 z-10">
+                  <div className="absolute left-[-50px] hidden group-hover:flex flex-col items-start mt-0 space-y-2 p-4 bg-white shadow-lg rounded-lg transition-all duration-300 z-20">
                     {user ? (
                       <Button
                         onClick={() => logoutUser()}
@@ -192,7 +193,7 @@ const Header = (props: Props) => {
                 </Link>
               </div>
             </div>
-          </header>
+          </header>   
         </div>
 
       </div>

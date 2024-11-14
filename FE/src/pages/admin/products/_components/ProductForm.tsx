@@ -165,7 +165,6 @@ const ProductForm = () => {
             if (info.file.status === "done") {
                 const isImage = /^image\//.test(info.file.type);
                 if (isImage) {
-                    console.log("isImage", isImage)
                     const imageUrl = info.file.response.url;
                     const newVariants = [...variants];
                     newVariants[index] = { ...newVariants[index], image: imageUrl };
@@ -192,13 +191,6 @@ const ProductForm = () => {
                 if (isImage) {
                     const newImageUrl = info.file.response.secure_url || info.file.response.url;
                     setImageGaller((prev) => [...prev, newImageUrl])
-                    // Cập nhật `imageGallery` nếu chưa có
-                    // setImageGaller((prev) => {
-                    //     if (!prev.includes(newImageUrl)) {
-                    //         return [...prev, newImageUrl];
-                    //     }
-                    //     return prev;
-                    // });
                     message.open({
                         type: 'success',
                         content: 'Upload ảnh thành công',
@@ -279,10 +271,19 @@ const ProductForm = () => {
             title: 'Ảnh',
             dataIndex: 'image',
             render: (text: any, record: any, index: number) => (
-                <Upload {...getPropsImgThumbnail(index)}
-                >
-                    <Button icon={<UploadOutlined />}>Tải lên ảnh</Button>
-                </Upload>
+                <>
+                    <Upload {...getPropsImgThumbnail(index)}
+                    >
+                        <Button icon={<UploadOutlined />}>Tải lên ảnh</Button>
+                    </Upload>
+                    {variants && variants[index] && variants[index].image && (
+                        <img
+                            src={variants[index].image}
+                            alt="Uploaded"
+                            style={{ marginTop: 16, width: 100, marginBottom: '10px' }}
+                        />
+                    )}
+                </>
             )
         },
         {
@@ -344,7 +345,7 @@ const ProductForm = () => {
     });
 
     const getProduct = (productShow: any) => {
-        console.log("ProductShow:", productShow);
+
         const productTags = productShow.tags.map((tag: any) => tag.id);
         const productType = productShow.type ? 1 : 0;
         const productAttribute = productShow.attributes.map((attribute: any) => attribute.id);
@@ -352,22 +353,16 @@ const ProductForm = () => {
             acc[attribute.id] = attribute.pivot.attribute_item_ids;
             return acc;
         }, {});
-
         const initialGalleryFiles = (productShow.galleries || []).map((galleryItem: any, index: number) => ({
-            uid: String(galleryItem.id || index), // Sử dụng `id` từ backend hoặc `index` để đảm bảo `uid` là duy nhất
+            uid: String(galleryItem.id || index),
             name: galleryItem.image.substring(galleryItem.image.lastIndexOf('/') + 1),
             status: 'done',
             url: galleryItem.image,
         }));
-        // setGalleryFileList(initialGalleryFiles); 
         setImageGaller(initialGalleryFiles.map((item: any) => item.url));
-        // console.log(initialFileList);      
-
         setAttribute(productType);
         setSelectedAttributeChildren(productAttribute);
         setSelectedValues(productAttributeValue);
-
-        // Khởi tạo initialItems với các thuộc tính từ productShow.variants
         const initialItems = productShow.variants.map((item: any) => {
             const itemAttributes = productAttribute.reduce((acc: any, attrId: any) => {
                 acc[attrId] = item[attrId] || [];
@@ -383,10 +378,6 @@ const ProductForm = () => {
             };
         });
         setSelectedItems(initialItems);
-
-        // const initialCheckedItems = productShow.variants.map((variant: any) => variant.isChecked || false);
-        // setCheckedItems(initialCheckedItems);
-
         const initialVariants = productShow.variants.map((variant: any) => ({
             image: variant.image || '',
             price_regular: variant.price_regular || '',
@@ -395,12 +386,10 @@ const ProductForm = () => {
             sku: variant.sku || ''
         }));
         setVariants(initialVariants);
-
         setValueStatus(productShow.status ? 1 : 0);
         setValueHome(productShow.is_show_home ? 1 : 0);
         setValueTrend(productShow.trend ? 1 : 0);
         setValueNew(productShow.is_new ? 1 : 0);
-
         form.setFieldsValue({
             ...productShow,
             status: productShow.status ? 1 : 0,
@@ -670,27 +659,22 @@ const ProductForm = () => {
                                 </Upload>
                                 {
                                     // imageGallery ? (
-                                    //     <>
-                                    //         {
-                                    //             imageGallery?.map((e) => (
-                                    //                 <img src={e} alt="Uploaded" style={{ marginTop: 16, width: 100, marginBottom: '10px' }} />
-                                    //             ))
-                                    //         }
-                                    //     </>
+                                    //     <img src={`${imageGallery}`} alt="Uploaded" style={{ marginTop: 16, width: 100, marginBottom: '10px' }} />
                                     // ) : (
-                                        productShow?.galleries && (
-                                            <>
-                                                {
-                                                    productShow?.galleries?.map((e:any) => (
+                                    productShow?.galleries && (
+                                        <>
+                                            {
+                                                productShow?.galleries?.map((e: any) => (
+                                                    <>
                                                         <img src={e.image} alt="Uploaded" style={{ marginTop: 16, width: 100, marginBottom: '10px' }} />
-                                                    ))
-                                                }
-                                            </>
-                                        )
+                                                    </>
+                                                ))
+                                            }
+                                        </>
+                                    )
                                     // )
                                 }
                                 {error?.galleries && <div className='text-red-600'>{error.galleries.join(', ')}</div>}
-
                             </Form.Item>
                             <Form.Item name="type" label="Kiểu sản phẩm" className="col-span-3">
                                 <Select

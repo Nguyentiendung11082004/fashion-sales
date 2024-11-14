@@ -41,7 +41,7 @@ const Banner = () => {
       (prevIndex) => (prevIndex - 1 + slides.length) % slides.length
     );
   };
-
+  
   const goToSlide = (index: number) => {
     setCurrentIndex(index);
   };
@@ -54,7 +54,7 @@ const Banner = () => {
   }, [currentIndex]);
 
   return (
-    <div className="relative skeleton-banner">
+    <div className="relative">
       <div className="hd-slider-wrapper relative mx-auto">
         <div
           ref={sliderRef}

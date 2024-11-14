@@ -35,7 +35,7 @@ const Cart = () => {
     setVisible(false);
   };
   const { token } = useAuth();
-  const { data, isFetching, isLoading } = useQuery({
+  const { data, isFetching } = useQuery({
     queryKey: ['cart'],
     queryFn: async () => {
       const res = await instance.get('/cart', {
@@ -147,11 +147,9 @@ const Cart = () => {
           .filter(key => updatedCheckedItems[Number(key)])
           .map(Number);
         setIdCart(updatedIdCart);
-        localStorage.setItem('idCart', JSON.stringify(updatedIdCart)); // Cập nhật localStorage với idCart mới
-        const isAllCheckedNow = updatedIdCart.length === carts.length; // Kiểm tra nếu tất cả sản phẩm còn lại đều được chọn
+        localStorage.setItem('idCart', JSON.stringify(updatedIdCart));
+        const isAllCheckedNow = updatedIdCart.length === carts.length;
         setIsAllChecked(isAllCheckedNow);
-
-        // Nếu không còn sản phẩm nào, đặt trạng thái isAllChecked là false
         if (updatedIdCart.length === 0) {
           setIsAllChecked(false);
         }
@@ -199,7 +197,6 @@ const Cart = () => {
 
   const [isAllChecked, setIsAllChecked] = useState<boolean>(false);
   const [checkedItems, setCheckedItems] = useState<{ [key: number]: boolean }>({});
-
   const handleCheckAll = () => {
     const newChecked = !isAllChecked;
     setIsAllChecked(newChecked);
@@ -212,7 +209,7 @@ const Cart = () => {
       }
     });
     setCheckedItems(newCheckedItems);
-    localStorage.setItem('checkedItems', JSON.stringify(newCheckedItems)); 
+    localStorage.setItem('checkedItems', JSON.stringify(newCheckedItems));
     setIdCart(newChecked ? allIdCarts : []);
   };
 
@@ -222,7 +219,7 @@ const Cart = () => {
       [cartId]: !checkedItems[cartId],
     };
     setCheckedItems(updatedCheckedItems);
-    localStorage.setItem('checkedItems', JSON.stringify(updatedCheckedItems)); 
+    localStorage.setItem('checkedItems', JSON.stringify(updatedCheckedItems));
     const updatedIdCarts = Object.keys(updatedCheckedItems)
       .filter(key => updatedCheckedItems[Number(key)])
       .map(Number);
@@ -302,169 +299,169 @@ const Cart = () => {
               <div className="hd-pagecart-items">
                 <div className="hd-item relative overflow-hidden">
                   {
-                    // isFetching ? <Loading /> :
-                     carts && carts.length > 0 ? (carts?.map((e: any) => {
-                      const { productvariant } = e;
-                      const attributesObject = productvariant?.attributes.reduce((acc: any, attribute: any) => {
-                        acc[attribute.name] = attribute.pivot.attribute_item_id;
-                        return acc;
-                      }, {});
-                      return <>
-                        <div className="hd-item-row lg:py-[2rem] py-[1rem] !items-center flex flex-wrap border-solid border-b-2">
-                          <div className="hd-infor-item lg:w-5/12 w-full hd-col-item">
-                            <div className="hd-infor !items-center !flex">
-                              <div className="mr-10">
-                                <input
-                                  type="checkbox"
-                                  checked={checkedItems[e?.id] || false}
-                                  onChange={() => handleCheckBoxChange(e?.id)}
-                                />
-                              </div>
-                              <Link
-                                to=""
-                                className="min-w-[120px] max-w-[120px] block overflow-hidden relative w-full touch-manipulation pb-[10px] lg:pb-0"
-                              >
-                                <img src={`${e?.product?.img_thumbnail}`}></img>
-                              </Link>
-                              <div className="hd-infor-text ms-4">
+                    isFetching ? <Loading /> :
+                      carts && carts.length > 0 ? (carts?.map((e: any) => {
+                        const { productvariant } = e;
+                        const attributesObject = productvariant?.attributes.reduce((acc: any, attribute: any) => {
+                          acc[attribute.name] = attribute.pivot.attribute_item_id;
+                          return acc;
+                        }, {});
+                        return <>
+                          <div className="hd-item-row lg:py-[2rem] py-[1rem] !items-center flex flex-wrap border-solid border-b-2">
+                            <div className="hd-infor-item lg:w-5/12 w-full hd-col-item">
+                              <div className="hd-infor !items-center !flex">
+                                <div className="mr-10">
+                                  <input
+                                    type="checkbox"
+                                    checked={checkedItems[e?.id] || false}
+                                    onChange={() => handleCheckBoxChange(e?.id)}
+                                  />
+                                </div>
                                 <Link
                                   to=""
-                                  className="text-sm font-semibold block mb-[5px] touch-manipulation hd-all-hover-bluelight"
+                                  className="min-w-[120px] max-w-[120px] block overflow-hidden relative w-full touch-manipulation pb-[10px] lg:pb-0"
                                 >
-                                  {e?.product?.name}
+                                  <img src={`${e?.product?.img_thumbnail}`}></img>
                                 </Link>
-                                {/*end hd-price-item*/}
-                                {updatedAttributes.dataAttributes && Object.entries(updatedAttributes.dataAttributes).length > 0 ? (
-                                  Object.entries(updatedAttributes.dataAttributes).map(([attributeName, attributeValue]) => {
-                                    const attributeItem = updatedAttributes.find((item: any) => item.name === attributeName);
-                                    return (
-                                      <div className="hd-infor-text-meta text-[13px] text-[#878787]" key={attributeName}>
-                                        <p>
-                                          {attributeName}: <strong>{attributeItem ? attributeItem.pivot.value : attributeValue}</strong>
-                                        </p>
+                                <div className="hd-infor-text ms-4">
+                                  <Link
+                                    to=""
+                                    className="text-sm font-semibold block mb-[5px] touch-manipulation hd-all-hover-bluelight"
+                                  >
+                                    {e?.product?.name}
+                                  </Link>
+                                  {/*end hd-price-item*/}
+                                  {updatedAttributes.dataAttributes && Object.entries(updatedAttributes.dataAttributes).length > 0 ? (
+                                    Object.entries(updatedAttributes.dataAttributes).map(([attributeName, attributeValue]) => {
+                                      const attributeItem = updatedAttributes.find((item: any) => item.name === attributeName);
+                                      return (
+                                        <div className="hd-infor-text-meta text-[13px] text-[#878787]" key={attributeName}>
+                                          <p>
+                                            {attributeName}: <strong>{attributeItem ? attributeItem.pivot.value : attributeValue}</strong>
+                                          </p>
+                                        </div>
+                                      );
+                                    })
+                                  ) : (
+                                    e?.productvariant?.attributes?.map((item: any) => (
+                                      <div className="hd-infor-text-meta text-[13px] text-[#878787]" key={item.id}>
+                                        <p>{item?.name}: <strong>{item?.pivot?.value}</strong></p>
                                       </div>
-                                    );
-                                  })
-                                ) : (
-                                  e?.productvariant?.attributes?.map((item: any) => (
-                                    <div className="hd-infor-text-meta text-[13px] text-[#878787]" key={item.id}>
-                                      <p>{item?.name}: <strong>{item?.pivot?.value}</strong></p>
-                                    </div>
-                                  ))
-                                )}
+                                    ))
+                                  )}
 
-                                <div className="hd-infor-text-tools mt-[10px]">
-                                  {
-                                    e.productvariant && <Button onClick={() => handleAttribute(e?.id, e?.productvariant?.attributes)} className="inline-flex mr-[-15px] border-none">
-                                      <Note />
-                                    </Button>
-                                  }
+                                  <div className="hd-infor-text-tools mt-[10px]">
+                                    {
+                                      e.productvariant && <Button onClick={() => handleAttribute(e?.id, e?.productvariant?.attributes)} className="inline-flex mr-[-15px] border-none">
+                                        <Note />
+                                      </Button>
+                                    }
 
-                                </div>
-                              </div>
-                            </div>
-
-                            <ModalCart
-                              open={visiable}
-                              onClose={closeModal}
-                              idCart={idCart}
-                              onUpdateAttributes={handleUpdateAttributes}
-                              attributes={updatedAttributes[idCart] || []}
-                            />
-
-                            <div className="hd-qty-total block lg:hidden">
-                              <div className="flex items-center justify-between border-2 border-slate-200 rounded-full py-[10px] px-[10px]">
-                                <div className="hd-quantity-item relative hd-col-item">
-                                  <div className="hd-quantity relative block min-w-[100px] w-[100px] h-8 mx-auto hd-all-btn">
-                                    <button
-                                      type="button"
-                                      className="hd-btn-item left-0 text-left pl-[15px] pb-[10px] text-sm cursor-pointer shadow-none transform-none touch-manipulation"
-                                    >
-                                      <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        strokeWidth={2}
-                                        stroke="currentColor"
-                                        className="size-3 hd-all-hover-bluelight"
-                                      >
-                                        <path
-                                          strokeLinecap="round"
-                                          strokeLinejoin="round"
-                                          d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
-                                        />
-                                      </svg>
-                                    </button>
-                                    <span className="select-none leading-8 cursor-text font-semibold text-sm">
-                                      1
-                                    </span>
-                                    <button
-                                      type="button"
-                                      className="hd-btn-item pb-[10px] right-0 text-right pr-[15px] p-0 top-0 text-sm cursor-pointer shadow-none transform-none touch-manipulation"
-                                    >
-                                      <AddCount />
-                                    </button>
                                   </div>
                                 </div>
+                              </div>
 
+                              <ModalCart
+                                open={visiable}
+                                onClose={closeModal}
+                                idCart={idCart}
+                                onUpdateAttributes={handleUpdateAttributes}
+                                attributes={updatedAttributes[idCart] || []}
+                              />
+
+                              <div className="hd-qty-total block lg:hidden">
+                                <div className="flex items-center justify-between border-2 border-slate-200 rounded-full py-[10px] px-[10px]">
+                                  <div className="hd-quantity-item relative hd-col-item">
+                                    <div className="hd-quantity relative block min-w-[100px] w-[100px] h-8 mx-auto hd-all-btn">
+                                      <button
+                                        type="button"
+                                        className="hd-btn-item left-0 text-left pl-[15px] pb-[10px] text-sm cursor-pointer shadow-none transform-none touch-manipulation"
+                                      >
+                                        <svg
+                                          xmlns="http://www.w3.org/2000/svg"
+                                          fill="none"
+                                          viewBox="0 0 24 24"
+                                          strokeWidth={2}
+                                          stroke="currentColor"
+                                          className="size-3 hd-all-hover-bluelight"
+                                        >
+                                          <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
+                                          />
+                                        </svg>
+                                      </button>
+                                      <span className="select-none leading-8 cursor-text font-semibold text-sm">
+                                        1
+                                      </span>
+                                      <button
+                                        type="button"
+                                        className="hd-btn-item pb-[10px] right-0 text-right pr-[15px] p-0 top-0 text-sm cursor-pointer shadow-none transform-none touch-manipulation"
+                                      >
+                                        <AddCount />
+                                      </button>
+                                    </div>
+                                  </div>
+
+                                </div>
                               </div>
                             </div>
-                          </div>
 
-                          {/*end hd-infor-item*/}
-                          <div className="hd-price-item !text-center w-3/12 hd-col-item lg:block hidden">
-                            <div className="hs-prices">
-                              <div className="hd-text-price">
-                                <del className="text-[#696969]">{FormatMoney(e?.productvariant?.price_regular || e?.product?.price_regular)}</del>
-                                <ins className="ms-[6px] no-underline text-[#ec0101]">
-                                  {FormatMoney(e?.productvariant?.price_sale || e?.product?.price_sale)}
-                                </ins>
+                            {/*end hd-infor-item*/}
+                            <div className="hd-price-item !text-center w-3/12 hd-col-item lg:block hidden">
+                              <div className="hs-prices">
+                                <div className="hd-text-price">
+                                  <del className="text-[#696969]">{FormatMoney(e?.productvariant?.price_regular || e?.product?.price_regular)}</del>
+                                  <ins className="ms-[6px] no-underline text-[#ec0101]">
+                                    {FormatMoney(e?.productvariant?.price_sale || e?.product?.price_sale)}
+                                  </ins>
+                                </div>
                               </div>
                             </div>
-                          </div>
-                          {/*end hd-price-item*/}
-                          <div className="hd-quantity-item !text-center w-2/12 hd-col-item lg:block hidden">
-                            <div className="hd-quantity relative block min-w-[120px] w-[120px] h-10 mx-auto hd-all-btn">
-                              <button
-                                type="button"
-                                className="hd-btn-item left-0 text-left pl-[15px] p-0 top-0 text-sm cursor-pointer shadow-none transform-none touch-manipulation"
-                                onClick={() => handleDecrease(e?.id, e?.quantity, attributesObject)}
-                              >
-                                <MinusOutlined />
-                              </button>
-                              <span className="select-none leading-9 cursor-text font-semibold text-base">
-                                {e?.quantity}
-                              </span>
-                              <button
-                                onClick={() => handleIncrease(e?.id, e?.quantity, attributesObject)}
-                                type="button"
-                                className="hd-btn-item right-0 text-right pr-[15px] p-0 top-0 text-sm cursor-pointer shadow-none transform-none touch-manipulation"
-                              >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  strokeWidth={2}
-                                  stroke="currentColor"
-                                  className="size-3 hd-all-hover-bluelight"
+                            {/*end hd-price-item*/}
+                            <div className="hd-quantity-item !text-center w-2/12 hd-col-item lg:block hidden">
+                              <div className="hd-quantity relative block min-w-[120px] w-[120px] h-10 mx-auto hd-all-btn">
+                                <button
+                                  type="button"
+                                  className="hd-btn-item left-0 text-left pl-[15px] p-0 top-0 text-sm cursor-pointer shadow-none transform-none touch-manipulation"
+                                  onClick={() => handleDecrease(e?.id, e?.quantity, attributesObject)}
                                 >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M12 4.5v15m7.5-7.5h-15"
-                                  />
-                                </svg>
-                              </button>
+                                  <MinusOutlined />
+                                </button>
+                                <span className="select-none leading-9 cursor-text font-semibold text-base">
+                                  {e?.quantity}
+                                </span>
+                                <button
+                                  onClick={() => handleIncrease(e?.id, e?.quantity, attributesObject)}
+                                  type="button"
+                                  className="hd-btn-item right-0 text-right pr-[15px] p-0 top-0 text-sm cursor-pointer shadow-none transform-none touch-manipulation"
+                                >
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    strokeWidth={2}
+                                    stroke="currentColor"
+                                    className="size-3 hd-all-hover-bluelight"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      d="M12 4.5v15m7.5-7.5h-15"
+                                    />
+                                  </svg>
+                                </button>
+                              </div>
                             </div>
+                            {/*end hd-quantity-item*/}
+                            <div className="hd-total-item hd-col-item text-end w-2/12 lg:block hidden">
+                              <span className="font-medium">{FormatMoney(e?.total_price)}</span>
+                            </div>
+                            {/*end hd-total-item*/}
                           </div>
-                          {/*end hd-quantity-item*/}
-                          <div className="hd-total-item hd-col-item text-end w-2/12 lg:block hidden">
-                            <span className="font-medium">{FormatMoney(e?.total_price)}</span>
-                          </div>
-                          {/*end hd-total-item*/}
-                        </div>
-                      </>
-                    })) : <p className="text-center mt-12 text-base">Giỏ hàng trống</p>
+                        </>
+                      })) : <p className="text-center mt-12 text-base">Giỏ hàng trống</p>
                   }
                   {/*end-item-1*/}
                 </div>
@@ -558,7 +555,8 @@ const Cart = () => {
                         <div className="hd-col-item w-auto">
                           <div className="text-right font-semibold">
                             {
-                              isFetching ? <Skeleton /> : FormatMoney(data?.sub_total)
+                              // isFetching ? <Skeleton /> : 
+                              FormatMoney(data?.sub_total)
                             }
                           </div>
                         </div>

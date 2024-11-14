@@ -54,8 +54,6 @@ const ModalActon = ({ currentId, open, onClose, setCurrentPage }: Props) => {
       }));
       setIsLoading(false);
       form.setFields(fields);
-  
-    
       const allFieldNames = ['attribute_id', 'value']; 
       allFieldNames.forEach((field) => {
         if (!errorFields[field]) {
