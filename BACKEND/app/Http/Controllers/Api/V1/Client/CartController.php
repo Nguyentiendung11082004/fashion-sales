@@ -133,7 +133,9 @@ class CartController extends Controller
                     ]);
                 }
 
-                broadcast(new CartEvent($cart->id, $cartItem))->toOthers();
+                broadcast(new CartEvent($cart->id, $cartItem));
+                // ->toOthers();
+
 
                 return response()->json(['message' => 'Thêm vào giỏ hàng thành công'], Response::HTTP_OK);
             });

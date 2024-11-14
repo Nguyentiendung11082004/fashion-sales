@@ -24,9 +24,9 @@ class StoreAddressRequest extends FormRequest
         return [
            'label' => 'required|string|max:255',
             'address' => 'required|string|max:255',
-            'city' => 'required|string|max:255',
-            'district' => 'required|string|max:255',
-            'ward' => 'required|string|max:255',
+            'city' => 'required|array|max:255',
+            'district' => 'required|array|max:255',
+            'ward' => 'required|array|max:255',
             'phone' => 'required|string|regex:/^0[0-9]{9}$/',
             'is_default' => 'boolean', // is_default có thể là true hoặc false
         ];

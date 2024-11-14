@@ -20,8 +20,8 @@ import { useQuery } from "@tanstack/react-query";
 type Props = {};
 const Header = (props: Props) => {
   const navigator = useNavigate();
-  const { data: wishlist = [] } = useWishlist();
-  const { user } = useUser();
+  const { data :  wishlist = []} = useWishlist();
+  const { user, urlImage } = useUser();
   let infoUser;
   if (user) {
     infoUser = user?.InforUser;
@@ -33,7 +33,7 @@ const Header = (props: Props) => {
   }
   const wishlistCount = wishlist.length;
   const { token } = useAuth();
-  const { data, isFetching } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ['cart'],
     queryFn: async () => {
       const res = await instance.get('/cart', {
@@ -54,7 +54,7 @@ const Header = (props: Props) => {
   } else if (cartItems && typeof cartItems === 'object') {
     qty += cartItems.quantity;
   }
-  if (isFetching) return <div></div>
+  if (isLoading) return <div></div>
   return (
     <>
       <div>
@@ -98,8 +98,9 @@ const Header = (props: Props) => {
             </div>
           </div>
         </section>
-        <div className="w-[100%] bg-[#fff] sticky top-0 left-0 right-0  z-20 ">
-          <header className="lg:mx-10 bg-[#fff] h-[70px] grid grid-cols-12 gap-4 ">
+        
+        <div className="w-[100%] bg-[#fff] sticky top-0 left-0 right-0 z-20">
+          <header className="lg:mx-10 bg-[#fff] h-[70px] grid grid-cols-12 gap-4 sticky top-0 z-30">
             <div className="lg:col-span-2 col-span-4 flex justify-center items-center md:items-center md:justify-center lg:justify-start  order-2 lg:order-1">
               <img src={LogoClient} alt="" className="h-[40px]" />
             </div>
@@ -109,12 +110,12 @@ const Header = (props: Props) => {
             <div className="lg:col-span-8  lg:flex lg:items-center lg:justify-center md:hidden  hidden lg:order-2">
               <ul className="flex space-x-16 lg:space-x-12 ml-10 text-[14px]">
                 <li>
-                  <Link to="" className=" font-normal text-hover">
+                  <Link to="" className="font-normal text-hover">
                     Trang Chủ
                   </Link>
                 </li>
                 <li className="relative">
-                  <Link to="/products" className=" font-normal text-hover">
+                  <Link to="/products" className="font-normal text-hover">
                     Sản Phẩm
                     <span className="absolute text-xs rounded-full px-2 py-[2px] text-white bg-primary top-[-10px] left-16 ">
                       New
@@ -122,22 +123,22 @@ const Header = (props: Props) => {
                   </Link>
                 </li>
                 <li>
-                  <Link to="" className=" font-normal text-hover">
+                  <Link to="" className="font-normal text-hover">
                     Phụ Kiện
                   </Link>
                 </li>
                 <li>
-                  <Link to="" className=" font-normal text-hover">
+                  <Link to="" className="font-normal text-hover">
                     Giày
                   </Link>
                 </li>
                 <li>
-                  <Link to="" className=" font-normal text-hover">
+                  <Link to="" className="font-normal text-hover">
                     Bài Viết
                   </Link>
                 </li>
                 <li>
-                  <Link to="" className=" font-normal text-hover">
+                  <Link to="" className="font-normal text-hover">
                     Liên Hệ
                   </Link>
                 </li>
@@ -146,42 +147,36 @@ const Header = (props: Props) => {
             <div className="lg:col-span-2 col-span-4 flex items-center justify-end order-3">
               <div className="flex items-center space-x-4">
                 <div className="relative group">
-
-                  {
-                    user ? <Link to="/account">
-                      {
-                        user ? (<img src={`${infoUser?.avatar}`} className="h-10 w-10 rounded-full object-cover" alt={`${infoUser?.name}`} />) : <UserHome />
-                      }
-                    </Link> : <UserHome />
-                  }
-
-                  <div className="absolute left-[-50px] hidden group-hover:flex flex-col items-start mt-0 space-y-2 p-4 bg-white shadow-lg rounded-lg transition-all duration-300 z-10">
+                  <Link to="/account">
                     {
-                      user ? (
-                        <Button
-                          onClick={() => logoutUser()}
-                          className="py-2 w-[150px] text-center text-white bg-red-500 rounded-md hover:bg-red-600 transition duration-200 ease-in-out">
-                          Đăng Xuất
-                        </Button>
-                      ) : (
-                        <div className="flex flex-col space-y-2">
-                          <Link
-                            to="/register"
-                            className=" py-2 w-[150px] text-center text-white bg-orange-400 rounded-md hover:bg-orange-500 transition duration-200 ease-in-out">
-                            Đăng Ký
-                          </Link>
-                          <Link
-                            to="/login"
-                            className="py-2 w-[150px] text-center text-white bg-blue-600 rounded-md hover:bg-blue-500 transition duration-200 ease-in-out">
-                            Đăng Nhập
-                          </Link>
-                        </div>
-                      )
+                      user ? (<img src={urlImage || infoUser?.avatar} className="h-10 w-10 rounded-full object-cover" alt={infoUser?.name} />) : <UserHome />
                     }
+                  </Link>
+                  <div className="absolute left-[-50px] hidden group-hover:flex flex-col items-start mt-0 space-y-2 p-4 bg-white shadow-lg rounded-lg transition-all duration-300 z-10">
+                    {user ? (
+                      <Button
+                        onClick={() => logoutUser()}
+                        className="py-2 w-[150px] text-center text-white bg-red-500 rounded-md hover:bg-red-600 transition duration-200 ease-in-out"
+                      >
+                        Đăng Xuất
+                      </Button>
+                    ) : (
+                      <div className="flex flex-col space-y-2">
+                        <Link
+                          to="/register"
+                          className="py-2 w-[150px] text-center text-white bg-orange-400 rounded-md hover:bg-orange-500 transition duration-200 ease-in-out"
+                        >
+                          Đăng Ký
+                        </Link>
+                        <Link
+                          to="/login"
+                          className="py-2 w-[150px] text-center text-white bg-blue-600 rounded-md hover:bg-blue-500 transition duration-200 ease-in-out"
+                        >
+                          Đăng Nhập
+                        </Link>
+                      </div>
+                    )}
                   </div>
-
-
-
                 </div>
                 <Link to="/wishlist" className="relative">
                   <span className="absolute text-xs right-[-5px] top-[-5px] bg-[#000] text-white px-1 rounded-full">
@@ -199,6 +194,7 @@ const Header = (props: Props) => {
             </div>
           </header>
         </div>
+
       </div>
     </>
   );

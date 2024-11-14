@@ -13,15 +13,18 @@ type Props = {
 };
 const ModalCart = ({ open, onClose, idCart, onUpdateAttributes, attributes }: Props) => {
   const { token } = useAuth();
+  console.log("attributes", attributes)
   const [activeAttributes, setActiveAttributes] = useState<any>({});
   const [currentPrice, setCurrentPrice] = useState<number | null>(null);
   const transformAttributes = (attributes: any) => {
-    return attributes?.reduce((acc: any, curr: any) => {
+    console.log("attributes", attributes)
+    return (Array.isArray(attributes) ? attributes : []).reduce((acc: any, curr: any) => {
       acc[curr.name] = curr.pivot.attribute_item_id.toString();
       return acc;
-    }, {}) || {};
+    }, {});
   };
   const [dataAttributes, setAttribute] = useState<any>(transformAttributes(attributes));
+  console.log("dataAttributes", dataAttributes)
   useEffect(() => {
     if (open && attributes) {
       setAttribute(transformAttributes(attributes));
@@ -141,8 +144,8 @@ const ModalCart = ({ open, onClose, idCart, onUpdateAttributes, attributes }: Pr
                     <div
                       key={item.id}
                       className={`relative flex-1 max-w-[75px] h-8 sm:h-8 rounded-full border-2 cursor-pointer 
-                                              ${isActive ? 'border-black ' : ''}
-                                                `}
+                    ${isActive ? 'border-black ' : ''}
+                     `}
                       onClick={() => {
                         if (!dis) {
                           handleActive(e.attribute, item.id);
@@ -150,7 +153,6 @@ const ModalCart = ({ open, onClose, idCart, onUpdateAttributes, attributes }: Pr
                       }}
                       style={_styles}
                     >
-
                       {e.attribute.toLowerCase() == 'color' ? (
                         <div
                           className="absolute inset-0.5 rounded-full overflow-hidden"
