@@ -1,8 +1,9 @@
+import Loading from '@/common/Loading/Loading';
 import { Itags } from '@/common/types/tags';
 import instance from '@/configs/axios';
 import { createTag, updateTag } from '@/services/api/admin/tags.api';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Button, Form, Input, Skeleton } from 'antd';
+import { Button, Form, Input } from 'antd';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -80,7 +81,7 @@ const FormTag = () => {
         </h1>
       </div>
       {
-        isFetching ? (<Skeleton />) : (
+        isFetching ? (<Loading />) : (
           <Form form={form} layout='vertical' onFinish={onFinish} initialValues={data}>
             <Form.Item name="name" label="Tên tag">
               <Input placeholder='Tên tag' />

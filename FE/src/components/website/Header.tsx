@@ -100,7 +100,11 @@ const Header = (props: Props) => {
           </div>
         </section>
         
+<<<<<<< HEAD
         <div className="w-[100%] bg-[#fff]">
+=======
+        <div className="w-[100%] bg-[#fff] ">
+>>>>>>> 6828ef0dec13b07132449db37bfeeee7d5575924
           <header className="lg:mx-10 bg-[#fff] h-[70px] grid grid-cols-12 gap-4 top-0 z-40">
             <div className="lg:col-span-2 col-span-4 flex justify-center items-center md:items-center md:justify-center lg:justify-start  order-2 lg:order-1">
               <img src={LogoClient} alt="" className="h-[40px]" />

@@ -10,10 +10,11 @@ import {
   Input,
   message,
   Select,
-  Skeleton,
   Upload,
   UploadProps,
 } from "antd";
+import Loading from "@/common/Loading/Loading";
+
 
 import { useAuth } from "@/common/context/Auth/AuthContext";
 import { IPost } from "@/common/types/post";
@@ -22,6 +23,7 @@ import { Option } from "antd/es/mentions";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
+import Loading from "@/common/Loading/Loading";
 
 const FormPost = () => {
   const [form] = Form.useForm();
@@ -163,7 +165,7 @@ const FormPost = () => {
       </div>
 
       {isFetching ? (
-        <Skeleton />
+        <Loading />
       ) : (
         <Form
           form={form}

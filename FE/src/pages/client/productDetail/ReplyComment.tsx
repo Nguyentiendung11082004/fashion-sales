@@ -2,16 +2,18 @@
 import { useAuth } from "@/common/context/Auth/AuthContext";
 import { Icomments } from "@/common/types/comments";
 import instance from "@/configs/axios";
-import { PlusOutlined } from "@ant-design/icons";
+import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button, Form, message, Upload, UploadProps } from "antd";
 import TextArea from "antd/es/input/TextArea";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
+
 interface UpdateReplyPayload {
   data: Icomments;
   replyToCommentId: any;
 }
+
 const ReplyComment = ({
   productId,
   setReplyToCommentId,
@@ -22,8 +24,16 @@ const ReplyComment = ({
   const [isLoading, setIsLoading] = useState(false);
   const { token } = useAuth();
   const [form] = Form.useForm();
-  const [urlImage, setUrlImage] = useState<string | null>(null);
+  const [urlImage, setUrlImage] = useState<string | null>(
+    InForCommentId?.image || null
+  );
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    if (InForCommentId) {
+      setUrlImage(InForCommentId.image);
+    }
+  }, [InForCommentId]);
 
   const propImgComment: UploadProps = {
     name: "file",
@@ -83,9 +93,7 @@ const ReplyComment = ({
       queryClient.invalidateQueries({ queryKey: ["product"] });
       toast.success("Chỉnh sửa thành công");
       form.resetFields();
-      console.log("replyToCommentId", setReplyToCommentId);
       setReplyToCommentId(null);
-      // setUrlImage(null);
       setInForCommentId(null);
       setIsLoading(false);
     },
@@ -98,7 +106,10 @@ const ReplyComment = ({
   const onFinish = (values: any) => {
     if (urlImage) {
       values.image = urlImage;
+    } else {
+      values.image = null;
     }
+
     if (InForCommentId && replyToCommentId) {
       updatReplyComment.mutate({ data: values as Icomments, replyToCommentId });
     } else {
@@ -110,83 +121,87 @@ const ReplyComment = ({
         image: urlImage,
       });
     }
+
+    setUrlImage(null);
   };
 
   return (
-    <>
-      <div className="w-[90%] border ml-[48px] flex items-center">
-        <Form
-          form={form}
-          onFinish={onFinish}
-          initialValues={InForCommentId}
-          className="flex justify-between items-center w-full"
-        >
-          {/* {replyToCommentId ? "Phản hồi" : "Sửa phản hồi"} */}
-          <div className="w-[90%] flex items-center">
-            <Form.Item name="content" className="w-[85%]">
-              <TextArea
-                placeholder="Nhập nhận xét của bạn"
-                rows={4}
-                className="h-full"
-              />
-            </Form.Item>
-            <Form.Item
-              valuePropName="fileList"
-              className="w-[30%] flex items-center justify-center h-full"
-            >
+    <div className="w-[90%] border ml-[48px] flex items-center">
+      <Form
+        form={form}
+        onFinish={onFinish}
+        initialValues={InForCommentId}
+        className="flex justify-between items-center w-full"
+      >
+        <div className="w-[90%] flex items-center">
+          <Form.Item name="content" className="w-[85%]">
+            <TextArea
+              autoFocus
+              placeholder="Nhập nhận xét của bạn"
+              rows={4}
+              className="h-full"
+            />
+          </Form.Item>
+          <Form.Item className="w-[30%] flex items-center justify-center h-full">
+            <div className="flex">
+              {urlImage && (
+                <div className="relative">
+                  <div className="w-[100px] h-[100px]">
+                    <img
+                      src={urlImage}
+                      alt="preview"
+                      className="w-[100px] h-[100px] border rounded-md"
+                    />
+                    <button
+                      onClick={() => setUrlImage(null)}
+                      className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 text-white rounded-md opacity-0 hover:opacity-100 hover:bg-opacity-30 transition-opacity duration-200"
+                    >
+                      <DeleteOutlined style={{ fontSize: "20px" }} />
+                    </button>
+                  </div>
+                </div>
+              )}
               <Upload
                 {...propImgComment}
-                showUploadList={{
-                  showPreviewIcon: false,
-                  showRemoveIcon: true,
-                }}
-                onRemove={() => {
-                  setUrlImage(null);
-                }}
+                showUploadList={false}
+                onRemove={() => setUrlImage(null)}
                 listType="picture-card"
                 maxCount={1}
-                className="flex items-center justify-center h-full w-full border-none"
+                className="ml-2 flex items-center justify-center h-full w-full border-none"
               >
                 <button
-                  style={{
-                    border: 0,
-                    background: "none",
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    height: "100%",
-                  }}
+                  className="flex flex-col justify-center items-center h-[100%]"
                   type="button"
                 >
                   <PlusOutlined />
                   <div style={{ marginTop: 8 }}>Upload</div>
                 </button>
               </Upload>
-            </Form.Item>
-          </div>
-          <div className="flex text-right justify-end mt-2">
-            <Button
-              className="text-center mr-2 px-4 flex items-center justify-center"
-              htmlType="submit"
-              type="primary"
-              loading={isLoading}
-            >
-              <span className="text-[12px]">Gửi</span>
-            </Button>
+            </div>
+          </Form.Item>
+        </div>
+        <div className="flex text-right justify-end mt-2">
+          <Button
+            className="text-center mr-2 px-4 flex items-center justify-center"
+            htmlType="submit"
+            type="primary"
+            loading={isLoading}
+          >
+            <span className="text-[12px]">Gửi</span>
+          </Button>
 
-            <Button
-              className="text-center text-red-500 mr-2 px-4 flex items-center justify-center"
-              onClick={() => {
-                setReplyToCommentId(null);
-              }}
-            >
-              <span className="text-[12px]">Hủy</span>
-            </Button>
-          </div>
-        </Form>
-      </div>
-    </>
+          <Button
+            className="text-center text-red-500 mr-2 px-4 flex items-center justify-center"
+            onClick={() => {
+              setReplyToCommentId(null);
+              setUrlImage(null);
+            }}
+          >
+            <span className="text-[12px]">Hủy</span>
+          </Button>
+        </div>
+      </Form>
+    </div>
   );
 };
 

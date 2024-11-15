@@ -1,22 +1,48 @@
 import Loading from "@/common/Loading/Loading";
 import React, { Suspense, lazy } from "react";
 import { Route, Routes } from "react-router-dom";
+
+const Vouchers = lazy(() => import("@/pages/admin/vouchers/Vouchers"));
+const VoucherDetail = lazy(
+  () => import("@/pages/admin/vouchers/components/VoucherDetail")
+);
+const FormVoucher = lazy(
+  () => import("@/pages/admin/vouchers/components/FormVoucher")
+);
+const OrderDetail = lazy(
+  () => import("@/pages/admin/order/components/OrderDetail")
+);
+const ProductForm = lazy(
+  () => import("@/pages/admin/products/_components/ProductForm")
+);
+
 // Lazy load các trang
 const HomePage = lazy(() => import("../pages/client/home/HomePage"));
+const Wishlist = lazy(() => import("@/pages/client/wishlist/Wishlist"));
 const Products = lazy(() => import("@/pages/client/products/Products"));
-const ProductDetail = lazy(() => import("@/pages/client/productDetail/ProductDetail"));
+const ProductDetail = lazy(
+  () => import("@/pages/client/productDetail/ProductDetail")
+);
 const About = lazy(() => import("@/pages/client/about/About"));
 const Account = lazy(() => import("@/pages/client/account/Account"));
 const Cart = lazy(() => import("@/pages/client/cart/Cart"));
 const Checkout = lazy(() => import("@/pages/client/checkout/Checkout"));
 const Contact = lazy(() => import("@/pages/client/contact/Contact"));
-const HistoryOrder = lazy(() => import("@/pages/client/historyOrder/HistoryOrder"));
+const HistoryOrder = lazy(
+  () => import("@/pages/client/historyOrder/HistoryOrder")
+);
 const NotFound = lazy(() => import("@/pages/client/notfound/NotFound"));
 const Login = lazy(() => import("@/pages/client/auth/login/Login"));
 const Register = lazy(() => import("@/pages/client/auth/register/Register"));
-const ForgotPassword = lazy(() => import("@/pages/client/auth/forgotpassword/ForgotPassword"));
-const ResetPassword = lazy(() => import("@/pages/client/auth/resetpassword/ResetPassword"));
-const PasswordResetHandler = lazy(() => import("@/pages/client/auth/resetpassword/PasswordResetHandler"));
+const ForgotPassword = lazy(
+  () => import("@/pages/client/auth/forgotpassword/ForgotPassword")
+);
+const ResetPassword = lazy(
+  () => import("@/pages/client/auth/resetpassword/ResetPassword")
+);
+const PasswordResetHandler = lazy(
+  () => import("@/pages/client/auth/resetpassword/PasswordResetHandler")
+);
 const Thanks = lazy(() => import("@/pages/client/thanks/Thanks"));
 const Order = lazy(() => import("@/pages/client/order"));
 const Permission = lazy(() => import("@/pages/client/auth/permission"));
@@ -24,31 +50,57 @@ const LayoutWebsite = lazy(() => import("../pages/client/layout"));
 const LayoutAdmin = lazy(() => import("@/pages/admin/layout"));
 const Dashboard = lazy(() => import("@/pages/admin/dashboard/Dashboard"));
 const ProductPageManager = lazy(() => import("@/pages/admin/products/page"));
-const ProductDetailAdmin = lazy(() => import("@/pages/admin/products/_components/ProductDetail"));
-const ProductForm = lazy(() => import("@/pages/admin/products/_components/ProductForm"));
+const ProductDetailAdmin = lazy(
+  () => import("@/pages/admin/products/_components/ProductDetail")
+);
+// const ProductForm = lazy(
+//   () => import("@/pages/admin/products/_components/ProductForm")
+// );
 const CategoryPage = lazy(() => import("@/pages/admin/category/Category"));
-const CategoryForm = lazy(() => import("@/pages/admin/category/_components/CategoryForm"));
-const AttributeItem = lazy(() => import("@/pages/admin/attribute/attribute-item/page"));
-const AttributeItemValues = lazy(() => import("@/pages/admin/attribute/attribute-item-values/page"));
+const CategoryForm = lazy(
+  () => import("@/pages/admin/category/_components/CategoryForm")
+);
+const AttributeItem = lazy(
+  () => import("@/pages/admin/attribute/attribute-item/page")
+);
+const AttributeItemValues = lazy(
+  () => import("@/pages/admin/attribute/attribute-item-values/page")
+);
 const ClientPage = lazy(() => import("@/pages/admin/account/client/Client"));
-const FormClient = lazy(() => import("@/pages/admin/account/client/components/FormClient"));
-const EmployeePage = lazy(() => import("@/pages/admin/account/employee/Employee"));
-const FormEmployee = lazy(() => import("@/pages/admin/account/employee/components/FormEmployee"));
+const FormClient = lazy(
+  () => import("@/pages/admin/account/client/components/FormClient")
+);
+const EmployeePage = lazy(
+  () => import("@/pages/admin/account/employee/Employee")
+);
+const FormEmployee = lazy(
+  () => import("@/pages/admin/account/employee/components/FormEmployee")
+);
 const Brands = lazy(() => import("@/pages/admin/brands/Brands"));
-const BrandForm = lazy(() => import("@/pages/admin/brands/_components/BrandForm"));
+const BrandForm = lazy(
+  () => import("@/pages/admin/brands/_components/BrandForm")
+);
 const OrderPage = lazy(() => import("@/pages/admin/order/Order"));
 const Tags = lazy(() => import("@/pages/admin/tags/Tags"));
 const FormTag = lazy(() => import("@/pages/admin/tags/_components/TagForm"));
 const Banners = lazy(() => import("@/pages/admin/banners/Banners"));
-const BannersForm = lazy(() => import("@/pages/admin/banners/components/BannersForm"));
+const BannersForm = lazy(
+  () => import("@/pages/admin/banners/components/BannersForm")
+);
 const Posts = lazy(() => import("@/pages/admin/posts/Posts"));
 const FormPost = lazy(() => import("@/pages/admin/posts/components/FormPost"));
 const Chatbox = lazy(() => import("@/pages/admin/chatbox/Chatbox"));
-const CommentPage = lazy(() => import("@/pages/admin/comments/Comments"));
+// const CommentPage = lazy(() => import("@/pages/admin/comments/Comments"));
 
 const Router = () => {
   return (
-    <Suspense fallback={<div><Loading /></div>}>
+    <Suspense
+      fallback={
+        <div>
+          <Loading />
+        </div>
+      }
+    >
       <Routes>
         <Route path="/" element={<LayoutWebsite />}>
           <Route index element={<HomePage />} />
@@ -59,7 +111,7 @@ const Router = () => {
             <Route path="cart" element={<Cart />} />
           </Route>
           <Route path="account" element={<Account />} />
-          {/* <Route path="wishlist" element={<Wishlist />} /> */}
+          <Route path="wishlist" element={<Wishlist />} />
           <Route path="checkout" element={<Checkout />} />
           <Route path="contact" element={<Contact />} />
           <Route path="thank" element={<Thanks />} />
@@ -69,7 +121,10 @@ const Router = () => {
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
         <Route path="account/forgotpassword" element={<ForgotPassword />} />
-        <Route path="/password/reset/:token" element={<PasswordResetHandler />} />
+        <Route
+          path="/password/reset/:token"
+          element={<PasswordResetHandler />}
+        />
         <Route path="password/reset" element={<ResetPassword />} />
         <Route path="/admin" element={<LayoutAdmin />}>
           <Route index element={<Dashboard />} />
@@ -90,7 +145,6 @@ const Router = () => {
           <Route path="brands" element={<Brands />} />
           <Route path="brands/create" element={<BrandForm />} />
           <Route path="brands/edit/:id" element={<BrandForm />} />
-          <Route path="order" element={<OrderPage />} />
           <Route path="tags" element={<Tags />} />
           <Route path="tags/create" element={<FormTag />} />
           <Route path="tags/edit/:id" element={<FormTag />} />
@@ -101,6 +155,12 @@ const Router = () => {
           <Route path="posts/create" element={<FormPost />} />
           <Route path="posts/edit/:id" element={<FormPost />} />
           <Route path="chatbox" element={<Chatbox />} />
+          <Route path="vouchers" element={<Vouchers />} />
+          <Route path="vouchers/:id" element={<VoucherDetail />} />
+          <Route path="vouchers/create" element={<FormVoucher />} />
+          <Route path="vouchers/edit/:id" element={<FormVoucher />} />
+          <Route path="orders" element={<OrderPage />} />
+          <Route path="orders/:id" element={<OrderDetail />} />
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>

@@ -42,7 +42,6 @@ const Banner = () => {
 
   useEffect(() => {
     const totalItems = data?.banners?.length || 0;
-    console.log("data?.banners", data?.banners);
     const maxPage = Math.ceil(totalItems / pageSize);
 
     if (totalItems > 0 && currentPage > maxPage) {

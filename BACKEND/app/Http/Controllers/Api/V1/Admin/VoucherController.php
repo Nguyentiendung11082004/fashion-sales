@@ -93,7 +93,7 @@ class VoucherController extends Controller
                         }
 
                         // Kiểm tra `_voucher_applies_to_total`
-                        if ($metaKey === '_voucher_applies_to_total') {
+if ($metaKey === '_voucher_applies_to_total') {
                             if (!is_bool($metaValue)) {
                                 return response()->json([
                                     'status' => 400,
@@ -335,7 +335,7 @@ class VoucherController extends Controller
                             VoucherMeta::where('voucher_id', $voucher->id)
                                 ->where('meta_key', '_voucher_applies_to_total')
                                 ->delete();
-                            continue; // Bỏ qua lưu vào database khi metaValue là false
+continue; // Bỏ qua lưu vào database khi metaValue là false
                         }
                         //Kết thúc bổ sung sẽ xóa bản ghi nếu từ true sang false
 
@@ -390,7 +390,7 @@ class VoucherController extends Controller
                     throw new \Exception('The selected categories cannot be included in both Applicable Product and Excluded Product');
                 }
                 if (!empty(array_intersect($categoryIds, $excludeCategoryIds))) {
-                    throw new \Exception('The selected categories cannot be included in both Applicable Categories and Excluded Categories');
+throw new \Exception('The selected categories cannot be included in both Applicable Categories and Excluded Categories');
                 }
 
                 if (!empty($metaData)) {

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Loading from '@/common/Loading/Loading'
 import { Icategories } from '@/common/types/categories'
 import { IProductVariant, Iproduct } from '@/common/types/products'
@@ -60,8 +61,7 @@ const ProductForm = () => {
         newVariants[index] = { ...newVariants[index], [field]: value };
         setVariants(newVariants);
     };
-
-    const { data, isFetching } = useQuery({
+const { data, isFetching } = useQuery({
         queryKey: ['productCreate'],
         queryFn: productCreate,
     });
@@ -132,7 +132,7 @@ const ProductForm = () => {
             }
             const attrName = attributeNames[index];
             const items = selectedValues[attrName] || [];
-            if (items.length === 0) return;
+if (items.length === 0) return;
 
             items.forEach((itemId: any) => {
                 const item = data?.attribute.find((attr: any) => attr.id === Number(attrName))
@@ -207,7 +207,7 @@ const ProductForm = () => {
     const propsImgThumbnail: UploadProps = {
         name: 'file',
         action: 'https://api.cloudinary.com/v1_1/dlvwxauhf/image/upload',
-        data: {
+data: {
             upload_preset: "fashion-sales",
             folder: "fashion-sales"
         },
@@ -287,7 +287,7 @@ const ProductForm = () => {
             title: 'Price Regular',
             dataIndex: 'price_regular',
             render: (text: any, record: any, index: number) => (
-                <Input
+<Input
                     value={variants[index]?.price_regular || ''}
                     onChange={(e) => handleInputChange(index, 'price_regular', e.target.value)}
                 />
@@ -364,7 +364,7 @@ const ProductForm = () => {
             const itemAttributes = productAttribute.reduce((acc: any, attrId: any) => {
                 acc[attrId] = item[attrId] || [];
                 return acc;
-            }, {});
+}, {});
 
             return {
                 price_regular: item.price_regular,
@@ -438,7 +438,7 @@ const ProductForm = () => {
                 setVariants(prev => {
                     const newVariants = [...prev];
                     newVariants[index] = {
-                        price_regular: '',
+price_regular: '',
                         price_sale: '',
                         quantity: '',
                         sku: '',
@@ -518,8 +518,12 @@ const ProductForm = () => {
                 quantity: Number(variant?.quantity),
                 image: variant?.image,
                 sku: variant?.sku,
+<<<<<<< HEAD
                 IdGuid: generateGUID()
             });
+=======
+});
+>>>>>>> 6828ef0dec13b07132449db37bfeeee7d5575924
         });
 
         if (!attribute) {
@@ -591,7 +595,7 @@ const ProductForm = () => {
 
                                 {error?.tags && <div className='text-red-600'>{error.tags.join(', ')}</div>}
                             </Form.Item>
-                            <Form.Item name="brand_id" label="Thương hiệu" className="col-span-1">
+<Form.Item name="brand_id" label="Thương hiệu" className="col-span-1">
                                 <Select
                                     size='large'
                                     options={data?.brand.map((item: any) => ({
@@ -638,7 +642,7 @@ const ProductForm = () => {
                                 ) : (
                                     productShow?.img_thumbnail && (
                                         <>
-                                            <img src={productShow.img_thumbnail} alt="Uploaded" style={{ marginTop: 16, width: 100, marginBottom: '10px' }} />
+<img src={productShow.img_thumbnail} alt="Uploaded" style={{ marginTop: 16, width: 100, marginBottom: '10px' }} />
                                         </>
                                     )
                                 )}
@@ -687,8 +691,7 @@ const ProductForm = () => {
                                 />
                                 {error?.type && <div className='text-red-600'>{error.type.join(', ')}</div>}
                             </Form.Item>
-
-                            <Form.Item className="col-span-3">
+<Form.Item className="col-span-3">
                                 {attribute == 1 && (
                                     <Form.Item name="attribute_id" label="Chọn thuộc tính">
                                         <Select
@@ -733,7 +736,7 @@ const ProductForm = () => {
                                         setSelectedAttributeChildren([]);
                                         setSelectedValues({});
                                         setIsTableVisible(false);
-                                        setAttribute(0)
+setAttribute(0)
                                         form.resetFields();
                                     }}>Hủy</Button>
                                 } */}
@@ -782,7 +785,7 @@ const ProductForm = () => {
                                 <div className="border border-gray-300 rounded-lg p-4 flex items-center space-x-4">
                                     <Radio.Group onChange={onChangeStatus} value={valueStatus} className="flex space-x-4">
                                         <Radio
-                                            value={1}
+value={1}
                                             className="text-lg font-semibold focus:outline-none"
                                         >
                                             Còn hàng
@@ -834,7 +837,7 @@ const ProductForm = () => {
                                         </Radio>
                                     </Radio.Group>
                                 </div>
-                            </Form.Item>
+</Form.Item>
                             <Form.Item name="is_new" label="Is New" className="col-span-1" >
                                 <div className="border border-gray-300 rounded-lg p-4 flex items-center space-x-4">
                                     <Radio.Group onChange={onChangeNew} value={valueNew} className="flex space-x-4">
@@ -864,14 +867,3 @@ const ProductForm = () => {
     )
 }
 export default ProductForm
-
-
-
-
-
-
-
-
-
-
-
