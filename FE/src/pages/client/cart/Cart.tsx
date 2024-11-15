@@ -35,7 +35,7 @@ const Cart = () => {
     setVisible(false);
   };
   const { token } = useAuth();
-  const { data, isFetching } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ['cart'],
     queryFn: async () => {
       const res = await instance.get('/cart', {
@@ -196,6 +196,7 @@ const Cart = () => {
   });
 
   const [isAllChecked, setIsAllChecked] = useState<boolean>(false);
+  console.log("isAllChecked",isAllChecked)
   const [checkedItems, setCheckedItems] = useState<{ [key: number]: boolean }>({});
   const handleCheckAll = () => {
     const newChecked = !isAllChecked;
@@ -224,6 +225,7 @@ const Cart = () => {
       .filter(key => updatedCheckedItems[Number(key)])
       .map(Number);
     setIdCart(updatedIdCarts);
+  
     setIsAllChecked(updatedIdCarts.length === carts.length);
   };
   const handleCheckout = () => {
@@ -252,6 +254,25 @@ const Cart = () => {
       setIdCart(updatedIdCarts);
     }
   }, []);
+  useEffect(() => {
+    // Khi dữ liệu giỏ hàng (carts) thay đổi, kiểm tra lại các checkbox
+    if (carts && carts.length > 0) {
+      // Cập nhật checkedItems từ localStorage nếu có
+      const storedCheckedItems = localStorage.getItem('checkedItems');
+      if (storedCheckedItems) {
+        const parsedCheckedItems = JSON.parse(storedCheckedItems);
+        setCheckedItems(parsedCheckedItems);
+  
+        // Tính toán lại isAllChecked
+        const isAllCheckedNow = carts.every((item:any) => parsedCheckedItems[item.id]);
+        setIsAllChecked(isAllCheckedNow);
+      }
+    } else {
+      // Nếu giỏ hàng trống, set isAllChecked = false
+      setIsAllChecked(false);
+    }
+  }, [carts]);
+  
   return (
     <>
       <main
@@ -299,7 +320,7 @@ const Cart = () => {
               <div className="hd-pagecart-items">
                 <div className="hd-item relative overflow-hidden">
                   {
-                    isFetching ? <Loading /> :
+                    isLoading ? <Loading /> :
                       carts && carts.length > 0 ? (carts?.map((e: any) => {
                         const { productvariant } = e;
                         const attributesObject = productvariant?.attributes.reduce((acc: any, attribute: any) => {
@@ -555,7 +576,7 @@ const Cart = () => {
                         <div className="hd-col-item w-auto">
                           <div className="text-right font-semibold">
                             {
-                              // isFetching ? <Skeleton /> : 
+                              // isLoading ? <Skeleton /> : 
                               FormatMoney(data?.sub_total)
                             }
                           </div>

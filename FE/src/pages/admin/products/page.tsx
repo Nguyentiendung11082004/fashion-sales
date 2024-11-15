@@ -148,7 +148,7 @@ const ProductPageManager = () => {
       key: product.id,
       ...product
     }
-  )) || [];
+    )) || [];
   useEffect(() => {
     if (isError && !hasError) {
       toast.error("Có lỗi xảy ra");

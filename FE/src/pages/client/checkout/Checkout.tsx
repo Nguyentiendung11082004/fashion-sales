@@ -22,11 +22,8 @@ const Checkout = () => {
   const savedCartIds = localStorage.getItem('cartIds');
   const cartIds = location.state?.cartIds || (savedCartIds ? JSON.parse(savedCartIds) : []);
   const _payload = location.state?._payload
-  const [idTinh, setIdTinh] = useState<number | null>(0)
-  const [idQuanHuyen, setIdQuanHuyen] = useState<number | null>(0)
-  const [idXa, setIdXa] = useState<number | null>(0)
   const [paymentMethhod, setPaymentMethod] = useState('1');
-  const [shiping, setShipPing] = useState<number>(1);
+  const [shiping, setShipPing] = useState<any>('1');
   const [voucher, setVoucher] = useState<any>();
   const [subTotal, setSubTotal] = useState(); // giá khi áp dụng voucher
   const [totalDiscount, setTotalDiscount] = useState();
@@ -163,14 +160,15 @@ const Checkout = () => {
     enabled: !!idAddress
   })
   const dataDiaChi = addressDetail?.data?.address;
+  const addressUser = dataCheckout?.user?.addresses?.filter((e: any) => e.is_default !== false);
+  console.log('addressUser', addressUser)
 
   const getShipp = async () => {
     let res = await instance.post(`/calculateshippingfee`, {
-      to_ward_code:payload?.idQuanHuyen,
-      to_district_id:String(payload?.idXa),
-      weight:160000
+      to_ward_code: payload?.idQuanHuyen,
+      to_district_id: String(payload?.idXa),
+      weight: 160000
     })
-    console.log("res",res)
     // if(res) {
     //   setShipPing(res)
     // }
@@ -250,10 +248,10 @@ const Checkout = () => {
                             <span className="hidden sm:block mt-4 ">
                               <Map />
                             </span>
-                            <div className="sm:ml-8">
+                            <div className="sm:ml-6 w-[75%]">
                               <h3 className="text-black flex">
                                 <span className="uppercase tracking-tight">
-                                  Địa chỉ nhận hàng
+                                  THÔNG TIN NGƯỜI NHẬN
                                 </span>
                                 <Completed />
                               </h3>
@@ -264,12 +262,15 @@ const Checkout = () => {
                                 </span>
                               </div>
                               <div className="mt-2">
-                                {dataDiaChi?.address ? dataDiaChi.address + '-' : ''}
-                                {dataDiaChi?.ward ? dataDiaChi.ward + '-' : ''}
-                                {dataDiaChi?.district ? dataDiaChi.district + '-' : ''}
-                                {dataDiaChi?.city || ''}
+                                {addressUser?.map((e: any) => (
+                                  <>
+                                    {e?.address ? e.address + '-' : ''}
+                                    {e?.ward ? e.ward + '-' : ''}
+                                    {e?.district ? e.district + '-' : ''}
+                                    {e?.city || ''}
+                                  </>
+                                ))}
                               </div>
-
                             </div>
                             <button onClick={handleOpenModal} className="py-2 px-4 bg-slate-50 hover:bg-slate-100 mt-5 sm:mt-0 sm:ml-auto text-sm font-medium rounded-lg">
                               Thay đổi

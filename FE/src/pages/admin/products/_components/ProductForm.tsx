@@ -13,6 +13,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { productDestroy } from '@/services/api/admin/products.api'
+import { generateGUID } from '@/common/utils/utils'
 type ErrorResponse = {
     [key: string]: string[];
 };
@@ -30,6 +31,7 @@ const ProductForm = () => {
     const [selectedItems, setSelectedItems] = useState<any>([]); // giá trị khi lưu ở table 
     const [isTableVisible, setIsTableVisible] = useState(false); // State điều khiển hiển thị bảng
     const [selectedValues, setSelectedValues] = useState<any>([]); // State lưu trữ giá trị đã chọn cho từng thuộc tính
+    console.log("selectedValues",selectedValues)
     const [isColumnsVisible, setIsColumnsVisible] = useState(false); // state cột
     const [error, setError] = useState<any>()
     const [valueHome, setValueHome] = useState(1);
@@ -95,11 +97,6 @@ const ProductForm = () => {
                 newSelectedValues[attrId] = [];
             }
         });
-        // Object.keys(newSelectedValues).forEach(attrId => {
-        //     if (!values.includes(attrId)) {
-        //         delete newSelectedValues[attrId];
-        //     }
-        // });
         setSelectedValues(newSelectedValues);
         handleSaveAttributes();
     };
@@ -276,13 +273,13 @@ const ProductForm = () => {
                     >
                         <Button icon={<UploadOutlined />}>Tải lên ảnh</Button>
                     </Upload>
-                    {variants && variants[index] && variants[index].image && (
+                    {id ? variants && variants[index] && variants[index].image && (
                         <img
                             src={variants[index].image}
                             alt="Uploaded"
                             style={{ marginTop: 16, width: 100, marginBottom: '10px' }}
                         />
-                    )}
+                    ) : ''}
                 </>
             )
         },
@@ -521,6 +518,7 @@ const ProductForm = () => {
                 quantity: Number(variant?.quantity),
                 image: variant?.image,
                 sku: variant?.sku,
+                IdGuid: generateGUID()
             });
         });
 
@@ -544,7 +542,7 @@ const ProductForm = () => {
             const productPayload = {
                 ...values,
                 img_thumbnail: urlImage,
-                galleries: imageGallery,
+                gallery: imageGallery,
                 attribute_item_id: attributeData,
                 product_variant: filteredVariants,
             };
