@@ -12,17 +12,18 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button, Modal, Pagination, Table } from "antd";
 import { ColumnType } from "antd/es/table";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const Vouchers = () => {
-  const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(5);
   const [visiable, setVisiable] = useState(false);
   const [currentId, setCurrentId] = useState<number>();
   const [hasError, setHasError] = useState(false);
   const queryClient = useQueryClient();
+  const initialPage = queryClient.getQueryData(["currentPage"]) || 1;
 
+  const [currentPage, setCurrentPage] = useState(Number(initialPage));
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ["vouchers"],
     queryFn: async () => {
@@ -34,9 +35,20 @@ const Vouchers = () => {
     },
   });
 
-  // console.log("data", data);
-  const dataVoucher = data?.data?.dataVouchers;
+  const navigate = useNavigate();
 
+  const handleEdit = (id: number) => {
+    navigate(`edit/${id}`, { state: { currentPage } });
+  };
+  const dataVoucher = data?.data?.dataVouchers;
+  useEffect(() => {
+    const totalItems = data?.data?.length || 0;
+    const maxPage = Math.ceil(totalItems / pageSize);
+
+    if (totalItems > 0 && currentPage > maxPage) {
+      setCurrentPage(maxPage);
+    }
+  }, [data, currentPage, pageSize]);
   const dataSource =
     dataVoucher?.map((item: IVouchers) => ({
       key: item?.id,
@@ -70,7 +82,7 @@ const Vouchers = () => {
       setVisiable(false);
     }
   };
-  
+
   const columns: ColumnType<IVouchers>[] = [
     {
       title: "Stt",
@@ -86,24 +98,7 @@ const Vouchers = () => {
       title: "Mô tả",
       dataIndex: "description",
     },
-    // {
-    //   title: "Mã code",
-    //   dataIndex: "code",
-    // },
-    // {
-    //   title: "Giá trị sẽ giảm",
-    //   dataIndex: "discount_value",
-    // },
-    // {
-    //   title: "Đơn vị giảm giá",
-    //   dataIndex: "discount_type",
-    //   render: (discount_type: string) =>
-    //     discount_type == "fixed" ? "VNĐ" : "%",
-    // },
-    // {
-    //   title: "Giá trị đơn hàng tối thiểu",
-    //   dataIndex: "min_order_value",
-    // },
+
     {
       title: "Số lượng",
       dataIndex: "usage_limit",
@@ -112,26 +107,7 @@ const Vouchers = () => {
       title: "Đã sử dụng",
       dataIndex: "used_count",
     },
-    // {
-    //   title: "Meta_key",
-    //   render: (record: IVouchers) => (
-    //     <div>
-    //       {record.meta?.map((value, index) => (
-    //         <div key={index}>{value.meta_key}</div>
-    //       ))}
-    //     </div>
-    //   ),
-    // },
-    // {
-    //   title: "Meta_value",
-    //   render: (record: IVouchers) => (
-    //     <div>
-    //       {record.meta?.map((value, index) => (
-    //         <div key={index}>{value.meta_value}</div>
-    //       ))}
-    //     </div>
-    //   ),
-    // },
+
     {
       title: "Ngày bắt đầu",
       dataIndex: "start_date",
@@ -151,11 +127,15 @@ const Vouchers = () => {
                 <EyeOutlined className="" />
               </Button>
             </Link>
-            <Link to={`edit/${record?.id}`}>
-              <Button className="btn-warning mx-2" style={{ width: "46px" }}>
-                <EditOutlined className="" />
-              </Button>
-            </Link>
+
+            <Button
+              className="btn-warning mx-2"
+              style={{ width: "46px" }}
+              onClick={() => handleEdit(record?.id)}
+            >
+              <EditOutlined />
+            </Button>
+
             <Button
               onClick={() => handleOpen(record?.id)}
               className="btn-danger"

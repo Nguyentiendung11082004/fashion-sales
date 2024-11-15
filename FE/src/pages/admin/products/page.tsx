@@ -23,7 +23,7 @@ const ProductPageManager = () => {
   const [currentId, setCurrentId] = useState<number>();
   const [hasError, setHasError] = useState(false);
   const queryClient = useQueryClient();
-  const { data, isLoading, isError } = useQuery({
+  const { data, isFetching, isError } = useQuery({
     queryKey: ["productsIndex"],
     queryFn: productsIndex,
   });
@@ -89,11 +89,6 @@ const ProductPageManager = () => {
         );
       },
     },
-    {
-      title: "slug",
-      dataIndex: "slug",
-    },
-
     {
       title: "status",
       dataIndex: "status",
@@ -177,7 +172,7 @@ const ProductPageManager = () => {
         </Link>
       </div>
       <div className="">
-        {isLoading ? (
+        {isFetching ? (
           <Loading />
         ) : (
           <>

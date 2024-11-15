@@ -1,5 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useRef, useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import slide1 from "@/assets/images/slider1.png";
+import slide2 from "@/assets/images/slider2.png";
+import slide3 from "@/assets/images/slider3.png"; 
 
 import instance from "@/configs/axios";
 import { useQuery } from "@tanstack/react-query";
@@ -41,7 +43,7 @@ const Banner = () => {
         data?.data?.data?.banners.length
     );
   };
-
+  
   const goToSlide = (index: number) => {
     setCurrentIndex(index);
   };
@@ -54,7 +56,7 @@ const Banner = () => {
   }, [currentIndex]);
 
   return (
-    <div className="relative skeleton-banner">
+    <div className="relative">
       <div className="hd-slider-wrapper relative mx-auto">
         <div
           ref={sliderRef}

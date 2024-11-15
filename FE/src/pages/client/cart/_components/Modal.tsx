@@ -1,9 +1,11 @@
+/* eslint-disable prefer-const */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useAuth } from "@/common/context/Auth/AuthContext";
+import Loading from "@/common/Loading/Loading";
 import { FormatMoney } from "@/common/utils/utils";
 import instance from "@/configs/axios";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Modal as AntModal, Button, Skeleton } from "antd";
+import { Modal as AntModal, Button } from "antd";
 import { useEffect, useState } from "react";
 type Props = {
   open: boolean;
@@ -20,9 +22,11 @@ const ModalCart = ({
   attributes,
 }: Props) => {
   const { token } = useAuth();
+  console.log("attributes", attributes);
   const [activeAttributes, setActiveAttributes] = useState<any>({});
   const [currentPrice, setCurrentPrice] = useState<number | null>(null);
   const transformAttributes = (attributes: any) => {
+    console.log("attributes", attributes);
     return (Array.isArray(attributes) ? attributes : []).reduce(
       (acc: any, curr: any) => {
         acc[curr.name] = curr.pivot.attribute_item_id.toString();
@@ -31,13 +35,10 @@ const ModalCart = ({
       {}
     );
   };
-
   const [dataAttributes, setAttribute] = useState<any>(
     transformAttributes(attributes)
   );
-
-  console.log("dataAttributes",dataAttributes)
-
+  console.log("dataAttributes", dataAttributes);
   useEffect(() => {
     if (open && attributes) {
       setAttribute(transformAttributes(attributes));
@@ -155,7 +156,6 @@ const ModalCart = ({
   console.log("resultDataAttribute", resultDataAttribute);
 
   const handleConfirm = (idCart: any) => {
-    
     onUpdateAttributes(idCart, { ...activeAttributes, dataAttributes });
     let qty = cartAttribute?.cart_item?.quantity;
     updateCart.mutate(
@@ -171,8 +171,6 @@ const ModalCart = ({
     onClose();
   };
 
-
-
   return (
     <AntModal
       open={open}
@@ -182,7 +180,7 @@ const ModalCart = ({
       maskClosable={false}
     >
       {isFetching ? (
-        <Skeleton />
+        <Loading />
       ) : (
         <div>
           <h2 className="text-2xl font-bold text-gray-800 mb-2">
@@ -211,8 +209,8 @@ const ModalCart = ({
                     <div
                       key={item.id}
                       className={`relative flex-1 max-w-[75px] h-8 sm:h-8 rounded-full border-2 cursor-pointer 
-                                              ${isActive ? "border-black " : ""}
-                                                `}
+                    ${isActive ? "border-black " : ""}
+                     `}
                       onClick={() => {
                         if (!dis) {
                           handleActive(e.attribute, item.id);

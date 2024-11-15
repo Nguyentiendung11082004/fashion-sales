@@ -7,7 +7,6 @@ import CartDetail from "@/components/icons/detail/CartDetail";
 import Eye from "@/components/icons/detail/Eye";
 import HeartWhite from "@/components/icons/detail/HeartWhite";
 import { ProductNext } from "@/components/icons";
-import { Skeleton } from "antd";
 import { useState } from "react";
 import Loading from "@/common/Loading/Loading";
 
@@ -37,7 +36,8 @@ const RelatedProducts = () => {
     );
   }
 
-  if (isLoading) return <Loading />;
+  if (isLoading)
+    return <Loading />;
   if (isError) return <p>{error.message}</p>;
 
   const indexOfLastProduct = currentPage * productsPerPage;

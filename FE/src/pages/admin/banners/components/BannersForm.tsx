@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { IBanner } from "@/common/types/banners";
 import Loading from "@/common/Loading/Loading";
+import { IBanner } from "@/common/types/banners";
 
 import instance from "@/configs/axios";
 import { bannerCreate, bannerUpdate } from "@/services/api/admin/banners";
@@ -13,7 +13,6 @@ import {
   Form,
   Input,
   message,
-  Skeleton,
   Upload,
   UploadProps,
 } from "antd";

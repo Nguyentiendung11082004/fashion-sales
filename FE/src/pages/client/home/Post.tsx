@@ -21,6 +21,7 @@ const Post = () => {
         });
       } catch (error) {
         throw new Error("Error");
+        console.log("Error");
       }
     },
   });

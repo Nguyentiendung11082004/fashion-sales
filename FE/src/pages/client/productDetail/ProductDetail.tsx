@@ -15,7 +15,7 @@ import {
   productShow_client,
 } from "@/services/api/client/productClient.api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Button, Popconfirm, Skeleton } from "antd";
+import { Button, Popconfirm } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
@@ -464,7 +464,7 @@ const ProductDetail = () => {
     }
   };
 
-  if (isLoading) return <Loading />;
+  if (isLoading) return <Loading/>;
   // if (isError) return <p>{error.message}</p>;
 
   return (

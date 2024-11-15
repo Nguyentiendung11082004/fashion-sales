@@ -888,7 +888,7 @@ const HomePage = () => {
             </div>
           </div>
         </div>
-        <LiveChat />
+        {/* <LiveChat /> */}
       </div>
     </>
   );

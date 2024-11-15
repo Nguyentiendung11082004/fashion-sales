@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import Loading from "@/common/Loading/Loading";
 import { IUser } from "@/common/types/users";
 import instance from "@/configs/axios";
 import { createClient, updateClient } from "@/services/api/admin/clients";
@@ -12,7 +13,6 @@ import {
   Input,
   message,
   Select,
-  Skeleton,
   Upload,
   UploadProps,
 } from "antd";
@@ -69,7 +69,10 @@ const FormEmployee = () => {
     },
   });
   const location = useLocation();
+  console.log("locaion: ",location)
   const currentPage = location.state?.currentPage || 1;
+  console.log("currentPage: ", location.state?.currentPage);
+
   const updateClientMutation = useMutation({
     mutationFn: (client: IUser) => updateClient(Number(id), client),
     onMutate: () => {
@@ -140,7 +143,7 @@ const FormEmployee = () => {
       </div>
 
       {isFetching ? (
-        <Skeleton />
+        <Loading />
       ) : (
         <Form form={form} layout="vertical" onFinish={onFinish}>
           <Form.Item<IUser> label="Username" name="name">

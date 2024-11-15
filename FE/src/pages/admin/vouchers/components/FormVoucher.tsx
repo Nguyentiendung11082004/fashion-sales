@@ -1,19 +1,18 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import Loading from "@/common/Loading/Loading";
 import { IVouchers } from "@/common/types/vouchers";
 import instance from "@/configs/axios";
 import { categoriesIndex } from "@/services/api/admin/categories";
 import { productsIndex } from "@/services/api/admin/products.api";
 import { voucherCreate, voucherUpdate } from "@/services/api/admin/voucher";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Button, DatePicker, Form, Input, Radio, Select, Skeleton } from "antd";
+import { Button, DatePicker, Form, Input, Radio, Select } from "antd";
 import TextArea from "antd/es/input/TextArea";
-import { Option } from "antd/es/mentions";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import Loading from "@/common/Loading/Loading";
 
 const FormVoucher = () => {
   const [form] = Form.useForm();
@@ -68,8 +67,10 @@ const FormVoucher = () => {
   });
 
   const location = useLocation();
-  const currentPage = location.state?.currentPage || 1;
+  console.log("locaion: ",location)
 
+  const currentPage = location.state?.currentPage || 1;
+  console.log("currentPage 123  : ", currentPage);
   const updateVoucher = useMutation({
     mutationFn: (data: IVouchers) => voucherUpdate(Number(id), data),
     onMutate: () => {
@@ -78,7 +79,7 @@ const FormVoucher = () => {
     },
     onSuccess: () => {
       queryClient.setQueryData(["currentPage"], currentPage);
-      queryClient.setQueryData(["vouchers", id], id);
+      // queryClient.setQueryData(["vouchers", id], id);
       refetch();
       setIsLoading(false);
       toast.success("Cập nhật voucher thành công");
@@ -95,57 +96,9 @@ const FormVoucher = () => {
       setIsLoading(false);
     },
   });
-  // useEffect(() => {
-  //   if (voucherDetail) {
-  //     console.log("voucherDetail", voucherDetail);
-  //     let metaDataValues = {};
-  //     const appliesToTotalMeta = voucherDetail?.meta_data?.find(
-  //       (meta: any) => meta?.meta_key === "_voucher_applies_to_total"
-  //     );
 
-  //     const initialVoucherAppliesToTotal = appliesToTotalMeta
-  //       ? "true"
-  //       : "false";
-  //     setVoucher_applies_to_total(initialVoucherAppliesToTotal);
-
-  //     if (initialVoucherAppliesToTotal === "false") {
-  //       metaDataValues = voucherDetail?.meta_data?.reduce(
-  //         (acc: any, meta: any) => {
-  //           if (
-  //             meta?.meta_key !== "_voucher_applies_to_total" &&
-  //             meta?.meta_key &&
-  //             meta?.meta_value !== undefined
-  //           ) {
-  //             // acc[meta.meta_key] = meta.item_names;
-  //             acc[meta.meta_key] = meta.id;
-  //           }
-  //           if (meta?.meta_key === "_voucher_max_discount_amount") {
-  //             acc[meta.meta_key] = meta.meta_value;
-  //           }
-  //           return acc;
-  //         },
-  //         {}
-  //       );
-  //     }
-
-  //     console.log("metaDataValues", metaDataValues);
-
-  //     const initialValues = {
-  //       ...voucherDetail?.voucher,
-  //       _voucher_applies_to_total: initialVoucherAppliesToTotal,
-  //       start_date: dayjs(voucherDetail?.voucher?.start_date),
-  //       end_date: dayjs(voucherDetail?.voucher?.end_date),
-  //       discount_value: parseFloat(voucherDetail?.voucher?.discount_value),
-  //       min_order_value: parseFloat(voucherDetail?.voucher?.min_order_value),
-  //       ...(initialVoucherAppliesToTotal === "false" ? metaDataValues : {}),
-  //     };
-
-  //     form.setFieldsValue(initialValues);
-  //   }
-  // }, [voucherDetail, form]);
   useEffect(() => {
     if (voucherDetail) {
-      console.log("voucherDetail", voucherDetail);
       let metaDataValues = {};
       const appliesToTotalMeta = voucherDetail?.meta_data?.find(
         (meta: any) => meta?.meta_key === "_voucher_applies_to_total"
@@ -183,8 +136,6 @@ const FormVoucher = () => {
           {}
         );
       }
-
-      console.log("metaDataValues", metaDataValues);
 
       const initialValues = {
         ...voucherDetail?.voucher,

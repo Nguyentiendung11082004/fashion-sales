@@ -1,55 +1,106 @@
-import ClientPage from "@/pages/admin/account/client/Client";
-import FormClient from "@/pages/admin/account/client/components/FormClient";
-import EmployeePage from "@/pages/admin/account/employee/Employee";
-import FormEmployee from "@/pages/admin/account/employee/components/FormEmployee";
-import AttributeItemValues from "@/pages/admin/attribute/attribute-item-values/page";
-import AttributeItem from "@/pages/admin/attribute/attribute-item/page";
-import Banners from "@/pages/admin/banners/Banners";
-import BannersForm from "@/pages/admin/banners/components/BannersForm";
-import Brands from "@/pages/admin/brands/Brands";
-import BrandForm from "@/pages/admin/brands/_components/BrandForm";
-import CategoryPage from "@/pages/admin/category/Category";
-import CategoryForm from "@/pages/admin/category/_components/CategoryForm";
-import Chatbox from "@/pages/admin/chatbox/Chatbox";
-import CommentPage from "@/pages/admin/comments/Comments";
-import Dashboard from "@/pages/admin/dashboard/Dashboard";
-import LayoutAdmin from "@/pages/admin/layout";
-import OrderPage from "@/pages/admin/order/Order";
-import Posts from "@/pages/admin/posts/Posts";
-import FormPost from "@/pages/admin/posts/components/FormPost";
-import ProductDetailAdmin from "@/pages/admin/products/_components/ProductDetail";
-import ProductForm from "@/pages/admin/products/_components/ProductForm";
-import ProductPageManager from "@/pages/admin/products/page";
-import Tags from "@/pages/admin/tags/Tags";
-import FormTag from "@/pages/admin/tags/_components/TagForm";
-import About from "@/pages/client/about/About";
-import Account from "@/pages/client/account/Account";
-import ForgotPassword from "@/pages/client/auth/forgotpassword/ForgotPassword";
-import Login from "@/pages/client/auth/login/Login";
-import Register from "@/pages/client/auth/register/Register";
-import ResetPassword from "@/pages/client/auth/resetpassword/ResetPassword";
-import Cart from "@/pages/client/cart/Cart";
-import Checkout from "@/pages/client/checkout/Checkout";
-import Contact from "@/pages/client/contact/Contact";
-import HistoryOrder from "@/pages/client/historyOrder/HistoryOrder";
-import NotFound from "@/pages/client/notfound/NotFound";
-import ProductDetail from "@/pages/client/productDetail/ProductDetail";
-import Products from "@/pages/client/products/Products";
-import Wishlist from "@/pages/client/wishlist/Wishlist";
+import Loading from "@/common/Loading/Loading";
+import React, { Suspense, lazy } from "react";
 import { Route, Routes } from "react-router-dom";
-import HomePage from "../pages/client/home/HomePage";
-import LayoutWebsite from "../pages/client/layout";
-import { PasswordResetHandler } from "@/pages/client/auth/resetpassword/PasswordResetHandler";
-import Vouchers from "@/pages/admin/vouchers/Vouchers";
-import VoucherDetail from "@/pages/admin/vouchers/components/VoucherDetail";
-import FormVoucher from "@/pages/admin/vouchers/components/FormVoucher";
-import Order from "@/pages/client/order";
-import Thanks from "@/pages/client/thanks/Thanks";
-import Permission from "@/pages/client/auth/permission";
-import OrderDetail from "@/pages/admin/order/components/OrderDetail";
+
+const Vouchers = lazy(() => import("@/pages/admin/vouchers/Vouchers"));
+const VoucherDetail = lazy(
+  () => import("@/pages/admin/vouchers/components/VoucherDetail")
+);
+const FormVoucher = lazy(
+  () => import("@/pages/admin/vouchers/components/FormVoucher")
+);
+const OrderDetail = lazy(
+  () => import("@/pages/admin/order/components/OrderDetail")
+);
+const ProductForm = lazy(
+  () => import("@/pages/admin/products/_components/ProductForm")
+);
+
+// Lazy load các trang
+const HomePage = lazy(() => import("../pages/client/home/HomePage"));
+const Wishlist = lazy(() => import("@/pages/client/wishlist/Wishlist"));
+const Products = lazy(() => import("@/pages/client/products/Products"));
+const ProductDetail = lazy(
+  () => import("@/pages/client/productDetail/ProductDetail")
+);
+const About = lazy(() => import("@/pages/client/about/About"));
+const Account = lazy(() => import("@/pages/client/account/Account"));
+const Cart = lazy(() => import("@/pages/client/cart/Cart"));
+const Checkout = lazy(() => import("@/pages/client/checkout/Checkout"));
+const Contact = lazy(() => import("@/pages/client/contact/Contact"));
+const HistoryOrder = lazy(
+  () => import("@/pages/client/historyOrder/HistoryOrder")
+);
+const NotFound = lazy(() => import("@/pages/client/notfound/NotFound"));
+const Login = lazy(() => import("@/pages/client/auth/login/Login"));
+const Register = lazy(() => import("@/pages/client/auth/register/Register"));
+const ForgotPassword = lazy(
+  () => import("@/pages/client/auth/forgotpassword/ForgotPassword")
+);
+const ResetPassword = lazy(
+  () => import("@/pages/client/auth/resetpassword/ResetPassword")
+);
+const PasswordResetHandler = lazy(
+  () => import("@/pages/client/auth/resetpassword/PasswordResetHandler")
+);
+const Thanks = lazy(() => import("@/pages/client/thanks/Thanks"));
+const Order = lazy(() => import("@/pages/client/order"));
+const Permission = lazy(() => import("@/pages/client/auth/permission"));
+const LayoutWebsite = lazy(() => import("../pages/client/layout"));
+const LayoutAdmin = lazy(() => import("@/pages/admin/layout"));
+const Dashboard = lazy(() => import("@/pages/admin/dashboard/Dashboard"));
+const ProductPageManager = lazy(() => import("@/pages/admin/products/page"));
+const ProductDetailAdmin = lazy(
+  () => import("@/pages/admin/products/_components/ProductDetail")
+);
+// const ProductForm = lazy(
+//   () => import("@/pages/admin/products/_components/ProductForm")
+// );
+const CategoryPage = lazy(() => import("@/pages/admin/category/Category"));
+const CategoryForm = lazy(
+  () => import("@/pages/admin/category/_components/CategoryForm")
+);
+const AttributeItem = lazy(
+  () => import("@/pages/admin/attribute/attribute-item/page")
+);
+const AttributeItemValues = lazy(
+  () => import("@/pages/admin/attribute/attribute-item-values/page")
+);
+const ClientPage = lazy(() => import("@/pages/admin/account/client/Client"));
+const FormClient = lazy(
+  () => import("@/pages/admin/account/client/components/FormClient")
+);
+const EmployeePage = lazy(
+  () => import("@/pages/admin/account/employee/Employee")
+);
+const FormEmployee = lazy(
+  () => import("@/pages/admin/account/employee/components/FormEmployee")
+);
+const Brands = lazy(() => import("@/pages/admin/brands/Brands"));
+const BrandForm = lazy(
+  () => import("@/pages/admin/brands/_components/BrandForm")
+);
+const OrderPage = lazy(() => import("@/pages/admin/order/Order"));
+const Tags = lazy(() => import("@/pages/admin/tags/Tags"));
+const FormTag = lazy(() => import("@/pages/admin/tags/_components/TagForm"));
+const Banners = lazy(() => import("@/pages/admin/banners/Banners"));
+const BannersForm = lazy(
+  () => import("@/pages/admin/banners/components/BannersForm")
+);
+const Posts = lazy(() => import("@/pages/admin/posts/Posts"));
+const FormPost = lazy(() => import("@/pages/admin/posts/components/FormPost"));
+const Chatbox = lazy(() => import("@/pages/admin/chatbox/Chatbox"));
+// const CommentPage = lazy(() => import("@/pages/admin/comments/Comments"));
+
 const Router = () => {
   return (
-    <>
+    <Suspense
+      fallback={
+        <div>
+          <Loading />
+        </div>
+      }
+    >
       <Routes>
         <Route path="/" element={<LayoutWebsite />}>
           <Route index element={<HomePage />} />
@@ -64,7 +115,6 @@ const Router = () => {
           <Route path="checkout" element={<Checkout />} />
           <Route path="contact" element={<Contact />} />
           <Route path="thank" element={<Thanks />} />
-
           <Route path="history-order" element={<HistoryOrder />} />
           <Route path="/order" element={<Order />} />
         </Route>
@@ -92,21 +142,12 @@ const Router = () => {
           <Route path="employees" element={<EmployeePage />} />
           <Route path="employees/create" element={<FormEmployee />} />
           <Route path="employees/edit/:id" element={<FormEmployee />} />
-          <Route path="category" element={<CategoryPage />} />
-          <Route path="comments" element={<CommentPage />} />
-          <Route path="clients" element={<ClientPage />} />
-          <Route path="clients/create" element={<FormClient />} />
           <Route path="brands" element={<Brands />} />
           <Route path="brands/create" element={<BrandForm />} />
           <Route path="brands/edit/:id" element={<BrandForm />} />
           <Route path="tags" element={<Tags />} />
           <Route path="tags/create" element={<FormTag />} />
           <Route path="tags/edit/:id" element={<FormTag />} />
-          <Route path="clients" element={<ClientPage />} />
-          <Route path="clients/create" element={<FormClient />} />
-          <Route path="employees" element={<EmployeePage />} />
-          <Route path="employees/create" element={<FormEmployee />} />
-          <Route path="employees/edit/:id" element={<FormEmployee />} />
           <Route path="banners" element={<Banners />} />
           <Route path="banners/create" element={<BannersForm />} />
           <Route path="banners/edit/:id" element={<BannersForm />} />
@@ -123,7 +164,7 @@ const Router = () => {
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
-    </>
+    </Suspense>
   );
 };
 

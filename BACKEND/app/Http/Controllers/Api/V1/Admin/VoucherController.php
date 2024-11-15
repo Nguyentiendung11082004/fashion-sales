@@ -200,7 +200,7 @@ if ($metaKey === '_voucher_applies_to_total') {
                 '_voucher_product_ids' => 'Sản phẩm được áp dụng giảm giá',
                 '_voucher_exclude_product_ids' => 'Sản phẩm không được áp dụng giảm giá',
                 '_voucher_max_discount_amount' => 'Số tiền giảm tối đa',
-                '_voucher_applies_to_total' => 'Áp dụng cho toàn bộ đơn hàng',  // Chỉnh sửa key đây
+                '_voucher_applies_to_total' => 'Áp dụng cho toàn bộ đơn hàng(true) HOẶC sản phẩm/danh mục ',  // Chỉnh sửa key đây
                 // Thêm các meta_key và tên tương ứng khác nếu cần
             ];
 

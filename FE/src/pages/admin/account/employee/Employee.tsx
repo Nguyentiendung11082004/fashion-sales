@@ -44,6 +44,8 @@ const EmployeePage = () => {
   const handleEdit = (id: number) => {
     navigate(`edit/${id}`, { state: { currentPage } });
   };
+
+  console.log("số trang : ", currentPage);
   useEffect(() => {
     const totalItems = data?.data?.length || 0;
     const maxPage = Math.ceil(totalItems / pageSize);

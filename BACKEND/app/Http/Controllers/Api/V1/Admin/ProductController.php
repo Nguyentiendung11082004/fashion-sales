@@ -82,7 +82,6 @@ class ProductController extends Controller
                     ProductGallery::query()->create([
                         "product_id" => $product->id,
                         "image" => $gallery
-
                     ]);
                 }
                 $product->tags()->attach($dataProduct['tags']);
@@ -196,7 +195,7 @@ class ProductController extends Controller
                     "attribute_item_id",
                     "product_variant",
                     "gallery",
-                    "tags"
+                    "tags",
                 ]);
 
                 $dataProduct['slug'] = Str::slug($dataProduct["name"]);
@@ -214,6 +213,7 @@ class ProductController extends Controller
                         }
                     }
                 }
+
 
                 $product->tags()->sync($request->tags);
 
@@ -240,13 +240,17 @@ class ProductController extends Controller
                         $syncVariant = [];
 
                         // Xử lý hình ảnh
-                        if (isset($item["image"])) {
+                        if (isset($item["image"]) ||empty($item["image"])) {
 
                             $url = $item["image"];
-                        } else {
-                            // Giữ ảnh cũ nếu không upload ảnh mới
-                            $url = $existingVariants[$keys]["image"] ?? null;
-                        }
+                           
+                        } 
+                        // else {
+                        //     // Giữ ảnh cũ nếu không upload ảnh mới
+                        //     $url = $existingVariants[$keys]["image"] ?? null;
+                        //     dd( $url,2);
+
+                        // }
 
                         // Kiểm tra xem biến thể có tồn tại trong DB không, nếu có thì update, nếu không thì tạo mới
                         if (isset($existingVariants[$keys])) {

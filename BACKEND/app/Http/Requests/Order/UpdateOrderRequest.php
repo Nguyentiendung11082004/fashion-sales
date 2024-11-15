@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Order;
 
+use App\Models\Order;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateOrderRequest extends FormRequest
@@ -22,10 +23,8 @@ class UpdateOrderRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'order_status' => 'required|string|in:Đang chờ xác nhận,Hủy',  // Allowed statuses
-            'user_note' => 'nullable|string|max:255',                // Optional user note by default
-            // Require user_note if the status is "Hủy"
-            'user_note' => 'required_if:status,Hủy|string|max:255',  
+            'order_status' => 'required|string|in:' . Order::STATUS_CANCELED,
+            'user_note' => 'required|string|max:255',
         ];
     }
 }

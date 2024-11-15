@@ -1,11 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import Loading from "@/common/Loading/Loading";
 import { Ibrands } from "@/common/types/brands";
 import instance from "@/configs/axios";
 import { createBrand, updateBrand } from "@/services/api/admin/brands.api";
 import { UploadOutlined } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Button, Form, Input, message, Skeleton, Upload } from "antd";
+import { Button, Form, Input, message, Upload } from "antd";
 import { UploadProps } from "antd/es/upload";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 
@@ -127,7 +129,7 @@ const BrandForm = () => {
       </div>
 
       {isFetching ? (
-        <Skeleton />
+        <Loading />
       ) : (
         <Form
           form={form}
