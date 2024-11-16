@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // import { useAuth } from "@/common/context/Auth/AuthContext";
 import AddCount from "@/components/icons/cart/AddCount";
@@ -44,6 +45,7 @@ const Cart = () => {
     refetchOnWindowFocus: true,
     refetchOnMount: true,
   });
+
   const pusher = new Pusher("4d3e0d70126f2605977e", {
     cluster: "ap1",
     authEndpoint: "http://localhost:8000/broadcasting/auth", // Thay bằng URL backend của bạn
