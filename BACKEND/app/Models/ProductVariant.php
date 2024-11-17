@@ -15,6 +15,7 @@ class ProductVariant extends Model
         "quantity",
         "image",
         "sku",
+        'id_guid'
         
     ];
 
