@@ -58,13 +58,6 @@ const LayoutAdmin: React.FC = () => {
                   Thống kê
                 </NavLink>
               ),
-              children: new Array(4).fill(null).map((index, j) => {
-                const subKey = index * 4 + j + 10;
-                return {
-                  key: subKey,
-                  label: `option${subKey}`,
-                };
-              }),
             },
             {
               key: "2",

@@ -31,13 +31,8 @@ const Cart = () => {
     setVisible(false);
   };
   const { token } = useAuth();
-<<<<<<< HEAD
   const { data, isLoading } = useQuery({
     queryKey: ['cart'],
-=======
-  const { data, isFetching } = useQuery({
-    queryKey: ["cart"],
->>>>>>> 6828ef0dec13b07132449db37bfeeee7d5575924
     queryFn: async () => {
       const res = await instance.get("/cart", {
         headers: {
@@ -49,7 +44,6 @@ const Cart = () => {
     refetchOnWindowFocus: true,
     refetchOnMount: true,
   });
-<<<<<<< HEAD
   const pusher = new Pusher('4d3e0d70126f2605977e', {
     cluster: 'ap1',
     authEndpoint: 'http://localhost:8000/broadcasting/auth', 
@@ -58,16 +52,6 @@ const Cart = () => {
         Authorization: `${token}`
       }
     }
-=======
-  const pusher = new Pusher("4d3e0d70126f2605977e", {
-    cluster: "ap1",
-    authEndpoint: "http://localhost:8000/broadcasting/auth", // Thay bằng URL backend của bạn
-    auth: {
-      headers: {
-        Authorization: `${token}`, // Thay thế bằng token của người dùng hiện tại
-      },
-    },
->>>>>>> 6828ef0dec13b07132449db37bfeeee7d5575924
   });
   useEffect(() => {
     const channel = pusher.subscribe(`private-cart.${9}`);
@@ -241,14 +225,8 @@ const Cart = () => {
   });
 
   const [isAllChecked, setIsAllChecked] = useState<boolean>(false);
-<<<<<<< HEAD
   console.log("isAllChecked",isAllChecked)
   const [checkedItems, setCheckedItems] = useState<{ [key: number]: boolean }>({});
-=======
-  const [checkedItems, setCheckedItems] = useState<{ [key: number]: boolean }>(
-    {}
-  );
->>>>>>> 6828ef0dec13b07132449db37bfeeee7d5575924
   const handleCheckAll = () => {
     const newChecked = !isAllChecked;
     setIsAllChecked(newChecked);
@@ -370,18 +348,7 @@ const Cart = () => {
               </div>
               <div className="hd-pagecart-items">
                 <div className="hd-item relative overflow-hidden">
-<<<<<<< HEAD
-                  {
-                    isLoading ? <Loading /> :
-                      carts && carts.length > 0 ? (carts?.map((e: any) => {
-                        const { productvariant } = e;
-                        const attributesObject = productvariant?.attributes.reduce((acc: any, attribute: any) => {
-                          acc[attribute.name] = attribute.pivot.attribute_item_id;
-                          return acc;
-                        }, {});
-                        return <>
-=======
-                  {isFetching ? (
+                  {isLoading ? (
                     <Loading />
                   ) : carts && carts.length > 0 ? (
                     carts?.map((e: any) => {
@@ -397,7 +364,6 @@ const Cart = () => {
                         );
                       return (
                         <>
->>>>>>> 6828ef0dec13b07132449db37bfeeee7d5575924
                           <div className="hd-item-row lg:py-[2rem] py-[1rem] !items-center flex flex-wrap border-solid border-b-2">
                             <div className="hd-infor-item lg:w-5/12 w-full hd-col-item">
                               <div className="hd-infor !items-center !flex">
@@ -712,11 +678,7 @@ const Cart = () => {
                         <div className="hd-col-item w-auto">
                           <div className="text-right font-semibold">
                             {
-<<<<<<< HEAD
-                              // isLoading ? <Skeleton /> : 
-=======
                               // isFetching ? <Skeleton /> :
->>>>>>> 6828ef0dec13b07132449db37bfeeee7d5575924
                               FormatMoney(data?.sub_total)
                             }
                           </div>

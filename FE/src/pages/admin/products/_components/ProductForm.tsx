@@ -350,7 +350,7 @@ data: {
             acc[attribute.id] = attribute.pivot.attribute_item_ids;
             return acc;
         }, {});
-        const initialGalleryFiles = (productShow.galleries || []).map((galleryItem: any, index: number) => ({
+        const initialGalleryFiles = (productShow.gallery || []).map((galleryItem: any, index: number) => ({
             uid: String(galleryItem.id || index),
             name: galleryItem.image.substring(galleryItem.image.lastIndexOf('/') + 1),
             status: 'done',
@@ -420,7 +420,7 @@ data: {
                 errors: errorFields[key],
             }));
             form.setFields(fields);
-            const allFieldNames = ['name', 'attribute_id', 'tags', 'brand_id', 'category_id', 'slug', 'sku', 'img_thumbnail', 'galleries', 'type', 'price_regular', 'price_sale', 'quantity', 'description', 'description_title'];
+            const allFieldNames = ['name', 'attribute_id', 'tags', 'brand_id', 'category_id', 'slug', 'sku', 'img_thumbnail', 'gallery', 'type', 'price_regular', 'price_sale', 'quantity', 'description', 'description_title'];
             allFieldNames.forEach((field) => {
                 if (!errorFields[field]) {
                     form.setFields([{ name: field, errors: [] }]);
@@ -518,12 +518,8 @@ price_regular: '',
                 quantity: Number(variant?.quantity),
                 image: variant?.image,
                 sku: variant?.sku,
-<<<<<<< HEAD
                 IdGuid: generateGUID()
             });
-=======
-});
->>>>>>> 6828ef0dec13b07132449db37bfeeee7d5575924
         });
 
         if (!attribute) {
@@ -650,23 +646,23 @@ price_regular: '',
 
                             </Form.Item>
                             <Form.Item
-                                name="galleries"
+                                name="gallery"
                                 label="Chọn mảng nhiều ảnh"
                                 className="col-span-1"
                             >
                                 <Upload
                                     {...propsGallery}
                                 >
-                                    <Button icon={<UploadOutlined />}>Tải lên galleries</Button>
+                                    <Button icon={<UploadOutlined />}>Tải lên gallery</Button>
                                 </Upload>
                                 {
                                     // imageGallery ? (
                                     //     <img src={`${imageGallery}`} alt="Uploaded" style={{ marginTop: 16, width: 100, marginBottom: '10px' }} />
                                     // ) : (
-                                    productShow?.galleries && (
+                                    productShow?.gallery && (
                                         <>
                                             {
-                                                productShow?.galleries?.map((e: any) => (
+                                                productShow?.gallery?.map((e: any) => (
                                                     <>
                                                         <img src={e.image} alt="Uploaded" style={{ marginTop: 16, width: 100, marginBottom: '10px' }} />
                                                     </>
@@ -676,7 +672,7 @@ price_regular: '',
                                     )
                                     // )
                                 }
-                                {error?.galleries && <div className='text-red-600'>{error.galleries.join(', ')}</div>}
+                                {error?.gallery && <div className='text-red-600'>{error.gallery.join(', ')}</div>}
                             </Form.Item>
                             <Form.Item name="type" label="Kiểu sản phẩm" className="col-span-3">
                                 <Select
