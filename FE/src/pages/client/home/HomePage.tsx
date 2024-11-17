@@ -11,7 +11,7 @@ import CartDetail from "@/components/icons/detail/CartDetail";
 import Eye from "@/components/icons/detail/Eye";
 import HeartWhite from "@/components/icons/detail/HeartWhite";
 import React, { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Banner from "./Banner/Banner";
 import Slideshow from "./SampleSlider/SampleSlider";
 import axios from "axios";
@@ -23,12 +23,13 @@ import LiveChat from "../liveChat/liveChat";
 import CartPopup from "@/components/ModalPopup/CartPopup";
 import DetailPopup from "@/components/ModalPopup/DetailPopup";
 import { Button } from "antd";
+import Post from "./Post";
 
 const HomePage = () => {
   const [trendProducts, setTrendProducts] = useState<any[]>([]);
   const [homeProducts, setHomeProducts] = useState<any[]>([]);
   const { handleAddToWishlist, isInWishlist } = useWishlist();
-
+  const [idProduct, setIdProduct] = useState();
   useEffect(() => {
     axios
       .get("http://127.0.0.1:8000/api/v1/product-home")
@@ -42,17 +43,17 @@ const HomePage = () => {
   }, []);
   const modalRef = useRef<HTMLDialogElement>(null);
 
-
-
-  const [productSeeMore,setProductSeeMore] = useState({})
+  const [productSeeMore, setProductSeeMore] = useState({});
   const [visiable, setVisible] = useState(false);
-  const handleOpenSeeMore = (product:any) => {
+  const handleOpenSeeMore = (product: any) => {
     setVisible(true);
-    setProductSeeMore(product)
-  }
+    setProductSeeMore(product);
+  };
   const closeModal = () => {
     setVisible(false);
   };
+  const navigate = useNavigate();
+
   return (
     <>
       <div>
@@ -73,19 +74,26 @@ const HomePage = () => {
           </div>
           <div className="grid grid-cols-2 gap-4 lg:ml-2.5 lg:grid-cols-3 xl:grid-cols-4 lg:gap-8 xl:gap-8 md:grid-cols-3 md:gap-6 mx-auto">
             {trendProducts.map((product) => (
-             <Link to={`/products/${product?.id}`} >
               <div key={product.id} className="product-item">
                 <div className="lg:mb-[25px] mb-[20px]">
                   <div className="cursor-pointer lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] sm:h-[345px] overflow-hidden">
-                    <img
-                      className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover/image:opacity-0 object-cover "
-                      src={product.img_thumbnail}
-                    />
-                    <img
-                      className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover/image:opacity-100 object-cover"
-                      src={product.img_thumbnail}
-                    />
-                    <div className="absolute inset-0 bg-black opacity-0 transition-opacity duration-300 ease-in-out group-hover:opacity-10"></div>
+                    <Link
+                      to={`/products/${product?.id}`}
+                      className="absolute inset-0"
+                    >
+                      <img
+                        className="group-hover:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover:opacity-0 object-cover"
+                        src={product.img_thumbnail}
+                        alt="Product"
+                      />
+                      <img
+                        className="group-hover:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover:opacity-100 object-cover"
+                        src={product.img_thumbnail}
+                        alt="Product"
+                      />
+                    </Link>
+                    <div className="image-overlay"></div>
+                    {/* <div className="absolute inset-0 bg-black opacity-0 transition-opacity duration-300 ease-in-out group-hover:opacity-10"></div> */}
                     <div>
                       <button
                         className="absolute left-5 top-5 cursor-pointer"
@@ -100,8 +108,10 @@ const HomePage = () => {
                     </div>
                     <div className="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100">
                       <Link to="" className="group/btn relative m-auto">
-                        <button className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]"
-                          onClick={() => handleOpenSeeMore(product)}>
+                        <button
+                          className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]"
+                          onClick={() => handleOpenSeeMore(product)}
+                        >
                           <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
                             Xem thêm
                           </p>
@@ -109,8 +119,13 @@ const HomePage = () => {
                         </button>
                       </Link>
                       <Link to="" className="group/btn relative">
-                        <button className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]"
-                          onClick={() => modalRef.current?.showModal()}>
+                        <button
+                          className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]"
+                          onClick={() => {
+                            modalRef.current?.showModal(),
+                              setIdProduct(product?.id);
+                          }}
+                        >
                           <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
                             Thêm vào giỏ hàng
                           </p>
@@ -170,7 +185,7 @@ const HomePage = () => {
                         </ul>
                       </div>
                     </div>
-                    zz
+
                     {product.price_regular && (
                       <div>
                         {product.price_sale > 0 &&
@@ -394,11 +409,19 @@ const HomePage = () => {
                   </div>
                 </div>
               </div>
-             </Link>
             ))}
+            <CartPopup
+              idProduct={idProduct}
+              ref={modalRef}
+              setIdProduct={setIdProduct}
+            />
           </div>
-          <CartPopup ref={modalRef} />
-          <DetailPopup open={visiable} onClose={closeModal} trendProducts={trendProducts} productSeeMore={productSeeMore} />
+          <DetailPopup
+            open={visiable}
+            onClose={closeModal}
+            trendProducts={trendProducts}
+            productSeeMore={productSeeMore}
+          />
         </section>
         <section className="container my-16 text-center">
           <Link to="">
@@ -455,15 +478,23 @@ const HomePage = () => {
               <div key={product.id} className="product-item">
                 <div className="lg:mb-[25px] mb-[20px]">
                   <div className="cursor-pointer lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] sm:h-[345px] overflow-hidden">
-                    <img
-                      className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover/image:opacity-0 object-cover "
-                      src={product.img_thumbnail}
-                    />
-                    <img
-                      className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover/image:opacity-100 object-cover"
-                      src={product.img_thumbnail}
-                    />
-                    <div className="absolute inset-0 bg-black opacity-0 transition-opacity duration-300 ease-in-out group-hover:opacity-10"></div>
+                    <Link
+                      to={`/products/${product?.id}`}
+                      className="absolute inset-0"
+                    >
+                      <img
+                        className="group-hover:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover:opacity-0 object-cover"
+                        src={product.img_thumbnail}
+                        alt="Product"
+                      />
+                      <img
+                        className="group-hover:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover:opacity-100 object-cover"
+                        src={product.img_thumbnail}
+                        alt="Product"
+                      />
+                    </Link>
+                    <div className="image-overlay"></div>
+                    {/* <div className="absolute inset-0 bg-black opacity-0 transition-opacity duration-300 ease-in-out group-hover:opacity-10"></div> */}
                     <div>
                       <button
                         className="absolute left-5 top-5 cursor-pointer"
@@ -486,7 +517,13 @@ const HomePage = () => {
                         </button>
                       </Link>
                       <Link to="" className="group/btn relative">
-                        <button className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]">
+                        <button
+                          className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]"
+                          onClick={() => {
+                            modalRef.current?.showModal(),
+                              setIdProduct(product?.id);
+                          }}
+                        >
                           <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
                             Thêm vào giỏ hàng
                           </p>
@@ -774,71 +811,7 @@ const HomePage = () => {
             ))}
           </div>
         </section>
-        <section className="container mt-28">
-          <div className="custom-heading ">
-            <div className="flex-auto items-center mx-auto">
-              <div className="mx-4 text-2xl font-bold text-gray-900">
-                BÀI VIẾT MỚI NHẤT
-              </div>
-            </div>
-          </div>
-          <div className="text-center mx-auto italic mt-2 custom-heading-sub mb-10">
-            <i>Tin tức mới nhất và thú vị nhất</i>
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-3 lg:gap-8 md:grid-cols-3 md:gap-4">
-            <div className="">
-              <div className="overflow-hidden ">
-                <img
-                  src={Blog1}
-                  className="hd-animation-border hover:scale-[1.2] hover:translate-2  transition-all ease-in-out duration-500"
-                />
-              </div>
-              <h3 className="mt-4 font-semibold text-xl text-hover transition-all ease-in-out duration-200">
-                Xu Hướng Xuân – Hè 2020
-              </h3>
-              <p className="mt-2 mb-4">Thêm vào ngày 11 tháng 5 năm 2022</p>
-              <span className="text-[#909090] ">
-                Kiểu chữ là công việc của người sắp chữ, người soạn nhạc, người
-                đánh máy, người đồ họa nhà thiết kế, giám đốc nghệ thuật, manga
-                nghệ sĩ,...
-              </span>
-            </div>
-            <div>
-              <div className="overflow-hidden mt-4 lg:mt-0 md:mt-0">
-                <img
-                  src={Blog2}
-                  className="hd-animation-border hover:scale-[1.2] hover:translate-2 transition-all ease-in-out duration-500"
-                />
-              </div>
-              <h3 className="mt-4 font-semibold text-xl text-hover transition-all ease-in-out duration-200">
-                Cách dễ nhất để đột phá Đứng đầu
-              </h3>
-              <p className="mt-2 mb-4">Thêm vào ngày 11 tháng 5 năm 2022</p>
-              <span className="text-[#909090] ">
-                Kiểu chữ là công việc của người sắp chữ, người soạn nhạc, người
-                đánh máy, người đồ họa nhà thiết kế, giám đốc nghệ thuật, manga
-                nghệ sĩ,...
-              </span>
-            </div>
-            <div>
-              <div className="overflow-hidden mt-4 lg:mt-0 md:mt-0">
-                <img
-                  src={Blog3}
-                  className="hd-animation-border hover:scale-[1.2] hover:translate-2  transition-all ease-in-out duration-500"
-                />
-              </div>
-              <h3 className="mt-4 font-semibold text-xl text-hover transition-all ease-in-out duration-200">
-                Phong cách dành cho cặp đôi
-              </h3>
-              <p className="mt-2 mb-4">Thêm vào ngày 11 tháng 5 năm 2022</p>
-              <span className="text-[#909090] ">
-                Kiểu chữ là công việc của người sắp chữ, người soạn nhạc, người
-                đánh máy, người đồ họa nhà thiết kế, giám đốc nghệ thuật, manga
-                nghệ sĩ,...
-              </span>
-            </div>
-          </div>
-        </section>
+        <Post />
 
         <Slideshow />
 
@@ -896,7 +869,6 @@ const HomePage = () => {
                 </p>
               </div>
             </div>
-
             <div className="flex gap-3">
               <svg
                 className="w-[90px] h-[45px] hover:origin-bottom-left hover:-rotate-12 hover:scale-105 transition-all ease-in-out duration-300"

@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import Loading from "@/common/Loading/Loading";
 import { IUser } from "@/common/types/users";
 import instance from "@/configs/axios";
 import { createClient, updateClient } from "@/services/api/admin/clients";
@@ -12,11 +13,9 @@ import {
   Input,
   message,
   Select,
-  Skeleton,
   Upload,
   UploadProps,
 } from "antd";
-import { Option } from "antd/es/mentions";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
@@ -46,7 +45,6 @@ const FormEmployee = () => {
       form.setFieldsValue({
         ...data,
         birth_date: data.birth_date ? dayjs(data.birth_date, "YYYY-MM-DD") : "",
-        gender: data.gender === "1" ? "1" : "0",
       });
       setUrlImage(data.avatar);
     }
@@ -71,7 +69,10 @@ const FormEmployee = () => {
     },
   });
   const location = useLocation();
+  console.log("locaion: ",location)
   const currentPage = location.state?.currentPage || 1;
+  console.log("currentPage: ", location.state?.currentPage);
+
   const updateClientMutation = useMutation({
     mutationFn: (client: IUser) => updateClient(Number(id), client),
     onMutate: () => {
@@ -115,11 +116,11 @@ const FormEmployee = () => {
     } else {
       value.birth_date = "";
     }
-    value.gender = value.gender === "1" ? "1" : "0";
     if (urlImage) {
       value.avatar = urlImage;
     }
     if (id) {
+      console.log;
       updateClientMutation.mutate(value);
     } else {
       createClientMutation.mutate({
@@ -142,18 +143,9 @@ const FormEmployee = () => {
       </div>
 
       {isFetching ? (
-        <Skeleton />
+        <Loading />
       ) : (
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={onFinish}
-          initialValues={{
-            ...data,
-            birth_date: data?.birth_date ? dayjs(data.birth_date) : "",
-            gender: data?.gender === "1" ? "1" : "0",
-          }}
-        >
+        <Form form={form} layout="vertical" onFinish={onFinish}>
           <Form.Item<IUser> label="Username" name="name">
             <Input />
           </Form.Item>
@@ -216,8 +208,8 @@ const FormEmployee = () => {
 
           <Form.Item label="Gender" name="gender">
             <Select placeholder="Choose gender">
-              <Option value="1">Nam</Option>
-              <Option value="0">Nữ</Option>
+              <Select.Option value={1}>Nam</Select.Option>
+              <Select.Option value={0}>Nữ</Select.Option>
             </Select>
             {errors.gender && (
               <div className="text-red-600">{errors.gender}</div>

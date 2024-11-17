@@ -7,11 +7,13 @@ use App\Models\Tag;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\Brand;
+use App\Models\Address;
 use App\Models\Product;
 use App\Models\Voucher;
 use App\Models\Category;
 use App\Models\Attribute;
 use App\Models\VoucherMeta;
+use Faker\Factory as Faker;
 use App\Models\AttributeItem;
 use App\Models\PaymentMethod;
 use Illuminate\Database\Seeder;
@@ -26,6 +28,7 @@ class DataCuong extends Seeder
      */
     public function run(): void
     {
+        $faker = Faker::create();
         // thêm mới attribute
         Attribute::query()->insert(
             [
@@ -179,6 +182,18 @@ class DataCuong extends Seeder
                 'email_verified_at' => now(),
             ]
         ]);
+        for ($i = 0; $i < 3; $i++) {
+            Address::create([
+                'user_id'   => 1,
+                'label'     => $faker->randomElement(['Home', 'Office', 'Other']),
+                'address'   => $faker->streetAddress,
+                'city'      => $faker->city,
+                'district'  => $faker->state,
+                'ward'      => $faker->streetName,
+                'phone'     => $faker->phoneNumber,
+                'is_default' => $i === 0, // Địa chỉ đầu tiên là mặc định
+            ]);
+        }
         // thêm dữ liệu brands
         Brand::query()->insert([
             [
@@ -337,6 +352,7 @@ class DataCuong extends Seeder
                 'price_sale' => 270000,
                 'slug' => 'ao-khoac-nam-don',
                 'category_id' => 3,
+                'weight' => 45
             ],
             [
                 'name' => 'Áo sơ mi nam',
@@ -346,6 +362,7 @@ class DataCuong extends Seeder
                 'price_sale' => 220000,
                 'slug' => 'ao-so-mi-nam-don',
                 'category_id' => 2,
+                'weight' => 45
             ],
             [
                 'name' => 'Giày công sở nam',
@@ -355,6 +372,7 @@ class DataCuong extends Seeder
                 'price_sale' => 450000,
                 'slug' => 'giay-cong-so-nam',
                 'category_id' => 6,
+                'weight' => 200
             ],
             [
                 'name' => 'Giày thể thao nam',
@@ -364,6 +382,7 @@ class DataCuong extends Seeder
                 'price_sale' => 550000,
                 'slug' => 'giay-the-thao-nam',
                 'category_id' => 5,
+                'weight' => 200
             ],
         ];
 
@@ -373,6 +392,7 @@ class DataCuong extends Seeder
                 'category_id' => $product['category_id'],
                 'type' => 0,
                 'sku' => $product['sku'],
+                'weight' => $product['weight'],
                 'name' => $product['name'],
                 'views' => 1,
                 'img_thumbnail' => $product['img_thumbnail'],

@@ -28,6 +28,7 @@ const Tags = () => {
     key: item?.id,
     ...item,
   })) || [];
+  
   const { mutate } = useMutation({
     mutationFn: deleteTag,
     onSuccess: () => {

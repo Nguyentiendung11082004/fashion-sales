@@ -1,32 +1,42 @@
-import React, { useState, useImperativeHandle, forwardRef, useEffect } from "react";
-import { Modal as AntModal, Button } from "antd";
-import { CloseOutlined, MinusOutlined } from "@ant-design/icons";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import HeartBlack from "@/components/icons/detail/HeartBlack";
+import { CloseOutlined, MinusOutlined } from "@ant-design/icons";
+import { Modal as AntModal, Button } from "antd";
+import { useState } from "react";
 
-import { Link, useNavigate } from "react-router-dom";
 import { FormatMoney } from "@/common/utils/utils";
+import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
 type Props = {
   open: boolean;
   onClose: () => void;
   trendProducts: any;
-  productSeeMore: any
-}
-import withReactContent from "sweetalert2-react-content";
+  productSeeMore: any;
+};
 const MySwal = withReactContent(Swal);
 const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
   const navigate = useNavigate();
   const attributes = productSeeMore?.variants;
   const transformAttributes = (variants: any) => {
-    return (Array.isArray(variants) ? variants : []).reduce((acc: any, variant: any) => {
-      variant?.attributes?.forEach((attribute: any) => {
-        acc[attribute.name.toLowerCase()] = attribute.pivot.attribute_item_id.toString();
-      });
-      return acc;
-    }, {});
+    return (Array.isArray(variants) ? variants : []).reduce(
+      (acc: any, variant: any) => {
+        variant?.attributes?.forEach((attribute: any) => {
+          acc[attribute.name.toLowerCase()] =
+            attribute.pivot.attribute_item_id.toString();
+        });
+        return acc;
+      },
+      {}
+    );
   };
-  const [dataAttribute, setDataAttribute] = useState<any>(transformAttributes(attributes));
-  const resultDataAttribute = Object.entries(productSeeMore?.unique_attributes ?? {}).map(([key, value]) => ({
+  const [dataAttribute, setDataAttribute] = useState<any>(
+    transformAttributes(attributes)
+  );
+  const resultDataAttribute = Object.entries(
+    productSeeMore?.unique_attributes ?? {}
+  ).map(([key, value]) => ({
     attribute: key,
     attributeValue: Object.entries(value ?? {}).map(([id, name]) => ({
       id,
@@ -34,27 +44,29 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
     })),
   }));
   const priceProduct = productSeeMore?.variants?.map((e: any) => e?.price_sale);
-  const minPrice = priceProduct && priceProduct.length > 0 ? Math.min(...priceProduct) : null;
-  const maxPrice = priceProduct && priceProduct.length > 0 ? Math.max(...priceProduct) : null
+  const minPrice =
+    priceProduct && priceProduct.length > 0 ? Math.min(...priceProduct) : null;
+  const maxPrice =
+    priceProduct && priceProduct.length > 0 ? Math.max(...priceProduct) : null;
   const [selectedVariantId, setSelectedVariantId] = useState<any>(null);
-  const [error, setError] = useState('')
+  const [error, setError] = useState("");
 
-  const getVariants = (data: any) => {
-  }
+  const getVariants = (data: any) => {};
   const findMatchingVariant = () => {
     const matchingVariant = productSeeMore?.variants?.find((variant: any) => {
       // Kiểm tra tất cả các thuộc tính trong dataAttribute
-      return Object.keys(dataAttribute).every(attrKey => {
+      return Object.keys(dataAttribute).every((attrKey) => {
         // Tìm thuộc tính trong variant.attributes tương ứng với mỗi key trong dataAttribute
         const attribute = variant.attributes.find(
-          (attr: any) => attr.name === attrKey && attr.pivot.value === dataAttribute[attrKey]
+          (attr: any) =>
+            attr.name === attrKey && attr.pivot.value === dataAttribute[attrKey]
         );
         return attribute !== undefined; // Nếu tìm thấy thuộc tính khớp thì trả về true
       });
     });
 
     if (matchingVariant) {
-      console.log('matchingVariant', matchingVariant);
+      console.log("matchingVariant", matchingVariant);
       setSelectedVariantId(matchingVariant.id);
     }
   };
@@ -65,22 +77,21 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
       [attribute]: id,
     }));
     findMatchingVariant();
-
   };
   console.log("selectedVariantId", selectedVariantId);
-  console.log('productSeeMore', productSeeMore.variants);
+  console.log("productSeeMore", productSeeMore.variants);
   console.log("dataAttribute", dataAttribute);
 
   const _payload = {
     product_id: productSeeMore.id,
     product_variant_id: selectedVariantId,
-    quantity: 1
-  }
+    quantity: 1,
+  };
   const styles = {
     disable: {
       opacity: 0.2,
-    }
-  }
+    },
+  };
   const handleClose = () => {
     setDataAttribute({});
     setSelectedVariantId(null);
@@ -92,8 +103,8 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
     //   setError('Vui lòng chọn loại sản phẩm');
     //   return;
     // }
-    navigate('/checkout', { state: { _payload: _payload } });
-  }
+    navigate("/checkout", { state: { _payload: _payload } });
+  };
   return (
     <AntModal
       open={open}
@@ -121,14 +132,14 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
           />
         </div>
         <div className="w-1/2 p-2 ml-4">
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">{productSeeMore?.name}</h2>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">
+            {productSeeMore?.name}
+          </h2>
           <div className="flex items-center justify-between">
             <span className="text-xl text-[#696969]">
-              {
-                minPrice !== null && maxPrice !== null
-                  ? `${FormatMoney(minPrice)} - ${FormatMoney(maxPrice)}`
-                  : FormatMoney(productSeeMore?.price_sale || 0)
-              }
+              {minPrice !== null && maxPrice !== null
+                ? `${FormatMoney(minPrice)} - ${FormatMoney(maxPrice)}`
+                : FormatMoney(productSeeMore?.price_sale || 0)}
             </span>
             <div className="flex items-center">
               <Link
@@ -214,42 +225,47 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
           <p className="mt-4 hd-all-text grey  mb-3">
             {productSeeMore?.description}
           </p>
-          {
-            resultDataAttribute?.map((e) => {
-              return (
-                <div className="my-4" key={e?.attribute}>
-                  <p className="font-medium">{e?.attribute}</p>
-                  <div className="flex mt-3 gap-2 " >
-                    {e?.attributeValue?.map((item: any) => {
-                      const isActive = dataAttribute[e.attribute.toLowerCase()] === item.id;
-                      return (
-                        <div
-                          key={item.id}
-                          className={`relative flex-1 max-w-[75px] h-8 sm:h-8 rounded-full border-2 cursor-pointer p-2
-                          ${isActive ? 'border-black' : ''}`}
-                          style={isActive ? { backgroundColor: item.name.toLowerCase() } : {}}
-                          onClick={() => getAttribute(e.attribute.toLowerCase(), item.id)}
-                        >
-                          {e.attribute.toLowerCase() === 'color' ? (
-                            <div
-                              className="absolute inset-0.5 rounded-full overflow-hidden"
-                              style={{ backgroundColor: item.name.toLowerCase() }}
-                              onClick={() => getVariants(e)}
-                            ></div>
-                          ) : (
-                            <p className="flex items-center justify-center h-full text-sm">
-                              {item.name}
-                            </p>
-                          )}
-                        </div>
-                      )
-                    })}
-                  </div>
+          {resultDataAttribute?.map((e) => {
+            return (
+              <div className="my-4" key={e?.attribute}>
+                <p className="font-medium">{e?.attribute}</p>
+                <div className="flex mt-3 gap-2 ">
+                  {e?.attributeValue?.map((item: any) => {
+                    const isActive =
+                      dataAttribute[e.attribute.toLowerCase()] === item.id;
+                    return (
+                      <div
+                        key={item.id}
+                        className={`relative flex-1 max-w-[75px] h-8 sm:h-8 rounded-full border-2 cursor-pointer p-2
+                          ${isActive ? "border-black" : ""}`}
+                        style={
+                          isActive
+                            ? { backgroundColor: item.name.toLowerCase() }
+                            : {}
+                        }
+                        onClick={() =>
+                          getAttribute(e.attribute.toLowerCase(), item.id)
+                        }
+                      >
+                        {e.attribute.toLowerCase() === "color" ? (
+                          <div
+                            className="absolute inset-0.5 rounded-full overflow-hidden"
+                            style={{ backgroundColor: item.name.toLowerCase() }}
+                            onClick={() => getVariants(e)}
+                          ></div>
+                        ) : (
+                          <p className="flex items-center justify-center h-full text-sm">
+                            {item.name}
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
-              )
-            })
-          }
-          <span style={{ color: 'red' }}> {error ? error : ''}</span>
+              </div>
+            );
+          })}
+          <span style={{ color: "red" }}> {error ? error : ""}</span>
           <div className="hd-quantity-item flex items-center">
             <div className="hd-quantity relative block min-w-[120px] w-[120px] h-10 hd-all-btn">
               <button
@@ -285,7 +301,7 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
             <div className="mx-3">
               <Button
                 onClick={handleCheckout}
-                style={{ width: '200px' }}
+                style={{ width: "200px" }}
                 className=" h-11 rounded-full bg-[#56cfe1] text-white text-base font-medium hover:bg-[#4bc3d5]"
               >
                 Mua Ngay
