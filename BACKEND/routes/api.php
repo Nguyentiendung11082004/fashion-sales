@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\V1\Admin\CommentsController;
 use App\Http\Controllers\Api\V1\Admin\EmployeeController;
 use App\Http\Controllers\Api\V1\Admin\AttributeController;
 use App\Http\Controllers\Api\V1\Admin\AttributeItemController;
+use App\Http\Controllers\Api\V1\Admin\AuthAdminController;
 use App\Http\Controllers\Api\V1\Admin\BannerController;
 use App\Http\Controllers\Api\V1\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Api\V1\Admin\PostController;
@@ -70,11 +71,19 @@ Route::prefix("v1/")->group(function () {
     Route::resource('checkout', CheckoutController::class);
     Route::apiResource('posts', PostController::class);
     Route::apiResource('order-status', AdminOrderController::class);
+
+    //Tìm kiếm trong Admin
+    Route::post('/client/search', [ClientController::class, 'search']);
+    Route::post('/employee/search', [EmployeeController::class, 'search']);
+
     //Login with Google
     Route::middleware(['web'])->group(function () {
         Route::get('login/google', [SocialiteController::class, 'redirectToGoogle']);
         Route::get('login/google/callback', [SocialiteController::class, 'handleGoogleCallback']);
     });
+
+    //Login Admin
+    Route::post('admin/login', [AuthAdminController::class, 'login']);
     //Gửi mail
     Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
         ->middleware(['signed'])->name('verification.verify');
