@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Loading from "@/common/Loading/Loading";
 import { IProductVariant } from "@/common/types/products";
 import instance from "@/configs/axios";

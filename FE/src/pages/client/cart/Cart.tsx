@@ -1,44 +1,40 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // import { useAuth } from "@/common/context/Auth/AuthContext";
-import { Product3 } from "@/components/icons";
 import AddCount from "@/components/icons/cart/AddCount";
 
+import { useAuth } from "@/common/context/Auth/AuthContext";
+import Loading from "@/common/Loading/Loading";
+import { FormatMoney } from "@/common/utils/utils";
 import Car from "@/components/icons/cart/Car";
-import Delete from "@/components/icons/cart/Delete";
 import Gift from "@/components/icons/cart/Gift";
 import Note from "@/components/icons/cart/Note";
-import ReduceProduct from "@/components/icons/cart/ReducrPro";
-import { useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Button } from "antd";
-import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import ModalCart from "./_components/Modal";
 import instance from "@/configs/axios";
-import { useAuth } from "@/common/context/Auth/AuthContext";
-import { FormatMoney } from "@/common/utils/utils";
-import { toast } from "react-toastify";
 import { MinusOutlined } from "@ant-design/icons";
-import Loading from "@/common/Loading/Loading";
-import CheckmarkAlert from "@/components/Notification/Toast";
-import Pusher from 'pusher-js';
-import Echo from "laravel-echo";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Button } from "antd";
+import Pusher from "pusher-js";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
+import ModalCart from "./_components/Modal";
 const MySwal = withReactContent(Swal);
 const Cart = () => {
   const [visiable, setVisible] = useState(false);
-  const [idCart, setIdCart] = useState<any>('');
+  const [idCart, setIdCart] = useState<any>("");
   const [updatedAttributes, setUpdatedAttributes] = useState<any>({});
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const closeModal = () => {
-    setIdCart('');
+    setIdCart("");
     setVisible(false);
   };
   const { token } = useAuth();
   const { data, isFetching } = useQuery({
-    queryKey: ['cart'],
+    queryKey: ["cart"],
     queryFn: async () => {
-      const res = await instance.get('/cart', {
+      const res = await instance.get("/cart", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -48,77 +44,93 @@ const Cart = () => {
     refetchOnWindowFocus: true,
     refetchOnMount: true,
   });
-  const pusher = new Pusher('4d3e0d70126f2605977e', {
-    cluster: 'ap1',
-    authEndpoint: 'http://localhost:8000/broadcasting/auth', // Thay bằng URL backend của bạn
+  const pusher = new Pusher("4d3e0d70126f2605977e", {
+    cluster: "ap1",
+    authEndpoint: "http://localhost:8000/broadcasting/auth", // Thay bằng URL backend của bạn
     auth: {
       headers: {
-        Authorization: `${token}` // Thay thế bằng token của người dùng hiện tại
-      }
-    }
+        Authorization: `${token}`, // Thay thế bằng token của người dùng hiện tại
+      },
+    },
   });
   useEffect(() => {
     const channel = pusher.subscribe(`private-cart.${9}`);
     // Lắng nghe sự kiện 'CartEvent'
-    channel.bind('CartEvent', (data: any) => {
+    channel.bind("CartEvent", (data: any) => {
       queryClient.invalidateQueries({
-        queryKey: ['cart']
+        queryKey: ["cart"],
       });
     });
 
-    pusher.connection.bind('connected', () => {
-    });
+    pusher.connection.bind("connected", () => {});
 
-    pusher.connection.bind('error', (err: any) => {
-    });
-
+    pusher.connection.bind("error", (err: any) => {});
 
     // Giả sử cartId là id của giỏ hàng hiện tại
 
     // Đăng ký vào kênh 'private-cart.{idCart}'
 
-
     // Huỷ đăng ký kênh khi component bị unmount hoặc khi `idCart` thay đổi
     return () => {
       pusher.unsubscribe(`private-cart.${idCart}`);
     };
-  }, [data, queryClient]);  // Cập nhật khi idCart hoặc token thay đổi
+  }, [data, queryClient]); // Cập nhật khi idCart hoặc token thay đổi
   // Đảm bảo rằng cartId không thay đổi khi component mount/unmount
 
   const updateQuantity = useMutation({
-    mutationFn: async ({ idCart, newQuantity, qtyProductVarinat }: { idCart: number; newQuantity: number, qtyProductVarinat: any }) => {
-      await instance.put(`/cart/${idCart}`, {
-        quantity: newQuantity,
-        product_variant: qtyProductVarinat,
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}`,
+    mutationFn: async ({
+      idCart,
+      newQuantity,
+      qtyProductVarinat,
+    }: {
+      idCart: number;
+      newQuantity: number;
+      qtyProductVarinat: any;
+    }) => {
+      await instance.put(
+        `/cart/${idCart}`,
+        {
+          quantity: newQuantity,
+          product_variant: qtyProductVarinat,
         },
-      });
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['cart'],
+        queryKey: ["cart"],
       });
     },
     onError: (message: any) => {
       toast.error(message?.response?.data?.message, {
         autoClose: 5000,
-      })
-    }
+      });
+    },
   });
-  const handleIncrease = (idCart: number, currentQuantity: number, qtyProductVarinat: any) => {
+  const handleIncrease = (
+    idCart: number,
+    currentQuantity: number,
+    qtyProductVarinat: any
+  ) => {
     const newQuantity = currentQuantity + 1;
     updateQuantity.mutate({ idCart, newQuantity, qtyProductVarinat });
   };
-  const handleDecrease = (idCart: number, currentQuantity: number, qtyProductVarinat: any) => {
+  const handleDecrease = (
+    idCart: number,
+    currentQuantity: number,
+    qtyProductVarinat: any
+  ) => {
     const newQuantity = currentQuantity - 1;
     updateQuantity.mutate({ idCart, newQuantity, qtyProductVarinat });
   };
   const deleteCart = useMutation({
     mutationFn: async ({ idCarts }: { idCarts: number[] }) => {
       await Promise.all(
-        idCarts.map(idCart =>
+        idCarts.map((idCart) =>
           instance.delete(`/cart/[${idCart}]`, {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -129,37 +141,43 @@ const Cart = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['cart'],
+        queryKey: ["cart"],
       });
-    }
+    },
   });
   const handleDeleteCart = (idCarts: number[]) => {
-    deleteCart.mutate({ idCarts }, {
-      onSuccess: () => {
-        const updatedCheckedItems = { ...checkedItems };
-        idCarts.forEach(id => {
-          delete updatedCheckedItems[id];
-        });
-        setCheckedItems(updatedCheckedItems);
-        localStorage.setItem('checkedItems', JSON.stringify(updatedCheckedItems));
+    deleteCart.mutate(
+      { idCarts },
+      {
+        onSuccess: () => {
+          const updatedCheckedItems = { ...checkedItems };
+          idCarts.forEach((id) => {
+            delete updatedCheckedItems[id];
+          });
+          setCheckedItems(updatedCheckedItems);
+          localStorage.setItem(
+            "checkedItems",
+            JSON.stringify(updatedCheckedItems)
+          );
 
-        const updatedIdCart = Object.keys(updatedCheckedItems)
-          .filter(key => updatedCheckedItems[Number(key)])
-          .map(Number);
-        setIdCart(updatedIdCart);
-        localStorage.setItem('idCart', JSON.stringify(updatedIdCart));
-        const isAllCheckedNow = updatedIdCart.length === carts.length;
-        setIsAllChecked(isAllCheckedNow);
-        if (updatedIdCart.length === 0) {
-          setIsAllChecked(false);
-        }
-      },
-      onError: (message: any) => {
-        toast.error(message?.response?.data?.message, {
-          autoClose: 5000,
-        });
+          const updatedIdCart = Object.keys(updatedCheckedItems)
+            .filter((key) => updatedCheckedItems[Number(key)])
+            .map(Number);
+          setIdCart(updatedIdCart);
+          localStorage.setItem("idCart", JSON.stringify(updatedIdCart));
+          const isAllCheckedNow = updatedIdCart.length === carts.length;
+          setIsAllChecked(isAllCheckedNow);
+          if (updatedIdCart.length === 0) {
+            setIsAllChecked(false);
+          }
+        },
+        onError: (message: any) => {
+          toast.error(message?.response?.data?.message, {
+            autoClose: 5000,
+          });
+        },
       }
-    });
+    );
   };
 
   const handleAttribute = (idCart: any, variants: any) => {
@@ -178,11 +196,22 @@ const Cart = () => {
   };
   const carts = data?.cart?.cartitems;
   carts?.map((cartItem: any) => {
-    const { id, product_id, product_variant_id, quantity, total_price, product, productvariant } = cartItem;
-    const attributesObject = productvariant?.attributes.reduce((acc: any, attribute: any) => {
-      acc[attribute.name] = attribute.pivot.attribute_item_id;
-      return acc;
-    }, {});
+    const {
+      id,
+      product_id,
+      product_variant_id,
+      quantity,
+      total_price,
+      product,
+      productvariant,
+    } = cartItem;
+    const attributesObject = productvariant?.attributes.reduce(
+      (acc: any, attribute: any) => {
+        acc[attribute.name] = attribute.pivot.attribute_item_id;
+        return acc;
+      },
+      {}
+    );
     return {
       id,
       product_id,
@@ -196,7 +225,9 @@ const Cart = () => {
   });
 
   const [isAllChecked, setIsAllChecked] = useState<boolean>(false);
-  const [checkedItems, setCheckedItems] = useState<{ [key: number]: boolean }>({});
+  const [checkedItems, setCheckedItems] = useState<{ [key: number]: boolean }>(
+    {}
+  );
   const handleCheckAll = () => {
     const newChecked = !isAllChecked;
     setIsAllChecked(newChecked);
@@ -209,7 +240,7 @@ const Cart = () => {
       }
     });
     setCheckedItems(newCheckedItems);
-    localStorage.setItem('checkedItems', JSON.stringify(newCheckedItems));
+    localStorage.setItem("checkedItems", JSON.stringify(newCheckedItems));
     setIdCart(newChecked ? allIdCarts : []);
   };
 
@@ -219,9 +250,9 @@ const Cart = () => {
       [cartId]: !checkedItems[cartId],
     };
     setCheckedItems(updatedCheckedItems);
-    localStorage.setItem('checkedItems', JSON.stringify(updatedCheckedItems));
+    localStorage.setItem("checkedItems", JSON.stringify(updatedCheckedItems));
     const updatedIdCarts = Object.keys(updatedCheckedItems)
-      .filter(key => updatedCheckedItems[Number(key)])
+      .filter((key) => updatedCheckedItems[Number(key)])
       .map(Number);
     setIdCart(updatedIdCarts);
     setIsAllChecked(updatedIdCarts.length === carts.length);
@@ -237,17 +268,17 @@ const Cart = () => {
         showConfirmButton: false,
       });
     } else {
-      navigate('/checkout', { state: { cartIds: idCart } });
+      navigate("/checkout", { state: { cartIds: idCart } });
     }
-  }
+  };
   useEffect(() => {
-    const storedCheckedItems = localStorage.getItem('checkedItems');
+    const storedCheckedItems = localStorage.getItem("checkedItems");
     if (storedCheckedItems) {
       const parsedCheckedItems = JSON.parse(storedCheckedItems);
       setCheckedItems(parsedCheckedItems);
       setIsAllChecked(Object.values(parsedCheckedItems).every(Boolean));
       const updatedIdCarts = Object.keys(parsedCheckedItems)
-        .filter(key => parsedCheckedItems[Number(key)])
+        .filter((key) => parsedCheckedItems[Number(key)])
         .map(Number);
       setIdCart(updatedIdCarts);
     }
@@ -298,15 +329,22 @@ const Cart = () => {
               </div>
               <div className="hd-pagecart-items">
                 <div className="hd-item relative overflow-hidden">
-                  {
-                    isFetching ? <Loading /> :
-                      carts && carts.length > 0 ? (carts?.map((e: any) => {
-                        const { productvariant } = e;
-                        const attributesObject = productvariant?.attributes.reduce((acc: any, attribute: any) => {
-                          acc[attribute.name] = attribute.pivot.attribute_item_id;
-                          return acc;
-                        }, {});
-                        return <>
+                  {isFetching ? (
+                    <Loading />
+                  ) : carts && carts.length > 0 ? (
+                    carts?.map((e: any) => {
+                      const { productvariant } = e;
+                      const attributesObject =
+                        productvariant?.attributes.reduce(
+                          (acc: any, attribute: any) => {
+                            acc[attribute.name] =
+                              attribute.pivot.attribute_item_id;
+                            return acc;
+                          },
+                          {}
+                        );
+                      return (
+                        <>
                           <div className="hd-item-row lg:py-[2rem] py-[1rem] !items-center flex flex-wrap border-solid border-b-2">
                             <div className="hd-infor-item lg:w-5/12 w-full hd-col-item">
                               <div className="hd-infor !items-center !flex">
@@ -321,7 +359,9 @@ const Cart = () => {
                                   to=""
                                   className="min-w-[120px] max-w-[120px] block overflow-hidden relative w-full touch-manipulation pb-[10px] lg:pb-0"
                                 >
-                                  <img src={`${e?.product?.img_thumbnail}`}></img>
+                                  <img
+                                    src={`${e?.product?.img_thumbnail}`}
+                                  ></img>
                                 </Link>
                                 <div className="hd-infor-text ms-4">
                                   <Link
@@ -331,32 +371,66 @@ const Cart = () => {
                                     {e?.product?.name}
                                   </Link>
                                   {/*end hd-price-item*/}
-                                  {updatedAttributes.dataAttributes && Object.entries(updatedAttributes.dataAttributes).length > 0 ? (
-                                    Object.entries(updatedAttributes.dataAttributes).map(([attributeName, attributeValue]) => {
-                                      const attributeItem = updatedAttributes.find((item: any) => item.name === attributeName);
-                                      return (
-                                        <div className="hd-infor-text-meta text-[13px] text-[#878787]" key={attributeName}>
-                                          <p>
-                                            {attributeName}: <strong>{attributeItem ? attributeItem.pivot.value : attributeValue}</strong>
-                                          </p>
-                                        </div>
-                                      );
-                                    })
-                                  ) : (
-                                    e?.productvariant?.attributes?.map((item: any) => (
-                                      <div className="hd-infor-text-meta text-[13px] text-[#878787]" key={item.id}>
-                                        <p>{item?.name}: <strong>{item?.pivot?.value}</strong></p>
-                                      </div>
-                                    ))
-                                  )}
+                                  {updatedAttributes.dataAttributes &&
+                                  Object.entries(
+                                    updatedAttributes.dataAttributes
+                                  ).length > 0
+                                    ? Object.entries(
+                                        updatedAttributes.dataAttributes
+                                      ).map(
+                                        ([attributeName, attributeValue]) => {
+                                          const attributeItem =
+                                            updatedAttributes.find(
+                                              (item: any) =>
+                                                item.name === attributeName
+                                            );
+                                          return (
+                                            <div
+                                              className="hd-infor-text-meta text-[13px] text-[#878787]"
+                                              key={attributeName}
+                                            >
+                                              <p>
+                                                {attributeName}:{" "}
+                                                <strong>
+                                                  {attributeItem
+                                                    ? attributeItem.pivot.value
+                                                    : attributeValue}
+                                                </strong>
+                                              </p>
+                                            </div>
+                                          );
+                                        }
+                                      )
+                                    : e?.productvariant?.attributes?.map(
+                                        (item: any) => (
+                                          <div
+                                            className="hd-infor-text-meta text-[13px] text-[#878787]"
+                                            key={item.id}
+                                          >
+                                            <p>
+                                              {item?.name}:{" "}
+                                              <strong>
+                                                {item?.pivot?.value}
+                                              </strong>
+                                            </p>
+                                          </div>
+                                        )
+                                      )}
 
                                   <div className="hd-infor-text-tools mt-[10px]">
-                                    {
-                                      e.productvariant && <Button onClick={() => handleAttribute(e?.id, e?.productvariant?.attributes)} className="inline-flex mr-[-15px] border-none">
+                                    {e.productvariant && (
+                                      <Button
+                                        onClick={() =>
+                                          handleAttribute(
+                                            e?.id,
+                                            e?.productvariant?.attributes
+                                          )
+                                        }
+                                        className="inline-flex mr-[-15px] border-none"
+                                      >
                                         <Note />
                                       </Button>
-                                    }
-
+                                    )}
                                   </div>
                                 </div>
                               </div>
@@ -403,7 +477,6 @@ const Cart = () => {
                                       </button>
                                     </div>
                                   </div>
-
                                 </div>
                               </div>
                             </div>
@@ -412,9 +485,17 @@ const Cart = () => {
                             <div className="hd-price-item !text-center w-3/12 hd-col-item lg:block hidden">
                               <div className="hs-prices">
                                 <div className="hd-text-price">
-                                  <del className="text-[#696969]">{FormatMoney(e?.productvariant?.price_regular || e?.product?.price_regular)}</del>
+                                  <del className="text-[#696969]">
+                                    {FormatMoney(
+                                      e?.productvariant?.price_regular ||
+                                        e?.product?.price_regular
+                                    )}
+                                  </del>
                                   <ins className="ms-[6px] no-underline text-[#ec0101]">
-                                    {FormatMoney(e?.productvariant?.price_sale || e?.product?.price_sale)}
+                                    {FormatMoney(
+                                      e?.productvariant?.price_sale ||
+                                        e?.product?.price_sale
+                                    )}
                                   </ins>
                                 </div>
                               </div>
@@ -425,7 +506,13 @@ const Cart = () => {
                                 <button
                                   type="button"
                                   className="hd-btn-item left-0 text-left pl-[15px] p-0 top-0 text-sm cursor-pointer shadow-none transform-none touch-manipulation"
-                                  onClick={() => handleDecrease(e?.id, e?.quantity, attributesObject)}
+                                  onClick={() =>
+                                    handleDecrease(
+                                      e?.id,
+                                      e?.quantity,
+                                      attributesObject
+                                    )
+                                  }
                                 >
                                   <MinusOutlined />
                                 </button>
@@ -433,7 +520,13 @@ const Cart = () => {
                                   {e?.quantity}
                                 </span>
                                 <button
-                                  onClick={() => handleIncrease(e?.id, e?.quantity, attributesObject)}
+                                  onClick={() =>
+                                    handleIncrease(
+                                      e?.id,
+                                      e?.quantity,
+                                      attributesObject
+                                    )
+                                  }
                                   type="button"
                                   className="hd-btn-item right-0 text-right pr-[15px] p-0 top-0 text-sm cursor-pointer shadow-none transform-none touch-manipulation"
                                 >
@@ -456,17 +549,28 @@ const Cart = () => {
                             </div>
                             {/*end hd-quantity-item*/}
                             <div className="hd-total-item hd-col-item text-end w-2/12 lg:block hidden">
-                              <span className="font-medium">{FormatMoney(e?.total_price)}</span>
+                              <span className="font-medium">
+                                {FormatMoney(e?.total_price)}
+                              </span>
                             </div>
                             {/*end hd-total-item*/}
                           </div>
                         </>
-                      })) : <p className="text-center mt-12 text-base">Giỏ hàng trống</p>
-                  }
+                      );
+                    })
+                  ) : (
+                    <p className="text-center mt-12 text-base">
+                      Giỏ hàng trống
+                    </p>
+                  )}
                   {/*end-item-1*/}
                 </div>
               </div>
-              <Button onClick={() => handleDeleteCart([idCart])} className="btn-danger mt-5 ml-auto" style={{ float: 'right', padding: '20px 10px' }}>
+              <Button
+                onClick={() => handleDeleteCart([idCart])}
+                className="btn-danger mt-5 ml-auto"
+                style={{ float: "right", padding: "20px 10px" }}
+              >
                 Xoá sản phẩm trong giỏ hàng
               </Button>
               {/*end hd-pagecart-items*/}
@@ -555,7 +659,7 @@ const Cart = () => {
                         <div className="hd-col-item w-auto">
                           <div className="text-right font-semibold">
                             {
-                              // isFetching ? <Skeleton /> : 
+                              // isFetching ? <Skeleton /> :
                               FormatMoney(data?.sub_total)
                             }
                           </div>
@@ -573,14 +677,12 @@ const Cart = () => {
                       <label>Tôi đồng ý với các điều khoản và điều kiện.</label>
                     </div>
                     <div className=" ">
-
                       <Button
                         onClick={handleCheckout}
                         className="bg-[#00BADB] text-base h-[50px] w-auto px-[45px] font-semibold rounded-full text-white inline-flex items-center relative overflow-hidden hover:bg-[#23b6cd] transition-all ease-in-out duration-300"
                       >
                         Thanh Toán
                       </Button>
-
                     </div>
                   </div>
                   {/*end hd-sub-total*/}
@@ -590,13 +692,11 @@ const Cart = () => {
             </form>
             {/*end hd-form-cart*/}
           </div>
-        </section >
+        </section>
         {/*end hd-page-body*/}
-      </main >
+      </main>
     </>
   );
 };
 
 export default Cart;
-
-

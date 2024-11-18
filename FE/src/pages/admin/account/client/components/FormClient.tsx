@@ -13,7 +13,7 @@ import {
   message,
   Select,
   Upload,
-  UploadProps,
+  UploadProps
 } from "antd";
 import { Option } from "antd/es/mentions";
 import dayjs from "dayjs";
@@ -28,7 +28,6 @@ const FormClient = () => {
   const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<any>("");
-  console.log(errors);
   const [urlImage, setUrlImage] = useState<any>();
 
   const { data, refetch, isFetching } = useQuery({
@@ -62,7 +61,7 @@ const FormClient = () => {
       queryClient.invalidateQueries({ queryKey: ["clients"] });
       toast.success("Thêm thành công");
       form.resetFields();
-      navigate(-1)
+      navigate(-1);
     },
     onError: (error: any) => {
       setErrors(error.response.data.errors);

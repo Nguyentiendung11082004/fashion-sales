@@ -5,10 +5,10 @@
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import dayjs from "dayjs";
 import { useAuth } from "@/common/context/Auth/AuthContext";
 import { useCart } from "@/common/context/Cart/CartContext";
 import { useUser } from "@/common/context/User/UserContext";
+import instance from "@/configs/axios";
 import { categoriesShow } from "@/services/api/admin/categories";
 import {
   findProductVariant,
@@ -16,13 +16,13 @@ import {
 } from "@/services/api/client/productClient.api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button, Popconfirm } from "antd";
+import dayjs from "dayjs";
 import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 import Less from "../../../components/icons/detail/Less";
 import CommentProduct from "./CommentProduct";
 import RelatedProducts from "./RelatedProducts";
-import instance from "@/configs/axios";
-import { toast } from "react-toastify";
 import ReplyComment from "./ReplyComment";
 import Loading from "@/common/Loading/Loading";
 
@@ -35,7 +35,7 @@ const ProductDetail = () => {
   const [product, setProduct] = useState<any>();
   const [selectedImage, setSelectedImage] = useState<string>();
 
-  const { data, isLoading, isError, error } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["product", id],
     queryFn: async () => {
       try {
@@ -70,9 +70,10 @@ const ProductDetail = () => {
   const comments = data?.product?.comments;
 
   // người dùng xóa, sửa bình luận
+
   // thông tin user đăng nhập
   const { user } = useUser();
-  const idUser = user?.InforUser;
+  const idUser = user?.InforUser.id;
 
   const queryClient = useQueryClient();
   const { mutate } = useMutation({
@@ -93,18 +94,17 @@ const ProductDetail = () => {
   });
 
   // Phân trang
-  const [currentPage, setCurrentPage] = useState(1); // Trang hiện tại
-  const commentsPerPage = 3; // Số lượng bình luận mỗi trang
+  const [currentPage, setCurrentPage] = useState(1);
+  const commentsPerPage = 3;
 
-  // Xác định vị trí của các bình luận trên trang hiện tại
   const indexOfLastComment = currentPage * commentsPerPage;
   const indexOfFirstComment = indexOfLastComment - commentsPerPage;
   const currentComments = comments?.slice(
     indexOfFirstComment,
     indexOfLastComment
-  ); // Các bình luận hiển thị trên trang hiện tại
+  );
 
-  const totalPages = Math.ceil(comments?.length / commentsPerPage); // Tổng số trang
+  const totalPages = Math.ceil(comments?.length / commentsPerPage);
 
   const handleNextPage = () => {
     if (currentPage < totalPages) {
@@ -161,7 +161,6 @@ const ProductDetail = () => {
             className={`py-4 mb-2 ${isChild ? "mt-2 border-none" : "border-2 border-gray-200"}`}
             style={{ marginLeft: isChild ? "0px" : `${level * 50}px` }}
           >
-            {/* Bình luận cha */}
             <div className="flex items-start">
               <img
                 className={`w-10 h-10 border-black rounded-full mr-4 border-2`}
@@ -202,9 +201,16 @@ const ProductDetail = () => {
               </div>
             </div>
 
-            {/* Các nút chức năng cho người dùng */}
             <div className="pl-[60px]">
-              {comment?.user_id === idUser ? (
+              <button
+                onClick={() =>
+                  handleReplyClick(comment?.id, comment?.parent_id)
+                }
+                className="font-bold text-[12px] text-blue-500 mr-2"
+              >
+                Trả lời
+              </button>
+              {comment?.user_id === idUser && (
                 <>
                   <button
                     onClick={() => onHandleEdit(comment?.id, comment)}
@@ -224,19 +230,9 @@ const ProductDetail = () => {
                     </button>
                   </Popconfirm>
                 </>
-              ) : (
-                <button
-                  onClick={() =>
-                    handleReplyClick(comment?.id, comment?.parent_id)
-                  }
-                  className="font-bold text-[12px] text-blue-500 mr-2"
-                >
-                  Trả lời
-                </button>
               )}
             </div>
 
-            {/* Hiện nút trả lời */}
             {replyToCommentId === comment.id && (
               <ReplyComment
                 productId={productId}
@@ -246,7 +242,6 @@ const ProductDetail = () => {
               />
             )}
 
-            {/* Hiển thị nút ẩn/hiện các bình luận con */}
             {hasChildren && (
               <button
                 onClick={() => toggleChildComments(comment.id)}
@@ -258,7 +253,6 @@ const ProductDetail = () => {
               </button>
             )}
 
-            {/* Render các bình luận con nếu mở */}
             {isOpen &&
               hasChildren &&
               comment.children_recursive.map((childComment: any) => (
@@ -276,7 +270,6 @@ const ProductDetail = () => {
       );
     });
   };
-  // console.log("data detail: ", data)
   const [activeButton, setActiveButton] = useState("details");
 
   const handleButtonClick = (buttonName: string) => {
@@ -290,7 +283,8 @@ const ProductDetail = () => {
 
   useEffect(() => {
     if (imgPr) {
-      setMainImage(imgPr);
+      // setMainImage(imgPr);
+      setSelectedImage(imgPr);
     }
   }, [imgPr, galleryImages]);
 
@@ -312,51 +306,60 @@ const ProductDetail = () => {
   const decreaseQuantity = () => {
     setQuantity((prev) => (prev > 1 ? prev - 1 : 1));
   };
-  const onHandleAddToCart = (idProduct: any, idProductVariant: any) => {
+  const onHandleAddToCart = (
+    idProduct: any,
+    idProductVariant: any,
+    quantity: any
+  ) => {
     if (data.getUniqueAttributes == 0) {
       idProductVariant = undefined;
     }
-
-    addToCart(idProduct, idProductVariant);
+    addToCart(idProduct, idProductVariant, quantity);
   };
 
+  // selectAttribute
   const [selectedAttributes, setSelectedAttributes] = useState<{
     product_variant: Record<string, string | number>;
   }>({
     product_variant: {},
   });
 
-  const result = product?.variants.map((variant: any) => {
-    if (!variant.attributes) {
-      return {};
-    }
-
-    const attributeObj = variant.attributes.reduce(
-      (acc: { [key: string]: number }, attribute: any) => {
-        acc[attribute.name] = attribute.pivot.attribute_item_id;
-        return acc;
-      },
-      {}
-    );
-    return attributeObj;
-  });
-
-  const [dataAttributes, setAttribute] = useState<any>([]);
-
   const handleAttributeSelect = (attribute: any, id: any) => {
-    setAttribute((prev: any) => ({
+    setSelectedAttributes((prev: any) => ({
       ...prev,
       [attribute]: id,
     }));
   };
 
+  const result = product?.variants
+    .filter(
+      (variant: any) =>
+        variant.attributes &&
+        variant.attributes.length > 0 &&
+        variant.quantity > 0
+    )
+    .map((variant: any) => {
+      const attributeObj = variant.attributes.reduce(
+        (acc: { [key: string]: string }, attribute: any) => {
+          acc[attribute.name] = attribute.pivot.attribute_item_id.toString();
+          return acc;
+        },
+        {}
+      );
+      return attributeObj;
+    });
+
   const checkDisable = (attribute: string, value: any) => {
     let res = false;
 
     let matchingItems = result?.filter((x: any) => {
-      return Object.keys(dataAttributes).every((key) => {
+      return Object.keys(selectedAttributes.product_variant).every((key) => {
         if (key !== attribute) {
-          return x[key] && x[key].toString() === dataAttributes[key].toString();
+          return (
+            x[key] &&
+            x[key].toString() ===
+              selectedAttributes?.product_variant[key].toString()
+          );
         }
         return true;
       });
@@ -370,6 +373,15 @@ const ProductDetail = () => {
 
     return res;
   };
+
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+
+  useEffect(() => {
+    if (result && result.length > 0 && isInitialLoad) {
+      setSelectedAttributes({ product_variant: result[0] });
+      setIsInitialLoad(false);
+    }
+  }, [result, isInitialLoad]);
 
   useEffect(() => {
     const fetchProductVariant = async () => {
@@ -391,7 +403,6 @@ const ProductDetail = () => {
         console.log("Call api thất bại", error);
       }
     };
-
     fetchProductVariant();
   }, [selectedAttributes]);
 
@@ -405,24 +416,8 @@ const ProductDetail = () => {
     })),
   }));
 
-  useEffect(() => {
-    if (getUniqueAttributes) {
-      const initialAttributes: IinitialAttributes = {};
-
-      const keys = Object.keys(getUniqueAttributes);
-
-      keys.forEach((key) => {
-        const value = getUniqueAttributes[key];
-        const firstValueId = Object.keys(value)[0];
-
-        if (firstValueId) {
-          initialAttributes[key] = firstValueId;
-        }
-      });
-
-      setSelectedAttributes({ product_variant: initialAttributes });
-    }
-  }, [getUniqueAttributes]);
+  console.log("resultGetUniqueAttribute", resultGetUniqueAttribute);
+  console.log("getUniqueAttributes", getUniqueAttributes);
 
   const [editIdComment, setEditIdComment] = useState<string | null>(null);
   const [InForCommentId, setInForCommentId] = useState<string | null>(null);
@@ -500,7 +495,8 @@ const ProductDetail = () => {
                     alt="product detail"
                     data-nimg="fill"
                     className="w-full lg:h-[100%] h-full lg:w-[550px] object-cover transition-transform ease-in-out duration-300 group-hover:scale-150"
-                    src={mainImage || selectedImage}
+                    // src={mainImage || selectedImage}
+                    src={selectedImage}
                   />
                 </div>
               </div>
@@ -613,13 +609,14 @@ const ProductDetail = () => {
                             return (
                               <div
                                 key={item.id}
-                                className={`relative flex-1 max-w-[60px] h-8 sm:h-9 rounded-full cursor-pointer flex items-center justify-center ${
-                                  isSelected
-                                    ? "border-gray-800 border-4"
-                                    : isDisabled
-                                      ? "border-gray-200 border-2 opacity-50 cursor-not-allowed"
-                                      : ""
-                                }`}
+                                className={`relative flex-1 max-w-[60px] h-8 sm:h-9 rounded-full cursor-pointer flex items-center justify-center
+                                   ${
+                                     isSelected
+                                       ? "border-gray-800 border-4"
+                                       : isDisabled
+                                         ? "border-gray-200 border-2 opacity-50 cursor-not-allowed"
+                                         : ""
+                                   }`}
                                 style={{
                                   backgroundColor:
                                     key.attribute === "color"
@@ -716,7 +713,9 @@ const ProductDetail = () => {
                 </div>
 
                 <Button
-                  onClick={() => onHandleAddToCart(id, product?.id)}
+                  onClick={() => {
+                    onHandleAddToCart(id, product?.id, quantity);
+                  }}
                   className={`h-11 w-full px-2 py-2 rounded-full ...`}
                   disabled={isLoading}
                 >
@@ -776,7 +775,13 @@ const ProductDetail = () => {
           <div className="container py-[45px]">
             <div className="w-[100%] text-center m-auto flex justify-center">
               <button
-                onClick={() => handleButtonClick("details")}
+                onClick={() => {
+                  handleButtonClick("details");
+                  setEditIdComment(null);
+                  setInForCommentId(null);
+                  setReplyToCommentId(null);
+                  setInForCommentId("");
+                }}
                 className={`${
                   activeButton === "details"
                     ? "border-black text-black border-2"
@@ -786,7 +791,13 @@ const ProductDetail = () => {
                 Chi tiết sản phẩm
               </button>
               <button
-                onClick={() => handleButtonClick("reviews")}
+                onClick={() => {
+                  handleButtonClick("reviews");
+                  setEditIdComment(null);
+                  setInForCommentId(null);
+                  setReplyToCommentId(null);
+                  setInForCommentId("");
+                }}
                 className={`${
                   activeButton === "reviews"
                     ? "border-black text-black border-2"
@@ -796,7 +807,12 @@ const ProductDetail = () => {
                 Xem đánh giá sản phẩm
               </button>
               <button
-                onClick={() => handleButtonClick("comment")}
+                onClick={() => {
+                  handleButtonClick("comment"), setEditIdComment(null);
+                  setInForCommentId(null);
+                  setReplyToCommentId(null);
+                  setInForCommentId("");
+                }}
                 className={`${
                   activeButton === "comment"
                     ? "border-black text-black border-2"

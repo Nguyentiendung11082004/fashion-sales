@@ -35,7 +35,6 @@ const LayoutAdmin: React.FC = () => {
         collapsible
         collapsed={collapsed}
         width={250}
-        
         className="bg-[black] min-h-screen"
       >
         <div className="flex items-center justify-center h-[25px] bg-[black]">
@@ -77,6 +76,15 @@ const LayoutAdmin: React.FC = () => {
               ),
             },
             {
+              key: "12",
+              icon: <ShoppingCartOutlined />,
+              label: (
+                <NavLink className="text-white" to="/admin/orders">
+                  Đơn hàng
+                </NavLink>
+              ),
+            },
+            {
               key: "3",
               icon: <UploadOutlined />,
               label: (
@@ -109,6 +117,7 @@ const LayoutAdmin: React.FC = () => {
                 </NavLink>
               ),
             },
+
             {
               key: "4",
               icon: <OrderedListOutlined />,
@@ -190,6 +199,30 @@ const LayoutAdmin: React.FC = () => {
                 </NavLink>
               ),
             },
+            {
+              key: "30",
+              icon: (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth="1.5"
+                  stroke="currentColor"
+                  className="size-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M9 4.5v15m6-15v15m-10.875 0h15.75c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125H4.125C3.504 4.5 3 5.004 3 5.625v12.75c0 .621.504 1.125 1.125 1.125Z"
+                  />
+                </svg>
+              ),
+              label: (
+                <NavLink to="/admin/vouchers" className="text-white">
+                  Voucher
+                </NavLink>
+              ),
+            },
 
             {
               key: "10",
@@ -209,15 +242,7 @@ const LayoutAdmin: React.FC = () => {
                 </NavLink>
               ),
             },
-            {
-              key: "12",
-              icon: <ShoppingCartOutlined />,
-              label: (
-                <NavLink className="text-white" to="/admin/order">
-                  Đơn hàng
-                </NavLink>
-              ),
-            },
+
             {
               key: "13",
               icon: <TagsOutlined />,
@@ -236,7 +261,6 @@ const LayoutAdmin: React.FC = () => {
                 </NavLink>
               ),
             },
-            
           ]}
         />
       </Sider>

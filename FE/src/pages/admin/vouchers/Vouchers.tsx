@@ -1,8 +1,7 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Loading from "@/common/Loading/Loading";
-import { Iproduct } from "@/common/types/products";
-import { productDestroy, productsIndex } from "@/services/api/admin/products.api";
+import { IVouchers } from "@/common/types/vouchers";
+import instance from "@/configs/axios";
 import {
   DeleteOutlined,
   EditOutlined,
@@ -10,35 +9,66 @@ import {
   PlusOutlined,
 } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Button, Modal, Pagination, Table, Tag } from "antd";
+import { Button, Modal, Pagination, Table } from "antd";
 import { ColumnType } from "antd/es/table";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
-const ProductPageManager = () => {
-  const [currentPage, setCurrentPage] = useState(1);
+const Vouchers = () => {
   const [pageSize] = useState(5);
   const [visiable, setVisiable] = useState(false);
   const [currentId, setCurrentId] = useState<number>();
   const [hasError, setHasError] = useState(false);
   const queryClient = useQueryClient();
-  const { data, isFetching, isError } = useQuery({
-    queryKey: ["productsIndex"],
-    queryFn: productsIndex,
+  const initialPage = queryClient.getQueryData(["currentPage"]) || 1;
+
+  const [currentPage, setCurrentPage] = useState(Number(initialPage));
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: ["vouchers"],
+    queryFn: async () => {
+      try {
+        return await instance.get(`/vouchers`);
+      } catch (error: any) {
+        throw new Error(error.message);
+      }
+    },
   });
 
-  console.log("data pr:",data)
+  const navigate = useNavigate();
+
+  const handleEdit = (id: number) => {
+    navigate(`edit/${id}`, { state: { currentPage } });
+  };
+  const dataVoucher = data?.data?.dataVouchers;
+  useEffect(() => {
+    const totalItems = data?.data?.length || 0;
+    const maxPage = Math.ceil(totalItems / pageSize);
+
+    if (totalItems > 0 && currentPage > maxPage) {
+      setCurrentPage(maxPage);
+    }
+  }, [data, currentPage, pageSize]);
+  const dataSource =
+    dataVoucher?.map((item: IVouchers) => ({
+      key: item?.id,
+      ...item,
+    })) || [];
+
   const { mutate } = useMutation({
-    mutationFn: productDestroy,
+    mutationFn: async (id: any) => {
+      try {
+        return await instance.delete(`/vouchers/${id}`);
+      } catch (error: any) {
+        throw new Error(error.message);
+      }
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ["productsIndex"],
-      });
-      toast.success("Xoá sản phẩm thành công");
+      queryClient.invalidateQueries({ queryKey: ["vouchers"] });
+      toast.success("Xoá thành công");
     },
     onError: () => {
-      toast.error("Xoá sản phẩm thất bại");
+      toast.error("Xoá thất bại");
     },
   });
 
@@ -53,92 +83,65 @@ const ProductPageManager = () => {
     }
   };
 
-  const column: ColumnType<Iproduct>[] = [
+  const columns: ColumnType<IVouchers>[] = [
     {
-      title: "STT",
-      render: (_, record: any, index: number) => (
+      title: "Stt",
+      render: (_, __: any, index: number) => (
         <div>{index + 1 + pageSize * (currentPage - 1)}</div>
       ),
     },
     {
-      title: "Type",
-      dataIndex: "type",
-      render: (text: any, record: Iproduct, index: number) => {
-        return <p>{record.type == 0 ? "Sản phẩm đơn" : "Sản phẩm biến thể"}</p>;
-      },
+      title: "Tên voucher",
+      dataIndex: "title",
+    },
+    {
+      title: "Mô tả",
+      dataIndex: "description",
     },
 
     {
-      title: "name",
-      dataIndex: "name",
+      title: "Số lượng",
+      dataIndex: "usage_limit",
     },
     {
-      title: "views",
-      dataIndex: "views",
-    },
-    {
-      title: "img_thumbnail",
-      dataIndex: "img_thumbnail",
-      render: (record: Iproduct) => {
-        return (
-          <img
-            src={`${record}`}
-            style={{ height: "60px", margin: "0 auto" }}
-            alt={`${record?.name}`}
-          />
-        );
-      },
-    },
-    {
-      title: "status",
-      dataIndex: "status",
-      render: (status) => (
-        <Tag color={status ? "green" : "red"}>
-          {status ? "Còn hàng" : "Hết hàng"}
-        </Tag>
-      ),
-    },
-    {
-      title: "is_show_home",
-      dataIndex: "is_show_home",
-      render: (is_show_home) => (
-        <Tag color={is_show_home ? "green" : "red"}>
-          {is_show_home ? "Còn hàng" : "Hết hàng"}
-        </Tag>
-      ),
-    },
-    {
-      title: "trend",
-      dataIndex: "trend",
-      render: (is_trend) => (
-        <Tag color={is_trend ? "green" : "red"}>
-          {is_trend == true ? "Hot trend" : "Lỗi thời"}
-        </Tag>
-      ),
+      title: "Đã sử dụng",
+      dataIndex: "used_count",
     },
 
+    {
+      title: "Ngày bắt đầu",
+      dataIndex: "start_date",
+    },
+    {
+      title: "Ngày kết thúc",
+      dataIndex: "end_date",
+    },
     {
       title: "Thao tác",
       fixed: "right",
-      render: (record: Iproduct) => {
+      render: (record: IVouchers) => {
         return (
           <div>
             <Link to={`${record?.id}`}>
               <Button className="btn-info" style={{ width: "46px" }}>
-                <EyeOutlined className="pl-2" />{" "}
+                <EyeOutlined className="" />
               </Button>
             </Link>
-            <Link to={`edit/${record?.id}`}>
-              <Button className="btn-warning mx-2" style={{ width: "46px" }}>
-                <EditOutlined className="pl-2" />{" "}
-              </Button>
-            </Link>
+
             <Button
-              onClick={() => handleOpen(record?.id as number)}
+              className="btn-warning mx-2"
+              style={{ width: "46px" }}
+              onClick={() => handleEdit(record?.id)}
+            >
+              <EditOutlined />
+            </Button>
+
+            <Button
+              onClick={() => handleOpen(record?.id)}
               className="btn-danger"
               style={{ width: "46px" }}
             >
-              <DeleteOutlined className="pl-2" />{" "}
+              <DeleteOutlined className="pl-2" />
             </Button>
           </div>
         );
@@ -146,33 +149,31 @@ const ProductPageManager = () => {
     },
   ];
 
-  const dataSource =
-    data?.data?.map((product: Iproduct) => ({
-      key: product.id,
-      ...product
-    }
-  )) || [];
   useEffect(() => {
     if (isError && !hasError) {
       toast.error("Có lỗi xảy ra");
       setHasError(true);
     }
   }, [isError, hasError]);
+
+  if (isLoading) return <div>Loading...</div>;
+  if (isError) return <div>{error.message}</div>;
+
   return (
     <div className="p-6 min-h-screen">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2">
-          Danh sách sản phẩm
+          Danh sách voucher
         </h1>
         <Link to={`create`}>
           <Button className="bg-blue-500 text-white rounded-lg h-10 px-4 flex items-center hover:bg-blue-600 transition duration-200">
             <PlusOutlined className="mr-2" />
-            Thêm sản phẩm
+            Thêm voucher
           </Button>
         </Link>
       </div>
       <div className="">
-        {isFetching ? (
+        {isLoading ? (
           <Loading />
         ) : (
           <>
@@ -182,7 +183,7 @@ const ProductPageManager = () => {
                 (currentPage - 1) * pageSize,
                 currentPage * pageSize
               )}
-              columns={column}
+              columns={columns}
               scroll={{ x: "max-content" }}
               pagination={false}
             />
@@ -209,4 +210,4 @@ const ProductPageManager = () => {
   );
 };
 
-export default ProductPageManager;
+export default Vouchers;
