@@ -91,9 +91,9 @@ Route::prefix("v1/")->group(function () {
     Route::post('try-on', [TryOnController::class, 'tryOn']);
 
     // thống kê
-    Route::get('getproductstatistics',[StatisticsController::class,"getProductStatistics"]);
+    Route::post('getproductstatistics',[StatisticsController::class,"getProductStatistics"]);
     Route::get('getorderstatistics',[StatisticsController::class,"getOrderStatistics"]);
-    Route::get('getrevenuestatistics',[StatisticsController::class,"getRevenueStatistics"]);
+    Route::post('getrevenuestatistics',[StatisticsController::class,"getRevenueStatistics"]);
     
 });
 
