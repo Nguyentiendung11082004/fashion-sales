@@ -29,7 +29,7 @@ const Checkout = () => {
   const [idQuanHuyen, setIdQuanHuyen] = useState<number | null>(0)
   const [idXa, setIdXa] = useState<number | null>(0)
   const [paymentMethhod, setPaymentMethod] = useState('1');
-  const [shiping, setShipPing] = useState<number>(1);
+  const [shiping, setShipPing] = useState<any>('1');
   const [voucher, setVoucher] = useState<any>();
   const [subTotal, setSubTotal] = useState(); // giá khi áp dụng voucher
   const [totalDiscount, setTotalDiscount] = useState();
