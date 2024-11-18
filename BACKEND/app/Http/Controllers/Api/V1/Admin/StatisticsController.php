@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Api\V1\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderDetail;
-// use App\Models\Product;
-// use App\Models\ProductVariant;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class StatisticsController extends Controller
@@ -16,111 +16,159 @@ class StatisticsController extends Controller
     // Thống kê doanh thu
     public function getRevenueStatistics(Request $request)
     {
-        // Lấy tham số bộ lọc từ request
-        $filterType = $request->input('filter_type', 'month'); // Mặc định theo tháng
-        $filterValue = $request->input('filter_value', now()->format('Y-m')); // Mặc định là tháng hiện tại
-    
-        // Khởi tạo truy vấn cơ bản
-        $query = OrderDetail::select(
-            'order_details.product_id',
-            'order_details.product_variant_id',
-            'products.name as product_name',
-            'products.sku as product_sku',
-            'product_variants.sku as variant_sku',
-            DB::raw('SUM(order_details.total_price) as revenue'),
-            DB::raw('SUM(order_details.quantity) as total_quantity')
-        )
-            ->leftJoin('products', 'order_details.product_id', '=', 'products.id')
-            ->leftJoin('product_variants', 'order_details.product_variant_id', '=', 'product_variants.id')
-            ->groupBy(
+        try {
+            // Lấy và kiểm tra tham số filter từ request
+            $filterType = $request->input('filter_type', 'day'); // Mặc định là 'day'
+           
+            if ($filterType === 'range') {
+                $request->validate([
+                    'filter_start_date' => 'required|date',
+                    'filter_end_date' => 'required|date|after_or_equal:filter_start_date',
+                ]);
+
+                $filterStartDate = $request->input('filter_start_date');
+                $filterEndDate = $request->input('filter_end_date');
+            }else{
+                $filterValue = $request->input('filter_value', now()->format('Y-m-d')); // Mặc định là ngày hiện tại
+                $filterStartDate = null;
+                $filterEndDate = null;
+            }
+
+            // Khởi tạo truy vấn cơ bản
+            $query = OrderDetail::select(
                 'order_details.product_id',
                 'order_details.product_variant_id',
-                'products.name',
-                'products.sku',
-                'product_variants.sku'
-            );
-    
-        // Áp dụng bộ lọc theo thời gian
-        switch ($filterType) {
-            case 'day':
-                $query->whereDate('order_details.created_at', $filterValue); // Lọc theo ngày
-                break;
-            case 'week':
-                $query->whereBetween('order_details.created_at', [
-                    now()->startOfWeek()->format('Y-m-d'),
-                    now()->endOfWeek()->format('Y-m-d'),
-                ]);
-                break;
-            case 'month':
-                $query->whereMonth('order_details.created_at', date('m', strtotime($filterValue)))
-                      ->whereYear('order_details.created_at', date('Y', strtotime($filterValue)));
-                break;
-            case 'year':
-                $query->whereYear('order_details.created_at', $filterValue); // Lọc theo năm
-                break;
-        }
-    
-        // Lấy dữ liệu tổng hợp
-        $revenueData = $query->get();
-    
-        // Tính tổng doanh thu
-        $totalRevenue = $revenueData->sum('revenue');
-    
-        // Lấy thông tin thuộc tính sản phẩm
-        $variantAttributes = DB::table('product_variant_has_attributes')
-            ->join('attributes', 'product_variant_has_attributes.attribute_id', '=', 'attributes.id')
-            ->join('attribute_items', 'product_variant_has_attributes.attribute_item_id', '=', 'attribute_items.id')
-            ->select(
-                'product_variant_has_attributes.product_variant_id',
-                'attributes.name as attribute_name',
-                'attribute_items.value as attribute_value'
+                'products.name as product_name',
+                'products.sku as product_sku',
+                'product_variants.sku as variant_sku',
+                DB::raw('SUM(order_details.total_price) as revenue'),
+                DB::raw('SUM(order_details.quantity) as total_quantity')
             )
-            ->get();
-    
-        // Ánh xạ thuộc tính theo biến thể
-        $attributeMap = [];
-        foreach ($variantAttributes as $attr) {
-            $attributeMap[$attr->product_variant_id][] = $attr->attribute_name . ': ' . $attr->attribute_value;
+                ->leftJoin('products', 'order_details.product_id', '=', 'products.id')
+                ->leftJoin('product_variants', 'order_details.product_variant_id', '=', 'product_variants.id')
+                ->groupBy(
+                    'order_details.product_id',
+                    'order_details.product_variant_id',
+                    'products.name',
+                    'products.sku',
+                    'product_variants.sku'
+                );
+
+            // Áp dụng bộ lọc thời gian
+            switch ($filterType) {
+                case 'day':
+                    $query->whereDate('order_details.created_at', $filterValue);
+                    break;
+
+                case 'week':
+                    $startOfWeek = Carbon::parse($filterValue)->startOfWeek()->format('Y-m-d 00:00:00');
+                    $endOfWeek = Carbon::parse($filterValue)->endOfWeek()->format('Y-m-d 23:59:59');
+                    $query->whereBetween('order_details.created_at', [$startOfWeek, $endOfWeek]);
+                    break;
+
+                case 'month':
+                    $query->whereMonth('order_details.created_at', Carbon::parse($filterValue)->month)
+                        ->whereYear('order_details.created_at', Carbon::parse($filterValue)->year);
+                    break;
+
+                case 'year':
+                    $query->whereYear('order_details.created_at', Carbon::parse($filterValue)->year);
+                    break;
+
+                case 'range':
+                    if ($filterStartDate && $filterEndDate) {
+                        $startDate = Carbon::parse($filterStartDate)->format('Y-m-d 00:00:00');
+                        $endDate = Carbon::parse($filterEndDate)->format('Y-m-d 23:59:59');
+                        $query->whereBetween('order_details.created_at', [$startDate, $endDate]);
+                    }
+                    break;
+
+                default:
+                    throw new \Exception("Filter type không hợp lệ.");
+            }
+
+            // Lấy dữ liệu tổng hợp
+            $revenueData = $query->get();
+
+            // Tính tổng doanh thu
+            $totalRevenue = $revenueData->sum('revenue');
+
+            // Lấy thông tin thuộc tính sản phẩm
+            $variantAttributes = DB::table('product_variant_has_attributes')
+                ->join('attributes', 'product_variant_has_attributes.attribute_id', '=', 'attributes.id')
+                ->join('attribute_items', 'product_variant_has_attributes.attribute_item_id', '=', 'attribute_items.id')
+                ->select(
+                    'product_variant_has_attributes.product_variant_id',
+                    'attributes.name as attribute_name',
+                    'attribute_items.value as attribute_value'
+                )
+                ->get();
+
+            // Ánh xạ thuộc tính theo biến thể
+            $attributeMap = [];
+            foreach ($variantAttributes as $attr) {
+                $attributeMap[$attr->product_variant_id][] = $attr->attribute_name . ': ' . $attr->attribute_value;
+            }
+
+            // Chuẩn hóa dữ liệu trả về
+            $result = $revenueData->map(function ($item) use ($attributeMap) {
+                return [
+                    'product_name' => $item->product_name,
+                    'product_sku' => $item->product_sku,
+                    'variant_sku' => $item->variant_sku,
+                    'attributes' => isset($attributeMap[$item->product_variant_id])
+                        ? implode(", ", $attributeMap[$item->product_variant_id])
+                        : null,
+                    'revenue' => (float)$item->revenue,
+                    'total_quantity' => (int)$item->total_quantity,
+                ];
+            });
+
+            // Trả về kết quả JSON bao gồm tổng doanh thu và dữ liệu chi tiết
+            return response()->json([
+                'status' => 'success',
+                'filter_type' => $filterType,
+                'filter_value' => $filterValue??null,
+                'filter_start_date' => $filterStartDate,
+                'filter_end_date' => $filterEndDate,
+                'total_revenue' => $totalRevenue,
+                'data' => $result,
+            ], 200);
+        } catch (\Exception $e) {
+            // Xử lý lỗi và trả về phản hồi
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ], 400);
         }
-    
-        // Chuẩn hóa dữ liệu trả về
-        $result = $revenueData->map(function ($item) use ($attributeMap) {
-            return [
-                'product_name' => $item->product_name,
-                'product_sku' => $item->product_sku,
-                'variant_sku' => $item->variant_sku,
-                'attributes' => isset($attributeMap[$item->product_variant_id])
-                    ? implode(", ", $attributeMap[$item->product_variant_id])
-                    : null,
-                'revenue' => (float)$item->revenue,
-                'total_quantity' => (int)$item->total_quantity,
-            ];
-        });
-    
-        // Trả về kết quả JSON bao gồm tổng doanh thu và dữ liệu chi tiết
-        return response()->json([
-            'total_revenue' => $totalRevenue,
-            'data' => $result,
-        ]);
     }
-    
+
+
+
+
     // Thống kê đơn hàng
     public function getOrderStatistics()
     {
-        $orderCountsByStatus = Order::select('order_status', DB::raw('count(*) as total_orders'))
-            ->groupBy('order_status')
-            ->get();
+        try {
+            $orderCountsByStatus = Order::select('order_status', DB::raw('count(*) as total_orders'))
+                ->groupBy('order_status')
+                ->get();
 
-        // Lấy tổng số lượng sản phẩm (bao gồm cả sản phẩm đơn và biến thể) trong các đơn hàng
-        $totalQuantityInOrder = OrderDetail::sum('quantity');
+            // Lấy tổng số lượng sản phẩm (bao gồm cả sản phẩm đơn và biến thể) trong các đơn hàng
+            $totalQuantityInOrder = OrderDetail::sum('quantity');
 
-        // Tạo một mảng để lưu kết quả
-        $result = [
-            'order_counts_by_status' => $orderCountsByStatus,
-            'total_quantity_in_order' => $totalQuantityInOrder,
-        ];
+            // Tạo một mảng để lưu kết quả
+            $result = [
+                'order_counts_by_status' => $orderCountsByStatus,
+                'total_quantity_in_order' => $totalQuantityInOrder,
+            ];
 
-        return response()->json($result);
+            return response()->json($result);
+        } catch (\Exception $ex) {
+            return response()->json([
+                "message" => $ex->getMessage()
+            ]);
+        }
     }
 
     public function getProductStatistics(Request $request)

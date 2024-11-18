@@ -133,7 +133,7 @@ class CartController extends Controller
                     ]);
                 }
 
-                broadcast(new CartEvent($cart->id, $cartItem));
+                // broadcast(new CartEvent($cart->id, $cartItem));
                 // ->toOthers();
 
 
