@@ -214,12 +214,12 @@ const Footer = (props: Props) => {
             </span>
             <div className="max-w-md w-full my-5 rounded-lg flex">
               <div className="max-w-md w-full my-5 rounded-lg flex">
-                <div className=" flex-1 z-10">
+                <div className=" flex-1 z-0">
                   <form className="max-w-md w-full my-5 rounded-lg flex">
                     <div className="relative flex-1">
                       <input
                         type="email"
-                        className="w-full border-gray-300 border rounded-full py-4 px-3 focus:outline-none focus:ring-2 focus:border-transparent"
+                        className="z-10 w-full border-gray-300 border rounded-full py-4 px-3 focus:outline-none focus:ring-2 focus:border-transparent"
                         placeholder="Emai của bạn"
                         required
                       />

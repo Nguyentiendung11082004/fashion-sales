@@ -1,39 +1,60 @@
-import React, { useState } from 'react';
-import { Modal as AntModal, Button } from 'antd';
-import { useQuery } from '@tanstack/react-query';
+import React, { useEffect, useState } from 'react';
+import { Modal as AntModal, Button, Form } from 'antd';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import instance from '@/configs/axios';
 import { useAuth } from '@/common/context/Auth/AuthContext';
 import Loading from '@/common/Loading/Loading';
 import AddressAction from './AddressAction';
+import { toast } from 'react-toastify';
+
 
 type Props = {
   open: boolean,
   onClose: () => void,
   title: string,
   dataCheckout: any,
-  onHandleOk: (id: any, dataIdAddress: any) => void;
+  onHandleOk: (dataIdAddress: any) => void;
 }
 
 const ModalAddress = ({ open, onClose, title, dataCheckout, onHandleOk }: Props) => {
   const { token } = useAuth();
   const [addressAction, setAddressAction] = useState(false);
   const [idAddress, setIdAddress] = useState();
-  const [selectedId, setSelectedId] = useState<number | null>(null);
-
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>, id: number) => {
-    setSelectedId(id);
-  };
-
   const [dataIdAddress, setDataIdAddress] = useState();
-
   const handleClose = () => {
     onClose();
-    setSelectedId(selectedId);
   };
+  const [form] = Form.useForm();
+  const [selectedId, setSelectedId] = useState<number | null>(null);
 
-  const handleOk = (id: any, dataIdAddress: any) => {
-    onHandleOk(id, dataIdAddress);
-    onClose();
+  console.log("selectedId", selectedId)
+  const queryClient = useQueryClient()
+  const mutationUpdate = useMutation({
+    mutationFn: async (data) => {
+      return await instance.put(`/addresses/${selectedId}`, data, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['address']
+      });
+      onClose();
+      form.resetFields();
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message)
+    }
+  })
+  const handleOk = (data: any) => {
+    const address = data?.find((e: any) => e.id === selectedId);
+    mutationUpdate.mutate({
+      ...address,
+      is_default: true,
+    })
+    onHandleOk(address)
   };
 
   const handleOpenAddress = (id?: any) => {
@@ -59,11 +80,20 @@ const ModalAddress = ({ open, onClose, title, dataCheckout, onHandleOk }: Props)
     enabled: open,
   });
 
-  const checkDefault = data?.find((e:any) => e?.is_default === true);
-  const defaultId = checkDefault?.id;
+  useEffect(() => {
+    const checkDefault = data?.find((e: any) => e?.is_default === true);
+    if (checkDefault) {
+      setSelectedId(checkDefault.id);
+    }
+  }, [data])
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>, id: number) => {
+    setSelectedId(id)
+  }
   const handleSaveValueAddress = (data: any) => {
     setDataIdAddress(data);
   };
+
   return (
     <>
       <AntModal title={title} open={open} onCancel={onClose} closable={false} maskClosable={false} footer={false}>
@@ -77,7 +107,7 @@ const ModalAddress = ({ open, onClose, title, dataCheckout, onHandleOk }: Props)
                   type="radio"
                   name="radio-group"
                   value={e.id}
-                  checked={defaultId === e.id}
+                  checked={selectedId === e.id}
                   onChange={(event) => handleChange(event, e.id)}
                   className="h-5 w-5 text-blue-500 border-gray-300 rounded"
                 />
@@ -111,7 +141,7 @@ const ModalAddress = ({ open, onClose, title, dataCheckout, onHandleOk }: Props)
         <Button className="mr-2" onClick={handleClose}>
           Quay lại
         </Button>
-        <Button type="primary" onClick={() => handleOk(selectedId, dataIdAddress)}>
+        <Button type="primary" onClick={() => handleOk(data)}>
           Ghi lại
         </Button>
       </AntModal>

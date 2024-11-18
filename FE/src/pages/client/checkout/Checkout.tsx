@@ -23,10 +23,10 @@ const Checkout = () => {
   const cartIds = location.state?.cartIds || (savedCartIds ? JSON.parse(savedCartIds) : []);
   const _payload = location.state?._payload
   const [paymentMethhod, setPaymentMethod] = useState('1');
-  const [shiping, setShipPing] = useState<string>('1');
+  const [shiping, setShipPing] = useState<string>('0');
   const [voucher, setVoucher] = useState<any>();
   const [subTotal, setSubTotal] = useState(); // giá khi áp dụng voucher
-  const [totalDiscount, setTotalDiscount] = useState();
+  const [totalDiscount, setTotalDiscount] = useState<number | undefined>();
   const [dataCheckout, setDataCheckout] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true); // Trạng thái loading
   const [visible, setVisible] = useState(false)
@@ -124,10 +124,7 @@ const Checkout = () => {
   });
 
   const handleOrder = () => {
-    // orderMutation.mutate();
-  };
-  const handleChangeShiping = (e: any) => {
-    setShipPing(e);
+    orderMutation.mutate();
   };
   const handleVoucher = () => {
     mutationVoucher.mutate();
@@ -141,11 +138,13 @@ const Checkout = () => {
   const handleCloseModal = () => {
     setVisible(false)
   }
-  const [payload, setPayLoad] = useState<any>({});
-  const handleSaveDiaChi = (id: any, dataIdAddress: any) => {
+  console.log("dataCheckout", dataCheckout)
+  const [payload, setPayLoad] = useState(dataCheckout);
+  const handleSaveDiaChi = (dataIdAddress: any) => {
     setPayLoad(dataIdAddress)
-    setIdAddress(id)
+    // setIdAddress(id)
   }
+  console.log("payload", payload)
   const { data: addressDetail, isLoading: queryLoading } = useQuery({
     queryKey: ['address', idAddress],
     queryFn: async () => {
@@ -157,21 +156,17 @@ const Checkout = () => {
     },
     enabled: !!idAddress
   })
-  // console.log("addressDetail", addressDetail)
   const dataDiaChi = dataCheckout?.user?.addresses?.filter((e: any) => e.is_default === true);
-  // console.log("payload", payload)
   const getShipp = async () => {
+    let weight = dataCheckout?.order_items?.map((e: any) => Number(e.product.weight));
+    let totalWeight = weight?.reduce((sum: any, currentWeight: any) => sum + currentWeight, 0);
     let res = await instance.post(`/calculateshippingfee`, {
-      to_ward_code: String(payload?.idQuanHuyen),
-      to_district_id: String(payload?.idXa),
-      weight: 160000
+      to_ward_code: String(payload?.ward?.id),
+      to_district_id: Number(payload?.district?.id),
+      weight: totalWeight
     })
-    // console.log("res", res)
-    // if(res) {
-    //   setShipPing(res)
-    // }
+    setShipPing(res?.data?.fee?.total)
   }
-
   useEffect(() => {
     if (!_payload) {
       return;
@@ -210,10 +205,15 @@ const Checkout = () => {
     if (cartIds && cartIds.length > 0 || _payload) {
       fetchData();
     }
-  }, [cartIds, token, payload]);
+  }, [cartIds, token, payload, visible]);
   useEffect(() => {
     getShipp()
-  }, [payload])
+  }, [payload, visible])
+  // useEffect(() => {
+  //   if (dataCheckout) {
+  //     setPayLoad(dataCheckout);
+  //   }
+  // }, [dataCheckout]);
 
   if (queryLoading) return <Loading />
 
@@ -399,7 +399,7 @@ const Checkout = () => {
                                 >
                                   Shiping
                                 </label>
-                                <Select onChange={handleChangeShiping} className="hd-Select  outline-0 h-11 mt-1.5 block w-full text-sm rounded-2xl border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:bg-neutral-50 dark:focus:ring-primary-6000 dark:focus:ring-opacity-25">
+                                <Select className="hd-Select  outline-0 h-11 mt-1.5 block w-full text-sm rounded-2xl border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:bg-neutral-50 dark:focus:ring-primary-6000 dark:focus:ring-opacity-25">
                                   <Option value="1">
                                     Tiêu chuẩn
                                   </Option>
@@ -623,15 +623,19 @@ const Checkout = () => {
                       </div>
                       <div className="flex justify-between py-2.5 mt-2">
                         <span>Phí ship</span>
-                        <span className="font-semibold text-slate-900">{shiping || 0}đ</span>
+                        <span className="font-semibold text-slate-900">{FormatMoney(Number(shiping)) || 0}</span>
                       </div>
                       <div className="flex justify-between py-2.5">
                         <span>Voucher</span>
-                        <span className="font-semibold text-slate-900">{totalDiscount || 0}đ</span>
+                        <span className="font-semibold text-slate-900"> {totalDiscount !== undefined ? FormatMoney(totalDiscount) : FormatMoney(0)}</span>
                       </div>
                       <div className="flex justify-between font-semibold text-slate-900 text-base pt-4">
                         <span>Tổng tiền</span>
-                        <span>{FormatMoney(subTotal ? subTotal : dataCheckout?.sub_total)}</span>
+                        <span>
+                          {FormatMoney(
+                            (subTotal || dataCheckout?.sub_total || 0) + (Number(shiping) || 0)
+                          )}
+                        </span>
                       </div>
                     </div>
                     {/*end hd-checkout-text-count*/}
