@@ -507,6 +507,7 @@ class OrderController extends Controller
                     // Chuyển hướng người dùng đến trang thanh toán
                     return response()->json(['payment_url' => $response['payment_url']], Response::HTTP_OK);
                 }
+                broadcast(new OrderCreated($order));
                 return response()->json($order->load('orderDetails')->toArray(), Response::HTTP_CREATED);
             });
             return $response;
@@ -823,6 +824,7 @@ class OrderController extends Controller
     }
 
     //////////////////////////////////
+    
     public function show(Order $order)
     {
         try {
@@ -845,29 +847,6 @@ class OrderController extends Controller
             return response()->json(['message' => 'Đã xảy ra lỗi khi lấy thông tin đơn hàng', 'error' => $e->getMessage()], 500);
         }
     }
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Order $order)
-    {
-        try {
-            if (auth('sanctum')->check()) {
-                $user_id = auth('sanctum')->id();
-
-                // Get all orders for the authenticated user, including order details
-                $orders = Order::query()
-                    ->where('user_id', $user_id)
-                    ->get();
-
-                return response()->json($orders, 200);
-            } else {
-                return response()->json(['message' => 'User not authenticated'], 401);
-            }
-        } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
-        }
-    }
-
     /**
      * Update the specified resource in storage.
      */
