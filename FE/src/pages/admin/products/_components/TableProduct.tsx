@@ -1,6 +1,9 @@
 import React from 'react';
 import { Space, Table, Tag } from 'antd';
 import type { TableProps } from 'antd';
+import { useQuery } from '@tanstack/react-query';
+import instance from '@/configs/axios';
+import Loading from '@/common/Loading/Loading';
 
 interface DataType {
   key: string;
@@ -83,6 +86,23 @@ const data: DataType[] = [
   },
 ];
 
-const TableProduct: React.FC = () => <Table columns={columns} dataSource={data} />;
+const TableProduct: React.FC = () => {
+  const { data: dataProduct, isLoading, isError } = useQuery({
+    queryKey: ['staticProduct'],
+    queryFn: async () => {
+      let res = await instance.post(`/getproductstatistics`, {
+        "type": [0, 1],
+        "status": [2]
+      });
+      return res?.data
+    }
+  })
+  console.log("dataProduct", dataProduct)
+  if (isLoading) return <Loading />;
+  return (
+    <Table columns={columns} dataSource={data} />
+  )
+
+}
 
 export default TableProduct;

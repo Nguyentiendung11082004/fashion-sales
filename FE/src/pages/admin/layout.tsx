@@ -28,6 +28,9 @@ const { Sider } = Layout;
 
 const LayoutAdmin: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
+  const toggleCollapsed = () => {
+    setCollapsed(!collapsed);
+  };
   return (
     <Layout>
       <Sider
@@ -43,7 +46,6 @@ const LayoutAdmin: React.FC = () => {
         <div className="w-[150px] my-[-10px] m-auto">
           <img src={LogoAdmin} alt="" className="" />
         </div>
-
         <Menu
           theme="dark"
           mode="inline"

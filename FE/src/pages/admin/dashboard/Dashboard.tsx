@@ -149,7 +149,7 @@ const Dashboard = () => {
 
       <div className="page-dashboard__table ">
         <div className="table-product mt-[20px]">
-          {/* <TableProduct /> */}
+          <TableProduct />
         </div>
         <div className="table-seller">
           {/* <TableSeller /> */}
