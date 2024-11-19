@@ -39,11 +39,11 @@ class AddressController extends Controller
             // Kiểm tra xem người dùng có xác thực hợp lệ
             $user = auth()->user();
 
-            // // Nếu người dùng thêm địa chỉ mặc định, kiểm tra xem đã có địa chỉ mặc định chưa
-            // if ($request->is_default) {
-            //     // Đánh dấu địa chỉ trước đó là không phải mặc định
-            //     $user->addresses->update(['is_default' => false]);
-            // };
+            if ($request->is_default) {
+                Address::where('user_id', $user->id)
+                    ->where('is_default', true)
+                    ->update(['is_default' => false]);
+            }
             $dataAddress = [
                 'label' => $request->label,
                 'address' => $request->address,
