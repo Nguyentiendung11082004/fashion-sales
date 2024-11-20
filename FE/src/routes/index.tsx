@@ -49,7 +49,6 @@ const Router = () => {
           <Route path="client" element={<ClientPage />} />
           <Route path="employee" element={<ClientPage />} />
           <Route path="order" element={<OrderPage />} />
-          
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>

@@ -113,7 +113,6 @@ const HistoryOrder = () => {
                       </div>
                       <div className="flex flex-1 items-end justify-between text-sm">
                         <p className="text-gray-500 dark:text-slate-400 flex items-center">
-                          {/* <span class="hidden sm:inline-block">Qty</span> */}
                           <span className="inline-block">x</span>
                           <span className="ml-2">1</span>
                         </p>
@@ -163,7 +162,6 @@ const HistoryOrder = () => {
                       </div>
                       <div className="flex flex-1 items-end justify-between text-sm">
                         <p className="text-gray-500 dark:text-slate-400 flex items-center">
-                          {/* <span class="hidden sm:inline-block">Qty</span> */}
                           <span className="inline-block">x</span>
                           <span className="ml-2">1</span>
                         </p>
@@ -213,7 +211,6 @@ const HistoryOrder = () => {
                       </div>
                       <div className="flex flex-1 items-end justify-between text-sm">
                         <p className="text-gray-500 dark:text-slate-400 flex items-center">
-                          {/* <span class="hidden sm:inline-block">Qty</span> */}
                           <span className="inline-block">x</span>
                           <span className="ml-2">1</span>
                         </p>
@@ -286,7 +283,6 @@ const HistoryOrder = () => {
                       </div>
                       <div className="flex flex-1 items-end justify-between text-sm">
                         <p className="text-gray-500 dark:text-slate-400 flex items-center">
-                          {/* <span class="hidden sm:inline-block">Qty</span> */}
                           <span className="inline-block">x</span>
                           <span className="ml-2">1</span>
                         </p>
@@ -336,7 +332,6 @@ const HistoryOrder = () => {
                       </div>
                       <div className="flex flex-1 items-end justify-between text-sm">
                         <p className="text-gray-500 dark:text-slate-400 flex items-center">
-                          {/* <span class="hidden sm:inline-block">Qty</span> */}
                           <span className="inline-block">x</span>
                           <span className="ml-2">1</span>
                         </p>
@@ -386,7 +381,6 @@ const HistoryOrder = () => {
                       </div>
                       <div className="flex flex-1 items-end justify-between text-sm">
                         <p className="text-gray-500 dark:text-slate-400 flex items-center">
-                          {/* <span class="hidden sm:inline-block">Qty</span> */}
                           <span className="inline-block">x</span>
                           <span className="ml-2">1</span>
                         </p>

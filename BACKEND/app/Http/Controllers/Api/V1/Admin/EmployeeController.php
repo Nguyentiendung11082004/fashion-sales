@@ -34,7 +34,7 @@ class EmployeeController extends Controller
     {
 
         try {
-         
+
             $dataEmployee = [
                 'name'        => $request->name,
                 'phone_number' => $request->phone_number,
@@ -47,22 +47,22 @@ class EmployeeController extends Controller
                 'role_id'     => $request->role_id,
                 'avatar'      => $request->avatar
             ];
-       
+
 
             // if ($request->hasFile('avatar')) {
             //     // Lưu avatar vào thư mục avatars
             //     $avatarPath = Storage::put('public/avatars', $request->file('avatar'));
             //     // Tạo URL đầy đủ cho avatar
-                
+
             //     $dataEmployee['avatar'] = url(Storage::url($avatarPath));
 
             // }
-        
+
         $employee = User::query()->create($dataEmployee);
-        
+
         return response()->json([
             'status'  =>201,
-            'success' =>true,  
+            'success' =>true,
             'message' =>'Employee created successfully!',
             'data'    => $employee
         ],201);
@@ -72,7 +72,7 @@ class EmployeeController extends Controller
                 'success' => false,
                 'message' => 'Không thành công.',
                 'error'   => $e->getMessage()
-            ], 500); 
+            ], 500);
         }
     }
 
@@ -86,7 +86,7 @@ class EmployeeController extends Controller
             return response()->json([
                 'massage' => 'Chi tiết nhân viên id = '.$id,
                 'data'    =>$employee
-            ]);       
+            ]);
         } catch (\Throwable $th) {
            if ($th instanceof ModelNotFoundException){
             return response()->json([
@@ -112,7 +112,7 @@ class EmployeeController extends Controller
             'phone_number' => $request->phone_number,
             'email'        => $request->email,
             'address'      => $request->address,
-            'password'     => $request->password ? bcrypt($request->password) : $employee->password, 
+            'password'     => $request->password ? bcrypt($request->password) : $employee->password,
             'birth_date'   => $request->birth_date,
             'is_active'    => $request->is_active ?? $employee->is_active,
             'gender'       => $request->gender,
@@ -120,12 +120,12 @@ class EmployeeController extends Controller
             'avatar'       =>$request->avatar ?? $employee->avatar //kiểm tra avatar
         ];
 
-    
+
         $employee->update($dataEmployee);
 
         return response()->json([
             'status'  => 200,
-            'success' => true,  
+            'success' => true,
             'message' => 'Employee updated successfully!',
             'data'    => $employee
         ], 200);
@@ -135,7 +135,7 @@ class EmployeeController extends Controller
             'success' => false,
             'message' => 'Update failed.',
             'error'   => $e->getMessage()
-        ], 500); 
+        ], 500);
     }
 }
     /**
@@ -144,25 +144,47 @@ class EmployeeController extends Controller
     public function destroy(string $id)
     {
         $employee = User::find($id);
-    
+
         if (!$employee) {
             return response()->json([
                 'success' => false,
                 'message' => 'Employee not found',
             ], 404);
         }
-    
+
         // Kiểm tra và xóa ảnh nếu tồn tại
         // if ($employee->avatar) {
         //     Storage::delete('public/avatars/' . basename($employee->avatar));
         // }
-    
+
         // Xóa bản ghi nhân viên
         $employee->delete();
-    
+
         return response()->json([
             'success' => true,
             'message' => 'Employee deleted successfully',
         ], 200);
+    }
+
+    public function search(Request $request)
+    {
+        $query = $request->input('query'); // Lấy từ khóa tìm kiếm từ body request
+
+        if (!$query) {
+            return response()->json([
+                'message' => 'Vui lòng nhập từ khóa tìm kiếm.',
+                'data' => []
+            ], 400);
+        }
+
+        // Tìm kiếm trong cột `name` và `email`
+        $results = User::where('name', 'LIKE', "%{$query}%")
+                        ->orWhere('email', 'LIKE', "%{$query}%")
+                        ->get();
+
+        return response()->json([
+            'message' => 'Kết quả tìm kiếm.',
+            'data' => $results,
+        ]);
     }
 }

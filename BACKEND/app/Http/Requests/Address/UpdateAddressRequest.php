@@ -24,9 +24,9 @@ class UpdateAddressRequest extends FormRequest
         return [
             'label' => 'string|max:255',
             'address' => 'string|max:255',
-            'city' => 'string|max:255',
-            'district' => 'string|max:255',
-            'ward' => 'string|max:255',
+            'city' => 'array|max:255',
+            'district' => 'array|max:255',
+            'ward' => 'array|max:255',
             'phone' => 'string|regex:/^0[0-9]{9}$/',
             'is_default' => 'boolean'
         ];
