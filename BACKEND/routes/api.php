@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\V1\Admin\CommentsController;
 use App\Http\Controllers\Api\V1\Admin\EmployeeController;
 use App\Http\Controllers\Api\V1\Admin\AttributeController;
 use App\Http\Controllers\Api\V1\Admin\AttributeItemController;
+use App\Http\Controllers\Api\V1\Admin\AuthAdminController;
 use App\Http\Controllers\Api\V1\Admin\BannerController;
 use App\Http\Controllers\Api\V1\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Api\V1\Admin\PostController;
@@ -30,6 +31,7 @@ use App\Http\Controllers\Api\V1\Client\ProductShopController;
 use App\Http\Controllers\Api\V1\Client\ChatController;
 use App\Http\Controllers\Api\V1\Client\ProductDetailController;
 use App\Http\Controllers\Api\V1\Client\InforUserController;
+use App\Http\Controllers\Api\V1\Client\SocialiteController;
 use App\Http\Controllers\Api\V1\Client\TryOnController;
 use App\Http\Controllers\API\V1\Service\PaymentController;
 
@@ -51,7 +53,7 @@ Route::prefix("v1/")->group(function () {
     Route::resource("tags", TagController::class);
     Route::resource('employees', EmployeeController::class);
     Route::resource('clients', ClientController::class);
-    Route::resource('vouchers',VoucherController::class);
+    Route::resource('vouchers', VoucherController::class);
     Route::apiResource('attribute', AttributeController::class);
     Route::apiResource('attributeItem', AttributeItemController::class);
     Route::apiResource('category', CategoryController::class);
@@ -69,6 +71,19 @@ Route::prefix("v1/")->group(function () {
     Route::resource('checkout', CheckoutController::class);
     Route::apiResource('posts', PostController::class);
     Route::apiResource('order-status', AdminOrderController::class);
+
+    //Tìm kiếm trong Admin
+    Route::post('/client/search', [ClientController::class, 'search']);
+    Route::post('/employee/search', [EmployeeController::class, 'search']);
+
+    //Login with Google
+    Route::middleware(['web'])->group(function () {
+        Route::get('login/google', [SocialiteController::class, 'redirectToGoogle']);
+        Route::get('login/google/callback', [SocialiteController::class, 'handleGoogleCallback']);
+    });
+
+    //Login Admin
+    Route::post('admin/login', [AuthAdminController::class, 'login']);
     //Gửi mail
     Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
         ->middleware(['signed'])->name('verification.verify');
@@ -79,12 +94,12 @@ Route::prefix("v1/")->group(function () {
     Route::get('password/reset/{token}', [AuthController::class, 'showResetForm'])
         ->name('password.reset');
     Route::post('password/reset', [AuthController::class, 'reset']);
-    
-    Route::get("getprovinces",[CheckoutController::class,"getProvinces"]);
-    Route::post("getdistricts",[CheckoutController::class,"getDistricts"]);
-    Route::post("getwards",[CheckoutController::class,"getWards"]);
-    Route::post("getavailableservices",[CheckoutController::class,"getAvailableServices"]);
-    Route::post("calculateshippingfee",[CheckoutController::class,"calculateShippingFee"]);
+
+    Route::get("getprovinces", [CheckoutController::class, "getProvinces"]);
+    Route::post("getdistricts", [CheckoutController::class, "getDistricts"]);
+    Route::post("getwards", [CheckoutController::class, "getWards"]);
+    Route::post("getavailableservices", [CheckoutController::class, "getAvailableServices"]);
+    Route::post("calculateshippingfee", [CheckoutController::class, "calculateShippingFee"]);
     Route::post('payment/vnpay', [PaymentController::class, 'createPayment']);
     Route::get('payment/vnpay-return', [PaymentController::class, 'vnpayReturn']);
 
@@ -93,8 +108,7 @@ Route::prefix("v1/")->group(function () {
     // thống kê
     Route::post('getproductstatistics',[StatisticsController::class,"getProductStatistics"]);
     Route::get('getorderstatistics',[StatisticsController::class,"getOrderStatistics"]);
-    Route::post('getrevenuestatistics',[StatisticsController::class,"getRevenueStatistics"]);
-    
+    Route::post('getrevenuestatistics',[StatisticsController::class,"getRevenueStatistics"]); 
 });
 
 Route::middleware('auth:sanctum')->prefix('v1/')->group(function () {
@@ -110,18 +124,15 @@ Route::middleware('auth:sanctum')->prefix('v1/')->group(function () {
 
     //  // Lấy tất cả các cuộc trò chuyện của người dùng
     //  Route::get('conversations', [ConversationController::class, 'index']);
- 
+
     //  // Lấy tin nhắn trong một cuộc trò chuyện
     //  Route::get('conversations/messages/{conversation}', [MessageController::class, 'index']);
- 
+
     //  // Gửi tin nhắn trong một cuộc trò chuyện
     //  Route::post('conversations/messages/{conversation}', [MessageController::class, 'store']);
     //  Route::post('conversations/messages', [MessageController::class, 'store']);
-     Route::resource("chat",ChatController::class);
-     Route::delete('chat-message/{conversation}',[ChatController::class,"deleteMessage"]);
+    Route::resource("chat", ChatController::class);
+    Route::delete('chat-message/{conversation}', [ChatController::class, "deleteMessage"]);
 
     Route::apiResource('comment', CommentController::class);
-    
-    
-   
 });
