@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Loading from "@/common/Loading/Loading";
 import { Iproduct } from "@/common/types/products";
 import { productDestroy, productsIndex } from "@/services/api/admin/products.api";
@@ -26,6 +28,7 @@ const ProductPageManager = () => {
     queryFn: productsIndex,
   });
 
+  console.log("data pr:",data)
   const { mutate } = useMutation({
     mutationFn: productDestroy,
     onSuccess: () => {

@@ -40,40 +40,46 @@ class SocialiteController extends Controller
 
         // Tạo token
         $token = $user->createToken($user->id)->plainTextToken;
+        // $frontendUrl = "http://localhost:5173/";
+        $frontendUrl = "http://localhost:5173/?token=$token";
 
-        return Response::json([
-            'user' => $user,
-            'token' => $token
-        ]);
+        // Chuyển hướng người dùng
+        return redirect($frontendUrl);
+
+
+        // return Response::json([
+        //     'user' => $user,
+        //     'token' => $token
+        // ]);
     }
 
-    public function redirectToFacebook()
-    {
-        return Socialite::driver('facebook')->redirect();
-    }
+    // public function redirectToFacebook()
+    // {
+    //     return Socialite::driver('facebook')->redirect();
+    // }
 
-    public function handleFacebookCallback(Request $request)
-    {
-        $facebookUser = Socialite::driver('facebook')->user();
+    // public function handleFacebookCallback(Request $request)
+    // {
+    //     $facebookUser = Socialite::driver('facebook')->user();
 
-        // Kiểm tra hoặc tạo người dùng từ dữ liệu Facebook
-        $user = User::firstOrCreate(
-            ['email' => $facebookUser->getEmail()],
-            [
-                'name' => $facebookUser->getName(),
-                'avatar' => $facebookUser->getAvatar()
-            ]
-        );
+    //     // Kiểm tra hoặc tạo người dùng từ dữ liệu Facebook
+    //     $user = User::firstOrCreate(
+    //         ['email' => $facebookUser->getEmail()],
+    //         [
+    //             'name' => $facebookUser->getName(),
+    //             'avatar' => $facebookUser->getAvatar()
+    //         ]
+    //     );
 
-        Auth::login($user);
+    //     Auth::login($user);
 
-        // Tạo token
-        $token = $user->createToken('YourAppName')->accessToken;
+    //     // Tạo token
+    //     $token = $user->createToken('YourAppName')->accessToken;
 
-        // Trả về dữ liệu JSON cho Frontend (React)
-        return Response::json([
-            'user' => $user,
-            'token' => $token
-        ]);
-    }
+    //     //Trả về dữ liệu JSON cho Frontend (React)
+    //         return Response::json([
+    //             'user' => $user,
+    //             'token' => $token
+    //         ]);
+    // }
 }

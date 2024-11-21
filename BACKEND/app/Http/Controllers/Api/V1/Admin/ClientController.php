@@ -20,7 +20,6 @@ class ClientController extends Controller
     public function index()
     {
 
-    
         $clients = User::whereIn('role_id', [1])->with('role')
         ->latest()->get();
 
@@ -30,14 +29,36 @@ class ClientController extends Controller
         ]);
     }
 
+    public function search(Request $request)
+{
+    $query = $request->input('query'); // Lấy từ khóa tìm kiếm từ body request
+
+    if (!$query) {
+        return response()->json([
+            'message' => 'Vui lòng nhập từ khóa tìm kiếm.',
+            'data' => []
+        ], 400);
+    }
+
+    // Tìm kiếm trong cột `name` và `email`
+    $results = User::where('name', 'LIKE', "%{$query}%")
+                    ->orWhere('email', 'LIKE', "%{$query}%")
+                    ->get();
+
+    return response()->json([
+        'message' => 'Kết quả tìm kiếm.',
+        'data' => $results,
+    ]);
+}
+
     /**
      * Store a newly created resource in storage.
      */
     public function store(UserRequest $request)
     {
         try {
-          
-         
+
+
             $dataClient = [
                 'name'         => $request->name,
                 'phone_number' => $request->phone_number,
@@ -50,13 +71,13 @@ class ClientController extends Controller
                 'role_id'      => $request->role_id ?? 1,
                 'avatar'       => $request->avatar
             ];
-           
+
 
         $client = User::query()->create($dataClient);
-        
+
         return response()->json([
             'status'  =>201,
-            'success' =>true,  
+            'success' =>true,
             'message' =>'Client created successfully!',
             'data'    => $client
         ],201);
@@ -66,7 +87,7 @@ class ClientController extends Controller
                 'success' => false,
                 'message' => 'Không thành công.',
                 'error'   => $e->getMessage()
-            ], 500); 
+            ], 500);
         }
     }
 
@@ -80,7 +101,7 @@ class ClientController extends Controller
             return response()->json([
                 'message' => 'Chi tiết khách hàng id = '.$id,
                 'data'    =>$client
-            ]);       
+            ]);
         } catch (\Throwable $th) {
            if ($th instanceof ModelNotFoundException){
             return response()->json([
@@ -92,7 +113,7 @@ class ClientController extends Controller
         ], HttpResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-    
+
 
     /**
      * Update the specified resource in storage.
@@ -120,7 +141,7 @@ class ClientController extends Controller
 
         return response()->json([
             'status'  => 200,
-            'success' => true,  
+            'success' => true,
             'message' => 'Client updated successfully!',
             'data'    => $client
         ], 200);
@@ -130,7 +151,7 @@ class ClientController extends Controller
             'success' => false,
             'message' => 'Update failed.',
             'error'   => $e->getMessage()
-        ], 500); 
+        ], 500);
     }
 }
 
@@ -140,17 +161,17 @@ class ClientController extends Controller
     public function destroy(string $id)
     {
         $client = User::find($id);
-    
+
         if (!$client) {
             return response()->json([
                 'success' => false,
                 'message' => 'Client not found',
             ], 404);
         }
-    
+
         // Xóa bản ghi nhân viên
         $client->delete();
-    
+
         return response()->json([
             'success' => true,
             'message' => 'Client deleted successfully',

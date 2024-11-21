@@ -1,7 +1,8 @@
+import Loading from '@/common/Loading/Loading';
 import { Iattribute } from '@/common/types/attribute';
 import { createAttributes, getAttribute, updateAttributes } from '@/services/api/admin/attribute';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Modal as AntModal, Button, Form, Input, Skeleton } from 'antd';
+import { Modal as AntModal, Button, Form, Input} from 'antd';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
@@ -85,7 +86,7 @@ const ModalActon = ({ currentId, open, onClose, setCurrentPage }: Props) => {
       footer={null}
     >
       {
-        isFetching ? (<Skeleton />) :
+        isFetching ? (<Loading />) :
           <Form layout='vertical' onFinish={onFinish} form={form}>
             <h1 className='text-xl font-bold text-gray-800 border-gray-300 pb-2'>
               {currentId ? 'Sửa thuộc tính' : 'Thêm thuộc tính'}
