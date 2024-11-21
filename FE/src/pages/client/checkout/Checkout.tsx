@@ -76,9 +76,9 @@ const Checkout = () => {
     ship_user_address: '',
     shipping_method: shiping,
     voucher_code: voucher,
-    product_id: _payload?.product_id || [],
-    product_variant_id: _payload?.product_variant_id || [],
-    quantity: _payload?.quantity || [],
+    product_id: _payload?.product_id || 0,
+    product_variant_id: _payload?.product_variant_id || 0,
+    quantity: _payload?.quantity || 0,
     cart_item_ids: cartIds || [],
     quantityOfCart: quantityOfCart || {},
   });
