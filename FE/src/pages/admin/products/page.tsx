@@ -27,8 +27,6 @@ const ProductPageManager = () => {
     queryKey: ["productsIndex"],
     queryFn: productsIndex,
   });
-
-  console.log("data pr:",data)
   const { mutate } = useMutation({
     mutationFn: productDestroy,
     onSuccess: () => {

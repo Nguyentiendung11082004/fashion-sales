@@ -201,7 +201,12 @@ class StatisticsController extends Controller
                         DB::raw('IFNULL(SUM(order_details.quantity), 0) as total_sold'),
                         DB::raw('(products.quantity) as remaining_quantity')
                     )
-                    ->groupBy('products.id')
+                    ->groupBy(
+                        'products.id',
+                        'products.name',
+                        'products.sku',
+                        'products.quantity'
+                    )
                     ->get()
                     ->map(function ($product) use ($bestSellingThreshold, $lowStockThreshold, $statusFilter) {
                         // Tính toán trạng thái
@@ -231,7 +236,6 @@ class StatisticsController extends Controller
 
                 $results['simple_products'] = $simpleProducts;
             }
-
             // Lọc sản phẩm có biến thể nếu typeFilter chứa 1
             if (in_array(1, $typeFilter)) {
                 $variantProducts = DB::table('products')
@@ -248,7 +252,10 @@ class StatisticsController extends Controller
                     )
                     ->groupBy(
                         'products.id',
-                        'product_variants.id'
+                        'product_variants.id',
+                        'products.name',
+                        'product_variants.sku',
+                        'product_variants.quantity'
                     )
                     ->get()
                     ->map(function ($variant) use ($bestSellingThreshold, $lowStockThreshold, $statusFilter) {
@@ -282,7 +289,7 @@ class StatisticsController extends Controller
                         if (empty($statusFilter) || !empty(array_intersect($statusFilter, $statusIds))) {
                             $variant->status = implode('|', $statuses);
                             return $variant;
-                        }
+          }
                         return null;
                     })
                     ->filter(); // Loại bỏ các sản phẩm không khớp filter

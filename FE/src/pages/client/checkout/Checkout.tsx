@@ -21,7 +21,9 @@ const Checkout = () => {
   const navigate = useNavigate();
   const savedCartIds = localStorage.getItem('cartIds');
   const cartIds = location.state?.cartIds || (savedCartIds ? JSON.parse(savedCartIds) : []);
-  const _payload = location.state?._payload
+  // const _payload = location.state?._payload;
+
+  const [_payload, _setPayLoad] = useState(location.state?._payload);
   const [paymentMethhod, setPaymentMethod] = useState('1');
   const [shiping, setShipPing] = useState<string>('0');
   const [voucher, setVoucher] = useState<any>();
@@ -30,7 +32,10 @@ const Checkout = () => {
   const [dataCheckout, setDataCheckout] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true); // Trạng thái loading
   const [visible, setVisible] = useState(false)
-  const [idAddress, setIdAddress] = useState('')
+  const [idAddress, setIdAddress] = useState('');
+  const [idTinh, setIdTinh] = useState<number | null>(0)
+  const [idQuanHuyen, setIdQuanHuyen] = useState<number | null>(0)
+  const [idXa, setIdXa] = useState<number | null>(0)
   const mutationVoucher = useMutation({
     mutationFn: async () => {
       const res = await instance.post(`/checkout`, {
@@ -61,9 +66,9 @@ const Checkout = () => {
     acc[id] = qty[index];
     return acc;
   }, {});
+  // console.log("_payload", _payload)
   const [order, setOrder] = useState({
     payment_method_id: 1,
-    payment_status: "pending",
     user_note: "",
     ship_user_email: '',
     ship_user_name: '',
@@ -71,9 +76,9 @@ const Checkout = () => {
     ship_user_address: '',
     shipping_method: shiping,
     voucher_code: voucher,
-    // id_product: _payload?.id_product || [],
-    // product_variant_id: _payload.product_variant_id || [],
-    // quantity: _payload.quantity || [],
+    product_id: _payload?.product_id || [],
+    product_variant_id: _payload?.product_variant_id || [],
+    quantity: _payload?.quantity || [],
     cart_item_ids: cartIds || [],
     quantityOfCart: quantityOfCart || {},
   });
@@ -110,12 +115,13 @@ const Checkout = () => {
         window.location.href = data?.payment_url;
         localStorage.removeItem('checkedItems');
       } else {
-        navigate('/thank');
         queryClient.invalidateQueries({
           queryKey: ['cart']
         });
+
         localStorage.removeItem('checkedItems');
       }
+      navigate('/thank', { replace: true });
       localStorage.removeItem('checkedItems');
     },
     onError: (error: any) => {
@@ -132,6 +138,38 @@ const Checkout = () => {
 
 
   // xử lý địa chỉ
+  const { data: tinhThanh } = useQuery({
+    queryKey: ['tinhThanh'],
+    queryFn: async () => {
+      const res = await instance.get(`/getprovinces`);
+      return res.data;
+    }
+  });
+  const { data: quanHuyen } = useQuery<any>({
+    queryKey: ['quanHuyen', idTinh],
+    queryFn: async () => {
+      const res = await instance.post(`/getdistricts`, { province_id: idTinh });
+      return res?.data;
+    },
+    enabled: !!tinhThanh
+  });
+  const { data: phuongXa } = useQuery({
+    queryKey: ['phuongXa', idQuanHuyen],
+    queryFn: async () => {
+      const res = await instance.post(`/getwards`, { district_id: idQuanHuyen });
+      return res.data;
+    },
+    enabled: !!quanHuyen
+  });
+  const handleChangeTinh = (e: any) => {
+    setIdTinh(Number(e.value));
+  };
+  const handleChangeQuanHuyen = (e: any) => {
+    setIdQuanHuyen(e.value);
+  };
+  const handleChangeXa = (e: any) => {
+    setIdXa(Number(e.value));
+  };
   const handleOpenModal = () => {
     setVisible(true)
   }
@@ -144,7 +182,6 @@ const Checkout = () => {
     setPayLoad(dataIdAddress)
     // setIdAddress(id)
   }
-  console.log("payload", payload)
   const { data: addressDetail, isLoading: queryLoading } = useQuery({
     queryKey: ['address', idAddress],
     queryFn: async () => {
@@ -172,12 +209,36 @@ const Checkout = () => {
       return;
     }
   })
-  useEffect(() => {
-    const fetchData = async () => {
-      const payload = { cart_item_ids: cartIds };
-      // hoặc là _payload khi checkout sản phẩm từ xem thêm 
-      // setIsLoading(true);
-      try {
+
+  const handleBuyCart = async () => {
+    let payload = { cart_item_ids: cartIds };
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/v1/checkout', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const data = await response.json();
+      setDataCheckout(data);
+      setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+    }
+    finally {
+      setIsLoading(false);
+    }
+  }
+  const handleBuyNow = async () => {
+    try {
+      if (_payload) {
         const response = await fetch('http://127.0.0.1:8000/api/v1/checkout', {
           method: 'POST',
           headers: {
@@ -185,7 +246,7 @@ const Checkout = () => {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
           },
-          body: JSON.stringify(payload),
+          body: JSON.stringify(_payload),
         });
 
         if (!response.ok) {
@@ -194,27 +255,24 @@ const Checkout = () => {
         const data = await response.json();
         setDataCheckout(data);
         setIsLoading(false);
-      } catch (error) {
-        setIsLoading(false);
       }
-      finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (cartIds && cartIds.length > 0 || _payload) {
-      fetchData();
+    } catch (error) {
+      setIsLoading(false);
     }
-  }, [cartIds, token, payload, visible]);
+    finally {
+      setIsLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    handleBuyNow()
+  }, [_payload])
+  useEffect(() => {
+    handleBuyCart()
+  }, [payload, visible]);
   useEffect(() => {
     getShipp()
   }, [payload, visible])
-  // useEffect(() => {
-  //   if (dataCheckout) {
-  //     setPayLoad(dataCheckout);
-  //   }
-  // }, [dataCheckout]);
-
   if (queryLoading) return <Loading />
 
 
@@ -387,9 +445,63 @@ const Checkout = () => {
                                   focus:border-neutral-200 rounded-2xl font-normal h-11 px-4 py-3 mt-1.5"
                                   type="text"
                                   placeholder="Nhập họ và tên"
+                                  onChange={(e) => setForm("ship_user_name", e.target.value)}
                                 />
                               </div>
-
+                              <div className="flex-1">
+                                <label
+                                  className="hd-Label text-base font-medium text-neutral-900"
+                                  data-nc-id="Label"
+                                >
+                                  Địa chỉ cụ thể
+                                </label>
+                                <input
+                                  className="block w-full outline-0 border border-neutral-200 focus:border-primary-300
+                               focus:ring focus:ring-primary-200 focus:ring-opacity-50
+                                bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25
+                                 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50
+                                  focus:border-neutral-200 rounded-2xl font-normal h-11 px-4 py-3 mt-1.5"
+                                  type="text"
+                                  placeholder="Nhập họ và tên"
+                                  onChange={(e) => setForm("ship_user_address", e.target.value)}
+                                />
+                              </div>
+                              <div className="flex-1">
+                                <label
+                                  className="hd-Label text-base font-medium text-neutral-900"
+                                  data-nc-id="Label"
+                                >
+                                  Số điện thoaị
+                                </label>
+                                <input
+                                  className="block w-full outline-0 border border-neutral-200 focus:border-primary-300
+                               focus:ring focus:ring-primary-200 focus:ring-opacity-50
+                                bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25
+                                 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50
+                                  focus:border-neutral-200 rounded-2xl font-normal h-11 px-4 py-3 mt-1.5"
+                                  type="text"
+                                  placeholder="Số điện thoại"
+                                  onChange={(e) => setForm("ship_user_phonenumber", e.target.value)}
+                                />
+                              </div>
+                              <div className="flex-1">
+                                <label
+                                  className="hd-Label text-base font-medium text-neutral-900"
+                                  data-nc-id="Label"
+                                >
+                                  Email
+                                </label>
+                                <input
+                                  className="block w-full outline-0 border border-neutral-200 focus:border-primary-300
+                               focus:ring focus:ring-primary-200 focus:ring-opacity-50
+                                bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25
+                                 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50
+                                  focus:border-neutral-200 rounded-2xl font-normal h-11 px-4 py-3 mt-1.5"
+                                  type="text"
+                                  placeholder="Số điện thoại"
+                                  onChange={(e) => setForm("ship_user_email", e.target.value)}
+                                />
+                              </div>
                             </div>
                             <div className="sm:flex space-y-4 sm:space-y-0 sm:space-x-3">
                               <div className="flex-1">
@@ -397,18 +509,57 @@ const Checkout = () => {
                                   className="hd-Label text-base font-medium text-neutral-900"
                                   data-nc-id="Label"
                                 >
-                                  Shiping
+                                  Thành Phố
                                 </label>
-                                <Select className="hd-Select  outline-0 h-11 mt-1.5 block w-full text-sm rounded-2xl border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:bg-neutral-50 dark:focus:ring-primary-6000 dark:focus:ring-opacity-25">
-                                  <Option value="1">
-                                    Tiêu chuẩn
-                                  </Option>
-                                  <Option value="2">
-                                    Hoả tốc
-                                  </Option>
-                                  <Option value="3">
-                                    Nhận tại cửa hàng
-                                  </Option>
+                                <Select
+                                  labelInValue
+                                  onChange={handleChangeTinh}
+                                  showSearch
+                                  optionFilterProp="children"
+                                  className="hd-Select outline-0 h-11 mt-1.5 block w-full text-sm rounded-2xl border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:bg-neutral-50 dark:focus:ring-primary-6000 dark:focus:ring-opacity-25">
+                                  {
+                                    tinhThanh?.provinces?.map((e: any) => (
+                                      <Option value={e?.ProvinceID}>{e?.ProvinceName}</Option>
+                                    ))
+                                  }
+                                </Select>
+                              </div>
+                              <div className="flex-1">
+                                <label
+                                  className="hd-Label text-base font-medium text-neutral-900"
+                                  data-nc-id="Label"
+                                >
+                                  Quận huyện
+                                </label>
+                                <Select
+                                  labelInValue
+                                  onChange={handleChangeQuanHuyen} className="hd-Select  outline-0 h-11 mt-1.5 block w-full text-sm rounded-2xl border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:bg-neutral-50 dark:focus:ring-primary-6000 dark:focus:ring-opacity-25">
+                                  {
+                                    quanHuyen?.districts?.map((quan: any) => (
+                                      <Option key={quan.DistrictID} value={quan.DistrictID}>
+                                        {quan.DistrictName}
+                                      </Option>
+                                    ))
+                                  }
+                                  <option value=""></option>
+                                </Select>
+                              </div>
+                              <div className="flex-1">
+                                <label
+                                  className="hd-Label text-base font-medium text-neutral-900"
+                                  data-nc-id="Label"
+                                >
+                                  Phường Xã
+                                </label>
+                                <Select
+                                  labelInValue
+                                  onChange={handleChangeXa}
+                                  className="hd-Select outline-0 h-11 mt-1.5 block w-full text-sm rounded-2xl border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:bg-neutral-50 dark:focus:ring-primary-6000 dark:focus:ring-opacity-25">
+                                  {
+                                    phuongXa?.wards?.map((e: any) => (
+                                      <Option key={e?.WardCode} value={`${e?.WardCode}`}>{e?.WardName}</Option>
+                                    ))
+                                  }
                                 </Select>
                               </div>
                             </div>

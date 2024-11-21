@@ -78,10 +78,6 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
     }));
     findMatchingVariant();
   };
-  console.log("selectedVariantId", selectedVariantId);
-  console.log("productSeeMore", productSeeMore.variants);
-  console.log("dataAttribute", dataAttribute);
-
   const _payload = {
     product_id: productSeeMore.id,
     product_variant_id: selectedVariantId,
@@ -99,10 +95,6 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
   };
 
   const handleCheckout = () => {
-    // if (!selectedVariantId) {
-    //   setError('Vui lòng chọn loại sản phẩm');
-    //   return;
-    // }
     navigate("/checkout", { state: { _payload: _payload } });
   };
   return (
