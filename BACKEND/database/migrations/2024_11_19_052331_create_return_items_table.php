@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreignIdFor(OrderDetail::class)->constrained()->cascadeOnDelete();
             $table->integer('quantity');
             $table->text('image')->nullable();
-            $table->enum('status',['pending', 'approved', 'rejected'])->default('pending');
+            $table->enum('status', ['pending', 'canceled', 'approved', 'rejected'])->default('pending');
 
 
             $table->timestamps();

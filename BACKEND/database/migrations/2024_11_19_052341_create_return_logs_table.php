@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(ReturnRequest::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(User::class)->constrained()->cascadeOnDelete();
-            $table->enum('action', ['approved', 'rejected', 'canceled', 'completed'])->default('approved');
+            $table->enum('action', ['approved', 'rejected', 'canceled']);
             $table->text("comment")->nullable();
             $table->timestamps();
         });

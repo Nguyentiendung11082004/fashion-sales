@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignIdFor(Order::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(User::class)->constrained()->cascadeOnDelete();
             $table->text('reason')->comment("lí do");
-            $table->enum('status',['pending', 'approved', 'rejected'])->default('pending');
+            $table->enum('status',['pending','canceled' ,'approved', 'rejected'])->default('pending');
 
             $table->timestamps();
         });

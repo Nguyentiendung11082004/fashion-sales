@@ -19,7 +19,7 @@ class StatisticsController extends Controller
         try {
             // Lấy và kiểm tra tham số filter từ request
             $filterType = $request->input('filter_type', 'day'); // Mặc định là 'day'
-           
+
             if ($filterType === 'range') {
                 $request->validate([
                     'filter_start_date' => 'required|date',
@@ -28,7 +28,7 @@ class StatisticsController extends Controller
 
                 $filterStartDate = $request->input('filter_start_date');
                 $filterEndDate = $request->input('filter_end_date');
-            }else{
+            } else {
                 $filterValue = $request->input('filter_value', now()->format('Y-m-d')); // Mặc định là ngày hiện tại
                 $filterStartDate = null;
                 $filterEndDate = null;
@@ -128,7 +128,7 @@ class StatisticsController extends Controller
             return response()->json([
                 'status' => 'success',
                 'filter_type' => $filterType,
-                'filter_value' => $filterValue??null,
+                'filter_value' => $filterValue ?? null,
                 'filter_start_date' => $filterStartDate,
                 'filter_end_date' => $filterEndDate,
                 'total_revenue' => $totalRevenue,
@@ -201,7 +201,11 @@ class StatisticsController extends Controller
                         DB::raw('IFNULL(SUM(order_details.quantity), 0) as total_sold'),
                         DB::raw('(products.quantity) as remaining_quantity')
                     )
-                    ->groupBy('products.id')
+                    ->groupBy(
+                        'products.id',
+                        'products.name',
+                        'products.sku'
+                    )
                     ->get()
                     ->map(function ($product) use ($bestSellingThreshold, $lowStockThreshold, $statusFilter) {
                         // Tính toán trạng thái
@@ -248,7 +252,10 @@ class StatisticsController extends Controller
                     )
                     ->groupBy(
                         'products.id',
-                        'product_variants.id'
+                        'product_variants.id',
+                        'products.name',
+                        'product_variants.sku',
+                        'product_variants.quantity'
                     )
                     ->get()
                     ->map(function ($variant) use ($bestSellingThreshold, $lowStockThreshold, $statusFilter) {
