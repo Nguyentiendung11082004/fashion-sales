@@ -109,7 +109,7 @@ Route::prefix("v1/")->group(function () {
 
     // thống kê
     Route::post('getproductstatistics',[StatisticsController::class,"getProductStatistics"]);
-    Route::get('getorderstatistics',[StatisticsController::class,"getOrderStatistics"]);
+    Route::post('getorderstatistics',[StatisticsController::class,"getOrderStatistics"]);
     Route::post('getrevenuestatistics',[StatisticsController::class,"getRevenueStatistics"]); 
 });
 

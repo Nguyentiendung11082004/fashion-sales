@@ -12,28 +12,102 @@ use Illuminate\Support\Facades\DB;
 
 class StatisticsController extends Controller
 {
-    //
+    // bộ lọc
+    private function applyDateFilter($query, Request $request, $column)
+    {
+        // Lấy filter_type và filter_value từ request
+        $filterType = $request->input('filter_type', 'day'); // Mặc định là lọc theo ngày
+        $filterValue = $request->input('filter_value', now()->format('Y-m-d')); // Giá trị lọc
+
+        // Các loại filter hợp lệ
+        $validFilterTypes = ['day', 'week', 'month', 'year', 'range'];
+        if (!in_array($filterType, $validFilterTypes)) {
+            throw new \Exception("Filter type không hợp lệ.");
+        }
+
+        // Kiểm tra filter_value có tồn tại (ngoại trừ trường hợp range)
+        if ($filterType !== 'range' && !$filterValue) {
+            throw new \Exception("Thiếu giá trị 'filter_value' cho bộ lọc.");
+        }
+
+        switch ($filterType) {
+            case 'day':
+                // Kiểm tra định dạng Y-m-d
+                if (!preg_match('/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/', $filterValue)) {
+                    throw new \Exception("Giá trị 'filter_value' không hợp lệ cho bộ lọc ngày. Cần định dạng Y-m-d.");
+                }
+                $query->whereDate($column, $filterValue);
+                break;
+
+            case 'week':
+                try {
+                    // Kiểm tra định dạng Y-m-d
+                    if (!preg_match('/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/', $filterValue)) {
+                        throw new \Exception("Giá trị 'filter_value' không hợp lệ cho bộ lọc tuần. Cần định dạng Y-m-d.");
+                    }
+
+                    $endOfWeek = Carbon::parse($filterValue)->endOfDay(); // Ngày kết thúc
+                    $startOfWeek = $endOfWeek->copy()->subDays(6)->startOfDay(); // 7 ngày trước
+
+                    $query->whereBetween($column, [$startOfWeek, $endOfWeek]);
+                } catch (\Exception $e) {
+                    throw new \Exception("Giá trị 'filter_value' không hợp lệ cho bộ lọc tuần.");
+                }
+                break;
+
+            case 'month':
+                try {
+                    // Chỉ chấp nhận định dạng Y-m
+                    if (!preg_match('/^\d{4}-(0[1-9]|1[0-2])$/', $filterValue)) {
+                        throw new \Exception("Giá trị 'filter_value' không hợp lệ cho bộ lọc tháng. Cần định dạng Y-m.");
+                    }
+
+                    $date = Carbon::parse($filterValue);
+                    $query->whereMonth($column, $date->month)
+                        ->whereYear($column, $date->year);
+                } catch (\Exception $e) {
+                    throw new \Exception("Giá trị 'filter_value' không hợp lệ cho bộ lọc tháng.");
+                }
+                break;
+
+            case 'year':
+                try {
+                    // Kiểm tra filter_value là số năm hợp lệ
+                    if (!preg_match('/^\d{4}$/', $filterValue)) {
+                        throw new \Exception("Giá trị 'filter_value' không hợp lệ cho bộ lọc năm. Cần là số năm (ví dụ: 2024).");
+                    }
+                    $query->whereYear($column, $filterValue);
+                } catch (\Exception $e) {
+                    throw new \Exception("Giá trị 'filter_value' không hợp lệ cho bộ lọc năm.");
+                }
+                break;
+
+            case 'range':
+                try {
+                    // Kiểm tra filter_start_date và filter_end_date
+                    $request->validate([
+                        'filter_start_date' => 'required|date',
+                        'filter_end_date' => 'required|date|after_or_equal:filter_start_date',
+                    ]);
+
+                    $startDate = Carbon::parse($request->input('filter_start_date'))->startOfDay();
+                    $endDate = Carbon::parse($request->input('filter_end_date'))->endOfDay();
+
+                    $query->whereBetween($column, [$startDate, $endDate]);
+                } catch (\Exception $e) {
+                    throw new \Exception("Giá trị ngày bắt đầu và kết thúc không hợp lệ cho bộ lọc range.");
+                }
+                break;
+
+            default:
+                throw new \Exception("Filter type không hợp lệ.");
+        }
+    }
+
     // Thống kê doanh thu
     public function getRevenueStatistics(Request $request)
     {
         try {
-            // Lấy và kiểm tra tham số filter từ request
-            $filterType = $request->input('filter_type', 'day'); // Mặc định là 'day'
-
-            if ($filterType === 'range') {
-                $request->validate([
-                    'filter_start_date' => 'required|date',
-                    'filter_end_date' => 'required|date|after_or_equal:filter_start_date',
-                ]);
-
-                $filterStartDate = $request->input('filter_start_date');
-                $filterEndDate = $request->input('filter_end_date');
-            } else {
-                $filterValue = $request->input('filter_value', now()->format('Y-m-d')); // Mặc định là ngày hiện tại
-                $filterStartDate = null;
-                $filterEndDate = null;
-            }
-
             // Khởi tạo truy vấn cơ bản
             $query = OrderDetail::select(
                 'order_details.product_id',
@@ -54,40 +128,10 @@ class StatisticsController extends Controller
                     'product_variants.sku'
                 );
 
-            // Áp dụng bộ lọc thời gian
-            switch ($filterType) {
-                case 'day':
-                    $query->whereDate('order_details.created_at', $filterValue);
-                    break;
+            // Áp dụng bộ lọc ngày tháng nếu có
+            $this->applyDateFilter($query, $request, 'order_details.created_at');
 
-                case 'week':
-                    $startOfWeek = Carbon::parse($filterValue)->startOfWeek()->format('Y-m-d 00:00:00');
-                    $endOfWeek = Carbon::parse($filterValue)->endOfWeek()->format('Y-m-d 23:59:59');
-                    $query->whereBetween('order_details.created_at', [$startOfWeek, $endOfWeek]);
-                    break;
-
-                case 'month':
-                    $query->whereMonth('order_details.created_at', Carbon::parse($filterValue)->month)
-                        ->whereYear('order_details.created_at', Carbon::parse($filterValue)->year);
-                    break;
-
-                case 'year':
-                    $query->whereYear('order_details.created_at', Carbon::parse($filterValue)->year);
-                    break;
-
-                case 'range':
-                    if ($filterStartDate && $filterEndDate) {
-                        $startDate = Carbon::parse($filterStartDate)->format('Y-m-d 00:00:00');
-                        $endDate = Carbon::parse($filterEndDate)->format('Y-m-d 23:59:59');
-                        $query->whereBetween('order_details.created_at', [$startDate, $endDate]);
-                    }
-                    break;
-
-                default:
-                    throw new \Exception("Filter type không hợp lệ.");
-            }
-
-            // Lấy dữ liệu tổng hợp
+            // Lấy dữ liệu tổng hợp từ truy vấn
             $revenueData = $query->get();
 
             // Tính tổng doanh thu
@@ -104,7 +148,7 @@ class StatisticsController extends Controller
                 )
                 ->get();
 
-            // Ánh xạ thuộc tính theo biến thể
+            // Ánh xạ thuộc tính theo biến thể sản phẩm
             $attributeMap = [];
             foreach ($variantAttributes as $attr) {
                 $attributeMap[$attr->product_variant_id][] = $attr->attribute_name . ': ' . $attr->attribute_value;
@@ -127,10 +171,6 @@ class StatisticsController extends Controller
             // Trả về kết quả JSON bao gồm tổng doanh thu và dữ liệu chi tiết
             return response()->json([
                 'status' => 'success',
-                'filter_type' => $filterType,
-                'filter_value' => $filterValue ?? null,
-                'filter_start_date' => $filterStartDate,
-                'filter_end_date' => $filterEndDate,
                 'total_revenue' => $totalRevenue,
                 'data' => $result,
             ], 200);
@@ -143,34 +183,42 @@ class StatisticsController extends Controller
         }
     }
 
-
-
-
-    // Thống kê đơn hàng
-    public function getOrderStatistics()
+    public function getOrderStatistics(Request $request)
     {
         try {
-            $orderCountsByStatus = Order::select('order_status', DB::raw('count(*) as total_orders'))
+            // Tạo query cơ bản cho Order
+            $ordersQuery = Order::query();
+    
+            // Áp dụng bộ lọc thời gian
+            $this->applyDateFilter($ordersQuery, $request, 'created_at');
+    
+            // Clone query ban đầu để tránh bị ảnh hưởng bởi groupBy
+            $orderIdsQuery = clone $ordersQuery;
+    
+            // Thống kê số lượng đơn hàng theo trạng thái
+            $orderCountsByStatus = $ordersQuery
+                ->select('order_status', DB::raw('count(*) as total_orders'))
                 ->groupBy('order_status')
                 ->get();
-
-            // Lấy tổng số lượng sản phẩm (bao gồm cả sản phẩm đơn và biến thể) trong các đơn hàng
-            $totalQuantityInOrder = OrderDetail::sum('quantity');
-
-            // Tạo một mảng để lưu kết quả
+    
+            // Lọc số lượng sản phẩm trong các đơn hàng dựa trên bộ lọc thời gian
+            $orderIds = $orderIdsQuery->pluck('id'); // Tách riêng query để lấy ID
+            $totalQuantityInOrder = OrderDetail::whereIn('order_id', $orderIds)->sum('quantity');
+    
+            // Tạo kết quả trả về
             $result = [
                 'order_counts_by_status' => $orderCountsByStatus,
                 'total_quantity_in_order' => $totalQuantityInOrder,
             ];
-
+    
             return response()->json($result);
         } catch (\Exception $ex) {
             return response()->json([
                 "message" => $ex->getMessage()
-            ]);
+            ], 500);
         }
     }
-
+ 
     public function getProductStatistics(Request $request)
     {
         try {
