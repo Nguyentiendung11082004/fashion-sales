@@ -1,4 +1,5 @@
 import Loading from "@/common/Loading/Loading";
+import GoogleCallback from "@/pages/client/auth/login/GoogleCallback";
 import React, { Suspense, lazy } from "react";
 import { Route, Routes } from "react-router-dom";
 

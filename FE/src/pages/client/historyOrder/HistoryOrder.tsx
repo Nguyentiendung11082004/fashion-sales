@@ -1,12 +1,12 @@
 import { useAuth } from "@/common/context/Auth/AuthContext";
-import { FormatMoney } from "@/common/utils/utils";
-import { Product4, Product5, Product6 } from "@/components/icons";
 import instance from "@/configs/axios";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button, Input, Modal, Table } from "antd";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
+import { useRealtimeOrders, notifyOrdersChanged } from '@/common/hooks/useRealtimeOrders'; 
+// import { notifyOrdersChanged, listenForOrdersChange } from '@/common/hooks/useRealtimeOrders'; 
 
 const HistoryOrder = () => {
   const [expandedOrders, setExpandedOrders] = useState<number[]>([]);
@@ -29,7 +29,10 @@ const HistoryOrder = () => {
       });
       return response.data;
     },
-  });
+    // refetchInterval: 2000,
+  }); 
+  useRealtimeOrders();
+
   const cancelOrder = async ({
     id,
     reason,
@@ -55,6 +58,7 @@ const HistoryOrder = () => {
       queryClient.invalidateQueries({ queryKey: ["history-order"] });
       toast.success("Đơn hàng đã được hủy thành công!");
       setCancelPopupOpen(false);
+      notifyOrdersChanged();
     },
     onError: () => {
       toast.error("Hủy đơn hàng thất bại.");
@@ -67,6 +71,7 @@ const HistoryOrder = () => {
           ? prev.filter((id) => id !== orderId) // Nếu đã mở, thì đóng
           : [...prev, orderId] // Nếu chưa mở, thì mở
     );
+    
   };
 
   // Khởi tạo trạng thái từ localStorage
@@ -244,13 +249,13 @@ const HistoryOrder = () => {
                 return (
                   <div
                     key={order.id}
-                    onClick={() => toggleOrderDetails(order.id)}
+                    
                     className="border border-slate-200 rounded-lg overflow-hidden z-0 mb-[30px]"
                   >
-                    <button className="hd-head-form-order w-full flex sm:flex-row justify-between lg:justify-between sm:justify-between sm:items-center p-4 sm:p-8 bg-slate-50 dark:bg-slate-500/5">
+                    <button 
+                    onClick={() => toggleOrderDetails(order.id)} className="hd-head-form-order w-full flex sm:flex-row justify-between lg:justify-between sm:justify-between sm:items-center p-4 sm:p-8 bg-slate-50 dark:bg-slate-500/5">
                       <div className="flex items-center">
                         <button
-                          onClick={() => toggleOrderDetails(order.id)}
                           className="text-base"
                         >
                           {isExpanded ? "▼" : "▲"}{" "}

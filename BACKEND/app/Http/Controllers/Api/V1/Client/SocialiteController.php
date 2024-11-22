@@ -41,10 +41,11 @@ class SocialiteController extends Controller
         // Tạo token
         $token = $user->createToken($user->id)->plainTextToken;
 
-        return Response::json([
-            'user' => $user,
-            'token' => $token
-        ]);
+        // return Response::json([
+        //     'user' => $user,
+        //     'token' => $token
+        // ]);
+        return redirect()->away('http://localhost:5173/login?token=' . urlencode($token));
     }
 
     public function redirectToFacebook()

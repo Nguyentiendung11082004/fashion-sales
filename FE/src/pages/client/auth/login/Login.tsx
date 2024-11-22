@@ -7,10 +7,12 @@ import LoginIcon1 from "@/components/icons/login/LoginIcon1";
 import instance from "@/configs/axios";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button, Form, Input } from "antd";
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 const Login = () => {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<any>('');
   const navigator = useNavigate();
@@ -48,6 +50,58 @@ const Login = () => {
     // login(data)
   };
 
+  const handleGoogleLogin = async () => {
+    try {
+        // const { data } = await instance.get('/login/google');
+        window.location.href = 'http://127.0.0.1:8000/api/v1/login/google';
+    } catch (error) {
+        console.error();
+    }
+};
+
+// useEffect(() => {
+//     const handleGoogleCallback = async () => {
+//         const urlParams = new URLSearchParams(window.location.search);
+//         if (urlParams.has('code')) {
+//             try {
+//                 const { data } = await instance.get(`/login/google/callback`);
+//                 localStorage.setItem('token', data.token);
+//                 window.location.href = '/'; 
+//             } catch (error) {
+//                 console.error();
+//             }
+//         }
+//     };
+
+//     handleGoogleCallback();
+// }, []);
+useEffect(() => {
+  // Lấy token từ URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const token = urlParams.get('token');
+
+  if (token) {
+      // Lưu token vào localStorage
+      localStorage.setItem('token', token);
+
+      // Chuyển hướng đến trang chính
+      // window.location.href = '/';
+      // navigate('/')
+      const storedToken = localStorage.getItem("token");
+            if (storedToken) {
+                console.log("Token saved:", storedToken);
+                // Chuyển hướng đến trang chính sau khi lưu token
+                // window.location.href = "/";
+                navigate('/')
+            } else {
+                console.error("Failed to save token in localStorage");
+            }
+  } else {
+      console.error("Token not found in URL");
+  }
+}, []);
+
+
   return (
     <>
       <div>
@@ -68,7 +122,9 @@ const Login = () => {
           <div className="w-full m-9 p-[50px] lg:w-[450px] shadow-2xl border">
             <h2 className="text-2xl font-semibold text-gray-700 text-center">Đăng nhập</h2>
             <p className="text-xl text-gray-600 text-center">Chào mừng trở lại</p>
-            <Button className="flex items-center justify-center w-full h-11 mt-4 bg-white rounded-lg shadow-md hover:bg-gray-100">
+            <Button 
+              onClick={handleGoogleLogin}
+             className="flex items-center justify-center w-full h-11 mt-4 bg-white rounded-lg shadow-md hover:bg-gray-100">
               <div className="px-1 py-3">
                 <LoginIcon1 />
               </div>
