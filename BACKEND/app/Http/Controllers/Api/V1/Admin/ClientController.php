@@ -21,7 +21,7 @@ class ClientController extends Controller
     {
 
         $clients = User::whereIn('role_id', [1])->with('role')
-        ->latest()->get();
+            ->latest()->get();
 
         return response()->json([
             'success' => true,
@@ -30,26 +30,26 @@ class ClientController extends Controller
     }
 
     public function search(Request $request)
-{
-    $query = $request->input('query'); // Lấy từ khóa tìm kiếm từ body request
+    {
+        $query = $request->input('query'); // Lấy từ khóa tìm kiếm từ body request
 
-    if (!$query) {
+        if (!$query) {
+            return response()->json([
+                'message' => 'Vui lòng nhập từ khóa tìm kiếm.',
+                'data' => []
+            ], 400);
+        }
+
+        // Tìm kiếm trong cột `name` và `email`
+        $results = User::where('name', 'LIKE', "%{$query}%")
+            ->orWhere('email', 'LIKE', "%{$query}%")
+            ->get();
+
         return response()->json([
-            'message' => 'Vui lòng nhập từ khóa tìm kiếm.',
-            'data' => []
-        ], 400);
+            'message' => 'Kết quả tìm kiếm.',
+            'data' => $results,
+        ]);
     }
-
-    // Tìm kiếm trong cột `name` và `email`
-    $results = User::where('name', 'LIKE', "%{$query}%")
-                    ->orWhere('email', 'LIKE', "%{$query}%")
-                    ->get();
-
-    return response()->json([
-        'message' => 'Kết quả tìm kiếm.',
-        'data' => $results,
-    ]);
-}
 
     /**
      * Store a newly created resource in storage.
@@ -73,14 +73,14 @@ class ClientController extends Controller
             ];
 
 
-        $client = User::query()->create($dataClient);
+            $client = User::query()->create($dataClient);
 
-        return response()->json([
-            'status'  =>201,
-            'success' =>true,
-            'message' =>'Client created successfully!',
-            'data'    => $client
-        ],201);
+            return response()->json([
+                'status'  => 201,
+                'success' => true,
+                'message' => 'Client created successfully!',
+                'data'    => $client
+            ], 201);
         } catch (\Exception $e) {
             return response()->json([
                 'status'  => 500,
@@ -99,18 +99,18 @@ class ClientController extends Controller
         try {
             $client = User::with('role')->findOrFail($id);
             return response()->json([
-                'message' => 'Chi tiết khách hàng id = '.$id,
-                'data'    =>$client
+                'message' => 'Chi tiết khách hàng id = ' . $id,
+                'data'    => $client
             ]);
         } catch (\Throwable $th) {
-           if ($th instanceof ModelNotFoundException){
+            if ($th instanceof ModelNotFoundException) {
+                return response()->json([
+                    'message' => 'Không tìm thấy khách hàng có id=' . $id,
+                ], HttpResponse::HTTP_NOT_FOUND);
+            }
             return response()->json([
-                'message'=>'Không tìm thấy khách hàng có id='.$id,
-            ], HttpResponse::HTTP_NOT_FOUND);
-           }
-           return response()->json([
-            'message'=>'Không tìm thấy khách hàng có id='.$id,
-        ], HttpResponse::HTTP_INTERNAL_SERVER_ERROR);
+                'message' => 'Không tìm thấy khách hàng có id=' . $id,
+            ], HttpResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -119,41 +119,41 @@ class ClientController extends Controller
      * Update the specified resource in storage.
      */
     public function update(UserRequest $request, string $id)
-{
-    try {
-        $client = User::findOrFail($id);
+    {
+        try {
+            $client = User::findOrFail($id);
 
-        // Tạo mảng dữ liệu để cập nhật
-        $dataClient = [
-            'name'         => $request->name,
-            'phone_number' => $request->phone_number,
-            'email'        => $request->email,
-            'address'      => $request->address,
-            'password'     => $request->password ? bcrypt($request->password) : $client->password,
-            'birth_date'   => $request->birth_date,
-            'is_active'    => $request->is_active ?? $client->is_active,
-            'gender'       => $request->gender,
-            'role_id'      => $request->role_id ?? $client->role_id,
-            'avatar'       => $request->avatar ?? $client->avatar //Kiểm tra avatar
-        ];
+            // Tạo mảng dữ liệu để cập nhật
+            $dataClient = [
+                'name'         => $request->name,
+                'phone_number' => $request->phone_number,
+                'email'        => $request->email,
+                'address'      => $request->address,
+                'password'     => $request->password ? bcrypt($request->password) : $client->password,
+                'birth_date'   => $request->birth_date,
+                'is_active'    => $request->is_active ?? $client->is_active,
+                'gender'       => $request->gender,
+                'role_id'      => $request->role_id ?? $client->role_id,
+                'avatar'       => $request->avatar ?? $client->avatar //Kiểm tra avatar
+            ];
 
-        $client->update($dataClient);
+            $client->update($dataClient);
 
-        return response()->json([
-            'status'  => 200,
-            'success' => true,
-            'message' => 'Client updated successfully!',
-            'data'    => $client
-        ], 200);
-    } catch (\Exception $e) {
-        return response()->json([
-            'status'  => 500,
-            'success' => false,
-            'message' => 'Update failed.',
-            'error'   => $e->getMessage()
-        ], 500);
+            return response()->json([
+                'status'  => 200,
+                'success' => true,
+                'message' => 'Client updated successfully!',
+                'data'    => $client
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => 500,
+                'success' => false,
+                'message' => 'Update failed.',
+                'error'   => $e->getMessage()
+            ], 500);
+        }
     }
-}
 
     /**
      * Remove the specified resource from storage.

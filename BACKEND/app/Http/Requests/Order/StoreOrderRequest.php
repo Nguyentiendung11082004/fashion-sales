@@ -48,7 +48,6 @@ class StoreOrderRequest extends FormRequest
             'voucher_code' => 'nullable|string|exists:vouchers,code',
         ];
     }
-
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
@@ -100,6 +99,7 @@ class StoreOrderRequest extends FormRequest
             }
             $this->checkVoucherDates($validator, $voucher);
             $this->checkVoucherUsage($validator, $voucher);
+            $this->verifyUserForVoucher($validator, $voucher);
         }
     }
 
@@ -118,6 +118,15 @@ class StoreOrderRequest extends FormRequest
     {
         if ($voucher->usage_limit && $voucher->used_count >= $voucher->usage_limit) {
             $validator->errors()->add('voucher_code', 'Voucher đã hết lượt sử dụng.');
+        }
+    }
+    protected function verifyUserForVoucher($validator, $voucher)
+    {
+        if (!auth('sanctum')->check()) {
+            $validator->errors()->add(
+                'voucher_code',
+                'Vui lòng đăng nhập để sử dụng voucher.'
+            );
         }
     }
 
