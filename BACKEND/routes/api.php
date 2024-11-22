@@ -20,6 +20,7 @@ use App\Http\Controllers\Api\V1\Admin\AuthAdminController;
 use App\Http\Controllers\Api\V1\Admin\BannerController;
 use App\Http\Controllers\Api\V1\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Api\V1\Admin\PostController;
+use App\Http\Controllers\Api\V1\Admin\ReturnAdminController;
 use App\Http\Controllers\Api\V1\Admin\StatisticsController;
 use App\Http\Controllers\Api\V1\Admin\VoucherController;
 use App\Http\Controllers\Api\V1\Client\AddressController;
@@ -31,6 +32,7 @@ use App\Http\Controllers\Api\V1\Client\ProductShopController;
 use App\Http\Controllers\Api\V1\Client\ChatController;
 use App\Http\Controllers\Api\V1\Client\ProductDetailController;
 use App\Http\Controllers\Api\V1\Client\InforUserController;
+use App\Http\Controllers\Api\V1\Client\ReturnController;
 use App\Http\Controllers\Api\V1\Client\SocialiteController;
 use App\Http\Controllers\Api\V1\Client\TryOnController;
 use App\Http\Controllers\API\V1\Service\PaymentController;
@@ -47,13 +49,17 @@ use App\Http\Controllers\API\V1\Service\PaymentController;
 */
 
 Route::prefix("v1/")->group(function () {
+        Route::middleware(['auth:sanctum', 'role:4'])->group(function () {
+        Route::resource('vouchers', VoucherController::class);
+    });
+
     Route::resource("products", ProductController::class);
     Route::resource("comments", CommentsController::class);
     Route::resource("brand", BrandController::class);
     Route::resource("tags", TagController::class);
     Route::resource('employees', EmployeeController::class);
     Route::resource('clients', ClientController::class);
-    Route::resource('vouchers', VoucherController::class);
+    // Route::resource('vouchers', VoucherController::class);
     Route::apiResource('attribute', AttributeController::class);
     Route::apiResource('attributeItem', AttributeItemController::class);
     Route::apiResource('category', CategoryController::class);
@@ -75,6 +81,18 @@ Route::prefix("v1/")->group(function () {
     //Tìm kiếm trong Admin
     Route::post('/client/search', [ClientController::class, 'search']);
     Route::post('/employee/search', [EmployeeController::class, 'search']);
+    Route::post('/voucher/search', [VoucherController::class, 'search']);
+    Route::post('/product/search', [ProductController::class, 'search']);
+    Route::post('/category/search', [CategoryController::class, 'search']);
+    Route::post('/order/search', [OrderController::class, 'search']);
+    Route::post('/post/search', [PostController::class, 'search']);
+    Route::post('/attribute/search', [AttributeController::class, 'search']);
+    Route::post('/banner/search', [BannerController::class, 'search']);
+    Route::post('/brand/search', [BrandController::class, 'search']);
+    Route::post('/comment/search', [CommentsController::class, 'search']);
+    Route::post('/tag/search', [TagController::class, 'search']);
+
+
 
     //Login with Google
     Route::middleware(['web'])->group(function () {
@@ -107,7 +125,7 @@ Route::prefix("v1/")->group(function () {
 
     // thống kê
     Route::post('getproductstatistics',[StatisticsController::class,"getProductStatistics"]);
-    Route::get('getorderstatistics',[StatisticsController::class,"getOrderStatistics"]);
+    Route::post('getorderstatistics',[StatisticsController::class,"getOrderStatistics"]);
     Route::post('getrevenuestatistics',[StatisticsController::class,"getRevenueStatistics"]); 
 });
 
@@ -135,4 +153,10 @@ Route::middleware('auth:sanctum')->prefix('v1/')->group(function () {
     Route::delete('chat-message/{conversation}', [ChatController::class, "deleteMessage"]);
 
     Route::apiResource('comment', CommentController::class);
+    
+    // hoàn trả hàng
+    Route::post('return-requests/create', [ReturnController::class, 'createReturnRequest']);
+    Route::post('return-requests/cancel', [ReturnController::class, 'cancelReturnItems']);
+    Route::post('return-requests/action', [ReturnAdminController::class, 'handleReturnRequest']);
+    
 });

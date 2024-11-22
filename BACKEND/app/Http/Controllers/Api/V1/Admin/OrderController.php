@@ -57,7 +57,7 @@ class OrderController extends Controller
                 'order' => $order,
                 'order_details' => $orderDetails,
             ];
-    
+
             return response()->json($orderData, Response::HTTP_OK);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             Log::error('Order not found: ' . $e->getMessage());
@@ -67,8 +67,8 @@ class OrderController extends Controller
             return response()->json(['message' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-    
-    
+
+
 
     /**
      * Show the form for editing the specified resource.
@@ -85,21 +85,21 @@ class OrderController extends Controller
     // {
     //     try {
     //         $order = Order::findOrFail($id);
-            
+
     //         // Kiểm tra xem yêu cầu có trường order_status hay không
     //         $newStatus = $request->input('order_status');
-            
+
     //         // Đảm bảo rằng trạng thái mới hợp lệ
     //         $allowedStatuses = ['Đang chờ xác nhận', 'Đã xác nhận', 'Đang vận chuyển', 'Giao hàng thành công', 'Đã hủy'];
-            
+
     //         if (!in_array($newStatus, $allowedStatuses)) {
     //             return response()->json(['message' => 'Trạng thái không hợp lệ.'], Response::HTTP_BAD_REQUEST);
     //         }
-    
+
     //         // Cập nhật trạng thái của đơn hàng
     //         $order->order_status = $newStatus;
     //         $order->save();
-    
+
     //         return response()->json(['message' => 'Cập nhật trạng thái thành công.', 'order' => $order], Response::HTTP_OK);
     //     } catch (\Exception $e) {
     //         return response()->json(['message' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -109,7 +109,7 @@ class OrderController extends Controller
 {
     try {
         $order = Order::findOrFail($id);
-        
+
         $currentStatus = $order->order_status;
         $newStatus = $request->input('order_status');
 
@@ -121,13 +121,13 @@ class OrderController extends Controller
             'Giao hàng thành công' => 5,
             'Đã hủy' => 6
         ];
-        
+
         // Nếu nhập trạng thái là số, lấy tên trạng thái từ mảng
         if (is_numeric($newStatus) && in_array((int)$newStatus, $statusMap)) {
             $newStatus = array_search((int)$newStatus, $statusMap);
         }
 
-        // Kiểm tra trạng thái đơn hàng 
+        // Kiểm tra trạng thái đơn hàng
         if (!array_key_exists($newStatus, $statusMap)) {
             return response()->json(['message' => 'Trạng thái không hợp lệ.'], Response::HTTP_BAD_REQUEST);
         }
@@ -167,5 +167,28 @@ class OrderController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function search(Request $request)
+    {
+        $query = $request->input('query'); // Lấy từ khóa tìm kiếm từ body request
+
+        if (!$query) {
+            return response()->json([
+                'message' => 'Vui lòng nhập từ khóa tìm kiếm.',
+                'data' => []
+            ], 400);
+        }
+
+        // Tìm kiếm trong cột `name` hoặc các cột khác nếu cần
+        $results = Order::where('order_code', 'LIKE', "%{$query}%")
+            ->orWhere('user_name', 'LIKE', "%{$query}%")
+            ->orWhere('user_email', 'LIKE', "%{$query}%")
+            ->get();
+
+        return response()->json([
+            'message' => 'Kết quả tìm kiếm.',
+            'data' => $results,
+        ]);
     }
 }
