@@ -32,7 +32,7 @@ class AuthAdminController extends Controller
                 ]);
             }
 
-            if ($user->role_id != 4) {
+            if ($user->role_id == 1) {
                 throw ValidationException::withMessages([
                     'role' => ['Tài khoản không có quyền admin.'],
                 ]);
