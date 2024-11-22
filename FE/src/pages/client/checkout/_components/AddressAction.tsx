@@ -19,7 +19,7 @@ type Props = {
     idAddress: any,
     onAddressSave: (data: any) => void;
 }
-const AddressAction = ({ title, open, onClose, idAddress,onAddressSave }: Props) => {
+const AddressAction = ({ title, open, onClose, idAddress, onAddressSave }: Props) => {
     const { Option } = Select;
     const [idTinh, setIdTinh] = useState<number | null>(0)
     const [idQuanHuyen, setIdQuanHuyen] = useState<number | null>(0)
@@ -27,6 +27,7 @@ const AddressAction = ({ title, open, onClose, idAddress,onAddressSave }: Props)
     const { token } = useAuth();
     const [form] = Form.useForm();
     const queryClient = useQueryClient()
+    
     const { data: tinhThanh } = useQuery({
         queryKey: ['tinhThanh'],
         queryFn: async () => {
@@ -109,9 +110,18 @@ const AddressAction = ({ title, open, onClose, idAddress,onAddressSave }: Props)
     const onFinish = (value: any) => {
         let payload = {
             ...value,
-            city: value.city.label,
-            district: value.district.label,
-            ward: value.district.label
+            city: {
+                id: value.city.value,
+                name: value.city.label
+            },
+            district: {
+                id: value.district.value,
+                name: value.district.label
+            },
+            ward: {
+                id: value.ward.value,
+                name: value.ward.label
+            }
         }
         if (idAddress) {
             mutationUpdate.mutate(payload)
@@ -121,19 +131,34 @@ const AddressAction = ({ title, open, onClose, idAddress,onAddressSave }: Props)
         onAddressSave({
             idQuanHuyen,
             idXa,
-          });
+        });
     }
     const handleClose = () => {
         form.resetFields()
         onClose();
     }
+    useEffect(() => {
+        if (!open) {
+            form.resetFields();
+        }
+    }, [open]);
     return (
         <>
             {
                 isFetching ? <Loading /> :
-                    <AntModal title={title} open={open} onCancel={() => handleClose()} closable={false} maskClosable={false} footer={false}>
+                    <AntModal 
+                    key={open ? 'open' : 'closed'} 
+                    title={title} open={open} onCancel={() => handleClose()} closable={false} maskClosable={false} footer={false}>
                         <Form layout='vertical' onFinish={onFinish}
-                            initialValues={dataDiaChi || {}}
+                            initialValues={{
+                                phone: dataDiaChi?.phone,
+                                city: dataDiaChi?.city ? { value: dataDiaChi.city.id, label: dataDiaChi.city.name } : undefined,
+                                district: dataDiaChi?.district ? { value: dataDiaChi.district.id, label: dataDiaChi.district.name } : undefined,
+                                ward: dataDiaChi?.ward ? { value: dataDiaChi.ward.id, label: dataDiaChi.ward.name } : undefined,
+                                address: dataDiaChi?.address,
+                                label: dataDiaChi?.label,
+                                is_default: dataDiaChi?.is_default || false,
+                            }}
                         >
                             <Form.Item name='phone' className=' text-2xl font-medium text-neutral-900' label="Số điện thoại">
                                 <Input />
@@ -144,7 +169,7 @@ const AddressAction = ({ title, open, onClose, idAddress,onAddressSave }: Props)
                                     onChange={handleChangeTinh}
                                     showSearch
                                     optionFilterProp="children"
-                                    className="hd-Select  outline-0 h-11 mt-1.5 block w-full text-sm rounded-2xl border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:bg-neutral-50 dark:focus:ring-primary-6000 dark:focus:ring-opacity-25">
+                                    className="hd-Select outline-0 h-11 mt-1.5 block w-full text-sm rounded-2xl border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:bg-neutral-50 dark:focus:ring-primary-6000 dark:focus:ring-opacity-25">
                                     {
                                         tinhThanh?.provinces?.map((e: any) => (
                                             <Option value={e?.ProvinceID}>{e?.ProvinceName}</Option>
@@ -184,15 +209,7 @@ const AddressAction = ({ title, open, onClose, idAddress,onAddressSave }: Props)
                             <Form.Item name="label" className='text-2xl font-medium text-neutral-900' label="Tiêu d">
                                 <Input />
                             </Form.Item>
-                            <Form.Item
-                                name="is_default"
-                                valuePropName="checked"
-                                className="flex items-center text-2xl font-medium text-neutral-900"
-                                initialValue={false}
-                                label="Đặt làm địa chỉ mặc định"
-                            >
-                                <Input type="checkbox" className="mr-2" />
-                            </Form.Item>
+                           
                             <Button onClick={() => handleClose()} className='mt-2 mr-3' >Quay lại</Button>
                             <Button type='primary' htmlType='submit' className='mt-2 mr-auto' >Lưu lại</Button>
                         </Form>

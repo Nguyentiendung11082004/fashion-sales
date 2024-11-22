@@ -16,7 +16,6 @@ const ProductForm = lazy(
   () => import("@/pages/admin/products/_components/ProductForm")
 );
 
-// Lazy load các trang
 const HomePage = lazy(() => import("../pages/client/home/HomePage"));
 const Wishlist = lazy(() => import("@/pages/client/wishlist/Wishlist"));
 const Products = lazy(() => import("@/pages/client/products/Products"));

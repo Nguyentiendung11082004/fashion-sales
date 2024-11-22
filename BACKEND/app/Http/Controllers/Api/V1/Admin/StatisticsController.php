@@ -204,7 +204,8 @@ class StatisticsController extends Controller
                     ->groupBy(
                         'products.id',
                         'products.name',
-                        'products.sku'
+                        'products.sku',
+                        'products.quantity'
                     )
                     ->get()
                     ->map(function ($product) use ($bestSellingThreshold, $lowStockThreshold, $statusFilter) {
@@ -235,7 +236,6 @@ class StatisticsController extends Controller
 
                 $results['simple_products'] = $simpleProducts;
             }
-
             // Lọc sản phẩm có biến thể nếu typeFilter chứa 1
             if (in_array(1, $typeFilter)) {
                 $variantProducts = DB::table('products')
@@ -289,7 +289,7 @@ class StatisticsController extends Controller
                         if (empty($statusFilter) || !empty(array_intersect($statusFilter, $statusIds))) {
                             $variant->status = implode('|', $statuses);
                             return $variant;
-                        }
+          }
                         return null;
                     })
                     ->filter(); // Loại bỏ các sản phẩm không khớp filter

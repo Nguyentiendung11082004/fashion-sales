@@ -31,8 +31,8 @@ const Cart = () => {
     setVisible(false);
   };
   const { token } = useAuth();
-  const { data, isFetching } = useQuery({
-    queryKey: ["cart"],
+  const { data, isLoading } = useQuery({
+    queryKey: ['cart'],
     queryFn: async () => {
       const res = await instance.get("/cart", {
         headers: {
@@ -44,14 +44,14 @@ const Cart = () => {
     refetchOnWindowFocus: true,
     refetchOnMount: true,
   });
-  const pusher = new Pusher("4d3e0d70126f2605977e", {
-    cluster: "ap1",
-    authEndpoint: "http://localhost:8000/broadcasting/auth", // Thay bằng URL backend của bạn
+  const pusher = new Pusher('4d3e0d70126f2605977e', {
+    cluster: 'ap1',
+    authEndpoint: 'http://localhost:8000/broadcasting/auth', 
     auth: {
       headers: {
-        Authorization: `${token}`, // Thay thế bằng token của người dùng hiện tại
-      },
-    },
+        Authorization: `${token}`
+      }
+    }
   });
   useEffect(() => {
     const channel = pusher.subscribe(`private-cart.${9}`);
@@ -225,9 +225,8 @@ const Cart = () => {
   });
 
   const [isAllChecked, setIsAllChecked] = useState<boolean>(false);
-  const [checkedItems, setCheckedItems] = useState<{ [key: number]: boolean }>(
-    {}
-  );
+  console.log("isAllChecked",isAllChecked)
+  const [checkedItems, setCheckedItems] = useState<{ [key: number]: boolean }>({});
   const handleCheckAll = () => {
     const newChecked = !isAllChecked;
     setIsAllChecked(newChecked);
@@ -255,6 +254,7 @@ const Cart = () => {
       .filter((key) => updatedCheckedItems[Number(key)])
       .map(Number);
     setIdCart(updatedIdCarts);
+  
     setIsAllChecked(updatedIdCarts.length === carts.length);
   };
   const handleCheckout = () => {
@@ -283,6 +283,25 @@ const Cart = () => {
       setIdCart(updatedIdCarts);
     }
   }, []);
+  useEffect(() => {
+    // Khi dữ liệu giỏ hàng (carts) thay đổi, kiểm tra lại các checkbox
+    if (carts && carts.length > 0) {
+      // Cập nhật checkedItems từ localStorage nếu có
+      const storedCheckedItems = localStorage.getItem('checkedItems');
+      if (storedCheckedItems) {
+        const parsedCheckedItems = JSON.parse(storedCheckedItems);
+        setCheckedItems(parsedCheckedItems);
+  
+        // Tính toán lại isAllChecked
+        const isAllCheckedNow = carts.every((item:any) => parsedCheckedItems[item.id]);
+        setIsAllChecked(isAllCheckedNow);
+      }
+    } else {
+      // Nếu giỏ hàng trống, set isAllChecked = false
+      setIsAllChecked(false);
+    }
+  }, [carts]);
+  
   return (
     <>
       <main
@@ -329,7 +348,7 @@ const Cart = () => {
               </div>
               <div className="hd-pagecart-items">
                 <div className="hd-item relative overflow-hidden">
-                  {isFetching ? (
+                  {isLoading ? (
                     <Loading />
                   ) : carts && carts.length > 0 ? (
                     carts?.map((e: any) => {

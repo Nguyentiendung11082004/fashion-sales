@@ -4,6 +4,9 @@ import React from 'react'
 import { Link } from 'react-router-dom';
 
 const Thanks = () => {
+  // const location = useLocation();
+  // location.state?._payload = null;
+
   return (
     <div className="container">
       <div className="flex my-20 items-center justify-center">

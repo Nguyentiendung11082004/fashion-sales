@@ -14,6 +14,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { productDestroy } from '@/services/api/admin/products.api'
+import { generateGUID } from '@/common/utils/utils'
 type ErrorResponse = {
     [key: string]: string[];
 };
@@ -31,6 +32,7 @@ const ProductForm = () => {
     const [selectedItems, setSelectedItems] = useState<any>([]); // giá trị khi lưu ở table 
     const [isTableVisible, setIsTableVisible] = useState(false); // State điều khiển hiển thị bảng
     const [selectedValues, setSelectedValues] = useState<any>([]); // State lưu trữ giá trị đã chọn cho từng thuộc tính
+    console.log("selectedValues",selectedValues)
     const [isColumnsVisible, setIsColumnsVisible] = useState(false); // state cột
     const [error, setError] = useState<any>()
     const [valueHome, setValueHome] = useState(1);
@@ -95,11 +97,6 @@ const { data, isFetching } = useQuery({
                 newSelectedValues[attrId] = [];
             }
         });
-        // Object.keys(newSelectedValues).forEach(attrId => {
-        //     if (!values.includes(attrId)) {
-        //         delete newSelectedValues[attrId];
-        //     }
-        // });
         setSelectedValues(newSelectedValues);
         handleSaveAttributes();
     };
@@ -276,13 +273,13 @@ data: {
                     >
                         <Button icon={<UploadOutlined />}>Tải lên ảnh</Button>
                     </Upload>
-                    {variants && variants[index] && variants[index].image && (
+                    {id ? variants && variants[index] && variants[index].image && (
                         <img
                             src={variants[index].image}
                             alt="Uploaded"
                             style={{ marginTop: 16, width: 100, marginBottom: '10px' }}
                         />
-                    )}
+                    ) : ''}
                 </>
             )
         },
@@ -353,7 +350,7 @@ data: {
             acc[attribute.id] = attribute.pivot.attribute_item_ids;
             return acc;
         }, {});
-        const initialGalleryFiles = (productShow.galleries || []).map((galleryItem: any, index: number) => ({
+        const initialGalleryFiles = (productShow.gallery || []).map((galleryItem: any, index: number) => ({
             uid: String(galleryItem.id || index),
             name: galleryItem.image.substring(galleryItem.image.lastIndexOf('/') + 1),
             status: 'done',
@@ -423,7 +420,7 @@ data: {
                 errors: errorFields[key],
             }));
             form.setFields(fields);
-            const allFieldNames = ['name', 'attribute_id', 'tags', 'brand_id', 'category_id', 'slug', 'sku', 'img_thumbnail', 'galleries', 'type', 'price_regular', 'price_sale', 'quantity', 'description', 'description_title'];
+            const allFieldNames = ['name', 'attribute_id', 'tags', 'brand_id', 'category_id', 'slug', 'sku', 'img_thumbnail', 'gallery', 'type', 'price_regular', 'price_sale', 'quantity', 'description', 'description_title'];
             allFieldNames.forEach((field) => {
                 if (!errorFields[field]) {
                     form.setFields([{ name: field, errors: [] }]);
@@ -521,7 +518,8 @@ price_regular: '',
                 quantity: Number(variant?.quantity),
                 image: variant?.image,
                 sku: variant?.sku,
-});
+                IdGuid: generateGUID()
+            });
         });
 
         if (!attribute) {
@@ -544,7 +542,7 @@ price_regular: '',
             const productPayload = {
                 ...values,
                 img_thumbnail: urlImage,
-                galleries: imageGallery,
+                gallery: imageGallery,
                 attribute_item_id: attributeData,
                 product_variant: filteredVariants,
             };
@@ -648,23 +646,23 @@ price_regular: '',
 
                             </Form.Item>
                             <Form.Item
-                                name="galleries"
+                                name="gallery"
                                 label="Chọn mảng nhiều ảnh"
                                 className="col-span-1"
                             >
                                 <Upload
                                     {...propsGallery}
                                 >
-                                    <Button icon={<UploadOutlined />}>Tải lên galleries</Button>
+                                    <Button icon={<UploadOutlined />}>Tải lên gallery</Button>
                                 </Upload>
                                 {
                                     // imageGallery ? (
                                     //     <img src={`${imageGallery}`} alt="Uploaded" style={{ marginTop: 16, width: 100, marginBottom: '10px' }} />
                                     // ) : (
-                                    productShow?.galleries && (
+                                    productShow?.gallery && (
                                         <>
                                             {
-                                                productShow?.galleries?.map((e: any) => (
+                                                productShow?.gallery?.map((e: any) => (
                                                     <>
                                                         <img src={e.image} alt="Uploaded" style={{ marginTop: 16, width: 100, marginBottom: '10px' }} />
                                                     </>
@@ -674,7 +672,7 @@ price_regular: '',
                                     )
                                     // )
                                 }
-                                {error?.galleries && <div className='text-red-600'>{error.galleries.join(', ')}</div>}
+                                {error?.gallery && <div className='text-red-600'>{error.gallery.join(', ')}</div>}
                             </Form.Item>
                             <Form.Item name="type" label="Kiểu sản phẩm" className="col-span-3">
                                 <Select
