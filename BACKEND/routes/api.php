@@ -32,7 +32,7 @@ use App\Http\Controllers\Api\V1\Client\ProductShopController;
 use App\Http\Controllers\Api\V1\Client\ChatController;
 use App\Http\Controllers\Api\V1\Client\ProductDetailController;
 use App\Http\Controllers\Api\V1\Client\InforUserController;
-use App\Http\Controllers\Api\V1\Client\SocialiteController;
+// use App\Http\Controllers\Api\V1\Client\SocialiteController;
 use App\Http\Controllers\Api\V1\Client\TryOnController;
 use App\Http\Controllers\API\V1\Service\PaymentController;
 
