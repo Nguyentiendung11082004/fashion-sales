@@ -46,9 +46,9 @@ class UserRequest extends FormRequest
             } elseif ($this->route('client')) {
                 $userID = $this->route('client');
             } else {
-                $userID = null; 
+                $userID = null;
             }
-            
+
 
             return [
                 'name'         => 'nullable|string|max:255',

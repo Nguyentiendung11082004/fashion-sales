@@ -17,7 +17,8 @@ class OrderDetail extends Model
         'attributes',
         'quantity',
         'price',
-        'total_price'
+        'total_price',
+        'discount'
     ];
 
     // Quan hệ với model Product (sản phẩm)

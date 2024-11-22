@@ -1,3 +1,4 @@
+// import { useAuth } from "@/common/context/Auth/AuthContext";
 import { Product3 } from "@/components/icons";
 import AddCount from "@/components/icons/cart/AddCount";
 
@@ -6,10 +7,202 @@ import Delete from "@/components/icons/cart/Delete";
 import Gift from "@/components/icons/cart/Gift";
 import Note from "@/components/icons/cart/Note";
 import ReduceProduct from "@/components/icons/cart/ReducrPro";
-import React from "react";
-import { Link } from "react-router-dom";
-
+import { useMutation, useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Button, Skeleton } from "antd";
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import ModalCart from "./_components/Modal";
+import instance from "@/configs/axios";
+import { useAuth } from "@/common/context/Auth/AuthContext";
+import { FormatMoney } from "@/common/utils/utils";
+import { toast } from "react-toastify";
+import { MinusOutlined } from "@ant-design/icons";
+import Loading from "@/common/Loading/Loading";
+import CheckmarkAlert from "@/components/Notification/Toast";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
+const MySwal = withReactContent(Swal);
 const Cart = () => {
+  const [visiable, setVisible] = useState(false);
+  const [idCart, setIdCart] = useState<any>('');
+  const [updatedAttributes, setUpdatedAttributes] = useState<any>({});
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const closeModal = () => {
+    setIdCart('');
+    setVisible(false);
+  };
+  const { token } = useAuth();
+  const { data, isFetching, isLoading } = useQuery({
+    queryKey: ['cart'],
+    queryFn: async () => {
+      const res = await instance.get('/cart', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return res.data;
+    },
+  });
+  const updateQuantity = useMutation({
+    mutationFn: async ({ idCart, newQuantity, qtyProductVarinat }: { idCart: number; newQuantity: number, qtyProductVarinat: any }) => {
+      await instance.put(`/cart/${idCart}`, {
+        quantity: newQuantity,
+        product_variant: qtyProductVarinat,
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['cart'],
+      });
+    },
+    onError: (message: any) => {
+      toast.error(message?.response?.data?.message, {
+        autoClose: 5000,
+      })
+    }
+  });
+  const handleIncrease = (idCart: number, currentQuantity: number, qtyProductVarinat: any) => {
+    const newQuantity = currentQuantity + 1;
+    updateQuantity.mutate({ idCart, newQuantity, qtyProductVarinat });
+  };
+  const handleDecrease = (idCart: number, currentQuantity: number, qtyProductVarinat: any) => {
+    const newQuantity = currentQuantity - 1;
+    updateQuantity.mutate({ idCart, newQuantity, qtyProductVarinat });
+  };
+  const deleteCart = useMutation({
+    mutationFn: async ({ idCarts }: { idCarts: number[] }) => {
+      await Promise.all(
+        idCarts.map(idCart =>
+          instance.delete(`/cart/[${idCart}]`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          })
+        )
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['cart'],
+      });
+    }
+  });
+  const handleDeleteCart = (idCarts: number[]) => {
+    deleteCart.mutate({ idCarts }, {
+      onSuccess: () => {
+        const updatedCheckedItems = { ...checkedItems };
+        idCarts.forEach(id => {
+          delete updatedCheckedItems[id];
+        });
+        setCheckedItems(updatedCheckedItems);
+        localStorage.setItem('checkedItems', JSON.stringify(updatedCheckedItems));
+        const updatedIdCart = Object.keys(updatedCheckedItems)
+          .filter(key => updatedCheckedItems[Number(key)])
+          .map(Number);
+        setIdCart(updatedIdCart);
+        localStorage.setItem('idCart', JSON.stringify(updatedIdCart)); // Cập nhật localStorage với idCart mới
+        const isAllCheckedNow = updatedIdCart.length === carts.length; // Nếu tất cả sản phẩm còn lại đều được chọn
+        setIsAllChecked(isAllCheckedNow);
+      }
+    });
+  };
+  const handleAttribute = (idCart: any, variants: any) => {
+    setIdCart([idCart]);
+    setVisible(true);
+    setUpdatedAttributes((prev: any) => ({
+      ...prev,
+      [idCart]: variants,
+    }));
+  };
+  const handleUpdateAttributes = (idCart: any, attributes: any) => {
+    setUpdatedAttributes({
+      ...updatedAttributes,
+      [idCart]: attributes,
+    });
+  };
+  const carts = data?.cart?.cartitems;
+  carts?.map((cartItem: any) => {
+    const { id, product_id, product_variant_id, quantity, total_price, product, productvariant } = cartItem;
+    const attributesObject = productvariant?.attributes.reduce((acc: any, attribute: any) => {
+      acc[attribute.name] = attribute.pivot.attribute_item_id;
+      return acc;
+    }, {});
+    return {
+      id,
+      product_id,
+      product_variant_id,
+      quantity,
+      total_price,
+      product_name: product.name,
+      product_image: product.img_thumbnail,
+      attributes: attributesObject,
+    };
+  });
+
+  const [isAllChecked, setIsAllChecked] = useState<boolean>(false);
+  const [checkedItems, setCheckedItems] = useState<{ [key: number]: boolean }>({});
+  // Khôi phục trạng thái từ localStorage khi component khởi tạo
+  useEffect(() => {
+    const storedCheckedItems = localStorage.getItem('checkedItems');
+    if (storedCheckedItems) {
+      const parsedCheckedItems = JSON.parse(storedCheckedItems);
+      setCheckedItems(parsedCheckedItems);
+      setIsAllChecked(Object.values(parsedCheckedItems).every(Boolean));
+      const updatedIdCarts = Object.keys(parsedCheckedItems)
+        .filter(key => parsedCheckedItems[Number(key)])
+        .map(Number);
+      setIdCart(updatedIdCarts);
+    }
+  }, []);
+  const handleCheckAll = () => {
+    const newChecked = !isAllChecked;
+    setIsAllChecked(newChecked);
+    const newCheckedItems: { [key: number]: boolean } = {};
+    const allIdCarts: number[] = [];
+    carts.forEach((item: any) => {
+      newCheckedItems[item.id] = newChecked;
+      if (newChecked) {
+        allIdCarts.push(item.id);
+      }
+    });
+    setCheckedItems(newCheckedItems);
+    localStorage.setItem('checkedItems', JSON.stringify(newCheckedItems)); // Lưu vào localStorage
+    setIdCart(newChecked ? allIdCarts : []);
+  };
+
+  const handleCheckBoxChange = (cartId: number) => {
+    const updatedCheckedItems = {
+      ...checkedItems,
+      [cartId]: !checkedItems[cartId],
+    };
+    setCheckedItems(updatedCheckedItems);
+    localStorage.setItem('checkedItems', JSON.stringify(updatedCheckedItems)); // Lưu vào localStorage
+    const updatedIdCarts = Object.keys(updatedCheckedItems)
+      .filter(key => updatedCheckedItems[Number(key)])
+      .map(Number);
+    setIdCart(updatedIdCarts);
+    setIsAllChecked(updatedIdCarts.length === carts.length);
+  };
+  const handleCheckout = () => {
+    if (!idCart || idCart.length === 0) {
+      MySwal.fire({
+        title: <strong>Cảnh báo</strong>,
+        icon: "error",
+        text: "Mày chưa chọn sản phẩm nào để thanh toán",
+        timer: 1500,
+        timerProgressBar: true,
+        showConfirmButton: false,
+      });
+    } else {
+      localStorage.setItem('cartIds', JSON.stringify(idCart));
+      navigate('/checkout', { state: { cartIds: idCart } });
+    }
+  }
   return (
     <>
       <main
@@ -33,75 +226,166 @@ const Cart = () => {
             <form className="hd-form-cart overflow-hidden relative">
               <div className="hd-pagecart-header text-sm uppercase font-semibold pt-5 pb-1.5 border-solid border-b-2">
                 <div className="flex flex-wrap mt-0 !items-center">
-                  <div className="lg:w-5/12 w-full flex-grow-0 flex-shrink-0 basis-auto hd-col-item">
+                  <div className="w-[5%] flex-grow-0 flex-shrink-0 basis-auto hd-col-item">
+                    <input
+                      type="checkbox"
+                      checked={isAllChecked}
+                      onChange={handleCheckAll}
+                    />
+                  </div>
+                  <div className="lg:w-[40%] w-full flex-grow-0 flex-shrink-0 basis-auto hd-col-item">
                     Sản phẩm
                   </div>
-                  <div className="w-3/12 flex-grow-0 flex-shrink-0 basis-auto hd-col-item !text-center hidden lg:block">
+                  <div className="w-[20%] flex-grow-0 flex-shrink-0 basis-auto hd-col-item !text-center hidden lg:block">
                     Giá
                   </div>
-                  <div className="w-2/12 flex-grow-0 flex-shrink-0 basis-auto hd-col-item !text-center hidden lg:block">
+                  <div className="w-[20%] flex-grow-0 flex-shrink-0 basis-auto hd-col-item !text-center hidden lg:block">
                     Số lượng
                   </div>
-                  <div className="w-2/12 flex-grow-0 flex-shrink-0 basis-auto hd-col-item lg:text-end text-right hidden lg:block">
+                  <div className="w-[15%] flex-grow-0 flex-shrink-0 basis-auto hd-col-item lg:text-end text-right hidden lg:block">
                     Tổng
                   </div>
                 </div>
               </div>
-              {/*end hd-pagecart-header*/}
               <div className="hd-pagecart-items">
                 <div className="hd-item relative overflow-hidden">
-                  <div className="hd-item-row lg:py-[2rem] py-[1rem] !items-center flex flex-wrap border-solid border-b-2">
-                    <div className="hd-infor-item lg:w-5/12 w-full hd-col-item">
-                      <div className="hd-infor !items-center !flex">
-                        <Link
-                          to=""
-                          className="min-w-[120px] max-w-[120px] block overflow-hidden relative w-full touch-manipulation pb-[10px] lg:pb-0"
-                        >
-                          <img src={Product3}></img>
-                        </Link>
-                        <div className="hd-infor-text ms-4">
-                          <Link
-                            to=""
-                            className="text-sm font-semibold block mb-[5px] touch-manipulation hd-all-hover-bluelight"
-                          >
-                            Cluse La Boheme Rose Gold
-                          </Link>
-                          <div className="hd-price-item mb-[5px] !text-center w-3/12 hd-col-item lg:hidden block">
+                  {
+                    isLoading ? <Loading /> : carts && carts.length > 0 ? (carts?.map((e: any) => {
+                      const { productvariant } = e;
+                      const attributesObject = productvariant?.attributes.reduce((acc: any, attribute: any) => {
+                        acc[attribute.name] = attribute.pivot.attribute_item_id;
+                        return acc;
+                      }, {});
+                      return <>
+                        <div className="hd-item-row lg:py-[2rem] py-[1rem] !items-center flex flex-wrap border-solid border-b-2">
+                          <div className="hd-infor-item lg:w-5/12 w-full hd-col-item">
+                            <div className="hd-infor !items-center !flex">
+                              <div className="mr-10">
+                                <input
+                                  type="checkbox"
+                                  checked={checkedItems[e?.id] || false}
+                                  onChange={() => handleCheckBoxChange(e?.id)}
+                                />
+                              </div>
+                              <Link
+                                to=""
+                                className="min-w-[120px] max-w-[120px] block overflow-hidden relative w-full touch-manipulation pb-[10px] lg:pb-0"
+                              >
+                                <img src={`${e?.product?.img_thumbnail}`}></img>
+                              </Link>
+                              <div className="hd-infor-text ms-4">
+                                <Link
+                                  to=""
+                                  className="text-sm font-semibold block mb-[5px] touch-manipulation hd-all-hover-bluelight"
+                                >
+                                  {e?.product?.name}
+                                </Link>
+                                {/*end hd-price-item*/}
+                                {updatedAttributes.dataAttributes && Object.entries(updatedAttributes.dataAttributes).length > 0 ? (
+                                  Object.entries(updatedAttributes.dataAttributes).map(([attributeName, attributeValue]) => {
+                                    const attributeItem = updatedAttributes.find((item: any) => item.name === attributeName);
+                                    return (
+                                      <div className="hd-infor-text-meta text-[13px] text-[#878787]" key={attributeName}>
+                                        <p>
+                                          {attributeName}: <strong>{attributeItem ? attributeItem.pivot.value : attributeValue}</strong>
+                                        </p>
+                                      </div>
+                                    );
+                                  })
+                                ) : (
+                                  e?.productvariant?.attributes?.map((item: any) => (
+                                    <div className="hd-infor-text-meta text-[13px] text-[#878787]" key={item.id}>
+                                      <p>{item?.name}: <strong>{item?.pivot?.value}</strong></p>
+                                    </div>
+                                  ))
+                                )}
+
+                                <div className="hd-infor-text-tools mt-[10px]">
+                                  {
+                                    e.productvariant && <Button onClick={() => handleAttribute(e?.id, e?.productvariant?.attributes)} className="inline-flex mr-[-15px] border-none">
+                                      <Note />
+                                    </Button>
+                                  }
+
+                                </div>
+                              </div>
+                            </div>
+
+                            <ModalCart
+                              open={visiable}
+                              onClose={closeModal}
+                              idCart={idCart}
+                              onUpdateAttributes={handleUpdateAttributes}
+                              attributes={updatedAttributes[idCart] || []}
+                            />
+
+                            <div className="hd-qty-total block lg:hidden">
+                              <div className="flex items-center justify-between border-2 border-slate-200 rounded-full py-[10px] px-[10px]">
+                                <div className="hd-quantity-item relative hd-col-item">
+                                  <div className="hd-quantity relative block min-w-[100px] w-[100px] h-8 mx-auto hd-all-btn">
+                                    <button
+                                      type="button"
+                                      className="hd-btn-item left-0 text-left pl-[15px] pb-[10px] text-sm cursor-pointer shadow-none transform-none touch-manipulation"
+                                    >
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        strokeWidth={2}
+                                        stroke="currentColor"
+                                        className="size-3 hd-all-hover-bluelight"
+                                      >
+                                        <path
+                                          strokeLinecap="round"
+                                          strokeLinejoin="round"
+                                          d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
+                                        />
+                                      </svg>
+                                    </button>
+                                    <span className="select-none leading-8 cursor-text font-semibold text-sm">
+                                      1
+                                    </span>
+                                    <button
+                                      type="button"
+                                      className="hd-btn-item pb-[10px] right-0 text-right pr-[15px] p-0 top-0 text-sm cursor-pointer shadow-none transform-none touch-manipulation"
+                                    >
+                                      <AddCount />
+                                    </button>
+                                  </div>
+                                </div>
+
+                              </div>
+                            </div>
+                          </div>
+
+                          {/*end hd-infor-item*/}
+                          <div className="hd-price-item !text-center w-3/12 hd-col-item lg:block hidden">
                             <div className="hs-prices">
-                              <div className="hd-text-price flex">
-                                <del className="text-[#696969]">1.551.000₫</del>
+                              <div className="hd-text-price">
+                                <del className="text-[#696969]">{FormatMoney(e?.productvariant?.price_regular || e?.product?.price_regular)}</del>
                                 <ins className="ms-[6px] no-underline text-[#ec0101]">
-                                  1.163.000₫
+                                  {FormatMoney(e?.productvariant?.price_sale || e?.product?.price_sale)}
                                 </ins>
                               </div>
                             </div>
                           </div>
                           {/*end hd-price-item*/}
-                          <div className="hd-infor-text-meta text-[13px] text-[#878787]">
-                            <p className="mb-[5px]">
-                              Màu sắc: <strong>Xanh</strong>
-                            </p>
-                            <p className="mb-[5px]">
-                              Kích thước: <strong>M</strong>
-                            </p>
-                          </div>
-                          <div className="hd-infor-text-tools mt-[10px]">
-                            <Link to="" className="inline-flex me-[10px]">
-                              <Note />
-                            </Link>
-                            <Link to="" className="inline-flex me-[10px]">
-                              <Delete />
-                            </Link>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="hd-qty-total block lg:hidden">
-                        <div className="flex items-center justify-between border-2 border-slate-200 rounded-full py-[10px] px-[10px]">
-                          <div className="hd-quantity-item relative hd-col-item">
-                            <div className="hd-quantity relative block min-w-[100px] w-[100px] h-8 mx-auto hd-all-btn">
+                          <div className="hd-quantity-item !text-center w-2/12 hd-col-item lg:block hidden">
+                            <div className="hd-quantity relative block min-w-[120px] w-[120px] h-10 mx-auto hd-all-btn">
                               <button
                                 type="button"
-                                className="hd-btn-item left-0 text-left pl-[15px] pb-[10px] text-sm cursor-pointer shadow-none transform-none touch-manipulation"
+                                className="hd-btn-item left-0 text-left pl-[15px] p-0 top-0 text-sm cursor-pointer shadow-none transform-none touch-manipulation"
+                                onClick={() => handleDecrease(e?.id, e?.quantity, attributesObject)}
+                              >
+                                <MinusOutlined />
+                              </button>
+                              <span className="select-none leading-9 cursor-text font-semibold text-base">
+                                {e?.quantity}
+                              </span>
+                              <button
+                                onClick={() => handleIncrease(e?.id, e?.quantity, attributesObject)}
+                                type="button"
+                                className="hd-btn-item right-0 text-right pr-[15px] p-0 top-0 text-sm cursor-pointer shadow-none transform-none touch-manipulation"
                               >
                                 <svg
                                   xmlns="http://www.w3.org/2000/svg"
@@ -114,83 +398,30 @@ const Cart = () => {
                                   <path
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
-                                    d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
+                                    d="M12 4.5v15m7.5-7.5h-15"
                                   />
                                 </svg>
-                              </button>
-                              <span className="select-none leading-8 cursor-text font-semibold text-sm">
-                                1
-                              </span>
-                              <button
-                                type="button"
-                                className="hd-btn-item pb-[10px] right-0 text-right pr-[15px] p-0 top-0 text-sm cursor-pointer shadow-none transform-none touch-manipulation"
-                              >
-                                <AddCount />
                               </button>
                             </div>
                           </div>
                           {/*end hd-quantity-item*/}
-                          <div className="hd-total-item hd-col-item flex">
-                            <p className="mr-3">Tổng:</p>
-                            <span className="font-medium">1.163.000₫</span>
+                          <div className="hd-total-item hd-col-item text-end w-2/12 lg:block hidden">
+                            <span className="font-medium">{FormatMoney(e?.total_price)}</span>
                           </div>
                           {/*end hd-total-item*/}
                         </div>
-                      </div>
-                    </div>
-                    {/*end hd-infor-item*/}
-                    <div className="hd-price-item !text-center w-3/12 hd-col-item lg:block hidden">
-                      <div className="hs-prices">
-                        <div className="hd-text-price">
-                          <del className="text-[#696969]">1.551.000₫</del>
-                          <ins className="ms-[6px] no-underline text-[#ec0101]">
-                            1.163.000₫
-                          </ins>
-                        </div>
-                      </div>
-                    </div>
-                    {/*end hd-price-item*/}
-                    <div className="hd-quantity-item !text-center w-2/12 hd-col-item lg:block hidden">
-                      <div className="hd-quantity relative block min-w-[120px] w-[120px] h-10 mx-auto hd-all-btn">
-                        <button
-                          type="button"
-                          className="hd-btn-item left-0 text-left pl-[15px] p-0 top-0 text-sm cursor-pointer shadow-none transform-none touch-manipulation"
-                        >
-                          <ReduceProduct />
-                        </button>
-                        <span className="select-none leading-9 cursor-text font-semibold text-base">
-                          1
-                        </span>
-                        <button
-                          type="button"
-                          className="hd-btn-item right-0 text-right pr-[15px] p-0 top-0 text-sm cursor-pointer shadow-none transform-none touch-manipulation"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            strokeWidth={2}
-                            stroke="currentColor"
-                            className="size-3 hd-all-hover-bluelight"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d="M12 4.5v15m7.5-7.5h-15"
-                            />
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
-                    {/*end hd-quantity-item*/}
-                    <div className="hd-total-item hd-col-item text-end w-2/12 lg:block hidden">
-                      <span className="font-medium">1.163.000₫</span>
-                    </div>
-                    {/*end hd-total-item*/}
-                  </div>
+                      </>
+                    })) : <p className="text-center mt-12 text-base">Giỏ hàng trống</p>
+                  }
+
+
+
                   {/*end-item-1*/}
                 </div>
               </div>
+              <Button onClick={() => handleDeleteCart([idCart])} className="btn-danger mt-5">
+                Xoá sản phẩm trong giỏ hàng
+              </Button>
               {/*end hd-pagecart-items*/}
               <div className="hd-pagecart-footer lg:my-[60px]">
                 <div className="hd-footer lg:flex lg:flex-wrap mt-[30px]">
@@ -276,7 +507,9 @@ const Cart = () => {
                         </div>
                         <div className="hd-col-item w-auto">
                           <div className="text-right font-semibold">
-                            1.552.000₫
+                            {
+                              isFetching ? <Skeleton /> : FormatMoney(data?.sub_total)
+                            }
                           </div>
                         </div>
                       </div>
@@ -292,12 +525,14 @@ const Cart = () => {
                       <label>Tôi đồng ý với các điều khoản và điều kiện.</label>
                     </div>
                     <div className=" ">
-                      <button
-                        type="submit"
+
+                      <Button
+                        onClick={handleCheckout}
                         className="bg-[#00BADB] text-base h-[50px] w-auto px-[45px] font-semibold rounded-full text-white inline-flex items-center relative overflow-hidden hover:bg-[#23b6cd] transition-all ease-in-out duration-300"
                       >
                         Thanh Toán
-                      </button>
+                      </Button>
+
                     </div>
                   </div>
                   {/*end hd-sub-total*/}
@@ -307,11 +542,13 @@ const Cart = () => {
             </form>
             {/*end hd-form-cart*/}
           </div>
-        </section>
+        </section >
         {/*end hd-page-body*/}
-      </main>
+      </main >
     </>
   );
 };
 
 export default Cart;
+
+

@@ -250,3 +250,72 @@ body {
   font-weight: bold;
 }
 
+@keyframes bounce-scale {
+  0%, 100% {
+    transform: scale(1); /* Kích thước bình thường */
+  }
+  50% {
+    transform: scale(1.1); /* Phóng to một chút */
+  }
+}
+
+.hover\:animate-bounce-scale:hover {
+  animation: bounce-scale 0.6s infinite; /* Hiệu ứng lặp vô hạn khi hover */
+}
+
+@keyframes bounce1 {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px); 
+  }
+}
+
+@keyframes bounce2 {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes bounce3 {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+.group-hover\:animate-bounce1 {
+  animation: bounce1 0.8s infinite; 
+}
+
+.group-hover\:animate-bounce2 {
+  animation: bounce2 0.8s infinite 0.1s; 
+}
+
+.group-hover\:animate-bounce3 {
+  animation: bounce3 0.8s infinite 0.2s;
+}
+
+@keyframes slide-in {
+  from {
+    transform: translateX(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+
+.animate-slide-in {
+  animation: slide-in 0.5s forwards; /* Thời gian trượt ra */
+}
+
+

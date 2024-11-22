@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Helper\Product\GetUniqueAttribute;
 
+
 class WishlistController extends Controller
 {
     /**
@@ -83,15 +84,36 @@ class WishlistController extends Controller
 
                     return response()->json(['message' => 'Sản phẩm đã được thêm vào danh sách yêu thích'], 201);
                 }
+            }
+            if (Auth::check()) {
+                $user_id = Auth::id();
+                // $userId = 1;
+                // Kiểm tra nếu sản phẩm đã có trong danh sách yêu thích
+                $wishlistItem = Wishlist::where('user_id', $user_id)
+                    ->where('product_id', $request->product_id)
+                    ->first();
+
+                if (!$wishlistItem) {
+                    // Nếu chưa có, thêm sản phẩm vào danh sách yêu thích
+                    Wishlist::create([
+                        'user_id' => $user_id,
+                        'product_id' => $request->product_id,
+                    ]);
+
+                    return response()->json(['message' => 'Sản phẩm đã được thêm vào danh sách yêu thích'], 201);
+                }
 
                 return response()->json(['message' => 'Sản phẩm đã có trong danh sách yêu thích'], 200);
             } else {
                 return response()->json(['message' => 'User not authenticated'], 401);
-            }
-        } catch (\Exception $e) {
+            } 
+        }
+         catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
+
+    
 
     /**
      * Remove the specified resource from storage.

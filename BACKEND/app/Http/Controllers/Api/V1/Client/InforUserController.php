@@ -21,7 +21,7 @@ class InforUserController extends Controller
 
             return response()->json([
                 'message'  => 'Thông tin người dùng:',
-                'Infor User' => $user
+                'InforUser' => $user
             ]);
         } catch (\Throwable $th) {
             if ($th instanceof ModelNotFoundException) {

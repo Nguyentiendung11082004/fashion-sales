@@ -76,4 +76,15 @@ class User extends Authenticatable implements MustVerifyEmail
      {
          return $this->hasMany(VoucherLog::class);
      }
+    public function messages(){
+        return $this->hasMany(Message::class);
+    }
+    public function conversations(){
+        return $this->belongsToMany(Conversation::class,"conversation_users","user_id","conversation_id")->withPivot('is_deleted');
+    }
+
+    public function addresses()
+{
+    return $this->hasMany(Address::class);
+}
 }
