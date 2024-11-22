@@ -19,7 +19,7 @@ class EmployeeController extends Controller
     public function index()
     {
         $employees = User::whereIn('role_id', [2, 3])->with('role')
-        ->latest()->get();
+            ->latest()->get();
 
         return response()->json([
             'success' => true,
@@ -58,14 +58,14 @@ class EmployeeController extends Controller
 
             // }
 
-        $employee = User::query()->create($dataEmployee);
+            $employee = User::query()->create($dataEmployee);
 
-        return response()->json([
-            'status'  =>201,
-            'success' =>true,
-            'message' =>'Employee created successfully!',
-            'data'    => $employee
-        ],201);
+            return response()->json([
+                'status'  => 201,
+                'success' => true,
+                'message' => 'Employee created successfully!',
+                'data'    => $employee
+            ], 201);
         } catch (\Exception $e) {
             return response()->json([
                 'status'  => 500,
@@ -84,18 +84,18 @@ class EmployeeController extends Controller
         try {
             $employee = User::with('role')->findOrFail($id);
             return response()->json([
-                'massage' => 'Chi tiết nhân viên id = '.$id,
-                'data'    =>$employee
+                'massage' => 'Chi tiết nhân viên id = ' . $id,
+                'data'    => $employee
             ]);
         } catch (\Throwable $th) {
-           if ($th instanceof ModelNotFoundException){
+            if ($th instanceof ModelNotFoundException) {
+                return response()->json([
+                    'massage' => 'Không tìm thấy nhân viên có id=' . $id,
+                ], HttpResponse::HTTP_NOT_FOUND);
+            }
             return response()->json([
-                'massage'=>'Không tìm thấy nhân viên có id='.$id,
-            ], HttpResponse::HTTP_NOT_FOUND);
-           }
-           return response()->json([
-            'massage'=>'Không tìm thấy nhân viên có id='.$id,
-        ], HttpResponse::HTTP_INTERNAL_SERVER_ERROR);
+                'massage' => 'Không tìm thấy nhân viên có id=' . $id,
+            ], HttpResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -103,41 +103,41 @@ class EmployeeController extends Controller
      * Update the specified resource in storage.
      */
     public function update(UserRequest $request, string $id)
-{
-    try {
-        $employee = User::findOrFail($id);
+    {
+        try {
+            $employee = User::findOrFail($id);
 
-        $dataEmployee = [
-            'name'         => $request->name,
-            'phone_number' => $request->phone_number,
-            'email'        => $request->email,
-            'address'      => $request->address,
-            'password'     => $request->password ? bcrypt($request->password) : $employee->password,
-            'birth_date'   => $request->birth_date,
-            'is_active'    => $request->is_active ?? $employee->is_active,
-            'gender'       => $request->gender,
-            'role_id'      => $request->role_id,
-            'avatar'       =>$request->avatar ?? $employee->avatar //kiểm tra avatar
-        ];
+            $dataEmployee = [
+                'name'         => $request->name,
+                'phone_number' => $request->phone_number,
+                'email'        => $request->email,
+                'address'      => $request->address,
+                'password'     => $request->password ? bcrypt($request->password) : $employee->password,
+                'birth_date'   => $request->birth_date,
+                'is_active'    => $request->is_active ?? $employee->is_active,
+                'gender'       => $request->gender,
+                'role_id'      => $request->role_id,
+                'avatar'       => $request->avatar ?? $employee->avatar //kiểm tra avatar
+            ];
 
 
-        $employee->update($dataEmployee);
+            $employee->update($dataEmployee);
 
-        return response()->json([
-            'status'  => 200,
-            'success' => true,
-            'message' => 'Employee updated successfully!',
-            'data'    => $employee
-        ], 200);
-    } catch (\Exception $e) {
-        return response()->json([
-            'status'  => 500,
-            'success' => false,
-            'message' => 'Update failed.',
-            'error'   => $e->getMessage()
-        ], 500);
+            return response()->json([
+                'status'  => 200,
+                'success' => true,
+                'message' => 'Employee updated successfully!',
+                'data'    => $employee
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => 500,
+                'success' => false,
+                'message' => 'Update failed.',
+                'error'   => $e->getMessage()
+            ], 500);
+        }
     }
-}
     /**
      * Remove the specified resource from storage.
      */
@@ -179,8 +179,8 @@ class EmployeeController extends Controller
 
         // Tìm kiếm trong cột `name` và `email`
         $results = User::where('name', 'LIKE', "%{$query}%")
-                        ->orWhere('email', 'LIKE', "%{$query}%")
-                        ->get();
+            ->orWhere('email', 'LIKE', "%{$query}%")
+            ->get();
 
         return response()->json([
             'message' => 'Kết quả tìm kiếm.',

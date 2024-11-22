@@ -47,13 +47,17 @@ use App\Http\Controllers\API\V1\Service\PaymentController;
 */
 
 Route::prefix("v1/")->group(function () {
+        Route::middleware(['auth:sanctum', 'role:4'])->group(function () {
+        Route::resource('vouchers', VoucherController::class);
+    });
+
     Route::resource("products", ProductController::class);
     Route::resource("comments", CommentsController::class);
     Route::resource("brand", BrandController::class);
     Route::resource("tags", TagController::class);
     Route::resource('employees', EmployeeController::class);
     Route::resource('clients', ClientController::class);
-    Route::resource('vouchers', VoucherController::class);
+    // Route::resource('vouchers', VoucherController::class);
     Route::apiResource('attribute', AttributeController::class);
     Route::apiResource('attributeItem', AttributeItemController::class);
     Route::apiResource('category', CategoryController::class);
@@ -75,6 +79,18 @@ Route::prefix("v1/")->group(function () {
     //Tìm kiếm trong Admin
     Route::post('/client/search', [ClientController::class, 'search']);
     Route::post('/employee/search', [EmployeeController::class, 'search']);
+    Route::post('/voucher/search', [VoucherController::class, 'search']);
+    Route::post('/product/search', [ProductController::class, 'search']);
+    Route::post('/category/search', [CategoryController::class, 'search']);
+    Route::post('/order/search', [OrderController::class, 'search']);
+    Route::post('/post/search', [PostController::class, 'search']);
+    Route::post('/attribute/search', [AttributeController::class, 'search']);
+    Route::post('/banner/search', [BannerController::class, 'search']);
+    Route::post('/brand/search', [BrandController::class, 'search']);
+    Route::post('/comment/search', [CommentsController::class, 'search']);
+    Route::post('/tag/search', [TagController::class, 'search']);
+
+
 
     //Login with Google
     Route::middleware(['web'])->group(function () {
@@ -106,12 +122,11 @@ Route::prefix("v1/")->group(function () {
     Route::post('try-on', [TryOnController::class, 'tryOn']);
 
     // thống kê
-    Route::post('getproductstatistics',[StatisticsController::class,"getProductStatistics"]);
+    Route::post('getproductstatistics', [StatisticsController::class, "getProductStatistics"]);
     // Route::post('searchbystatus',[StatisticsController::class,"searchByStatus"]);
 
-    Route::get('getorderstatistics',[StatisticsController::class,"getOrderStatistics"]);
-    Route::get('getrevenuestatistics',[StatisticsController::class,"getRevenueStatistics"]);
-
+    Route::get('getorderstatistics', [StatisticsController::class, "getOrderStatistics"]);
+    Route::get('getrevenuestatistics', [StatisticsController::class, "getRevenueStatistics"]);
 });
 
 Route::middleware('auth:sanctum')->prefix('v1/')->group(function () {

@@ -16,8 +16,8 @@ use Carbon\Carbon;
 
 class BannerController extends Controller
 {
-    /** 
-     * Display a listing of the resource. 
+    /**
+     * Display a listing of the resource.
      */
     public function index(Request $request)
     {
@@ -51,8 +51,8 @@ class BannerController extends Controller
         }
     }
 
-    /** 
-     * Store a newly created resource in storage. 
+    /**
+     * Store a newly created resource in storage.
      */
     public function store(StoreBannerRequest $request)
     {
@@ -87,8 +87,8 @@ class BannerController extends Controller
         }
     }
 
-    /** 
-     * Display the specified resource. 
+    /**
+     * Display the specified resource.
      */
     public function show(string $id)
     {
@@ -96,8 +96,8 @@ class BannerController extends Controller
         return new BannerResource($banner);
     }
 
-    /** 
-     * Update the specified resource in storage. 
+    /**
+     * Update the specified resource in storage.
      */
     public function update(UpdateBannerRequest $request, string $id)
     {
@@ -141,8 +141,8 @@ class BannerController extends Controller
         }
     }
 
-    /** 
-     * Remove the specified resource from storage. 
+    /**
+     * Remove the specified resource from storage.
      */
     public function destroy(string $id)
     {
@@ -163,18 +163,18 @@ class BannerController extends Controller
     private function updateBannerStatus()
     {
         $currentDate = Carbon::now();
-    
+
         // Đặt trạng thái của các banner chưa đến ngày bắt đầu
         Banner::query()
             ->where('start_date', '>', $currentDate)
             ->update(['status' => false]);
-    
+
         // Đặt trạng thái của các banner đang hoạt động
         Banner::query()
             ->where('start_date', '<=', $currentDate)
             ->where('end_date', '>=', $currentDate)
             ->update(['status' => true]);
-    
+
         // Đặt trạng thái của các banner đã hết hạn
         Banner::query()
             ->where('end_date', '<', $currentDate)
@@ -209,5 +209,27 @@ class BannerController extends Controller
             'message' => 'Các banners đang hoạt động trong khoảng thời gian hợp lệ.',
             'data' => $banners
         ], Response::HTTP_OK);
+    }
+
+    public function search(Request $request)
+    {
+        $query = $request->input('query'); // Lấy từ khóa tìm kiếm từ body request
+
+        if (!$query) {
+            return response()->json([
+                'message' => 'Vui lòng nhập từ khóa tìm kiếm.',
+                'data' => []
+            ], 400);
+        }
+
+        // Tìm kiếm trong cột `name` hoặc các cột khác nếu cần
+        $results = Banner::where('title', 'LIKE', "%{$query}%")
+            ->orWhere('id', 'LIKE', "%{$query}%") // Thêm cột mô tả nếu có
+            ->get();
+
+        return response()->json([
+            'message' => 'Kết quả tìm kiếm.',
+            'data' => $results,
+        ]);
     }
 }

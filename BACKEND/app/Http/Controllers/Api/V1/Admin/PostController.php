@@ -55,7 +55,7 @@ class PostController extends Controller
             $purifier = new HTMLPurifier();
             $data['post_content'] = $purifier->purify($data['post_content']);
             if ($request->has('img_thumbnail')) {
-                $data['img_thumbnail'] = $request->img_thumbnail; 
+                $data['img_thumbnail'] = $request->img_thumbnail;
             }
             $post = Post::create($data);
 
@@ -102,22 +102,22 @@ class PostController extends Controller
     //         if ($data['post_name'] !== $post->post_name) {
     //             $data['slug'] = $this->generateUniqueSlug($data['post_name'], $id);
     //         } else {
-    //             $data['slug'] = $post->slug; 
+    //             $data['slug'] = $post->slug;
     //         }
     //         $purifier = new HTMLPurifier();
     //         $data['post_content'] = $purifier->purify($data['post_content']);
     //         if ($request->has('img_thumbnail')) {
-    //             $data['img_thumbnail'] = $request->img_thumbnail; 
+    //             $data['img_thumbnail'] = $request->img_thumbnail;
     //         } else {
-    //             $data['img_thumbnail'] = $post->img_thumbnail; 
+    //             $data['img_thumbnail'] = $post->img_thumbnail;
     //         }
     //         $post->update($data);
-    
+
     //         return response()->json([
     //             'message' => 'Cập nhật bài viết thành công!',
     //             'data' => $post
     //         ], Response::HTTP_OK);
-    
+
     //     } catch (QueryException $e) {
     //         return response()->json([
     //             'message' => 'Cập nhật bài viết thất bại!',
@@ -202,14 +202,14 @@ class PostController extends Controller
     public function getPostsGroupedByCategory(Request $request)
     {
         try {
-            $fields = $request->query('fields', 'id_post_name_img_user_date'); 
-    
+            $fields = $request->query('fields', 'id_post_name_img_user_date');
+
             // 1. Lấy tất cả các danh mục và bài viết thuộc danh mục
             $categories = Category::with('posts.user')->get(); // Lấy cả thông tin người đăng qua mối quan hệ 'user'
-            
+
             // 2. Chuẩn bị mảng để lưu bài viết phân theo danh mục
             $data = [];
-    
+
             // 3. Lặp qua các danh mục và nhóm bài viết
             foreach ($categories as $category) {
                 // Kiểm tra nếu danh mục có bài viết
@@ -231,9 +231,9 @@ class PostController extends Controller
                     }
                 }
             }
-    
-            $uncategorizedPosts = Post::whereNull('category_id')->with('user')->get(); 
-    
+
+            $uncategorizedPosts = Post::whereNull('category_id')->with('user')->get();
+
             if ($uncategorizedPosts->count() > 0) {
                 if ($fields === 'id_post_name_img_user_date') {
                     $data['Không có danh mục'] = $uncategorizedPosts->map(function ($post) {
@@ -241,8 +241,8 @@ class PostController extends Controller
                             'id' => $post->id,
                             'post_name' => $post->post_name,
                             'img_thumbnail' => $post->img_thumbnail,
-                            'user_name' => $post->user->name, 
-                            'created_at' => $post->created_at->format('Y-m-d'), 
+                            'user_name' => $post->user->name,
+                            'created_at' => $post->created_at->format('Y-m-d'),
                             'slug' => $post->slug,
                         ];
                     });
@@ -255,7 +255,7 @@ class PostController extends Controller
                 'message' => 'Danh sách bài viết theo danh mục và không có danh mục',
                 'data' => $data
             ], 200);
-    
+
         } catch (\Exception $e) {
             return response()->json([
                 'status' => false,
@@ -263,6 +263,27 @@ class PostController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+    public function search(Request $request)
+    {
+        $query = $request->input('query'); // Lấy từ khóa tìm kiếm từ body request
+
+        if (!$query) {
+            return response()->json([
+                'message' => 'Vui lòng nhập từ khóa tìm kiếm.',
+                'data' => []
+            ], 400);
+        }
+
+        // Tìm kiếm trong cột `name` hoặc các cột khác nếu cần
+        $results = Post::where('post_name', 'LIKE', "%{$query}%")
+            ->orWhere('post_content', 'LIKE', "%{$query}%") // Thêm cột mô tả nếu có
+            ->get();
+
+        return response()->json([
+            'message' => 'Kết quả tìm kiếm.',
+            'data' => $results,
+        ]);
     }
 }
 
