@@ -1,39 +1,47 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Column } from '@ant-design/charts';
+import instance from '@/configs/axios';
+interface OrderStatistic {
+      order_status: string;
+      total_orders: number;
+}
 
-// import { Typography } from 'antd';
-// const { Title } = Typography;
-const data = [
-      { type: 'Jan', value: 30 },
-      { type: 'Feb', value: 70 },
-      { type: 'Mar', value: 45 },
-      { type: 'Apr', value: 85 },
-      { type: 'May', value: 87 },
-      { type: 'Jun', value: 84 },
-      { type: 'Jul', value: 88 },
-      { type: 'Aug', value: 89 },
-      { type: 'Sep', value: 82 },
-      { type: 'Oct', value: 65 },
-      { type: 'Nov', value: 75 },
-      { type: 'Dec', value: 70 },
-
-];
+interface ResponseData {
+      order_counts_by_status: OrderStatistic[];
+      total_quantity_in_order: string;
+}
 
 const Chart = () => {
+      const [dataStatic, setDataStatic] = useState<ResponseData | null>(null);
+      const getData = async () => {
+            let res = await instance.get(`/getorderstatistics`);
+            setDataStatic(res?.data);
+      }
+      const chartData = dataStatic?.order_counts_by_status?.map((e) => ({
+            order_status: e.order_status,
+            total_orders: e.total_orders,
+      })) ?? [];
+
       const config = {
-            data,
-            xField: 'type',
-            yField: 'value',
-            columnWidth: 0.1,
+            data: chartData,
+            xField: 'order_status', // Trục X là trạng thái đơn hàng
+            yField: 'total_orders', // Trục Y là số lượng đơn hàng
+            columnWidth: 0.3, // Độ rộng của các cột
             label: {
-                  position: 'middle',
-                  style: { fill: '#FFFFFF', opacity: 0.6 },
+                  position: 'middle', // Vị trí nhãn nằm ở giữa cột
             },
       };
-
-      return <>
-            <Column {...config} />
-      </>;
+      useEffect(() => {
+            getData()
+      }, [])
+      return (
+            <div>
+                  <h3 className="text-xl font-semibold text-gray-800 text-center ">
+                        Tổng số đơn hàng: {dataStatic?.total_quantity_in_order}
+                  </h3>
+                  <Column {...config} />
+            </div>
+      );
 };
 
 export default Chart;

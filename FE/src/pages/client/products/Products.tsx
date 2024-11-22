@@ -298,6 +298,22 @@ const Products = () => {
       modalRef.current.showModal(); // Sử dụng showModal để hiển thị modal
     }
   };
+  const [currentPage, setCurrentPage] = useState(1); // Trang hiện tại
+  const productsPerPage = 12; // Mỗi trang có 12 sản phẩm
+  const totalProducts = pro?.products?.length || 0; // Tổng số sản phẩm
+  // Tính toán các sản phẩm hiển thị trên trang hiện tại
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = pro?.products?.slice(
+    indexOfFirstProduct,
+    indexOfLastProduct
+  );
+  // Tính số trang
+  const totalPages = Math.ceil(totalProducts / productsPerPage);
+  // Hàm để chuyển trang
+  const handlePageChange = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+  };
   return (
     <>
       <div>
@@ -1426,6 +1442,41 @@ const Products = () => {
                   );
                 })}
               </div>
+              {/* phân trang  */}
+              {totalProducts > productsPerPage && (
+                <div className="pagination flex justify-center mt-6">
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="px-4 py-2 mx-1 bg-gray-100 rounded"
+                  >
+                    Quay lại
+                  </button>
+                  {Array.from(
+                    { length: totalPages },
+                    (_, index) => index + 1
+                  ).map((pageNumber) => (
+                    <button
+                      key={pageNumber}
+                      onClick={() => handlePageChange(pageNumber)}
+                      className={`px-4 py-2 mx-1 ${
+                        currentPage === pageNumber
+                          ? "text-black"
+                          : "text-gray-300"
+                      } rounded`}
+                    >
+                      {pageNumber}
+                    </button>
+                  ))}
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="px-4 py-2 mx-1 bg-gray-100 rounded"
+                  >
+                    Chuyển tiếp
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>

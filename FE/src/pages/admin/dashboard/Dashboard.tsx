@@ -121,9 +121,9 @@ const Dashboard = () => {
       <div className="page-dashboard__chart flex mt-5">
         <div className="chart-left bg-white w-[68%] mr-5 shadow">
           <div className="title flex justify-between m-5">
-            <p className="text-[#495057] text-[18px] font-medium">Revenue</p>
+            <p className="text-[#495057] text-[18px] font-medium">Thống kê đơn hàng</p>
             <ul className="flex space-x-2">
-              <li className="px-2 py-1 text-[#3577f1] bg-[#E1EBFD] text-[11.375px] rounded-md">
+              {/* <li className="px-2 py-1 text-[#3577f1] bg-[#E1EBFD] text-[11.375px] rounded-md">
                 ALL
               </li>
               <li className="px-2 py-1 text-[#3577f1] bg-[#E1EBFD] text-[11.375px] rounded-md">
@@ -134,7 +134,7 @@ const Dashboard = () => {
               </li>
               <li className="px-2 py-1 text-[#3577f1] bg-[#E1EBFD] text-[11.375px] rounded-md">
                 1Y
-              </li>
+              </li> */}
             </ul>
           </div>
           <Chart />
@@ -152,21 +152,21 @@ const Dashboard = () => {
           <TableProduct />
         </div>
         <div className="table-seller">
-          <TableSeller />
+          {/* <TableSeller /> */}
         </div>
       </div>
-      <div className="page-dashboard__source">
+      <div className="w-[50%]">
         <div className="chart-source">
           <DonutChartWithStats />
         </div>
         <div className="table-order">
-          <TableOrder />
+          {/* <TableOrder />   */}
         </div>
         <div></div>
       </div>
       <div className="page-dashboard__btn">
         <button>
-          <FontAwesomeIcon className="btn-setting" icon={faGear} />
+          {/* <FontAwesomeIcon className="btn-setting" icon={faGear} /> */}
         </button>
       </div>
     </div>

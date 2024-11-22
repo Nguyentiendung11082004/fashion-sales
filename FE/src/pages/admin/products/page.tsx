@@ -27,8 +27,6 @@ const ProductPageManager = () => {
     queryKey: ["productsIndex"],
     queryFn: productsIndex,
   });
-
-  console.log("data pr:",data)
   const { mutate } = useMutation({
     mutationFn: productDestroy,
     onSuccess: () => {
@@ -151,7 +149,7 @@ const ProductPageManager = () => {
       key: product.id,
       ...product
     }
-  )) || [];
+    )) || [];
   useEffect(() => {
     if (isError && !hasError) {
       toast.error("Có lỗi xảy ra");

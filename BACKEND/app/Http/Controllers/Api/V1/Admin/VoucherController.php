@@ -11,6 +11,7 @@ use App\Models\Voucher;
 use App\Models\VoucherMeta;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
 
 class VoucherController extends Controller
 {
@@ -447,5 +448,27 @@ throw new \Exception('The selected categories cannot be included in both Applica
                 'errors' => $e->getMessage()
             ], 500);
         }
+    }
+
+    public function search(Request $request)
+    {
+        $query = $request->input('query'); // Lấy từ khóa tìm kiếm từ body request
+
+        if (!$query) {
+            return response()->json([
+                'message' => 'Vui lòng nhập từ khóa tìm kiếm.',
+                'data' => []
+            ], 400);
+        }
+
+        // Tìm kiếm trong cột `name` và `email`
+        $results = Voucher::where('title', 'LIKE', "%{$query}%")
+            ->orWhere('code', 'LIKE', "%{$query}%")
+            ->get();
+
+        return response()->json([
+            'message' => 'Kết quả tìm kiếm.',
+            'data' => $results,
+        ]);
     }
 }
