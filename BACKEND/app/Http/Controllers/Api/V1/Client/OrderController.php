@@ -13,6 +13,7 @@ use App\Models\OrderDetail;
 use App\Models\VoucherMeta;
 use App\Models\VoucherUser;
 use App\Events\OrderCreated;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Models\ProductVariant;
@@ -68,7 +69,25 @@ class OrderController extends Controller
             $response = DB::transaction(function () use ($data, $user, $isImmediatePurchase, $isCartPurchase) {
                 // Tạo đơn hàng
                 $order = $this->createOrder($data, $user);
-                list($totalQuantity, $totalPrice) = $this->processOrderItems($data, $user, $order, $isImmediatePurchase, $isCartPurchase);
+                $totalQuantity = 0;
+                $totalPrice = 0.00;
+
+                if ($isImmediatePurchase) {
+                    list($quantity, $price) = $this->addImmediatePurchase($data, $order);
+                    $totalQuantity += $quantity;
+                    $totalPrice += $price;
+                }
+
+                if ($isCartPurchase) {
+                    if (auth('sanctum')->check()) {
+                        list($quantity, $price) = $this->addCartItemsToOrder($data, $user, $order);
+                        $totalQuantity += $quantity;
+                        $totalPrice += $price;
+                    } else {
+                        DB::rollBack();
+                        return response()->json(['message' => 'Vui lòng đăng nhập để mua hàng từ giỏ hàng.'], Response::HTTP_UNAUTHORIZED);
+                    }
+                }
                 // Áp dụng voucher nếu có
                 if (isset($data['voucher_code']) && auth('sanctum')->check()) {
                     $voucher_result = $this->applyVoucher($data['voucher_code'], $order->orderDetails, $order->id);
@@ -119,6 +138,7 @@ class OrderController extends Controller
             });
             return $response;
         } catch (\Exception $ex) {
+            DB::rollBack();
             return response()->json(['message' => $ex->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
@@ -155,32 +175,14 @@ class OrderController extends Controller
             'user_note' => $data['user_note'],
             'ship_user_name' => $data['ship_user_name'],
             'ship_user_phonenumber' => $data['ship_user_phonenumber'],
-            'ship_user_address' => $data['ship_user_address'],
+            'ship_user_address' => $data['ship_user_address'] . ', ' .
+                $data['xa'] . ', ' .
+                $data['huyen'] . ', ' .
+                $data['tinh'],
             'shipping_method' => $data['shipping_method'],
             'voucher_id' => null,
             'voucher_discount' => 0,
         ]);
-    }
-
-    // Hàm xử lý sản phẩm trong đơn hàng
-    protected function processOrderItems($data, $user, $order, $isImmediatePurchase, $isCartPurchase)
-    {
-        $totalQuantity = 0;
-        $totalPrice = 0.00;
-
-        if ($isImmediatePurchase) {
-            list($quantity, $price) = $this->addImmediatePurchase($data, $order);
-            $totalQuantity += $quantity;
-            $totalPrice += $price;
-        }
-
-        if ($isCartPurchase) {
-            list($quantity, $price) = $this->addCartItemsToOrder($data, $user, $order);
-            $totalQuantity += $quantity;
-            $totalPrice += $price;
-        }
-
-        return [$totalQuantity, $totalPrice];
     }
 
     // Hàm thêm sản phẩm mua ngay vào đơn hàng
@@ -193,7 +195,7 @@ class OrderController extends Controller
         // Kiểm tra nếu sản phẩm có biến thể
         if ($product->type == 1) {
             if (!isset($data['product_variant_id'])) {
-                DB::rollBack();
+
                 return response()->json(['message' => 'Sản phẩm này có biến thể. Vui lòng chọn biến thể.'], Response::HTTP_BAD_REQUEST);
             }
             $variant = ProductVariant::with('attributes')->findOrFail($data['product_variant_id']);
@@ -219,7 +221,6 @@ class OrderController extends Controller
     {
         // Kiểm tra người dùng đã đăng nhập chưa trước khi tiến hành mua từ giỏ hàng
         if (!auth('sanctum')->check()) {
-            DB::rollBack();
             return response()->json(['message' => 'Vui lòng đăng nhập để mua hàng từ giỏ hàng.'], Response::HTTP_UNAUTHORIZED);
         }
         $cartItemIds = $data['cart_item_ids'];
@@ -230,7 +231,6 @@ class OrderController extends Controller
             ->with('cartitems.product', 'cartitems.productvariant.attributes')
             ->first();
         if (!$cart || $cart->cartitems->isEmpty()) {
-            DB::rollBack();
             return response()->json(['message' => 'Giỏ hàng trống, vui lòng thêm sản phẩm vào giỏ hàng trước khi thanh toán.'], 400);
         }
         $totalQuantity = 0;
@@ -256,8 +256,7 @@ class OrderController extends Controller
             }
         }
         // If no valid cart items were found in cartItemIds
-        if (!$validCartItemFound) {
-            DB::rollBack(); // Rollback nếu có lỗi
+        if (!$validCartItemFound) { // Rollback nếu có lỗi
             return response()->json([
                 'message' => 'Không có sản phẩm nào trong giỏ hàng phù hợp với yêu cầu của bạn.',
             ], 400);
@@ -293,10 +292,6 @@ class OrderController extends Controller
             ->whereDate('start_date', '<=', now())
             ->whereDate('end_date', '>=', now())
             ->first();
-
-        if (!$voucher) {
-            return ['error' => 'Voucher không hợp lệ hoặc đã hết hạn.'];
-        }
         $voucher->increment('used_count');
         $voucher_metas = VoucherMeta::where('voucher_id', $voucher->id)->pluck('meta_value', 'meta_key')->toArray();
         $eligible_products = [];
