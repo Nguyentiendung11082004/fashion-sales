@@ -20,6 +20,26 @@ class StoreOrderRequest extends FormRequest
     {
         return true;
     }
+    public function prepareForValidation()
+    {
+        // Lấy tất cả dữ liệu từ request
+        $data = $this->all();
+
+        // Loại bỏ các trường null hoặc rỗng (''), kể cả trong mảng con
+        $filteredData = array_filter($data, function ($value) {
+            if (is_array($value)) {
+                // Nếu là mảng, loại bỏ các giá trị null/rỗng trong mảng
+                return count(array_filter($value, function ($item) {
+                    return $item !== null && $item !== '';
+                })) > 0;
+            }
+            // Nếu không phải mảng, loại bỏ null hoặc chuỗi rỗng
+            return $value !== null && $value !== '';
+        });
+
+        // Ghi đè lại dữ liệu request
+        $this->replace($filteredData);
+    }
 
     /**
      * Get the validation rules that apply to the request.
@@ -37,6 +57,9 @@ class StoreOrderRequest extends FormRequest
                 'regex:/^0[3|5|7|8|9][0-9]{8}$/',
             ],
             'ship_user_email' => 'nullable|email|max:255',
+            'xa'=> 'required|string|max:255',
+            'huyen'=> 'required|string|max:255',
+            'tinh'=> 'required|string|max:255',
             'ship_user_address' => 'required|string|max:255',
             'shipping_method' => 'required|string|max:50',
             'product_id' => 'required_without:cart_item_ids|integer|exists:products,id',
@@ -60,7 +83,6 @@ class StoreOrderRequest extends FormRequest
     {
         if ($this->has('product_id')) {
             $product = Product::find($this->product_id);
-
             if ($product->type) {
                 if (!$this->filled('product_variant_id')) {
                     $validator->errors()->add('product_variant_id', 'Vui lòng chọn biến thể sản phẩm.');
