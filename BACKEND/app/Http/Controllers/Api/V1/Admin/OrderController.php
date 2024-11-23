@@ -135,7 +135,7 @@ class OrderController extends Controller
             }
 
             if ($currentStatus === 'Đang vận chuyển' && !in_array($newStatus, ['Giao hàng thành công'])) {
-                return response()->json(['message' => 'Khi đang vận chuyển, chỉ có thể cập nhật thành "Giao hàng thành công" hoặc "Hoàn hàng".'], Response::HTTP_BAD_REQUEST);
+                return response()->json(['message' => 'Khi đang vận chuyển, chỉ có thể cập nhật thành "Giao hàng thành công".'], Response::HTTP_BAD_REQUEST);
             }
 
             if ($currentStatus === 'Giao hàng thành công' && !in_array($newStatus, ['Hoàn hàng', 'Hoàn thành'])) {
