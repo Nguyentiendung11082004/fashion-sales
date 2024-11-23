@@ -6,7 +6,7 @@ export interface IProductVariant {
   quantity: number;
   sku: string;
   image: string;
-  IdGuid: any;
+  id_guid: any;
 }
 export interface IProductGalleries {
   id: number;

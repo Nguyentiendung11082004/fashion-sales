@@ -66,7 +66,7 @@ const Checkout = () => {
     acc[id] = qty[index];
     return acc;
   }, {});
-  // console.log("_payload", _payload)
+
   const [order, setOrder] = useState({
     payment_method_id: 1,
     user_note: "",
@@ -76,33 +76,47 @@ const Checkout = () => {
     ship_user_address: '',
     shipping_method: shiping,
     voucher_code: voucher,
-    // product_id: _payload?.product_id || null,
-    // product_variant_id: _payload?.product_variant_id || null,
-    // quantity: _payload?.quantity || null,
-    cart_item_ids: cartIds || [],
-    quantityOfCart: quantityOfCart || {},
+    // cart_item_ids: cartIds || [],
+    // quantityOfCart: quantityOfCart || {},
+    product_id: _payload?.product_id || null,
+    product_variant_id: _payload?.product_variant_id || null,
+    quantity: _payload?.quantity || null,
   });
-  useEffect(() => {
-    if (dataCheckout && dataCheckout.user) {
-      setOrder((prevOrder) => ({
-        ...prevOrder,
-        ship_user_email: dataCheckout.user.email || '',
-        ship_user_name: dataCheckout.user.name || '',
-        ship_user_phonenumber: dataCheckout.user.phone_number || '',
-        ship_user_address: dataCheckout.user.address || '',
-        quantityOfCart: quantityOfCart,
-      }));
-    }
-  }, [dataCheckout]);
+  // let cartOrder = {
+  //   payment_method_id: order.payment_method_id,
+  //   user_note: order.user_note,
+  //   ship_user_email: order.ship_user_email,
+  //   ship_user_name: order.ship_user_name,
+  //   ship_user_phonenumber: order.ship_user_phonenumber,
+  //   ship_user_address: order.ship_user_address,
+  //   shipping_method: order.shipping_method,
+  //   voucher_code: order.voucher_code,
+  //   cart_item_ids: order.cart_item_ids,
+  //   quantityOfCart: order.quantityOfCart,
+  // };
+  // let instantOrder = {
+  //   payment_method_id: order.payment_method_id,
+  //   user_note: order.user_note,
+  //   ship_user_email: order.ship_user_email,
+  //   ship_user_name: order.ship_user_name,
+  //   ship_user_phonenumber: order.ship_user_phonenumber,
+  //   ship_user_address: order.ship_user_address,
+  //   shipping_method: order.shipping_method,
+  //   voucher_code: order.voucher_code,
+  //   product_id: order.product_id,
+  //   product_variant_id: order.product_variant_id,
+  //   quantity: order.quantity,
+  // };
+  // console.log("instantOrder", instantOrder)
 
-  const setForm = (props: any, value: any) => {
-    setOrder((prev) => ({
-      ...prev,
-      [props]: value
-    }));
-  };
   const orderMutation = useMutation({
     mutationFn: async () => {
+      // let orderData;
+      // if (order.cart_item_ids.length > 0) {
+      //   orderData = cartOrder;
+      // } else {
+      //   orderData = instantOrder;
+      // }
       const res = await instance.post(`/order`, order, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -118,10 +132,10 @@ const Checkout = () => {
         queryClient.invalidateQueries({
           queryKey: ['cart']
         });
-
         localStorage.removeItem('checkedItems');
       }
       navigate('/thank', { replace: true });
+      // localStorage.removeItem('cartIds');
       localStorage.removeItem('checkedItems');
     },
     onError: (error: any) => {
@@ -137,6 +151,13 @@ const Checkout = () => {
   };
 
 
+
+  const setForm = (props: any, value: any) => {
+    setOrder((prev) => ({
+      ...prev,
+      [props]: value
+    }));
+  };
   // xử lý địa chỉ
   const { data: tinhThanh } = useQuery({
     queryKey: ['tinhThanh'],
@@ -162,13 +183,25 @@ const Checkout = () => {
     enabled: !!quanHuyen
   });
   const handleChangeTinh = (e: any) => {
-    setIdTinh(Number(e.value));
+    setOrder((prev: any) => ({
+      ...prev,
+      tinh: e.label
+    })),
+      setIdTinh(Number(e.value));
   };
   const handleChangeQuanHuyen = (e: any) => {
-    setIdQuanHuyen(e.value);
+    setOrder((prev: any) => ({
+      ...prev,
+      huyen: e.label
+    })),
+      setIdQuanHuyen(e.value);
   };
   const handleChangeXa = (e: any) => {
-    setIdXa(Number(e.value));
+    setOrder((prev: any) => ({
+      ...prev,
+      xa: e.label
+    })),
+      setIdXa(Number(e.value));
   };
   const handleOpenModal = () => {
     setVisible(true)
@@ -176,11 +209,9 @@ const Checkout = () => {
   const handleCloseModal = () => {
     setVisible(false)
   }
-  console.log("dataCheckout", dataCheckout)
   const [payload, setPayLoad] = useState(dataCheckout);
   const handleSaveDiaChi = (dataIdAddress: any) => {
     setPayLoad(dataIdAddress)
-    // setIdAddress(id)
   }
   const { data: addressDetail, isLoading: queryLoading } = useQuery({
     queryKey: ['address', idAddress],
@@ -193,23 +224,45 @@ const Checkout = () => {
     },
     enabled: !!idAddress
   })
-  const dataDiaChi = dataCheckout?.user?.addresses?.filter((e: any) => e.is_default === true);
+  let dataDiaChi = dataCheckout?.user?.addresses?.filter((e: any) => e.is_default === true);
+
   const getShipp = async () => {
+    const defaultAddress = dataDiaChi?.length > 0 ? dataDiaChi[0] : null;
+    const toWardCode = defaultAddress ? String(defaultAddress?.ward?.id) : String(payload?.ward?.id);
+    const toDistrictId = defaultAddress ? Number(defaultAddress?.district?.id) : Number(payload?.district?.id);
     let weight = dataCheckout?.order_items?.map((e: any) => Number(e.product.weight));
     let totalWeight = weight?.reduce((sum: any, currentWeight: any) => sum + currentWeight, 0);
+    // Gửi yêu cầu tính phí vận chuyển
     let res = await instance.post(`/calculateshippingfee`, {
-      to_ward_code: String(payload?.ward?.id),
-      to_district_id: Number(payload?.district?.id),
+      to_ward_code: toWardCode,
+      to_district_id: toDistrictId,
       weight: totalWeight
-    })
-    setShipPing(res?.data?.fee?.total)
-  }
+    });
+
+    // Cập nhật phí vận chuyển
+    setShipPing(res?.data?.fee?.total);
+  };
+  useEffect(() => {
+    if (dataCheckout && dataCheckout.user) {
+      console.log("dataDiaChi", dataDiaChi)
+      setOrder((prevOrder) => ({
+        ...prevOrder,
+        ship_user_email: dataCheckout.user.email || '',
+        ship_user_name: dataCheckout.user.name || '',
+        ship_user_phonenumber: dataCheckout.user.phone_number || '',
+        ship_user_address: dataDiaChi[0].address || '', 
+        tinh: dataDiaChi[0].city?.name || '',
+        huyen: dataDiaChi[0].district?.name || '',
+        xa: dataDiaChi[0].ward?.name || '',
+        quantityOfCart: quantityOfCart,
+      }));
+    }
+  }, [dataCheckout]);
   useEffect(() => {
     if (!_payload) {
       return;
     }
   })
-
   const handleBuyCart = async () => {
     let payload = { cart_item_ids: cartIds };
     try {
@@ -222,7 +275,6 @@ const Checkout = () => {
         },
         body: JSON.stringify(payload),
       });
-
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
@@ -272,7 +324,7 @@ const Checkout = () => {
   }, [payload, visible]);
   useEffect(() => {
     getShipp()
-  }, [payload, visible])
+  }, [payload, visible, dataDiaChi])
   if (queryLoading) return <Loading />
 
 
@@ -303,45 +355,47 @@ const Checkout = () => {
                     <div className="space-y-8">
                       <div id="hd-ContactInfo" className="scroll-mt-24">
                         <div className="border border-slate-200 rounded-xl overflow-hidden z-0">
-                          <div className="flex flex-col sm:flex-row items-start p-6">
-                            <span className="hidden sm:block mt-4 ">
-                              <Map />
-                            </span>
-                            <div className="sm:ml-8">
-                              <h3 className="text-black flex">
-                                <span className="uppercase tracking-tight">
-                                  Địa chỉ nhận hàng
-                                </span>
-                                <Completed />
-                              </h3>
-                              <div className="font-semibold mt-1 text-sm">
-                                <span>{dataCheckout?.user?.name}</span>
-                                <span className="ml-3 tracking-tighter">
-                                  {dataCheckout?.user?.phone_number}
-                                </span>
+                          {
+                            token && <div className="flex flex-col sm:flex-row items-start p-6">
+                              <span className="hidden sm:block mt-4 ">
+                                <Map />
+                              </span>
+                              <div className="sm:ml-8">
+                                <h3 className="text-black flex">
+                                  <span className="uppercase tracking-tight">
+                                    Địa chỉ nhận hàng
+                                  </span>
+                                  <Completed />
+                                </h3>
+                                <div className="font-semibold mt-1 text-sm">
+                                  <span>{dataCheckout?.user?.name}</span>
+                                  <span className="ml-3 tracking-tighter">
+                                    {dataCheckout?.user?.phone_number}
+                                  </span>
+                                </div>
+                                <div className="mt-2">
+                                  {
+                                    dataDiaChi?.map((e: any) => {
+                                      const addressParts = [
+                                        e?.address,
+                                        e?.ward?.name,
+                                        e?.district?.name,
+                                        e?.city?.name
+                                      ];
+                                      const fullAddress = addressParts.filter(Boolean).join(' - ');
+                                      return <div key={e.id}>{fullAddress}</div>;
+                                    })
+                                  }
+
+
+                                </div>
+
                               </div>
-                              <div className="mt-2">
-                                {
-                                  dataDiaChi?.map((e: any) => {
-                                    const addressParts = [
-                                      e?.address,
-                                      e?.ward?.name,
-                                      e?.district?.name,
-                                      e?.city?.name
-                                    ];
-                                    const fullAddress = addressParts.filter(Boolean).join(' - ');
-                                    return <div key={e.id}>{fullAddress}</div>;
-                                  })
-                                }
-
-
-                              </div>
-
+                              <button onClick={handleOpenModal} className="py-2 px-4 bg-slate-50 hover:bg-slate-100 mt-5 sm:mt-0 sm:ml-auto text-sm font-medium rounded-lg">
+                                Thay đổi
+                              </button>
                             </div>
-                            <button onClick={handleOpenModal} className="py-2 px-4 bg-slate-50 hover:bg-slate-100 mt-5 sm:mt-0 sm:ml-auto text-sm font-medium rounded-lg">
-                              Thay đổi
-                            </button>
-                          </div>
+                          }
                           {/*end*/}
                           <div className="hd-no-account border-t border-slate-200 px-6 py-7 space-y-4 sm:space-y-6 hidden">
                             <div className="flex justify-between flex-wrap items-baseline">
@@ -379,7 +433,10 @@ const Checkout = () => {
                                 Email
                               </label>
                               <input
-                                className="block w-full outline-0 border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50 focus:border-neutral-200 rounded-2xl font-normal h-11 px-4 py-3 mt-1.5"
+                                className="block w-full outline-0 border border-neutral-200 focus:border-primary-300
+                                 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:focus:ring-primary-6000 
+                                 dark:focus:ring-opacity-25 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50
+                                  focus:border-neutral-200 rounded-2xl font-normal h-11 px-4 py-3 mt-1.5"
                                 type="email"
                               />
                             </div>
@@ -429,140 +486,150 @@ const Checkout = () => {
                             />
                           </div>
                         </div> */}
-                            <div className="sm:flex space-y-4 sm:space-y-0 sm:space-x-3">
-                              <div className="flex-1">
-                                <label
-                                  className="hd-Label text-base font-medium text-neutral-900"
-                                  data-nc-id="Label"
-                                >
-                                  Họ và tên
-                                </label>
-                                <input
-                                  className="block w-full outline-0 border border-neutral-200 focus:border-primary-300
-                               focus:ring focus:ring-primary-200 focus:ring-opacity-50
-                                bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25
-                                 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50
-                                  focus:border-neutral-200 rounded-2xl font-normal h-11 px-4 py-3 mt-1.5"
-                                  type="text"
-                                  placeholder="Nhập họ và tên"
-                                  onChange={(e) => setForm("ship_user_name", e.target.value)}
-                                />
-                              </div>
-                              <div className="flex-1">
-                                <label
-                                  className="hd-Label text-base font-medium text-neutral-900"
-                                  data-nc-id="Label"
-                                >
-                                  Địa chỉ cụ thể
-                                </label>
-                                <input
-                                  className="block w-full outline-0 border border-neutral-200 focus:border-primary-300
-                               focus:ring focus:ring-primary-200 focus:ring-opacity-50
-                                bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25
-                                 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50
-                                  focus:border-neutral-200 rounded-2xl font-normal h-11 px-4 py-3 mt-1.5"
-                                  type="text"
-                                  placeholder="Nhập họ và tên"
-                                  onChange={(e) => setForm("ship_user_address", e.target.value)}
-                                />
-                              </div>
-                              <div className="flex-1">
-                                <label
-                                  className="hd-Label text-base font-medium text-neutral-900"
-                                  data-nc-id="Label"
-                                >
-                                  Số điện thoaị
-                                </label>
-                                <input
-                                  className="block w-full outline-0 border border-neutral-200 focus:border-primary-300
-                               focus:ring focus:ring-primary-200 focus:ring-opacity-50
-                                bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25
-                                 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50
-                                  focus:border-neutral-200 rounded-2xl font-normal h-11 px-4 py-3 mt-1.5"
-                                  type="text"
-                                  placeholder="Số điện thoại"
-                                  onChange={(e) => setForm("ship_user_phonenumber", e.target.value)}
-                                />
-                              </div>
-                              <div className="flex-1">
-                                <label
-                                  className="hd-Label text-base font-medium text-neutral-900"
-                                  data-nc-id="Label"
-                                >
-                                  Email
-                                </label>
-                                <input
-                                  className="block w-full outline-0 border border-neutral-200 focus:border-primary-300
-                               focus:ring focus:ring-primary-200 focus:ring-opacity-50
-                                bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25
-                                 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50
-                                  focus:border-neutral-200 rounded-2xl font-normal h-11 px-4 py-3 mt-1.5"
-                                  type="text"
-                                  placeholder="Số điện thoại"
-                                  onChange={(e) => setForm("ship_user_email", e.target.value)}
-                                />
-                              </div>
-                            </div>
-                            <div className="sm:flex space-y-4 sm:space-y-0 sm:space-x-3">
-                              <div className="flex-1">
-                                <label
-                                  className="hd-Label text-base font-medium text-neutral-900"
-                                  data-nc-id="Label"
-                                >
-                                  Thành Phố
-                                </label>
-                                <Select
-                                  labelInValue
-                                  onChange={handleChangeTinh}
-                                  showSearch
-                                  optionFilterProp="children"
-                                  className="hd-Select outline-0 h-11 mt-1.5 block w-full text-sm rounded-2xl border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:bg-neutral-50 dark:focus:ring-primary-6000 dark:focus:ring-opacity-25">
-                                  {
-                                    tinhThanh?.provinces?.map((e: any) => (
-                                      <Option value={e?.ProvinceID}>{e?.ProvinceName}</Option>
-                                    ))
-                                  }
-                                </Select>
-                              </div>
-                              <div className="flex-1">
-                                <label
-                                  className="hd-Label text-base font-medium text-neutral-900"
-                                  data-nc-id="Label"
-                                >
-                                  Quận huyện
-                                </label>
-                                <Select
-                                  labelInValue
-                                  onChange={handleChangeQuanHuyen} className="hd-Select  outline-0 h-11 mt-1.5 block w-full text-sm rounded-2xl border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:bg-neutral-50 dark:focus:ring-primary-6000 dark:focus:ring-opacity-25">
-                                  {
-                                    quanHuyen?.districts?.map((quan: any) => (
-                                      <Option key={quan.DistrictID} value={quan.DistrictID}>
-                                        {quan.DistrictName}
-                                      </Option>
-                                    ))
-                                  }
-                                  <option value=""></option>
-                                </Select>
-                              </div>
-                              <div className="flex-1">
-                                <label
-                                  className="hd-Label text-base font-medium text-neutral-900"
-                                  data-nc-id="Label"
-                                >
-                                  Phường Xã
-                                </label>
-                                <Select
-                                  labelInValue
-                                  onChange={handleChangeXa}
-                                  className="hd-Select outline-0 h-11 mt-1.5 block w-full text-sm rounded-2xl border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:bg-neutral-50 dark:focus:ring-primary-6000 dark:focus:ring-opacity-25">
-                                  {
-                                    phuongXa?.wards?.map((e: any) => (
-                                      <Option key={e?.WardCode} value={`${e?.WardCode}`}>{e?.WardName}</Option>
-                                    ))
-                                  }
-                                </Select>
-                              </div>
-                            </div>
+                            {
+                              !token &&
+
+                              <>
+                                <h3 >Thông tin người nhận hàng</h3>
+                                <div className="sm:flex space-y-4 sm:space-y-0 sm:space-x-3">
+                                  <div className="flex-1">
+                                    <label
+                                      className="hd-Label text-base font-medium text-neutral-900"
+                                      data-nc-id="Label"
+                                    >
+                                      Họ và tên
+                                    </label>
+                                    <input
+                                      className="block w-full outline-0 border border-neutral-200 focus:border-primary-300
+                           focus:ring focus:ring-primary-200 focus:ring-opacity-50
+                            bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25
+                             dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50
+                              focus:border-neutral-200 rounded-2xl font-normal h-11 px-4 py-3 mt-1.5"
+                                      type="text"
+                                      placeholder="Nhập họ và tên"
+                                      onChange={(e) => setForm("ship_user_name", e.target.value)}
+                                    />
+                                  </div>
+                                  <div className="flex-1">
+                                    <label
+                                      className="hd-Label text-base font-medium text-neutral-900"
+                                      data-nc-id="Label"
+                                    >
+                                      Địa chỉ cụ thể
+                                    </label>
+                                    <input
+                                      className="block w-full outline-0 border border-neutral-200 focus:border-primary-300
+                           focus:ring focus:ring-primary-200 focus:ring-opacity-50
+                            bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25
+                             dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50
+                              focus:border-neutral-200 rounded-2xl font-normal h-11 px-4 py-3 mt-1.5"
+                                      type="text"
+                                      placeholder="Nhập họ và tên"
+                                      onChange={(e) => setForm("ship_user_address", e.target.value)}
+                                    />
+                                  </div>
+                                  <div className="flex-1">
+                                    <label
+                                      className="hd-Label text-base font-medium text-neutral-900"
+                                      data-nc-id="Label"
+                                    >
+                                      Số điện thoaị
+                                    </label>
+                                    <input
+                                      className="block w-full outline-0 border border-neutral-200 focus:border-primary-300
+                           focus:ring focus:ring-primary-200 focus:ring-opacity-50
+                            bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25
+                             dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50
+                              focus:border-neutral-200 rounded-2xl font-normal h-11 px-4 py-3 mt-1.5"
+                                      type="text"
+                                      placeholder="Số điện thoại"
+                                      onChange={(e) => setForm("ship_user_phonenumber", e.target.value)}
+                                    />
+                                  </div>
+                                  <div className="flex-1">
+                                    <label
+                                      className="hd-Label text-base font-medium text-neutral-900"
+                                      data-nc-id="Label"
+                                    >
+                                      Email
+                                    </label>
+                                    <input
+                                      className="block w-full outline-0 border border-neutral-200 focus:border-primary-300
+                           focus:ring focus:ring-primary-200 focus:ring-opacity-50
+                            bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25
+                             dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50
+                              focus:border-neutral-200 rounded-2xl font-normal h-11 px-4 py-3 mt-1.5"
+                                      type="text"
+                                      placeholder="Email"
+                                      onChange={(e) => setForm("ship_user_email", e.target.value)}
+                                    />
+                                  </div>
+                                </div>
+                                {/* chọn đia chỉ */}
+                                <div className="sm:flex space-y-4 sm:space-y-0 sm:space-x-3">
+                                  <div className="flex-1">
+                                    <label
+                                      className="hd-Label text-base font-medium text-neutral-900"
+                                      data-nc-id="Label"
+                                    >
+                                      Thành Phố
+                                    </label>
+                                    <Select
+                                      labelInValue
+                                      onChange={handleChangeTinh}
+                                      showSearch
+                                      optionFilterProp="children"
+                                      className="hd-Select outline-0 h-11 mt-1.5 block w-full text-sm rounded-2xl border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:bg-neutral-50 dark:focus:ring-primary-6000 dark:focus:ring-opacity-25">
+                                      {
+                                        tinhThanh?.provinces?.map((e: any) => (
+                                          <Option value={e?.ProvinceID}>{e?.ProvinceName}</Option>
+                                        ))
+                                      }
+                                    </Select>
+                                  </div>
+                                  <div className="flex-1">
+                                    <label
+                                      className="hd-Label text-base font-medium text-neutral-900"
+                                      data-nc-id="Label"
+                                    >
+                                      Quận huyện
+                                    </label>
+                                    <Select
+                                      labelInValue
+                                      onChange={handleChangeQuanHuyen} className="hd-Select  outline-0 h-11 mt-1.5 block w-full text-sm rounded-2xl border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:bg-neutral-50 dark:focus:ring-primary-6000 dark:focus:ring-opacity-25">
+                                      {
+                                        quanHuyen?.districts?.map((quan: any) => (
+                                          <Option key={quan.DistrictID} value={quan.DistrictID}>
+                                            {quan.DistrictName}
+                                          </Option>
+                                        ))
+                                      }
+                                      <option value=""></option>
+                                    </Select>
+                                  </div>
+                                  <div className="flex-1">
+                                    <label
+                                      className="hd-Label text-base font-medium text-neutral-900"
+                                      data-nc-id="Label"
+                                    >
+                                      Phường Xã
+                                    </label>
+                                    <Select
+                                      labelInValue
+                                      onChange={handleChangeXa}
+                                      className="hd-Select outline-0 h-11 mt-1.5 block w-full text-sm rounded-2xl border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:bg-neutral-50 dark:focus:ring-primary-6000 dark:focus:ring-opacity-25">
+                                      {
+                                        phuongXa?.wards?.map((e: any) => (
+                                          <Option key={e?.WardCode} value={`${e?.WardCode}`}>{e?.WardName}</Option>
+                                        ))
+                                      }
+                                    </Select>
+                                  </div>
+                                </div>
+                              </>
+                            }
+
+
 
 
                             <div className="sm:flex space-y-4 sm:space-y-0 sm:space-x-3">
