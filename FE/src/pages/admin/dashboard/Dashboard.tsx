@@ -20,6 +20,7 @@ import { DatePicker, Select, Space } from 'antd';
 const { RangePicker } = DatePicker;
 import type { DatePickerProps, GetProps } from 'antd';
 type RangePickerProps = GetProps<typeof DatePicker.RangePicker>;
+import dayjs from 'dayjs';
 export const DashboardContext = createContext<any | undefined>(undefined);
 
 const Dashboard = () => {
@@ -31,43 +32,76 @@ const Dashboard = () => {
   })
   const [inputRange, setInputRange] = useState(false);
   const onChange: DatePickerProps['onChange'] = (date, dateString) => {
-    const formattedDate = date ? date.format('YYYY-MM-DD') : '';
+    console.log("date",date)
+    let formattedDate = '';
+    if (filter.filter_type === 'day') {
+      formattedDate = date ? date.format('YYYY-MM-DD') : '';
+    }  else if (filter.filter_type === 'week') {
+      // Nếu là "week", tính toán và lưu tuần (chỉ lưu năm và tuần)
+      if (date) {
+        // const year = date.year(); 
+        // // Tính tuần trong năm từ ngày đã chọn
+        // const weekNumber = date.week(); 
+        // // Format lại thành "YYYY-Wn" (ví dụ: "2024-W12")
+        // formattedDate = `${year}-W${weekNumber}`;
+      }
+    }
+    else if (filter.filter_type === 'month') {
+      if (date) {
+        formattedDate = date.format('YYYY-MM'); // Lưu tháng dưới dạng YYYY-MM
+      }
+    } else if (filter.filter_type === 'year') {
+      // Nếu là "year", chỉ lưu năm
+      if (date) {
+        formattedDate = date.format('YYYY');
+      }
+    }
+
+    // Cập nhật state với giá trị đã format
     setFilter((prev: any) => ({
       ...prev,
-      filter_value: formattedDate
-    }))
+      filter_value: formattedDate,
+    }));
   };
+
   const filterRange = (value: DatePickerProps['value'] | RangePickerProps['value']) => {
     console.log('filterRange: ', value);
   };
   const hanldeChangeType = (type: string) => {
     switch (type) {
       case "day":
+        setInputRange(false)
         setFilter((prev: any) => ({ ...prev, filter_type: type }))
         break;
       case "week":
+        setInputRange(false)
+
         setFilter((prev: any) => ({ ...prev, filter_type: type }))
         break;
       case "month":
+        setInputRange(false)
+
         setFilter((prev: any) => ({ ...prev, filter_type: type }))
         break;
       case "year":
+        setInputRange(false)
+
         setFilter((prev: any) => ({ ...prev, filter_type: type }))
         break;
       case "range":
-        setInputRange((prev) => !prev)
+        setInputRange(true)
         setFilter((prev: any) => ({ ...prev, filter_type: type }))
       default:
         break;
     }
   }
-  const [tongDonHang,setTongDonHang] = useState<any>([])
-  const handleDonHang = (data:any) => {
+  const [tongDonHang, setTongDonHang] = useState<any>([])
+  const handleDonHang = (data: any) => {
     setTongDonHang(data)
   }
   const _props = {
-   filter,
-   setFilter
+    filter,
+    setFilter
   }
   return (
     <DashboardContext.Provider value={_props}>
@@ -85,13 +119,13 @@ const Dashboard = () => {
               allowClear
             >
               <Option value="day">Tìm theo ngày</Option>
-              <Option value="week">Tìm theo tuần</Option>
+              {/* <Option value="week">Tìm theo tuần</Option> */}
               <Option value="month">Tìm theo tháng</Option>
               <Option value="year">Tìm theo năm</Option>
               <Option value="range">Tìm theo khoảng</Option>
             </Select>
             {
-              !inputRange && <DatePicker
+              inputRange === false && <DatePicker
                 onChange={onChange}
                 style={{ width: 280 }}
                 className="border border-gray-300 rounded-lg p-2 mt-4  text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -100,10 +134,10 @@ const Dashboard = () => {
               />
             }
             {
-              inputRange && <RangePicker className="mt-4"
+              inputRange === true && <RangePicker className="mt-4"
                 onChange={(value, dateString) => {
                   setFilter((prev: any) => ({
-                    ...prev,
+                    // ...prev,
                     filter_type: "range",
                     filter_start_date: dateString[0],
                     filter_end_date: dateString[1],

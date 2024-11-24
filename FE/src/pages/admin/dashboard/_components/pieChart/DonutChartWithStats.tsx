@@ -10,7 +10,6 @@ const { Option } = Select;
 const DonutChartWithLegend = () => {
   const {filter,setFilter} = useContext(DashboardContext)
   const [data, setData] = useState<any>([])
-
   const getData = async () => {
     let res = await instance.post(`/getrevenuestatistics`, filter);
     if (res) {
@@ -44,13 +43,13 @@ const DonutChartWithLegend = () => {
     getData();
   }, [filter])
   return (
-    <div className="py-6 px-8 bg-white rounded-lg shadow-md">
+    <div className="py-6 px-8 bg-white rounded-lg shadow-md mt-2">
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-xl font-semibold text-gray-800">
           Doanh thu của sản phẩm
         </h3>
       </div>
-      <div className="mt-4">
+      <div className="">
         {
           value.length > 0 ? <Column {...config} /> : "Không có dữ liệu"
         }
