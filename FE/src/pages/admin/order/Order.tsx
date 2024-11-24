@@ -110,7 +110,7 @@ const OrderPage = () => {
       dataIndex: "payment_method_id",
       render: (method: number | undefined) => {
         if (typeof method !== "number") return "";
-        return method === 1 ? "Chuyển khoản" : "Thanh toán khi nhận hàng";
+        return method === 1 ? "Thanh toán khi nhận hàng" : "Thanh toán online";
       },
     },
     {
