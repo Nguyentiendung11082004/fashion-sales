@@ -31,7 +31,8 @@ const Checkout = () => {
   const [isLoading, setIsLoading] = useState(true); // Trạng thái loading
   const [visible, setVisible] = useState(false)
   const [idTinh, setIdTinh] = useState<number | null>(0)
-  const [idQuanHuyen, setIdQuanHuyen] = useState<number | null>(0)
+  const [idQuanHuyen, setIdQuanHuyen] = useState<number | null>(0);
+  console.log("idQuanHuyen", idQuanHuyen)
   const [idXa, setIdXa] = useState<number | null>(0);
   const [payloadDiaChi, setPayLoadDiaChi] = useState<any>(null);
   const mutationVoucher = useMutation({
@@ -70,7 +71,7 @@ const Checkout = () => {
     ship_user_name: '',
     ship_user_phonenumber: '',
     ship_user_address: '',
-    shipping_method: shiping,
+    shipping_method: paymentMethhod,
     voucher_code: voucher,
     cart_item_ids: cartIds || [],
     quantityOfCart: quantityOfCart || {},
@@ -166,11 +167,6 @@ const Checkout = () => {
       xa: e.label, // Update the state with the selected ward name
     }));
     setIdXa(Number(e.value)); // Update the ward ID
-    // setPayLoadDiaChi((prev:any)=> ({
-    //   ...prev,
-    //   to_ward_code: e.id
-    // }))
-
   };
 
   const handleOpenModal = () => {
@@ -199,7 +195,6 @@ const Checkout = () => {
     // if (!(payloadDiaChi?.ward && payloadDiaChi?.district ) || !(idXa || idQuanHuyen)) {
     //   return; // Dừng lại nếu không có đủ thông tin
     // }
-
     setIsLoading(true);
     try {
       let weight = dataCheckout?.order_items?.map((e: any) => Number(e.product.weight));
@@ -232,10 +227,10 @@ const Checkout = () => {
         ship_user_email: dataCheckout.user.email || '',
         ship_user_name: dataCheckout.user.name || '',
         ship_user_phonenumber: dataCheckout.user.phone_number || '',
-        ship_user_address: dataDiaChi[0].address || '',
-        tinh: dataDiaChi[0].city?.name || '',
-        huyen: dataDiaChi[0].district?.name || '',
-        xa: dataDiaChi[0].ward?.name || '',
+        ship_user_address: dataDiaChi[0]?.address || '',
+        tinh: dataDiaChi[0]?.city?.name || '',
+        huyen: dataDiaChi[0]?.district?.name || '',
+        xa: dataDiaChi[0]?.ward?.name || '',
         quantityOfCart: quantityOfCart,
       }));
     }
@@ -560,16 +555,18 @@ const Checkout = () => {
                                   </label>
                                   <Select
                                     labelInValue
-                                    onChange={handleChangeQuanHuyen} className="hd-Select  outline-0 h-11 mt-1.5 block w-full text-sm rounded-2xl border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:bg-neutral-50 dark:focus:ring-primary-6000 dark:focus:ring-opacity-25">
-                                    {
-                                      quanHuyen?.districts?.map((quan: any) => (
-                                        <Option key={quan.DistrictID} value={quan.DistrictID}>
-                                          {quan.DistrictName}
-                                        </Option>
-                                      ))
-                                    }
-                                    <option value=""></option>
+                                    value={idQuanHuyen ? { value: idQuanHuyen } : undefined}  // Đặt giá trị cho quận/huyện
+                                    onChange={handleChangeQuanHuyen}
+                                    className="hd-Select outline-0 h-11 mt-1.5 block w-full text-sm rounded-2xl border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:bg-neutral-50 dark:focus:ring-primary-6000 dark:focus:ring-opacity-25">
+                                    {quanHuyen?.districts?.map((quan: any) => (
+                                      <Option key={quan.DistrictID} value={quan.DistrictID}>
+                                        {quan.DistrictName}
+                                      </Option>
+                                    ))}
                                   </Select>
+
+
+
                                 </div>
                                 <div className="flex-1">
                                   <label
@@ -580,13 +577,12 @@ const Checkout = () => {
                                   </label>
                                   <Select
                                     labelInValue
+                                    value={idXa ? { value: idXa } : undefined}  // Đặt giá trị cho xã/phường
                                     onChange={handleChangeXa}
                                     className="hd-Select outline-0 h-11 mt-1.5 block w-full text-sm rounded-2xl border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:bg-neutral-50 dark:focus:ring-primary-6000 dark:focus:ring-opacity-25">
-                                    {
-                                      phuongXa?.wards?.map((e: any) => (
-                                        <Option key={e?.WardCode} value={`${e?.WardCode}`}>{e?.WardName}</Option>
-                                      ))
-                                    }
+                                    {phuongXa?.wards?.map((e: any) => (
+                                      <Option key={e?.WardCode} value={`${e?.WardCode}`}>{e?.WardName}</Option>
+                                    ))}
                                   </Select>
                                 </div>
                               </div>
