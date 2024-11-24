@@ -46,10 +46,10 @@ class Order extends Model
             self::STATUS_PENDING,
             self::STATUS_CONFIRMED,
             self::STATUS_SHIPPING,
-            self::STATUS_FAILED,
             self::STATUS_SUCCESS,
             self::STATUS_CANCELED,
             self::STATUS_RETURNED,
+            self::STATUS_COMPLETED,
         ];
     }
 
