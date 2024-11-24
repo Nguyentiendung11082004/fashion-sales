@@ -47,9 +47,9 @@ use App\Http\Controllers\API\V1\Service\PaymentController;
 */
 
 Route::prefix("v1/")->group(function () {
-        Route::middleware(['auth:sanctum', 'role:4'])->group(function () {
-        Route::resource('vouchers', VoucherController::class);
-    });
+    //     Route::middleware(['auth:sanctum', 'role:4'])->group(function () {
+    //     Route::resource('vouchers', VoucherController::class);
+    // });
 
     Route::resource("products", ProductController::class);
     Route::resource("comments", CommentsController::class);
