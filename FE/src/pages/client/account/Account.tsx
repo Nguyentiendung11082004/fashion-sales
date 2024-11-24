@@ -1,13 +1,160 @@
+import { useAuth } from "@/common/context/Auth/AuthContext";
 import { useUser } from "@/common/context/User/UserContext";
+import { IUser } from "@/common/types/users";
 import AddImage from "@/components/icons/about/AboutInfo";
 import Address from "@/components/icons/account/Address";
 import DateBirth from "@/components/icons/account/DateBirdth";
 import Email from "@/components/icons/account/Email";
 import Phone from "@/components/icons/account/Phone";
+import instance from "@/configs/axios";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 const Account = () => {
-  const { user } = useUser();
+  const { user, urlImage, setUrlImage } = useUser();
   const dataUser = user?.InforUser;
+  const { token } = useAuth();
+  const queryClient = useQueryClient();
+  const [newAvatar, setNewAvatar] = useState<string | null>(null);
+  const [tempName, setTempName] = useState<string | undefined>(dataUser?.name);
+  const [tempEmail, setTempEmail] = useState<string | undefined>(dataUser?.email);
+  const [errors, setErrors] = useState<{ [key: string]: string[] }>({});
+
+  // State lưu trữ thông tin người dùng
+  const [formData, setFormData] = useState<Partial<IUser>>({
+    name: dataUser?.name || "",
+    email: dataUser?.email || "",
+    phone_number: dataUser?.phone_number || "",
+    address: dataUser?.address || "",
+    birth_date:
+      dataUser?.birth_date instanceof Date
+        ? dataUser.birth_date.toISOString().split("T")[0]
+        : dataUser?.birth_date || "",
+    gender: dataUser?.gender ?? undefined,
+    avatar: dataUser?.avatar || "",
+  });
+
+  // Xử lý khi thay đổi giá trị input
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]:
+        name === "gender"
+          ? value === "Nam"
+          : name === "birth_date"
+            ? value
+            : value,
+    }));
+  };
+
+  const mutation = useMutation({
+    mutationFn: async (newUserData: Partial<IUser>) => {
+      const res = await instance.put("/user/update ", newUserData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return res.data;
+    },
+    onSuccess: (data) => {
+      console.log("Dữ liệu người dùng sau khi cập nhật:", data);
+      queryClient.invalidateQueries({ queryKey: ["user", token] });
+      toast.success("Cập nhật thành công");
+      // Cập nhật tên, email và avatar trong bộ nhớ đệm 
+      queryClient.setQueryData(["user", token], (oldData: any) => {
+        if (!oldData || !oldData["Infor User"]) return oldData; // kiểm tra dữ liệu tồn tại
+        return {
+          ...oldData,
+          "Infor User": {
+            ...oldData["Infor User"],
+            avatar: newAvatar,
+            name: formData.name, // cập nhật name mới
+            email: formData.email, // cập nhật email mới
+          },
+        };
+      });
+
+      setTempName(formData.name);
+      setTempEmail(formData.email);
+      
+    if (newAvatar) {
+      setUrlImage(newAvatar);
+    }
+    },
+    onError: (error: any) => {
+      if (error?.response && error?.response.data.errors) {
+        setErrors(error?.response.data.errors); // Lưu lỗi vào trạng thái
+      }
+      toast.success("Cập nhật thất bại");
+      console.error("Có lỗi xảy ra:", error);
+    },
+  });
+
+  // Mutation để upload ảnh lên Cloudinary
+  const uploadImageMutation = useMutation({
+    mutationFn: async (file: File) => {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("upload_preset", "upload-img");
+      formData.append("folder", "upload-img");
+
+      const response = await fetch(
+        "https://api.cloudinary.com/v1_1/dijxcfiff/image/upload",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Upload ảnh thất bại");
+      }
+
+      const data = await response.json();
+      return data;
+    },
+    onSuccess: (data) => {
+      setNewAvatar(data.url);
+      toast.success("Tải ảnh lên thành công");
+    
+    },
+    onError: (error) => {
+      toast.error("Tải ảnh lên thất bại");
+      console.error("Lỗi tải ảnh:", error);
+    },
+  });
+  // console.log("User data:", user);
+  // console.log("Current urlImage:", urlImage);
+
+
+  // Xử lý khi chọn file ảnh
+  const handleFileChange = (info: any) => {
+    const file = info.target.files[0];
+    if (file) {
+      uploadImageMutation.mutate(file);
+    }
+  };
+
+  // Hàm xử lý submit form
+  const handleSubmit = (e: any) => {
+    e.preventDefault();
+    console.log("Dữ liệu sẽ được cập nhật:", formData);
+    const newData = {
+      name: formData.name,
+      email: formData.email,
+      phone_number: formData.phone_number,
+      address: formData.address,
+      birth_date: formData.birth_date,
+      gender: formData.gender, // (true = Nam, false = Nữ)
+      avatar: newAvatar, 
+    };
+    mutation.mutate({ ...newData, avatar: newAvatar as string | undefined });
+  };
+
   return (
     <main
       id="main-content"
@@ -30,8 +177,10 @@ const Account = () => {
           <div className="max-w-auto">
             <div className="max-w-[42rem]">
               <span className="hd-all-textgrey block mt-4">
-                <span className="text-black font-semibold">{dataUser?.name}</span>
-                <span className="mx-2">{dataUser?.email}</span> <span>{dataUser?.address}</span>
+                <span className="text-black font-semibold">
+                  {tempName || dataUser?.name}
+                </span>
+                <span className="mx-2">{tempEmail || dataUser?.email}</span>
               </span>
             </div>
             <hr className="mt-[1rem] h-0 border-solid border-b-2" />
@@ -39,10 +188,10 @@ const Account = () => {
               <Link to="account.html" className="hd-account-menu-item">
                 Thông tin tài khoản
               </Link>
-              <Link to="#" className="hd-account-menu-item">
+              <Link to="/wishlist" className="hd-account-menu-item">
                 Yêu thích
               </Link>
-              <Link to="history-order.html" className="hd-account-menu-item">
+              <Link to="/history-order" className="hd-account-menu-item">
                 Lịch sử mua hàng
               </Link>
               <Link
@@ -72,7 +221,7 @@ const Account = () => {
                     decoding="async"
                     data-nimg={1}
                     className="w-32 h-32 rounded-full object-cover z-0"
-                    src={`${dataUser?.avatar}`}
+                    src={newAvatar || urlImage || dataUser?.avatar}
                     style={{ color: "transparent" }}
                   />
                   <div className="absolute inset-0 flex cursor-pointer items-center justify-center bg-black bg-opacity-35">
@@ -81,11 +230,12 @@ const Account = () => {
                   <input
                     type="file"
                     className="absolute inset-0 cursor-pointer opacity-0"
+                    onChange={handleFileChange}
                   />
                 </div>
               </div>
               {/*end item-start*/}
-              <div className="lg:w-3/4 max-w-full">
+              <form onSubmit={handleSubmit} className="lg:w-3/4 max-w-full">
                 <div>
                   <label
                     className="nc-Label text-base font-medium"
@@ -97,8 +247,9 @@ const Account = () => {
                   <input
                     className="block w-full outline-0 border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50 focus:border-neutral-200 rounded-2xl font-normal h-11 px-4 py-3 mt-1.5"
                     type="text"
-                    value={`${dataUser?.name || ''}`}
-
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
                   />
                 </div>
                 <div className="mt-5">
@@ -116,12 +267,17 @@ const Account = () => {
                     </span>
                     <input
                       className="block w-full outline-0 border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50 rounded-2xl font-normal h-11 px-4 py-3 !rounded-l-none"
-                      value={`${dataUser?.email || ''}`}
-
+                      value={formData.email}
+                      onChange={handleChange}
                       type="text"
+                      name="email"
                     />
                   </div>
+                  {errors.email && (
+                    <span className="text-red-500 text-sm">{errors.email[0]}</span>
+                  )}
                 </div>
+
                 <div className="max-w-lg mt-5">
                   <label
                     className="nc-Label text-base font-medium"
@@ -138,7 +294,13 @@ const Account = () => {
                     <input
                       className="block w-full outline-0 border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50 rounded-2xl font-normal h-11 px-4 py-3 !rounded-l-none"
                       type="date"
-                      value={user?.birth_date}
+                      name="birth_date"
+                      value={
+                        typeof formData.birth_date === "string"
+                          ? formData.birth_date
+                          : ""
+                      }
+                      onChange={handleChange}
                     />
                   </div>
                 </div>
@@ -157,8 +319,10 @@ const Account = () => {
                     </span>
                     <input
                       className="block w-full outline-0 border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50 rounded-2xl font-normal h-11 px-4 py-3 !rounded-l-none"
-                      value={`${dataUser?.address || ''}`}
+                      value={formData.address}
+                      onChange={handleChange}
                       type="text"
+                      name="address"
                     />
                   </div>
                 </div>
@@ -171,7 +335,9 @@ const Account = () => {
                   </label>
                   <select
                     className="nc-Select h-11 mt-1.5 px-[10px] block w-full outline-0 rounded-2xl border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-50"
-                    value={dataUser?.role_id == 1 ? "Nam" : "Nữ"}
+                    value={formData.gender ? "Nam" : "Nữ"}
+                    onChange={handleChange}
+                    name="gender"
                   >
                     <option value="Nam">Nam</option>
                     <option value="Nữ">Nữ</option>
@@ -192,10 +358,15 @@ const Account = () => {
                     </span>
                     <input
                       className="block w-full outline-0 border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50 rounded-2xl font-normal h-11 px-4 py-3 !rounded-l-none"
-                      value={`${dataUser?.phone_number || ''}`}
+                      value={formData.phone_number}
+                      onChange={handleChange}
                       type="text"
+                      name="phone_number"
                     />
                   </div>
+                  {errors.phone_number && (
+                    <span className="text-red-500 text-sm">{errors.phone_number[0]}</span>
+                  )}
                 </div>
                 <div className="mt-5">
                   <label
@@ -209,15 +380,13 @@ const Account = () => {
                     rows={4}
                   />
                 </div>
-                <div className="mt-10">
-                  <button
-                    type="submit"
-                    className="text-base bg-[#00BADB] h-[50px] w-auto px-[45px] font-semibold rounded-full text-white inline-flex items-center relative overflow-hidden hover:bg-[#23b6cd] transition-all ease-in-out duration-300"
-                  >
-                    Cập nhật
-                  </button>
-                </div>
-              </div>
+                <button
+                  type="submit"
+                  className="text-base mt-10 bg-[#00BADB] h-[50px] w-auto px-[45px] font-semibold rounded-full text-white inline-flex items-center relative overflow-hidden hover:bg-[#23b6cd] transition-all ease-in-out duration-300"
+                >
+                  Cập nhật
+                </button>
+              </form>
               {/*end item-end*/}
             </div>
           </div>

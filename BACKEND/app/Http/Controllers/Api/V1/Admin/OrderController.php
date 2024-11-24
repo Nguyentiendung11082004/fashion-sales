@@ -72,7 +72,7 @@ class OrderController extends Controller
                 'order' => $order,
                 'order_details' => $orderDetails,
             ];
-    
+
             return response()->json($orderData, Response::HTTP_OK);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             Log::error('Order not found: ' . $e->getMessage());
@@ -82,6 +82,8 @@ class OrderController extends Controller
             return response()->json(['message' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+
 
     /**
      * Show the form for editing the specified resource.
@@ -106,7 +108,7 @@ class OrderController extends Controller
                 'Đang chờ xác nhận' => 1,
                 'Đã xác nhận' => 2,
                 'Đang vận chuyển' => 3,
-                'Hoàn hàng' => 4,
+                'Hoàn trả hàng' => 4,
                 'Giao hàng thành công' => 5,
                 'Đã hủy' => 6,
                 'Hoàn thành' => 7
@@ -138,12 +140,12 @@ class OrderController extends Controller
                 return response()->json(['message' => 'Khi đang vận chuyển, chỉ có thể cập nhật thành "Giao hàng thành công".'], Response::HTTP_BAD_REQUEST);
             }
 
-            if ($currentStatus === 'Giao hàng thành công' && !in_array($newStatus, ['Hoàn hàng', 'Hoàn thành'])) {
-                return response()->json(['message' => 'Sau "Giao hàng thành công", chỉ có thể chuyển sang "Hoàn hàng" hoặc "Hoàn thành".'], Response::HTTP_BAD_REQUEST);
+            if ($currentStatus === 'Giao hàng thành công' && !in_array($newStatus, ['Hoàn trả hàng', 'Hoàn thành'])) {
+                return response()->json(['message' => 'Sau "Giao hàng thành công", chỉ có thể chuyển sang "Hoàn trả hàng" hoặc "Hoàn thành".'], Response::HTTP_BAD_REQUEST);
             }
 
-            if ($currentStatus === 'Hoàn hàng' && $newStatus !== 'Hoàn thành') {
-                return response()->json(['message' => 'Từ "Hoàn hàng", chỉ có thể chuyển sang "Hoàn thành".'], Response::HTTP_BAD_REQUEST);
+            if ($currentStatus === 'Hoàn trả hàng' && $newStatus !== 'Hoàn thành') {
+                return response()->json(['message' => 'Từ "Hoàn trả hàng", chỉ có thể chuyển sang "Hoàn thành".'], Response::HTTP_BAD_REQUEST);
             }
 
          
@@ -168,5 +170,28 @@ class OrderController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function search(Request $request)
+    {
+        $query = $request->input('query'); // Lấy từ khóa tìm kiếm từ body request
+
+        if (!$query) {
+            return response()->json([
+                'message' => 'Vui lòng nhập từ khóa tìm kiếm.',
+                'data' => []
+            ], 400);
+        }
+
+        // Tìm kiếm trong cột `name` hoặc các cột khác nếu cần
+        $results = Order::where('order_code', 'LIKE', "%{$query}%")
+            ->orWhere('user_name', 'LIKE', "%{$query}%")
+            ->orWhere('user_email', 'LIKE', "%{$query}%")
+            ->get();
+
+        return response()->json([
+            'message' => 'Kết quả tìm kiếm.',
+            'data' => $results,
+        ]);
     }
 }

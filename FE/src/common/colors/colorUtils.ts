@@ -40,3 +40,4 @@ export const colorClassMap: Record<string, string> = {
     Slate: "Xám ",
     // Thêm các màu khác nếu cần (lưu ý chữ cái đầu phải viết hoa)
   };
+  

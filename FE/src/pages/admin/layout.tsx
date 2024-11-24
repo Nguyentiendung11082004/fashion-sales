@@ -28,6 +28,9 @@ const { Sider } = Layout;
 
 const LayoutAdmin: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
+  const toggleCollapsed = () => {
+    setCollapsed(!collapsed);
+  };
   return (
     <Layout>
       <Sider
@@ -35,7 +38,6 @@ const LayoutAdmin: React.FC = () => {
         collapsible
         collapsed={collapsed}
         width={250}
-        
         className="bg-[black] min-h-screen"
       >
         <div className="flex items-center justify-center h-[25px] bg-[black]">
@@ -44,7 +46,6 @@ const LayoutAdmin: React.FC = () => {
         <div className="w-[150px] my-[-10px] m-auto">
           <img src={LogoAdmin} alt="" className="" />
         </div>
-
         <Menu
           theme="dark"
           mode="inline"
@@ -59,13 +60,6 @@ const LayoutAdmin: React.FC = () => {
                   Thống kê
                 </NavLink>
               ),
-              children: new Array(4).fill(null).map((index, j) => {
-                const subKey = index * 4 + j + 10;
-                return {
-                  key: subKey,
-                  label: `option${subKey}`,
-                };
-              }),
             },
             {
               key: "2",
@@ -73,6 +67,15 @@ const LayoutAdmin: React.FC = () => {
               label: (
                 <NavLink className="text-white" to="/admin/products">
                   Sản phẩm
+                </NavLink>
+              ),
+            },
+            {
+              key: "12",
+              icon: <ShoppingCartOutlined />,
+              label: (
+                <NavLink className="text-white" to="/admin/orders">
+                  Đơn hàng
                 </NavLink>
               ),
             },
@@ -109,6 +112,7 @@ const LayoutAdmin: React.FC = () => {
                 </NavLink>
               ),
             },
+
             {
               key: "4",
               icon: <OrderedListOutlined />,
@@ -190,6 +194,30 @@ const LayoutAdmin: React.FC = () => {
                 </NavLink>
               ),
             },
+            {
+              key: "30",
+              icon: (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth="1.5"
+                  stroke="currentColor"
+                  className="size-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M9 4.5v15m6-15v15m-10.875 0h15.75c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125H4.125C3.504 4.5 3 5.004 3 5.625v12.75c0 .621.504 1.125 1.125 1.125Z"
+                  />
+                </svg>
+              ),
+              label: (
+                <NavLink to="/admin/vouchers" className="text-white">
+                  Voucher
+                </NavLink>
+              ),
+            },
 
             {
               key: "10",
@@ -209,15 +237,7 @@ const LayoutAdmin: React.FC = () => {
                 </NavLink>
               ),
             },
-            {
-              key: "12",
-              icon: <ShoppingCartOutlined />,
-              label: (
-                <NavLink className="text-white" to="/admin/order">
-                  Đơn hàng
-                </NavLink>
-              ),
-            },
+
             {
               key: "13",
               icon: <TagsOutlined />,
@@ -236,7 +256,6 @@ const LayoutAdmin: React.FC = () => {
                 </NavLink>
               ),
             },
-            
           ]}
         />
       </Sider>

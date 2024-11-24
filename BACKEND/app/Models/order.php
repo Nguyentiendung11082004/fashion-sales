@@ -24,15 +24,49 @@ class Order extends Model
         'ship_user_name',
         'ship_user_phonenumber',
         'ship_user_address',
-        "voucher_id",
-        "voucher_discount"
+        'voucher_id',
+        'voucher_discount',
+        'return_notes'
     ];
+    // Order status constants
+    const STATUS_PENDING = 'Đang chờ xác nhận';
+    const STATUS_CONFIRMED = 'Đã xác nhận';
+    const STATUS_SHIPPING = 'Đang vận chuyển';
+    const STATUS_SUCCESS = 'Giao hàng thành công';
+    const STATUS_CANCELED = 'Đã hủy';
+    const STATUS_RETURNED = 'Hoàn trả hàng';
+    const STATUS_COMPLETED = 'Hoàn thành';
+    // Payment status constants
+    const PAYMENT_PENDING = 'Chưa Thanh Toán';
+    const PAYMENT_PAID = 'Đã thanh toán';
+    // Get all order statuses
+    public static function getOrderStatuses()
+    {
+        return [
+            self::STATUS_PENDING,
+            self::STATUS_CONFIRMED,
+            self::STATUS_SHIPPING,
+            self::STATUS_SUCCESS,
+            self::STATUS_CANCELED,
+            self::STATUS_RETURNED,
+            self::STATUS_COMPLETED,
+        ];
+    }
+
+    // Get all payment statuses
+    public static function getPaymentStatuses()
+    {
+        return [
+            self::PAYMENT_PENDING,
+            self::PAYMENT_PAID,
+        ];
+    }
     protected static function boot()
     {
         parent::boot();
         static::creating(function ($order) {
             // Tạo mã order_code bao gồm chữ và số
-            $order->order_code = 'ORD-' . strtoupper(uniqid());
+            $order->order_code = 'MIXMATCH-' . strtoupper(uniqid());
         });
     }
     // Quan hệ với model User (người dùng)
@@ -52,9 +86,9 @@ class Order extends Model
     {
         return $this->hasMany(OrderDetail::class);
     }
-     // Liên kết đến voucher_logs
-     public function voucherLogs()
-     {
-         return $this->hasMany(VoucherLog::class);
-     }
+    // Liên kết đến voucher_logs
+    public function voucherLogs()
+    {
+        return $this->hasMany(VoucherLog::class);
+    }
 }

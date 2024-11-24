@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import Loading from "@/common/Loading/Loading";
 import { IBanner } from "@/common/types/banners";
+
 import instance from "@/configs/axios";
 import { bannerCreate, bannerUpdate } from "@/services/api/admin/banners";
 import { UploadOutlined } from "@ant-design/icons";
@@ -11,7 +13,6 @@ import {
   Form,
   Input,
   message,
-  Skeleton,
   Upload,
   UploadProps,
 } from "antd";
@@ -44,11 +45,11 @@ const BannersForm = () => {
       form.setFieldsValue({
         ...data,
         start_date: data?.start_date
-          ? dayjs(data?.start_date, "YYYY-MM-DD")
+          ? dayjs(data.start_date, "YYYY-MM-DD")
           : "",
-        end_date: data?.end_date ? dayjs(data?.end_date, "YYYY-MM-DD") : "",
+        end_date: data?.end_date ? dayjs(data.end_date, "YYYY-MM-DD") : "",
       });
-      setUrlImage(data.image);
+      setUrlImage(data?.image);
     }
   }, [data, form]);
 
@@ -81,7 +82,6 @@ const BannersForm = () => {
     },
     onSuccess: () => {
       queryClient.setQueryData(["currentPage"], currentPage);
-
       refetch();
       setIsLoading(false);
       toast.success("Cập nhật thành công");
@@ -115,19 +115,6 @@ const BannersForm = () => {
       }
     },
   };
-
-  useEffect(() => {
-    if (data) {
-      form.setFieldsValue({
-        ...data,
-        start_date: data?.start_date
-          ? dayjs(data.start_date, "YYYY-MM-DD")
-          : "",
-        end_date: data?.end_date ? dayjs(data.end_date, "YYYY-MM-DD") : "",
-      });
-      setUrlImage(data?.image);
-    }
-  }, [data, form]);
 
   const onFinish = (value: any) => {
     if (value.start_date) {
@@ -164,7 +151,7 @@ const BannersForm = () => {
       </div>
 
       {isFetching ? (
-        <Skeleton />
+        <Loading />
       ) : (
         <Form
           form={form}

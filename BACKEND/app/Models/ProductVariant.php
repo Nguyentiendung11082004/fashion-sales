@@ -15,6 +15,7 @@ class ProductVariant extends Model
         "quantity",
         "image",
         "sku",
+        'id_guid'
         
     ];
 
@@ -26,6 +27,10 @@ class ProductVariant extends Model
     }
     public function cartitems(){
         return $this->hasMany(CartItem::class);
+    }
+    public function orderDetails()
+    {
+        return $this->hasMany(OrderDetail::class);
     }
     
    

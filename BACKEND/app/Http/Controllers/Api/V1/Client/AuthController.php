@@ -130,13 +130,13 @@ class AuthController extends Controller
 
             // Kiểm tra xem email đã được xác thực chưa
             if ($user->hasVerifiedEmail()) {
-               
+
                 return response()->json([
                     'message' => 'Email already verified.'
                 ], 400);
                 // ->redirect("http://localhost:5173/")
 
-                
+
             }
 
             // Xác thực email
@@ -313,7 +313,7 @@ class AuthController extends Controller
     {
 
         try {
-            // $request->user()->currentAccessToken()->delete();
+        
             $request->user()->tokens()->delete();
 
             return response()->json([

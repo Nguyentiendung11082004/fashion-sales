@@ -6,10 +6,15 @@ import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { useAuth } from "../Auth/AuthContext";
 const MySwal = withReactContent(Swal);
+
 interface CartContextType {
   data: any;
   isLoading: boolean;
-  addToCart: (idProduct: number, idProductVariant: number) => void;
+  addToCart: (
+    idProduct: number,
+    idProductVariant: number,
+    quantity: number
+  ) => void;
   handleIncrease: (idCart: number, currentQuantity: number) => void;
   handleDecrease: (idCart: number, currentQuantity: number) => void;
 }
@@ -39,20 +44,23 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     },
     enabled: !!token,
   });
+
   const addCartMutation = useMutation({
     mutationFn: async ({
       idProduct,
       idProductVariant,
+      quantity,
     }: {
       idProduct: number;
-      idProductVariant: number;
+      idProductVariant?: number;
+      quantity?: number;
     }) => {
       await instance.post(
         `/cart`,
         {
           product_id: idProduct,
           product_variant_id: idProductVariant,
-          quantity: 1,
+          quantity: quantity || 1,
         },
         {
           headers: {
@@ -86,9 +94,14 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     },
   });
 
-  const addToCart = (idProduct: number, idProductVariant: number) => {
-    addCartMutation.mutate({ idProduct, idProductVariant });
+  const addToCart = (
+    idProduct: number,
+    idProductVariant: number,
+    quantity: number
+  ) => {
+    addCartMutation.mutate({ idProduct, idProductVariant, quantity });
   };
+
   const updateQuantity = useMutation({
     mutationFn: async ({
       idCart,
@@ -113,13 +126,14 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       queryClient.invalidateQueries({ queryKey: ["cart"] });
     },
   });
+
   const handleIncrease = (idCart: number, currentQuantity: number) => {
     const newQuantity = currentQuantity + 1;
     updateQuantity.mutate({ idCart, newQuantity });
   };
 
   const handleDecrease = (idCart: number, currentQuantity: number) => {
-    const newQuantity = currentQuantity - 1;
+    const newQuantity = currentQuantity > 1 ? currentQuantity - 1 : 1;
     updateQuantity.mutate({ idCart, newQuantity });
   };
 

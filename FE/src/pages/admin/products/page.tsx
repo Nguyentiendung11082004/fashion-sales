@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Loading from "@/common/Loading/Loading";
 import { Iproduct } from "@/common/types/products";
 import { productDestroy, productsIndex } from "@/services/api/admin/products.api";
@@ -21,11 +23,10 @@ const ProductPageManager = () => {
   const [currentId, setCurrentId] = useState<number>();
   const [hasError, setHasError] = useState(false);
   const queryClient = useQueryClient();
-  const { data, isLoading, isError } = useQuery({
+  const { data, isFetching, isError } = useQuery({
     queryKey: ["productsIndex"],
     queryFn: productsIndex,
   });
-
   const { mutate } = useMutation({
     mutationFn: productDestroy,
     onSuccess: () => {
@@ -86,11 +87,6 @@ const ProductPageManager = () => {
         );
       },
     },
-    {
-      title: "slug",
-      dataIndex: "slug",
-    },
-
     {
       title: "status",
       dataIndex: "status",
@@ -153,7 +149,7 @@ const ProductPageManager = () => {
       key: product.id,
       ...product
     }
-  )) || [];
+    )) || [];
   useEffect(() => {
     if (isError && !hasError) {
       toast.error("Có lỗi xảy ra");
@@ -174,7 +170,7 @@ const ProductPageManager = () => {
         </Link>
       </div>
       <div className="">
-        {isLoading ? (
+        {isFetching ? (
           <Loading />
         ) : (
           <>

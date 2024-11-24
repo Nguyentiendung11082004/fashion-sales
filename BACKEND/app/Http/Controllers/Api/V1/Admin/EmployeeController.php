@@ -19,7 +19,7 @@ class EmployeeController extends Controller
     public function index()
     {
         $employees = User::whereIn('role_id', [2, 3])->with('role')
-        ->latest()->get();
+            ->latest()->get();
 
         return response()->json([
             'success' => true,
@@ -34,7 +34,7 @@ class EmployeeController extends Controller
     {
 
         try {
-         
+
             $dataEmployee = [
                 'name'        => $request->name,
                 'phone_number' => $request->phone_number,
@@ -47,32 +47,32 @@ class EmployeeController extends Controller
                 'role_id'     => $request->role_id,
                 'avatar'      => $request->avatar
             ];
-       
+
 
             // if ($request->hasFile('avatar')) {
             //     // Lưu avatar vào thư mục avatars
             //     $avatarPath = Storage::put('public/avatars', $request->file('avatar'));
             //     // Tạo URL đầy đủ cho avatar
-                
+
             //     $dataEmployee['avatar'] = url(Storage::url($avatarPath));
 
             // }
-        
-        $employee = User::query()->create($dataEmployee);
-        
-        return response()->json([
-            'status'  =>201,
-            'success' =>true,  
-            'message' =>'Employee created successfully!',
-            'data'    => $employee
-        ],201);
+
+            $employee = User::query()->create($dataEmployee);
+
+            return response()->json([
+                'status'  => 201,
+                'success' => true,
+                'message' => 'Employee created successfully!',
+                'data'    => $employee
+            ], 201);
         } catch (\Exception $e) {
             return response()->json([
                 'status'  => 500,
                 'success' => false,
                 'message' => 'Không thành công.',
                 'error'   => $e->getMessage()
-            ], 500); 
+            ], 500);
         }
     }
 
@@ -84,18 +84,18 @@ class EmployeeController extends Controller
         try {
             $employee = User::with('role')->findOrFail($id);
             return response()->json([
-                'massage' => 'Chi tiết nhân viên id = '.$id,
-                'data'    =>$employee
-            ]);       
+                'massage' => 'Chi tiết nhân viên id = ' . $id,
+                'data'    => $employee
+            ]);
         } catch (\Throwable $th) {
-           if ($th instanceof ModelNotFoundException){
+            if ($th instanceof ModelNotFoundException) {
+                return response()->json([
+                    'massage' => 'Không tìm thấy nhân viên có id=' . $id,
+                ], HttpResponse::HTTP_NOT_FOUND);
+            }
             return response()->json([
-                'massage'=>'Không tìm thấy nhân viên có id='.$id,
-            ], HttpResponse::HTTP_NOT_FOUND);
-           }
-           return response()->json([
-            'massage'=>'Không tìm thấy nhân viên có id='.$id,
-        ], HttpResponse::HTTP_INTERNAL_SERVER_ERROR);
+                'massage' => 'Không tìm thấy nhân viên có id=' . $id,
+            ], HttpResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -103,66 +103,88 @@ class EmployeeController extends Controller
      * Update the specified resource in storage.
      */
     public function update(UserRequest $request, string $id)
-{
-    try {
-        $employee = User::findOrFail($id);
+    {
+        try {
+            $employee = User::findOrFail($id);
 
-        $dataEmployee = [
-            'name'         => $request->name,
-            'phone_number' => $request->phone_number,
-            'email'        => $request->email,
-            'address'      => $request->address,
-            'password'     => $request->password ? bcrypt($request->password) : $employee->password, 
-            'birth_date'   => $request->birth_date,
-            'is_active'    => $request->is_active ?? $employee->is_active,
-            'gender'       => $request->gender,
-            'role_id'      => $request->role_id,
-            'avatar'       =>$request->avatar ?? $employee->avatar //kiểm tra avatar
-        ];
+            $dataEmployee = [
+                'name'         => $request->name,
+                'phone_number' => $request->phone_number,
+                'email'        => $request->email,
+                'address'      => $request->address,
+                'password'     => $request->password ? bcrypt($request->password) : $employee->password,
+                'birth_date'   => $request->birth_date,
+                'is_active'    => $request->is_active ?? $employee->is_active,
+                'gender'       => $request->gender,
+                'role_id'      => $request->role_id,
+                'avatar'       => $request->avatar ?? $employee->avatar //kiểm tra avatar
+            ];
 
-    
-        $employee->update($dataEmployee);
 
-        return response()->json([
-            'status'  => 200,
-            'success' => true,  
-            'message' => 'Employee updated successfully!',
-            'data'    => $employee
-        ], 200);
-    } catch (\Exception $e) {
-        return response()->json([
-            'status'  => 500,
-            'success' => false,
-            'message' => 'Update failed.',
-            'error'   => $e->getMessage()
-        ], 500); 
+            $employee->update($dataEmployee);
+
+            return response()->json([
+                'status'  => 200,
+                'success' => true,
+                'message' => 'Employee updated successfully!',
+                'data'    => $employee
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status'  => 500,
+                'success' => false,
+                'message' => 'Update failed.',
+                'error'   => $e->getMessage()
+            ], 500);
+        }
     }
-}
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(string $id)
     {
         $employee = User::find($id);
-    
+
         if (!$employee) {
             return response()->json([
                 'success' => false,
                 'message' => 'Employee not found',
             ], 404);
         }
-    
+
         // Kiểm tra và xóa ảnh nếu tồn tại
         // if ($employee->avatar) {
         //     Storage::delete('public/avatars/' . basename($employee->avatar));
         // }
-    
+
         // Xóa bản ghi nhân viên
         $employee->delete();
-    
+
         return response()->json([
             'success' => true,
             'message' => 'Employee deleted successfully',
         ], 200);
+    }
+
+    public function search(Request $request)
+    {
+        $query = $request->input('query'); // Lấy từ khóa tìm kiếm từ body request
+
+        if (!$query) {
+            return response()->json([
+                'message' => 'Vui lòng nhập từ khóa tìm kiếm.',
+                'data' => []
+            ], 400);
+        }
+
+        // Tìm kiếm trong cột `name` và `email`
+        $results = User::where('name', 'LIKE', "%{$query}%")
+            ->orWhere('email', 'LIKE', "%{$query}%")
+            ->get();
+
+        return response()->json([
+            'message' => 'Kết quả tìm kiếm.',
+            'data' => $results,
+        ]);
     }
 }
