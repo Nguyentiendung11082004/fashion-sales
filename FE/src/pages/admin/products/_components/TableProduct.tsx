@@ -115,7 +115,8 @@ const TableProduct: React.FC = () => {
       type: value
     }));
   };
-  const variantProducts = dataProduct?.variant_products?.map((item: any) => ({
+  console.log("dataProduct", dataProduct)
+  const variantProducts = (dataProduct?.variant_products || [])?.map((item: any) => ({
     key: item.variant_id,
     name: item.product_name + ' - ' + item.variant_sku,
     sku: item.variant_sku,
