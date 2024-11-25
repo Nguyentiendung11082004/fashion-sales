@@ -1,5 +1,4 @@
 import Loading from "@/common/Loading/Loading";
-import GoogleCallback from "@/pages/client/auth/login/GoogleCallback";
 import React, { Suspense, lazy } from "react";
 import { Route, Routes } from "react-router-dom";
 
@@ -161,6 +160,7 @@ const Router = () => {
           <Route path="vouchers/edit/:id" element={<FormVoucher />} />
           <Route path="orders" element={<OrderPage />} />
           <Route path="orders/:id" element={<OrderDetail />} />
+          {/* <Route path="/comments" element={<CommentPage/>} /> */}
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>

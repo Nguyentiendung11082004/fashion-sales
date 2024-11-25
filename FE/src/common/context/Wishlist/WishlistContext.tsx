@@ -1,9 +1,9 @@
+import React, { createContext, useContext, useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/common/context/Auth/AuthContext";
-import { ResponseWishlist } from "@/common/types/responseDataFilter";
-import instance from "@/configs/axios";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import React, { createContext, useContext, useState} from "react";
 import { useNavigate } from "react-router-dom";
+import instance from "@/configs/axios";
+import { ResponseWishlist } from "@/common/types/responseDataFilter";
 
 interface WishlistContextType {
   data: ResponseWishlist[] | undefined;
@@ -13,24 +13,27 @@ interface WishlistContextType {
 
 const WishlistContext = createContext<WishlistContextType | null>(null);
 
-export const WishlistProvider = ({children}: {children: React.ReactNode}) => {
+export const WishlistProvider = ({ children }: { children: React.ReactNode }) => {
   const queryClient = useQueryClient();
   const { token } = useAuth();
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const [localWishlist, setLocalWishlist] = useState<Set<number | string>>(new Set());
+  const [isActive, setIsActive] = useState(false); 
 
-  const { data } = useQuery<ResponseWishlist[]>({
-    queryKey: ["productsData", token],
-    queryFn: async () => {
-      const response = await instance.get("/wishlist", {
-        headers: {
-          Authorization: `Bearer ${token}`, 
-        },
-      });
-      return response.data;
-    },
-  });
-  //   console.log(data);
+  const { data } = useQuery<ResponseWishlist[]>(
+    {
+      queryKey: ["productsData", token],
+      queryFn: async () => {
+        const response = await instance.get("/wishlist", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        return response.data;
+      },
+      enabled: isActive, // Chỉ kích hoạt khi cần
+    }
+  );
 
   const mutationAdd = useMutation({
     mutationFn: async ({ product_id }: { product_id: number | string }) => {
@@ -54,16 +57,17 @@ export const WishlistProvider = ({children}: {children: React.ReactNode}) => {
   });
 
   const isInWishlist = (product_id: number | string): boolean => {
+    setIsActive(true); 
     return (
       localWishlist.has(product_id) ||
       (data?.some((item) => item.product.id === product_id) ?? false)
     );
-  };  
+  };
 
   const handleAddToWishlist = (product: { id: number | string }) => {
     const newProductId = product.id;
+    setIsActive(true); 
 
-    // Cập nhật trạng thái địa phương ngay lập tức
     setLocalWishlist((prev) => {
       const updatedWishlist = new Set(prev);
       if (updatedWishlist.has(newProductId)) {
@@ -74,7 +78,6 @@ export const WishlistProvider = ({children}: {children: React.ReactNode}) => {
       return updatedWishlist;
     });
 
-    // Thực hiện cuộc gọi API
     if (!isInWishlist(newProductId)) {
       mutationAdd.mutate({ product_id: newProductId });
     } else {
@@ -82,10 +85,13 @@ export const WishlistProvider = ({children}: {children: React.ReactNode}) => {
     }
   };
 
-
   return (
     <WishlistContext.Provider
-      value={{ data, isInWishlist, handleAddToWishlist }}
+      value={{
+        data,
+        isInWishlist,
+        handleAddToWishlist,
+      }}
     >
       {children}
     </WishlistContext.Provider>
@@ -93,9 +99,9 @@ export const WishlistProvider = ({children}: {children: React.ReactNode}) => {
 };
 
 export const useWishlist = (): WishlistContextType => {
-    const context = useContext(WishlistContext);
-    if (!context) {
-        throw new Error("useWishlist must be used within a WishlistProvider");
-    }
-    return context;
+  const context = useContext(WishlistContext);
+  if (!context) {
+    throw new Error("useWishlist must be used within a WishlistProvider");
+  }
+  return context;
 };

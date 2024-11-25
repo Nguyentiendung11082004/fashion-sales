@@ -3,7 +3,7 @@ import instance from "@/configs/axios";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button, Input, Modal, Table } from "antd";
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useRealtimeOrders, notifyOrdersChanged } from '@/common/hooks/useRealtimeOrders'; 
 // import { notifyOrdersChanged, listenForOrdersChange } from '@/common/hooks/useRealtimeOrders'; 
@@ -19,6 +19,8 @@ const HistoryOrder = () => {
   const [cancelReason, setCancelReason] = useState("");
   const queryClient = useQueryClient();
   const { token } = useAuth();
+  const location = useLocation();
+  const isActive = (path: string) => location.pathname === path;
   const { data, isFetching, isError } = useQuery({
     queryKey: ["history-order"],
     queryFn: async () => {
@@ -151,23 +153,48 @@ const HistoryOrder = () => {
                 </span>
               </div>
               <hr className="mt-[1rem] h-0 border-solid border-b-2" />
-              <div className="hd-account-menu overflow-x-auto flex uppercase font-medium">
-                <Link to="account.html" className="hd-account-menu-item">
-                  Thông tin tài khoản
-                </Link>
-                <Link to="#" className="hd-account-menu-item">
-                  Yêu thích
-                </Link>
-                <Link to="history-order.html" className="hd-account-menu-item">
-                  Lịch sử mua hàng
-                </Link>
-                <Link
-                  to="updatepass-account.html"
-                  className="hd-account-menu-item"
-                >
-                  Đổi mật khẩu
-                </Link>
-              </div>
+              <div className="hd-account-menu overflow-x-auto flex uppercase font-medium ">
+              <Link
+                to="/account"
+                className={`${
+                  isActive("/account")
+                    ? "block w-1/4 lg:text-left text-center flex-shrink-0 py-[1.5rem] leading-4 relative border-b-[3px] border-[#00BADB]"
+                    : "hd-account-menu-item "
+                }`}
+              >
+                Thông tin tài khoản
+              </Link>
+              <Link
+                to="/wishlist"
+                className={`${
+                  isActive("/wishlist")
+                    ? "block w-1/4 lg:text-left text-center flex-shrink-0 py-[1.5rem] leading-4 relative border-b-[3px] border-[#00BADB]"
+                    : "hd-account-menu-item "
+                }`}
+              >
+                Yêu thích
+              </Link>
+              <Link
+                to="/history-order"
+                className={`${
+                  isActive("/history-order")
+                    ? "block w-1/4 lg:text-left text-center flex-shrink-0 py-[1.5rem] leading-4 relative border-b-[3px] border-[#00BADB]"
+                    : "hd-account-menu-item "
+                }`}
+              >
+                Lịch sử mua hàng
+              </Link>
+              <Link
+                to="/password/reset"
+                className={`${
+                  isActive("/password/reset")
+                    ? "block w-1/4 lg:text-left text-center flex-shrink-0 py-[1.5rem] leading-4 relative border-b-[3px] border-[#00BADB]"
+                    : "hd-account-menu-item "
+                }`}
+              >
+                Đổi mật khẩu
+              </Link>
+            </div>
               <hr className="h-0 border-solid border-b-2" />
             </div>
           </div>

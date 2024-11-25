@@ -17,7 +17,7 @@ const Login = () => {
   const [error, setError] = useState<any>('');
   const navigator = useNavigate();
   const [form] = Form.useForm();
-  const { login, token } = useAuth();
+  const { login} = useAuth();
   const queryClient = useQueryClient();
   const { mutate } = useMutation({
     mutationFn: async (user) => {
@@ -50,57 +50,33 @@ const Login = () => {
     // login(data)
   };
 
-  const handleGoogleLogin = async () => {
+  const handleGoogleLogin = () => {
     try {
-        // const { data } = await instance.get('/login/google');
         window.location.href = 'http://127.0.0.1:8000/api/v1/login/google';
     } catch (error) {
         console.error();
     }
 };
 
-// useEffect(() => {
-//     const handleGoogleCallback = async () => {
-//         const urlParams = new URLSearchParams(window.location.search);
-//         if (urlParams.has('code')) {
-//             try {
-//                 const { data } = await instance.get(`/login/google/callback`);
-//                 localStorage.setItem('token', data.token);
-//                 window.location.href = '/'; 
-//             } catch (error) {
-//                 console.error();
-//             }
-//         }
-//     };
+const [token, setToken] = useState(localStorage.getItem('token') || null);
 
-//     handleGoogleCallback();
-// }, []);
 useEffect(() => {
-  // Lấy token từ URL
   const urlParams = new URLSearchParams(window.location.search);
-  const token = urlParams.get('token');
+  const urlToken = urlParams.get('token');
 
-  if (token) {
-      // Lưu token vào localStorage
-      localStorage.setItem('token', token);
+  if (urlToken) {
+    // Lưu token vào state và localStorage
+    setToken(urlToken);
+    localStorage.setItem('token', urlToken);
 
-      // Chuyển hướng đến trang chính
-      // window.location.href = '/';
-      // navigate('/')
-      const storedToken = localStorage.getItem("token");
-            if (storedToken) {
-                console.log("Token saved:", storedToken);
-                // Chuyển hướng đến trang chính sau khi lưu token
-                // window.location.href = "/";
-                navigate('/')
-            } else {
-                console.error("Failed to save token in localStorage");
-            }
-  } else {
-      console.error("Token not found in URL");
+    // Xóa token khỏi URL
+    const newUrl = window.location.origin + window.location.pathname;
+    window.history.replaceState(null, "", newUrl);
+
+    // Chuyển hướng về trang chủ
+    window.location.href = "/";
   }
-}, []);
-
+}, []);  // empty dependency array để `useEffect` chỉ chạy một lần khi component mount
 
   return (
     <>
