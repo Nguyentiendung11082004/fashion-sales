@@ -45,9 +45,10 @@ const Cart = () => {
     refetchOnWindowFocus: true,
     refetchOnMount: true,
   });
+  console.log("data", data)
   const pusher = new Pusher('4d3e0d70126f2605977e', {
     cluster: 'ap1',
-    authEndpoint: 'http://localhost:8000/broadcasting/auth', 
+    authEndpoint: 'http://localhost:8000/broadcasting/auth',
     auth: {
       headers: {
         Authorization: `${token}`
@@ -63,9 +64,9 @@ const Cart = () => {
       });
     });
 
-    pusher.connection.bind("connected", () => {});
+    pusher.connection.bind("connected", () => { });
 
-    pusher.connection.bind("error", (err: any) => {});
+    pusher.connection.bind("error", (err: any) => { });
 
     // Giả sử cartId là id của giỏ hàng hiện tại
 
@@ -77,6 +78,7 @@ const Cart = () => {
     };
   }, [data, queryClient]); // Cập nhật khi idCart hoặc token thay đổi
   // Đảm bảo rằng cartId không thay đổi khi component mount/unmount
+
 
   const updateQuantity = useMutation({
     mutationFn: async ({
@@ -102,11 +104,13 @@ const Cart = () => {
       );
     },
     onSuccess: () => {
+      console.log("1")
       queryClient.invalidateQueries({
         queryKey: ["cart"],
       });
     },
     onError: (message: any) => {
+      console.log("message", message)
       toast.error(message?.response?.data?.message, {
         autoClose: 5000,
       });
@@ -254,10 +258,10 @@ const Cart = () => {
       .filter((key) => updatedCheckedItems[Number(key)])
       .map(Number);
     setIdCart(updatedIdCarts);
-  
+
     setIsAllChecked(updatedIdCarts.length === carts.length);
   };
-  
+
   const handleCheckout = () => {
     if (!idCart || idCart.length === 0) {
       MySwal.fire({
@@ -292,9 +296,9 @@ const Cart = () => {
       if (storedCheckedItems) {
         const parsedCheckedItems = JSON.parse(storedCheckedItems);
         setCheckedItems(parsedCheckedItems);
-  
+
         // Tính toán lại isAllChecked
-        const isAllCheckedNow = carts.every((item:any) => parsedCheckedItems[item.id]);
+        const isAllCheckedNow = carts.every((item: any) => parsedCheckedItems[item.id]);
         setIsAllChecked(isAllCheckedNow);
       }
     } else {
@@ -302,7 +306,7 @@ const Cart = () => {
       setIsAllChecked(false);
     }
   }, [carts]);
-  
+
   return (
     <>
       <main
@@ -392,50 +396,50 @@ const Cart = () => {
                                   </Link>
                                   {/*end hd-price-item*/}
                                   {updatedAttributes.dataAttributes &&
-                                  Object.entries(
-                                    updatedAttributes.dataAttributes
-                                  ).length > 0
+                                    Object.entries(
+                                      updatedAttributes.dataAttributes
+                                    ).length > 0
                                     ? Object.entries(
-                                        updatedAttributes.dataAttributes
-                                      ).map(
-                                        ([attributeName, attributeValue]) => {
-                                          const attributeItem =
-                                            updatedAttributes.find(
-                                              (item: any) =>
-                                                item.name === attributeName
-                                            );
-                                          return (
-                                            <div
-                                              className="hd-infor-text-meta text-[13px] text-[#878787]"
-                                              key={attributeName}
-                                            >
-                                              <p>
-                                                {attributeName}:{" "}
-                                                <strong>
-                                                  {attributeItem
-                                                    ? attributeItem.pivot.value
-                                                    : attributeValue}
-                                                </strong>
-                                              </p>
-                                            </div>
+                                      updatedAttributes.dataAttributes
+                                    ).map(
+                                      ([attributeName, attributeValue]) => {
+                                        const attributeItem =
+                                          updatedAttributes.find(
+                                            (item: any) =>
+                                              item.name === attributeName
                                           );
-                                        }
-                                      )
-                                    : e?.productvariant?.attributes?.map(
-                                        (item: any) => (
+                                        return (
                                           <div
                                             className="hd-infor-text-meta text-[13px] text-[#878787]"
-                                            key={item.id}
+                                            key={attributeName}
                                           >
                                             <p>
-                                              {item?.name}:{" "}
+                                              {attributeName}:{" "}
                                               <strong>
-                                                {item?.pivot?.value}
+                                                {attributeItem
+                                                  ? attributeItem.pivot.value
+                                                  : attributeValue}
                                               </strong>
                                             </p>
                                           </div>
-                                        )
-                                      )}
+                                        );
+                                      }
+                                    )
+                                    : e?.productvariant?.attributes?.map(
+                                      (item: any) => (
+                                        <div
+                                          className="hd-infor-text-meta text-[13px] text-[#878787]"
+                                          key={item.id}
+                                        >
+                                          <p>
+                                            {item?.name}:{" "}
+                                            <strong>
+                                              {item?.pivot?.value}
+                                            </strong>
+                                          </p>
+                                        </div>
+                                      )
+                                    )}
 
                                   <div className="hd-infor-text-tools mt-[10px]">
                                     {e.productvariant && (
@@ -508,13 +512,13 @@ const Cart = () => {
                                   <del className="text-[#696969]">
                                     {FormatMoney(
                                       e?.productvariant?.price_regular ||
-                                        e?.product?.price_regular
+                                      e?.product?.price_regular
                                     )}
                                   </del>
                                   <ins className="ms-[6px] no-underline text-[#ec0101]">
                                     {FormatMoney(
                                       e?.productvariant?.price_sale ||
-                                        e?.product?.price_sale
+                                      e?.product?.price_sale
                                     )}
                                   </ins>
                                 </div>
