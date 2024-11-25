@@ -111,7 +111,8 @@ class OrderController extends Controller
                 'Hoàn trả hàng' => 4,
                 'Giao hàng thành công' => 5,
                 'Đã hủy' => 6,
-                'Hoàn thành' => 7
+                'Hoàn thành' => 7,
+                'Đã nhận hàng' => 8
             ];
             
          
@@ -140,7 +141,7 @@ class OrderController extends Controller
                 return response()->json(['message' => 'Khi đang vận chuyển, chỉ có thể cập nhật thành "Giao hàng thành công".'], Response::HTTP_BAD_REQUEST);
             }
 
-            if ($currentStatus === 'Giao hàng thành công' && !in_array($newStatus, ['Hoàn trả hàng', 'Hoàn thành'])) {
+            if ($currentStatus === 'Giao hàng thành công' && !in_array($newStatus, ['Hoàn trả hàng','Đã nhận hàng', 'Hoàn thành'])) {
                 return response()->json(['message' => 'Sau "Giao hàng thành công", chỉ có thể chuyển sang "Hoàn trả hàng" hoặc "Hoàn thành".'], Response::HTTP_BAD_REQUEST);
             }
 
@@ -148,7 +149,10 @@ class OrderController extends Controller
                 return response()->json(['message' => 'Từ "Hoàn trả hàng", chỉ có thể chuyển sang "Hoàn thành".'], Response::HTTP_BAD_REQUEST);
             }
 
-         
+            if ($newStatus === 'Đã nhận hàng') {
+                $newStatus = 'Hoàn thành';
+            }
+    
           
 
             // Nếu có trạng thái mới từ request, thực hiện thay đổi trạng thái
