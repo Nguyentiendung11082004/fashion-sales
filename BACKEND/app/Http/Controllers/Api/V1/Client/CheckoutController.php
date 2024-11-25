@@ -423,13 +423,14 @@ class CheckoutController extends Controller
         try {
             $to_district_id = $request["to_district_id"];
             $weight = $request["weight"];
-            $api_key = '18f28540-8fbc-11ef-839a-16ebf09470c6';
+            $api_key = env('API_KEY');
+            
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, "https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/available-services");
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($ch, CURLOPT_POST, 1);
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
-                'shop_id' => 5404595,  // Thay YOUR_SHOP_ID bằng mã shop GHN của bạn
+                'shop_id' => env('SHOP_ID'),
                 'from_district' => 1804, //đan phượng
                 'to_district' => $to_district_id,
                 'weight' => $weight
@@ -438,67 +439,90 @@ class CheckoutController extends Controller
                 'Token: ' . $api_key,
                 'Content-Type: application/json'
             ]);
-
+    
             $response = curl_exec($ch);
+    
+            if (curl_errno($ch)) {
+                throw new \Exception('CURL Error: ' . curl_error($ch));
+            }
+    
             curl_close($ch);
-
-            $services = json_decode($response, true)['data'][0];
-            // dd($services);
-
-            return  $services;
+    
+            $responseData = json_decode($response, true);
+            
+            if (!isset($responseData['data']) || empty($responseData['data'])) {
+                throw new \Exception('GHN API không trả về dữ liệu dịch vụ.');
+            }
+            
+            $services = $responseData['data'][0] ?? null;
+            
+            if (!$services) {
+                throw new \Exception('Không tìm thấy dịch vụ vận chuyển khả dụng.');
+            }
+    
+            return $services;
         } catch (\Exception $ex) {
             return response()->json([
                 "message" => $ex->getMessage()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+    
     // tính phí vận chuyển
     public function calculateShippingFee(Request $request)
     {
         try {
-
             $request->validate([
-
-                "to_district_id" => "required",
+                "to_district_id" => "required|integer",
                 "to_ward_code" => "required|string",
-                "weight" => "required", //đơn vị tính g
-
+                "weight" => "required|integer|min:1",
             ]);
-
-
-            // $from_district_id = $request->from_district_id;
+    
             $to_district_id = $request->to_district_id;
             $to_ward_code = $request->to_ward_code;
-
             $weight = $request->weight;
-
-
+    
             $services = $this->getAvailableServices($request);
-            // dd($services);
+    
+            if (!isset($services["service_id"])) {
+                throw new \Exception('Không tìm thấy service_id từ GHN API.');
+            }
+    
             $service_id = $services["service_id"];
-            $api_key = '18f28540-8fbc-11ef-839a-16ebf09470c6';
+            $api_key = env('API_KEY');
+    
             $ch = curl_init();
-
             curl_setopt($ch, CURLOPT_URL, "https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee");
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($ch, CURLOPT_POST, 1);
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
-                "shop_id" => 5404595,
-                'service_id' => $service_id,
-                'to_district_id' => $to_district_id,
+                "shop_id" => env('SHOP_ID'),
+                "service_id" => $service_id,
+                "to_district_id" => $to_district_id,
                 "to_ward_code" => $to_ward_code,
-                'weight' => $weight,
+                "weight" => $weight,
             ]));
             curl_setopt($ch, CURLOPT_HTTPHEADER, [
                 'Token: ' . $api_key,
-                'Content-Type: application/json'
+                'Content-Type: application/json',
             ]);
-
+    
             $response = curl_exec($ch);
+    
+            if (curl_errno($ch)) {
+                throw new \Exception('CURL Error: ' . curl_error($ch));
+            }
+    
             curl_close($ch);
-
-            $fee = json_decode($response, true)['data'];
-
+    
+            $responseData = json_decode($response, true);
+    
+            if (!isset($responseData['data'])) {
+                throw new \Exception('Không lấy được phí vận chuyển từ GHN API.');
+            }
+    
+            $fee = $responseData['data'];
+    
             return response()->json([
                 "fee" => $fee
             ], Response::HTTP_OK);
@@ -508,4 +532,5 @@ class CheckoutController extends Controller
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+    
 }
