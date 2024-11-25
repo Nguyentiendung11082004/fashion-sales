@@ -27,7 +27,10 @@ const OrderPage = () => {
     },
   });
   const queryClient = useQueryClient();
-  const dataOrder = data?.data;
+
+  const dataOrder = data?.data?.data;
+  console.log("data đơn hàng", dataOrder);
+
   const orStatus = {
     1: "Đang chờ xác nhận",
     2: "Đã xác nhận",
@@ -39,12 +42,20 @@ const OrderPage = () => {
   };
   const handleUpdateStatus = async (orderId: number, status: string) => {
     try {
+      console.log("orderId: ", orderId);
+      console.log("status: ", status);
+
       const orderToUpdate = dataOrder?.find(
         (order: IOrder) => order.id === orderId
       );
+
+      console.log("orderToUpdate: ", orderToUpdate);
+
       const response = await instance.put(`/order-status/${orderId}`, {
         order_status: status,
       });
+      console.log("response:", response);
+
       if (response.status === 200) {
         queryClient.invalidateQueries({ queryKey: ["order-status"] });
 

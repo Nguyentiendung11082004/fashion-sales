@@ -15,6 +15,7 @@ const OrderDetail = () => {
     },
   });
   const dataOrderDetail = data?.data;
+  console.log("data order nè : ", dataOrderDetail);
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>{error.message}</div>;
 
@@ -101,17 +102,14 @@ const OrderDetail = () => {
             <span className="font-semibold">Tên: </span>
             {dataOrderDetail?.order?.ship_user_name}
           </div>
+
           <div className="text-gray-700">
-            <span className="font-semibold">Email: </span>
-            {dataOrderDetail?.order?.user_email}
+            <span className="font-semibold">Địa chỉ: </span>
+            {dataOrderDetail?.order?.ship_user_address}
           </div>
           <div className="text-gray-700">
             <span className="font-semibold">Số điện thoại: </span>
             {dataOrderDetail?.order?.ship_user_phonenumber}
-          </div>
-          <div className="text-gray-700">
-            <span className="font-semibold">Địa chỉ: </span>
-            {dataOrderDetail?.order?.ship_user_address}
           </div>
         </div>
       </div>
