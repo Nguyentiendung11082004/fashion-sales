@@ -901,7 +901,7 @@ const ProductDetail = () => {
 
               {activeButton === "comment" && (
                 <CommentProduct
-                  productId={productId}
+                  productId={productId}zzz
                   setEditIdComment={setEditIdComment}
                   editIdComment={editIdComment}
                   InForCommentId={InForCommentId}

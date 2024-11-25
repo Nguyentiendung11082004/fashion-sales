@@ -172,7 +172,7 @@ class OrderController extends Controller
             'user_email' => $user['email'],
             'user_phonenumber' => $user['phone_number'],
             'user_address' => $user['address'],
-            'user_note' => $data['user_note'],
+            'user_note' => $data['user_note']?? '',
             'ship_user_name' => $data['ship_user_name'],
             'ship_user_phonenumber' => $data['ship_user_phonenumber'],
             'ship_user_address' => $data['ship_user_address'] . ', ' .

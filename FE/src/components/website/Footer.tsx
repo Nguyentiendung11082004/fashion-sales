@@ -214,7 +214,7 @@ const Footer = (props: Props) => {
             </span>
             <div className="max-w-md w-full my-5 rounded-lg flex">
               <div className="max-w-md w-full my-5 rounded-lg flex">
-                <div className=" flex-1 z-0">
+                <div className=" flex-1 -z-10">
                   <form className="max-w-md w-full my-5 rounded-lg flex">
                     <div className="relative flex-1">
                       <input

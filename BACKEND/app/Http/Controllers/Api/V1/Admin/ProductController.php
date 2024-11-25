@@ -104,6 +104,7 @@ class ProductController extends Controller
                             "quantity" => $item["quantity"],
                             "image" => $item['image'],
                             "sku" => $item["sku"],
+                            "id_guid" => $item["id_guid"]
 
                         ]);
                         foreach ($item["attribute_item_id"] as  $value) {

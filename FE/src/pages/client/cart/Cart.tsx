@@ -226,7 +226,6 @@ const Cart = () => {
   });
 
   const [isAllChecked, setIsAllChecked] = useState<boolean>(false);
-  console.log("isAllChecked",isAllChecked)
   const [checkedItems, setCheckedItems] = useState<{ [key: number]: boolean }>({});
   const handleCheckAll = () => {
     const newChecked = !isAllChecked;
@@ -258,6 +257,7 @@ const Cart = () => {
   
     setIsAllChecked(updatedIdCarts.length === carts.length);
   };
+  
   const handleCheckout = () => {
     if (!idCart || idCart.length === 0) {
       MySwal.fire({
