@@ -14,63 +14,7 @@ class CommentsController extends Controller
     /**
      * Display a listing of the resource.
      */
-    // public function index(Request $request)
-    // {
-    //     try {
-    //         // Lấy tất cả các bình luận và sắp xếp theo ID mới nhất
-    //         $comments = Comments::query()
-    //             ->leftJoin('users', 'comments.user_id', '=', 'users.id')
-    //             ->leftJoin('products', 'comments.product_id', '=', 'products.id')
-    //             ->select(
-    //                 'comments.*',
-    //                 'users.name as user_name',
-    //                 'users.email as user_email',
-    //                 'users.phone_number as user_phone',
-    //                 'products.name as product_name'
-    //             )
-    //             ->orderBy('comments.id', 'desc') // Thêm sắp xếp theo ID giảm dần
-    //             ->get();
-
-    //         // Thay thế thông tin người dùng và sản phẩm nếu không tồn tại
-    //         foreach ($comments as $comment) {
-    //             if (is_null($comment->user_name)) {
-    //                 $comment->user_name = 'Người dùng đã bị xóa';
-    //                 $comment->user_email = 'Không có thông tin';
-    //                 $comment->user_phone = 'Không có thông tin';
-    //             }
-    //             if (is_null($comment->product_name)) {
-    //                 $comment->product_name = 'Sản phẩm đã bị xóa';
-    //             }
-    //         }
-
-    //         // Kiểm tra dữ liệu
-    //         if ($comments->isEmpty()) {
-    //             return response()->json([
-    //                 'status' => false,
-    //                 'message' => 'Không có dữ liệu.',
-    //                 'data' => []
-    //             ], Response::HTTP_OK);
-    //         }
-
-    //         // Trả về dữ liệu với cấu trúc rõ ràng
-    //         return response()->json([
-    //             'status' => true,
-    //             'message' => 'Danh sách bình luận được lấy thành công.',
-    //             'data' => [
-    //                 'total' => $comments->count(),
-    //                 'comments' => $comments
-    //             ]
-    //         ], Response::HTTP_OK);
-
-    //     } catch (\Exception $ex) {
-    //         Log::error('API/V1/Admin/CommentsController@index: ', [$ex->getMessage()]);
-
-    //         return response()->json([
-    //             'status' => false,
-    //             'message' => 'Đã có lỗi nghiêm trọng xảy ra trong quá trình lấy dữ liệu.'
-    //         ], Response::HTTP_INTERNAL_SERVER_ERROR);
-    //     }
-    // }
+  
  public function index()
     {
         $comments = Comments::with(['user:id,name,avatar', 'childrenRecursive.user:id,name,avatar'])
