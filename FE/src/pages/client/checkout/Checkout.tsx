@@ -155,8 +155,6 @@ const Checkout = () => {
     setOrder((prev: any) => ({
       ...prev,
       tinh: e.label,
-      huyen: null, 
-      xa: null
     })),
     setIdTinh(Number(e.value));
     setIdQuanHuyen(null)
@@ -166,7 +164,6 @@ const Checkout = () => {
     setOrder((prev: any) => ({
       ...prev,
       huyen: e.label,
-      xa: null
     })),
       setIdXa(null)
       setIdQuanHuyen(e.value);
