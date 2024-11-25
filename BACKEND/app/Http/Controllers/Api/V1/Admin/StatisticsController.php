@@ -280,7 +280,7 @@ class StatisticsController extends Controller
                         }
                         return null;
                     })
-                    ->filter(); // Loại bỏ các sản phẩm không khớp filter
+->filter(); // Loại bỏ các sản phẩm không khớp filter
 
                 $results['simple_products'] = $simpleProducts;
             }
@@ -333,15 +333,16 @@ class StatisticsController extends Controller
                         }
 
                         // Lọc theo statusFilter nếu có
-                        $statusIds = $this->getStatusIds($statuses);
+$statusIds = $this->getStatusIds($statuses);
                         if (empty($statusFilter) || !empty(array_intersect($statusFilter, $statusIds))) {
                             $variant->status = implode('|', $statuses);
                             return $variant;
           }
                         return null;
                     })
-                    ->filter(); // Loại bỏ các sản phẩm không khớp filter
-
+                    ->filter() // Loại bỏ các sản phẩm không khớp filter
+ ->values() // Đặt lại chỉ số key để đảm bảo trả về là mảng
+        ->toArray(); // Chuyển đổi Collection thành mảng
                 $results['variant_products'] = $variantProducts;
             }
 

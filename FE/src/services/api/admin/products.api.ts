@@ -15,7 +15,7 @@ const handleRequest = async (
   }
 };
 
-export const productsIndex = () => handleRequest("get", `/products`);
+export const productsIndex = (filter:any) => handleRequest("get", `/products`,filter);
 // getall
 export const productShow = (id: number | string) =>
   handleRequest("get", `/products/${id}`);

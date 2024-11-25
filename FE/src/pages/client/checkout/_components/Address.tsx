@@ -27,27 +27,27 @@ const ModalAddress = ({ open, onClose, title, dataCheckout, onHandleOk }: Props)
   const [form] = Form.useForm();
   const [selectedId, setSelectedId] = useState<number | null>(null);
 
-  console.log("selectedId", selectedId)
   const queryClient = useQueryClient()
   const mutationUpdate = useMutation({
     mutationFn: async (data) => {
-      return await instance.put(`/addresses/${selectedId}`, data, {
+      const response = await instance.put(`/addresses/${selectedId}`, data, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      })
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['address']
       });
+      return response.data;
+    },
+    onSuccess: (updatedAddress) => {
+      queryClient.invalidateQueries({
+        queryKey: ['address'],
+      });
+      onHandleOk(updatedAddress);
       onClose();
-      form.resetFields();
     },
     onError: (error: any) => {
-      toast.error(error?.response?.data?.message)
+      toast.error(error?.response?.data?.message);
     }
-  })
+  });
   const handleOk = (data: any) => {
     const address = data?.find((e: any) => e.id === selectedId);
     mutationUpdate.mutate({
