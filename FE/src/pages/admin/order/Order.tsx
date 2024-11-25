@@ -28,7 +28,7 @@ const OrderPage = () => {
   });
   const queryClient = useQueryClient();
 
-  const dataOrder = data?.data;
+  const dataOrder = data?.data?.data;
   console.log("data đơn hàng", dataOrder);
 
   const orStatus = {
@@ -74,7 +74,7 @@ const OrderPage = () => {
   };
 
   const dataSource = dataOrder
-    ? dataOrder.map((item: IOrder) => ({
+    ? dataOrder?.map((item: IOrder) => ({
         key: item?.id,
         ...item,
       }))

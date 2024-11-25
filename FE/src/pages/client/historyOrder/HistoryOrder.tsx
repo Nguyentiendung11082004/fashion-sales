@@ -123,8 +123,9 @@ const HistoryOrder = () => {
       key: "value",
     },
   ];
-
+  if (isFetching) return <div>Loading...</div>;
   return (
+
     <>
       <main
         id="main-content"
@@ -215,9 +216,10 @@ const HistoryOrder = () => {
                   order.order_status.trim().toLowerCase() === "đã xác nhận";
                 const canCel =
                   order.order_status.trim().toLowerCase() === "đã hủy";
+                const shipOk = order.order_status.trim().toLowerCase() === "đang vận chuyển";
 
                 const handleReceived = (orderId: number) => {
-                  if (isCancelOk || canCel) {
+                  if (isCancelOk || canCel || shipOk) {
                     toast.warning(
                       "Không thể xác nhận nhận hàng ở trạng thái này."
                     );
@@ -549,7 +551,7 @@ const HistoryOrder = () => {
                                 ? "Đã Nhận Được Hàng"
                                 : "Đã Nhận Hàng"}
                             </button>
-                            {!isCancelOk && !canCel && (
+                            {!isCancelOk && !canCel && !shipOk && (
                               <button
                                 type="button"
                                 className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 ttnc-ButtonSecondary text-slate-700 ${
