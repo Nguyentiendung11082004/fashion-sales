@@ -35,12 +35,14 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const { data, isLoading } = useQuery({
     queryKey: ["cart"],
     queryFn: async () => {
-      const res = await instance.get("/cart", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      return res.data;
+      if(token) {
+        const res = await instance.get("/cart", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        return res.data;
+      }
     },
     enabled: !!token,
   });
