@@ -66,58 +66,146 @@ class ProductController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+    // public function store(StoreProduct $request)
+    // {
+    //     try {
+
+    //         $respone = DB::transaction(function () use ($request) {
+
+    //             $dataProduct = $request->except(["attribute_id", "attribute_item_id", "product_variant"]);
+
+    //             $dataProduct["slug"] = Str::slug($request->input("name"));
+
+    //             $product = Product::query()->create($dataProduct);
+    //             foreach ($request->gallery as  $gallery) {
+
+    //                 ProductGallery::query()->create([
+    //                     "product_id" => $product->id,
+    //                     "image" => $gallery
+    //                 ]);
+    //             }
+    //             $product->tags()->attach($dataProduct['tags']);
+
+
+    //             if ($request->input('type') == 1) {
+    //                 // create product_has_attribute
+
+    //                 foreach ($request->input("attribute_item_id") as $attributeId => $attributeItemId) {
+    //                     $product->attributes()->attach($attributeId, ["attribute_item_ids" => json_encode($attributeItemId)]);
+    //                 }
+    //                 // thêm mới productvariant
+
+    //                 foreach ($request->input("product_variant") as $item) {
+    //                     //    dd($item);
+    //                     $productVariant = ProductVariant::query()->create([
+    //                         "product_id" => $product->id,
+    //                         "price_regular" => $item["price_regular"],
+    //                         "price_sale" => $item["price_sale"],
+    //                         "quantity" => $item["quantity"],
+    //                         "image" => $item['image'],
+    //                         "sku" => $item["sku"],
+    //                         "id_guid" => $item["id_guid"]??null
+
+    //                     ]);
+    //                     foreach ($item["attribute_item_id"] as  $value) {
+
+    //                         $attribute_id = null;
+
+    //                         foreach ($request->input('attribute_id') as  $attr_id) {
+
+    //                             if (in_array($value['id'], $request->input('attribute_item_id')[$attr_id])) {
+    //                                 $attribute_id = $attr_id;
+    //                                 break;
+    //                             }
+    //                         }
+    //                         if ($attribute_id !== null) {
+    //                             $productVariant->attributes()->attach(
+    //                                 $attribute_id,
+    //                                 ["attribute_item_id" => $value["id"], "value" => $value['value']]
+    //                             );
+    //                         }
+    //                     }
+    //                 }
+    //             }
+
+    //             return [
+    //                 "message" => "thêm mới thành công !",
+    //                 "data" => $product
+    //             ];
+    //         });
+    //         return response()->json($respone, Response::HTTP_CREATED);
+    //     } catch (\Exception $ex) {
+
+    //         // dd($ex->getMessage());
+    //         return response()->json([
+    //             'message' => $ex->getMessage()
+    //         ], Response::HTTP_INTERNAL_SERVER_ERROR);
+    //     }
+    // }
     public function store(StoreProduct $request)
     {
         try {
-
             $respone = DB::transaction(function () use ($request) {
-
+                // Tạo dữ liệu sản phẩm
                 $dataProduct = $request->except(["attribute_id", "attribute_item_id", "product_variant"]);
-
                 $dataProduct["slug"] = Str::slug($request->input("name"));
-
                 $product = Product::query()->create($dataProduct);
-                foreach ($request->gallery as  $gallery) {
 
+                // Thêm gallery
+                foreach ($request->gallery as $gallery) {
                     ProductGallery::query()->create([
                         "product_id" => $product->id,
                         "image" => $gallery
                     ]);
                 }
+
+                // Gắn tag cho sản phẩm
                 $product->tags()->attach($dataProduct['tags']);
 
-
                 if ($request->input('type') == 1) {
-                    // create product_has_attribute
-
+                    // Gắn attribute và attribute_item_id vào bảng trung gian
                     foreach ($request->input("attribute_item_id") as $attributeId => $attributeItemId) {
                         $product->attributes()->attach($attributeId, ["attribute_item_ids" => json_encode($attributeItemId)]);
                     }
-                    // thêm mới productvariant
 
-                    foreach ($request->input("product_variant") as $item) {
-                        //    dd($item);
+                    // Lấy danh sách các `attribute_item_id` hợp lệ từ request
+                    $validAttributeItems = collect($request->input("attribute_item_id"))
+                        ->flatMap(fn($items) => $items)
+                        ->toArray();
+
+                    // Duyệt qua từng product_variant
+                    foreach ($request->input("product_variant") as $variant) {
+                        // Kiểm tra tất cả `attribute_item_id` trong biến thể có hợp lệ không
+                        $isValidVariant = collect($variant["attribute_item_id"])
+                            ->every(fn($item) => in_array($item['id'], $validAttributeItems));
+
+                        // Nếu biến thể không hợp lệ, bỏ qua
+                        if (!$isValidVariant) {
+                            continue;
+                        }
+
+                        // Thêm product_variant vào DB
                         $productVariant = ProductVariant::query()->create([
                             "product_id" => $product->id,
-                            "price_regular" => $item["price_regular"],
-                            "price_sale" => $item["price_sale"],
-                            "quantity" => $item["quantity"],
-                            "image" => $item['image'],
-                            "sku" => $item["sku"],
-                            "id_guid" => $item["id_guid"]
-
+                            "price_regular" => $variant["price_regular"],
+                            "price_sale" => $variant["price_sale"],
+                            "quantity" => $variant["quantity"],
+                            "image" => $variant['image'],
+                            "sku" => $variant["sku"],
+                            "id_guid" => $variant["id_guid"]??null
                         ]);
-                        foreach ($item["attribute_item_id"] as  $value) {
 
+                        // Gắn attribute_item_id cho biến thể
+                        foreach ($variant["attribute_item_id"] as $value) {
                             $attribute_id = null;
 
-                            foreach ($request->input('attribute_id') as  $attr_id) {
-
+                            foreach ($request->input('attribute_id') as $attr_id) {
                                 if (in_array($value['id'], $request->input('attribute_item_id')[$attr_id])) {
                                     $attribute_id = $attr_id;
                                     break;
                                 }
                             }
+
                             if ($attribute_id !== null) {
                                 $productVariant->attributes()->attach(
                                     $attribute_id,
@@ -129,20 +217,18 @@ class ProductController extends Controller
                 }
 
                 return [
-                    "message" => "thêm mới thành công !",
+                    "message" => "Thêm mới thành công!",
                     "data" => $product
                 ];
             });
+
             return response()->json($respone, Response::HTTP_CREATED);
         } catch (\Exception $ex) {
-
-            // dd($ex->getMessage());
             return response()->json([
                 'message' => $ex->getMessage()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-
     /**
      * Display the specified resource.
      */
@@ -150,7 +236,7 @@ class ProductController extends Controller
     {
         try {
             // dd($id);
-            $product = Product::query()->latest('id')->findOrFail($id)->load(["brand", "category", "attributes", "variants", "galleries", "tags"]);
+            $product = Product::query()->latest('id')->findOrFail($id)->load(["brand", "category", "attributes", "variants.attributes", "galleries", "tags"]);
             // dd($product);
             foreach ($product->attributes as  $item) {
                 $item->pivot->attribute_item_ids = json_decode($item->pivot->attribute_item_ids);
@@ -241,10 +327,9 @@ class ProductController extends Controller
                         $syncVariant = [];
 
                         // Xử lý hình ảnh
-                        if (isset($item["image"]) ||empty($item["image"])) {
+                        if (isset($item["image"]) || empty($item["image"])) {
 
                             $url = $item["image"];
-
                         }
                         // else {
                         //     // Giữ ảnh cũ nếu không upload ảnh mới
@@ -289,7 +374,7 @@ class ProductController extends Controller
 
                             $attribute_id = null;
 
-                            foreach ($request->input('attribute_id') as  $attr_id  ) { //2,1
+                            foreach ($request->input('attribute_id') as  $attr_id) { //2,1
 
                                 if (in_array($value['id'], $request->input('attribute_item_id')[$attr_id])) {
                                     $attribute_id = $attr_id;
