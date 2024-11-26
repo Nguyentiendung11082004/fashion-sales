@@ -7,15 +7,17 @@ import LoginIcon1 from "@/components/icons/login/LoginIcon1";
 import instance from "@/configs/axios";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button, Form, Input } from "antd";
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 const Login = () => {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<any>('');
   const navigator = useNavigate();
   const [form] = Form.useForm();
-  const { login, token } = useAuth();
+  const { login} = useAuth();
   const queryClient = useQueryClient();
   const { mutate } = useMutation({
     mutationFn: async (user) => {
@@ -48,6 +50,34 @@ const Login = () => {
     // login(data)
   };
 
+  const handleGoogleLogin = () => {
+    try {
+        window.location.href = 'http://127.0.0.1:8000/api/v1/login/google';
+    } catch (error) {
+        console.error();
+    }
+};
+
+const [token, setToken] = useState(localStorage.getItem('token') || null);
+
+useEffect(() => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlToken = urlParams.get('token');
+
+  if (urlToken) {
+    // Lưu token vào state và localStorage
+    setToken(urlToken);
+    localStorage.setItem('token', urlToken);
+
+    // Xóa token khỏi URL
+    const newUrl = window.location.origin + window.location.pathname;
+    window.history.replaceState(null, "", newUrl);
+
+    // Chuyển hướng về trang chủ
+    window.location.href = "/";
+  }
+}, []);  // empty dependency array để `useEffect` chỉ chạy một lần khi component mount
+
   return (
     <>
       <div>
@@ -68,7 +98,9 @@ const Login = () => {
           <div className="w-full m-9 p-[50px] lg:w-[450px] shadow-2xl border">
             <h2 className="text-2xl font-semibold text-gray-700 text-center">Đăng nhập</h2>
             <p className="text-xl text-gray-600 text-center">Chào mừng trở lại</p>
-            <Button className="flex items-center justify-center w-full h-11 mt-4 bg-white rounded-lg shadow-md hover:bg-gray-100">
+            <Button 
+              onClick={handleGoogleLogin}
+             className="flex items-center justify-center w-full h-11 mt-4 bg-white rounded-lg shadow-md hover:bg-gray-100">
               <div className="px-1 py-3">
                 <LoginIcon1 />
               </div>

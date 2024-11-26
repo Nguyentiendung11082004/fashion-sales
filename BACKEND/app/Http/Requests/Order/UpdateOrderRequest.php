@@ -20,11 +20,18 @@ class UpdateOrderRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
+    // public function rules(): array
+    // {
+    //     return [
+    //         'order_status' => 'required|string|in:' . Order::STATUS_CANCELED . ',' . Order::STATUS_SUCCESS,
+    //         'user_note' => 'required|string|max:255',
+    //     ];
+    // }
     public function rules(): array
     {
         return [
-            'order_status' => 'required|string|in:' . Order::STATUS_CANCELED,
-            'user_note' => 'required|string|max:255',
+            'order_status' => 'required|string|in:' . Order::STATUS_CANCELED . ',' . Order::STATUS_COMPLETED,
+            'user_note' => 'required_if:order_status,' . Order::STATUS_CANCELED . '|string|max:255',
         ];
     }
 }

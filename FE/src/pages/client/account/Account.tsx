@@ -9,7 +9,7 @@ import Phone from "@/components/icons/account/Phone";
 import instance from "@/configs/axios";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 const Account = () => {
   const { user, urlImage, setUrlImage } = useUser();
@@ -18,8 +18,12 @@ const Account = () => {
   const queryClient = useQueryClient();
   const [newAvatar, setNewAvatar] = useState<string | null>(null);
   const [tempName, setTempName] = useState<string | undefined>(dataUser?.name);
-  const [tempEmail, setTempEmail] = useState<string | undefined>(dataUser?.email);
+  const [tempEmail, setTempEmail] = useState<string | undefined>(
+    dataUser?.email
+  );
   const [errors, setErrors] = useState<{ [key: string]: string[] }>({});
+  const location = useLocation();
+  const isActive = (path: string) => location.pathname === path;
 
   // State lưu trữ thông tin người dùng
   const [formData, setFormData] = useState<Partial<IUser>>({
@@ -64,7 +68,7 @@ const Account = () => {
       console.log("Dữ liệu người dùng sau khi cập nhật:", data);
       queryClient.invalidateQueries({ queryKey: ["user", token] });
       toast.success("Cập nhật thành công");
-      // Cập nhật tên, email và avatar trong bộ nhớ đệm 
+      // Cập nhật tên, email và avatar trong bộ nhớ đệm
       queryClient.setQueryData(["user", token], (oldData: any) => {
         if (!oldData || !oldData["Infor User"]) return oldData; // kiểm tra dữ liệu tồn tại
         return {
@@ -80,10 +84,10 @@ const Account = () => {
 
       setTempName(formData.name);
       setTempEmail(formData.email);
-      
-    if (newAvatar) {
-      setUrlImage(newAvatar);
-    }
+
+      if (newAvatar) {
+        setUrlImage(newAvatar);
+      }
     },
     onError: (error: any) => {
       if (error?.response && error?.response.data.errors) {
@@ -120,7 +124,6 @@ const Account = () => {
     onSuccess: (data) => {
       setNewAvatar(data.url);
       toast.success("Tải ảnh lên thành công");
-    
     },
     onError: (error) => {
       toast.error("Tải ảnh lên thất bại");
@@ -129,7 +132,6 @@ const Account = () => {
   });
   // console.log("User data:", user);
   // console.log("Current urlImage:", urlImage);
-
 
   // Xử lý khi chọn file ảnh
   const handleFileChange = (info: any) => {
@@ -150,7 +152,7 @@ const Account = () => {
       address: formData.address,
       birth_date: formData.birth_date,
       gender: formData.gender, // (true = Nam, false = Nữ)
-      avatar: newAvatar, 
+      avatar: newAvatar,
     };
     mutation.mutate({ ...newData, avatar: newAvatar as string | undefined });
   };
@@ -185,18 +187,43 @@ const Account = () => {
             </div>
             <hr className="mt-[1rem] h-0 border-solid border-b-2" />
             <div className="hd-account-menu overflow-x-auto flex uppercase font-medium ">
-              <Link to="account.html" className="hd-account-menu-item">
+              <Link
+                to="/account"
+                className={`${
+                  isActive("/account")
+                    ? "block w-1/4 lg:text-left text-center flex-shrink-0 py-[1.5rem] leading-4 relative border-b-[3px] border-[#00BADB]"
+                    : "hd-account-menu-item "
+                }`}
+              >
                 Thông tin tài khoản
               </Link>
-              <Link to="/wishlist" className="hd-account-menu-item">
+              <Link
+                to="/wishlist"
+                className={`${
+                  isActive("/wishlist")
+                    ? "block w-1/4 lg:text-left text-center flex-shrink-0 py-[1.5rem] leading-4 relative border-b-[3px] border-[#00BADB]"
+                    : "hd-account-menu-item "
+                }`}
+              >
                 Yêu thích
               </Link>
-              <Link to="/history-order" className="hd-account-menu-item">
+              <Link
+                to="/history-order"
+                className={`${
+                  isActive("/history-order")
+                    ? "block w-1/4 lg:text-left text-center flex-shrink-0 py-[1.5rem] leading-4 relative border-b-[3px] border-[#00BADB]"
+                    : "hd-account-menu-item "
+                }`}
+              >
                 Lịch sử mua hàng
               </Link>
               <Link
-                to="updatepass-account.html"
-                className="hd-account-menu-item"
+                to="/password/reset"
+                className={`${
+                  isActive("/password/reset")
+                    ? "block w-1/4 lg:text-left text-center flex-shrink-0 py-[1.5rem] leading-4 relative border-b-[3px] border-[#00BADB]"
+                    : "hd-account-menu-item "
+                }`}
               >
                 Đổi mật khẩu
               </Link>
@@ -274,7 +301,9 @@ const Account = () => {
                     />
                   </div>
                   {errors.email && (
-                    <span className="text-red-500 text-sm">{errors.email[0]}</span>
+                    <span className="text-red-500 text-sm">
+                      {errors.email[0]}
+                    </span>
                   )}
                 </div>
 
@@ -365,7 +394,9 @@ const Account = () => {
                     />
                   </div>
                   {errors.phone_number && (
-                    <span className="text-red-500 text-sm">{errors.phone_number[0]}</span>
+                    <span className="text-red-500 text-sm">
+                      {errors.phone_number[0]}
+                    </span>
                   )}
                 </div>
                 <div className="mt-5">

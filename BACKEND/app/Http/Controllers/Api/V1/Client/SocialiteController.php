@@ -41,7 +41,7 @@ class SocialiteController extends Controller
         // Tạo token
         $token = $user->createToken($user->id)->plainTextToken;
         // $frontendUrl = "http://localhost:5173/";
-        $frontendUrl = "http://localhost:5173/?token=$token";
+        $frontendUrl = "http://localhost:5173/login?token=$token";
 
         // Chuyển hướng người dùng
         return redirect($frontendUrl);

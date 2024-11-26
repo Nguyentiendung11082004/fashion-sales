@@ -158,10 +158,10 @@ Route::middleware('auth:sanctum')->prefix('v1/')->group(function () {
     Route::delete('chat-message/{conversation}', [ChatController::class, "deleteMessage"]);
 
     Route::apiResource('comment', CommentController::class);
-    
+
     // hoàn trả hàng
     Route::post('return-requests/create', [ReturnController::class, 'createReturnRequest']);
     Route::post('return-requests/cancel', [ReturnController::class, 'cancelReturnItems']);
     Route::post('return-requests/action', [ReturnAdminController::class, 'handleReturnRequest']);
-    
+
 });
