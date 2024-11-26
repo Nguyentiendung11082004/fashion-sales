@@ -35,6 +35,7 @@ use App\Http\Controllers\Api\V1\Client\InforUserController;
 use App\Http\Controllers\Api\V1\Client\ReturnController;
 use App\Http\Controllers\Api\V1\Client\SocialiteController;
 use App\Http\Controllers\Api\V1\Client\TryOnController;
+use App\Http\Controllers\Api\V1\Service\OrderGHNController;
 use App\Http\Controllers\API\V1\Service\PaymentController;
 
 /*
@@ -128,6 +129,9 @@ Route::prefix("v1/")->group(function () {
     Route::post('getproductstatistics',[StatisticsController::class,"getProductStatistics"]);
     Route::post('getorderstatistics',[StatisticsController::class,"getOrderStatistics"]);
     Route::post('getrevenuestatistics',[StatisticsController::class,"getRevenueStatistics"]); 
+
+    // order create ghn
+    Route::post('createorderghn',[OrderGHNController::class,'createOrder']);
 });
 
 Route::middleware('auth:sanctum')->prefix('v1/')->group(function () {

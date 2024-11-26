@@ -149,14 +149,12 @@ const Checkout = () => {
     },
     enabled: !!quanHuyen
   });
-  console.log("idXa", idXa)
-  console.log("idQuanHuyen", idQuanHuyen)
   const handleChangeTinh = (e: any) => {
     setOrder((prev: any) => ({
       ...prev,
       tinh: e.label,
     })),
-    setIdTinh(Number(e.value));
+      setIdTinh(Number(e.value));
     setIdQuanHuyen(null)
     setIdXa(null)
   };
@@ -166,7 +164,7 @@ const Checkout = () => {
       huyen: e.label,
     })),
       setIdXa(null)
-      setIdQuanHuyen(e.value);
+    setIdQuanHuyen(e.value);
   };
   const handleChangeXa = async (e: any) => {
     setOrder((prev: any) => ({
@@ -245,9 +243,10 @@ const Checkout = () => {
   })
   const handleBuyCart = async () => {
     let payload = { cart_item_ids: cartIds };
-    if (cartIds) {
+    if (cartIds.length > 0) {
       try {
         setIsLoading(true);
+        console.log("1")
         const response = await fetch('http://127.0.0.1:8000/api/v1/checkout', {
           method: 'POST',
           headers: {
