@@ -23,7 +23,7 @@ class UpdateOrderRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'order_status' => 'required|string|in:' . Order::STATUS_CANCELED,
+            'order_status' => 'required|string|in:' . Order::STATUS_CANCELED . ',' . Order::STATUS_SUCCESS,
             'user_note' => 'required|string|max:255',
         ];
     }
