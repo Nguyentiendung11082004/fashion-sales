@@ -75,7 +75,7 @@ const OrderPage = () => {
   };
 
   const dataSource = dataOrder
-    ? dataOrder.map((item: IOrder) => ({
+    ? dataOrder?.map((item: IOrder) => ({
         key: item?.id,
         ...item,
       }))

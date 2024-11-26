@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { memo, useEffect, useState } from "react";
 import {
   AreaChartOutlined,
   CommentOutlined,
@@ -12,7 +12,7 @@ import {
   OrderedListOutlined,
 } from "@ant-design/icons";
 import { Button, Layout, Menu } from "antd";
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBell,
@@ -23,14 +23,253 @@ import {
   faTable,
 } from "@fortawesome/free-solid-svg-icons";
 import { LogoAdmin } from "@/components/icons";
+import { Content } from "antd/es/layout/layout";
 
 const { Sider } = Layout;
+
+const SidebarMenu = memo(({ selectedKey }: { selectedKey: string }) => (
+  <Menu
+    theme="dark"
+    mode="inline"
+    selectedKeys={[selectedKey]}
+    className="space-y-2 bg-[black]"
+    items={[
+      {
+        key: "1",
+        icon: <AreaChartOutlined />,
+        label: (
+          <NavLink to="/admin" className="text-white">
+            Thống kê
+          </NavLink>
+        ),
+      },
+      {
+        key: "2",
+        icon: <VideoCameraOutlined />,
+        label: (
+          <NavLink className="text-white" to="/admin/products">
+            Sản phẩm
+          </NavLink>
+        ),
+      },
+      {
+        key: "12",
+        icon: <ShoppingCartOutlined />,
+        label: (
+          <NavLink className="text-white" to="/admin/orders">
+            Đơn hàng
+          </NavLink>
+        ),
+      },
+      {
+        key: "3",
+        icon: <UploadOutlined />,
+        label: (
+          <NavLink className="text-white" to="/admin/categories">
+            Danh mục
+          </NavLink>
+        ),
+      },
+      {
+        key: "20",
+        icon: (
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="size-6"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z"
+            />
+          </svg>
+        ),
+        label: (
+          <NavLink className="text-white" to="/admin/banners">
+            Banners
+          </NavLink>
+        ),
+      },
+
+      {
+        key: "4",
+        icon: <OrderedListOutlined />,
+        label: (
+          <NavLink className="text-white" to="/admin">
+            Biến thể
+          </NavLink>
+        ),
+        children: [
+          {
+            key: "5",
+            label: (
+              <NavLink className="text-white" to="/admin/attributes">
+                Thuộc tính
+              </NavLink>
+            ),
+          },
+          {
+            key: "6",
+            label: (
+              <NavLink
+                className="text-white"
+                to="/admin/attribute-values"
+              >
+                Giá trị thuộc tính
+              </NavLink>
+            ),
+          },
+        ],
+      },
+      {
+        key: "7",
+        icon: <UserOutlined />,
+        label: (
+          <NavLink to={""} className="text-white">
+            Tài khoản
+          </NavLink>
+        ),
+        children: [
+          {
+            key: "8",
+            label: (
+              <NavLink to="/admin/clients" className="text-white">
+                Khách hàng
+              </NavLink>
+            ),
+          },
+          {
+            key: "9",
+            label: (
+              <NavLink to="/admin/employees" className="text-white">
+                Nhân viên
+              </NavLink>
+            ),
+          },
+        ],
+      },
+      {
+        key: "15",
+        icon: (
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth="1.5"
+            stroke="currentColor"
+            className="size-6"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"
+            />
+          </svg>
+        ),
+        label: (
+          <NavLink to="/admin/posts" className="text-white">
+            Bài viết
+          </NavLink>
+        ),
+      },
+      {
+        key: "30",
+        icon: (
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth="1.5"
+            stroke="currentColor"
+            className="size-6"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M9 4.5v15m6-15v15m-10.875 0h15.75c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125H4.125C3.504 4.5 3 5.004 3 5.625v12.75c0 .621.504 1.125 1.125 1.125Z"
+            />
+          </svg>
+        ),
+        label: (
+          <NavLink to="/admin/vouchers" className="text-white">
+            Voucher
+          </NavLink>
+        ),
+      },
+
+      {
+        key: "10",
+        icon: <CommentOutlined />,
+        label: (
+          <NavLink className="text-white" to="/admin/comments">
+            Bình luận
+          </NavLink>
+        ),
+      },
+      {
+        key: "11",
+        icon: <CommentOutlined />,
+        label: (
+          <NavLink className="text-white" to="/admin/chatbox">
+            Tin nhắn
+          </NavLink>
+        ),
+      },
+
+      {
+        key: "13",
+        icon: <TagsOutlined />,
+        label: (
+          <NavLink className="text-white" to="/admin/tags">
+            Tags
+          </NavLink>
+        ),
+      },
+      {
+        key: "14",
+        icon: <TagsOutlined />,
+        label: (
+          <NavLink className="text-white" to="/admin/brands">
+            Brands
+          </NavLink>
+        ),
+      },
+    ]}
+  />
+));
 
 const LayoutAdmin: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
   const toggleCollapsed = () => {
     setCollapsed(!collapsed);
   };
+  const location = useLocation();
+  // Map đường dẫn thành key
+  const pathToKeyMap: Record<string, string> = {
+    "/admin": "1",
+    "/admin/products": "2",
+    "/admin/orders": "12",
+    "/admin/categories": "3",
+    "/admin/banners": "20",
+    "/admin/attributes": "5",
+    "/admin/attribute-values": "6",
+    "/admin/clients": "8",
+    "/admin/employees": "9",
+    "/admin/posts": "15",
+    "/admin/vouchers": "30",
+    "/admin/comments": "10",
+    "/admin/chatbox": "11",
+    "/admin/tags": "13",
+    "/admin/brands": "14",
+  };
+
+  // Tính toán selectedKeys ngay lập tức
+  const currentKey = pathToKeyMap[location.pathname] || "1";
+
   return (
     <Layout>
       <Sider
@@ -46,218 +285,7 @@ const LayoutAdmin: React.FC = () => {
         <div className="w-[150px] my-[-10px] m-auto">
           <img src={LogoAdmin} alt="" className="" />
         </div>
-        <Menu
-          theme="dark"
-          mode="inline"
-          defaultSelectedKeys={["1"]}
-          className="space-y-2 bg-[black]"
-          items={[
-            {
-              key: "1",
-              icon: <AreaChartOutlined />,
-              label: (
-                <NavLink to="/admin" className="text-white">
-                  Thống kê
-                </NavLink>
-              ),
-            },
-            {
-              key: "2",
-              icon: <VideoCameraOutlined />,
-              label: (
-                <NavLink className="text-white" to="/admin/products">
-                  Sản phẩm
-                </NavLink>
-              ),
-            },
-            {
-              key: "12",
-              icon: <ShoppingCartOutlined />,
-              label: (
-                <NavLink className="text-white" to="/admin/orders">
-                  Đơn hàng
-                </NavLink>
-              ),
-            },
-            {
-              key: "3",
-              icon: <UploadOutlined />,
-              label: (
-                <NavLink className="text-white" to="/admin/categories">
-                  Danh mục
-                </NavLink>
-              ),
-            },
-            {
-              key: "20",
-              icon: (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="size-6"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z"
-                  />
-                </svg>
-              ),
-              label: (
-                <NavLink className="text-white" to="/admin/banners">
-                  Banners
-                </NavLink>
-              ),
-            },
-
-            {
-              key: "4",
-              icon: <OrderedListOutlined />,
-              label: (
-                <NavLink className="text-white" to="/admin">
-                  Biến thể
-                </NavLink>
-              ),
-              children: [
-                {
-                  key: "5",
-                  label: (
-                    <NavLink className="text-white" to="/admin/attributes">
-                      Thuộc tính
-                    </NavLink>
-                  ),
-                },
-                {
-                  key: "6",
-                  label: (
-                    <NavLink
-                      className="text-white"
-                      to="/admin/attribute-values"
-                    >
-                      Giá trị thuộc tính
-                    </NavLink>
-                  ),
-                },
-              ],
-            },
-            {
-              key: "7",
-              icon: <UserOutlined />,
-              label: (
-                <NavLink to={""} className="text-white">
-                  Tài khoản
-                </NavLink>
-              ),
-              children: [
-                {
-                  key: "8",
-                  label: (
-                    <NavLink to="/admin/clients" className="text-white">
-                      Khách hàng
-                    </NavLink>
-                  ),
-                },
-                {
-                  key: "9",
-                  label: (
-                    <NavLink to="/admin/employees" className="text-white">
-                      Nhân viên
-                    </NavLink>
-                  ),
-                },
-              ],
-            },
-            {
-              key: "15",
-              icon: (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth="1.5"
-                  stroke="currentColor"
-                  className="size-6"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"
-                  />
-                </svg>
-              ),
-              label: (
-                <NavLink to="/admin/posts" className="text-white">
-                  Bài viết
-                </NavLink>
-              ),
-            },
-            {
-              key: "30",
-              icon: (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth="1.5"
-                  stroke="currentColor"
-                  className="size-6"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M9 4.5v15m6-15v15m-10.875 0h15.75c.621 0 1.125-.504 1.125-1.125V5.625c0-.621-.504-1.125-1.125-1.125H4.125C3.504 4.5 3 5.004 3 5.625v12.75c0 .621.504 1.125 1.125 1.125Z"
-                  />
-                </svg>
-              ),
-              label: (
-                <NavLink to="/admin/vouchers" className="text-white">
-                  Voucher
-                </NavLink>
-              ),
-            },
-
-            {
-              key: "10",
-              icon: <CommentOutlined />,
-              label: (
-                <NavLink className="text-white" to="/admin/comments">
-                  Bình luận
-                </NavLink>
-              ),
-            },
-            {
-              key: "11",
-              icon: <CommentOutlined />,
-              label: (
-                <NavLink className="text-white" to="/admin/chatbox">
-                  Tin nhắn
-                </NavLink>
-              ),
-            },
-
-            {
-              key: "13",
-              icon: <TagsOutlined />,
-              label: (
-                <NavLink className="text-white" to="/admin/tags">
-                  Tags
-                </NavLink>
-              ),
-            },
-            {
-              key: "14",
-              icon: <TagsOutlined />,
-              label: (
-                <NavLink className="text-white" to="/admin/brands">
-                  Brands
-                </NavLink>
-              ),
-            },
-          ]}
-        />
+        <SidebarMenu selectedKey={currentKey} />
       </Sider>
       <Layout>
         <div className="header flex justify-between items-center border-b border-gray-200 bg-white h-[60px]">
@@ -332,8 +360,9 @@ const LayoutAdmin: React.FC = () => {
             </div>
           </div>
         </div>
-
-        <Outlet />
+        <Content>
+          <Outlet />
+        </Content>
       </Layout>
     </Layout>
   );

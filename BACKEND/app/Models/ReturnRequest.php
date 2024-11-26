@@ -22,4 +22,9 @@ class ReturnRequest extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function items()
+{
+    return $this->hasMany(ReturnItem::class, 'return_request_id');
+}
 }

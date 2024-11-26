@@ -50,10 +50,9 @@ use App\Http\Controllers\API\V1\Service\PaymentController;
 */
 
 Route::prefix("v1/")->group(function () {
-//         // Route::middleware(['auth:sanctum', 'role:4'])->group(function () {
-//         // Route::resource('vouchers', VoucherController::class);
-//     }
-// );
+    //     Route::middleware(['auth:sanctum', 'role:4'])->group(function () {
+    //     Route::resource('vouchers', VoucherController::class);
+    // });
 
     Route::resource("products", ProductController::class);
     Route::resource("comments", CommentsController::class);
@@ -132,6 +131,10 @@ Route::prefix("v1/")->group(function () {
 
     // order create ghn
     Route::post('createorderghn',[OrderGHNController::class,'createOrder']);
+   
+
+    //Quản lí hoàn đơn Admin
+    Route::post('return-items/status/{returnItemId}', [ReturnAdminController::class, 'updateReturnItemStatus']);
 });
 
 Route::middleware('auth:sanctum')->prefix('v1/')->group(function () {
@@ -158,10 +161,11 @@ Route::middleware('auth:sanctum')->prefix('v1/')->group(function () {
     Route::delete('chat-message/{conversation}', [ChatController::class, "deleteMessage"]);
 
     Route::apiResource('comment', CommentController::class);
-    
+
     // hoàn trả hàng
     Route::post('return-requests/create', [ReturnController::class, 'createReturnRequest']);
     Route::post('return-requests/cancel', [ReturnController::class, 'cancelReturnItems']);
-    Route::post('return-requests/action', [ReturnAdminController::class, 'handleReturnRequest']);
-    
+    // Route::post('return-requests/action', [ReturnAdminController::class, 'handleReturnRequest']);
+
+
 });

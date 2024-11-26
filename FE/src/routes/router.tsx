@@ -161,6 +161,7 @@ const Router = () => {
           <Route path="comments" element={<CommentPage />} />
           <Route path="orders" element={<OrderPage />} />
           <Route path="orders/:id" element={<OrderDetail />} />
+          {/* <Route path="/comments" element={<CommentPage/>} /> */}
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
