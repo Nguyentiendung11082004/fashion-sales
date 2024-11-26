@@ -172,7 +172,7 @@ class OrderController extends Controller
             'user_email' => $user['email'],
             'user_phonenumber' => $user['phone_number'],
             'user_address' => $user['address'],
-            'user_note' => $data['user_note']?? '',
+            'user_note' => $data['user_note'] ?? '',
             'ship_user_name' => $data['ship_user_name'],
             'ship_user_phonenumber' => $data['ship_user_phonenumber'],
             'ship_user_address' => $data['ship_user_address'] . ', ' .
@@ -180,6 +180,7 @@ class OrderController extends Controller
                 $data['huyen'] . ', ' .
                 $data['tinh'],
             'shipping_method' => $data['shipping_method'],
+            'shipping_fee' => $data['shipping_fee'],
             'voucher_id' => null,
             'voucher_discount' => 0,
         ]);
@@ -471,6 +472,10 @@ class OrderController extends Controller
         if ($order->order_status === Order::STATUS_CANCELED) {
             return response()->json(['message' => 'Đơn hàng đã được hủy.'], 400);
         }
+        // Kiểm tra trạng thái đơn hàng
+        if ($order->order_status === Order::STATUS_COMPLETED) {
+            return response()->json(['message' => 'Đơn hàng đã hoàn thành.'], 400);
+        }
 
         // Lấy trạng thái mới từ request
         $order_status = $request->input('order_status');
@@ -503,6 +508,14 @@ class OrderController extends Controller
                 $voucher_logs->update([
                     'action' => 'reverted',
                 ]);
+            }
+            $order->order_status = $order_status;
+        }
+        if ($order_status === Order::STATUS_COMPLETED) {
+            if (!in_array($order->order_status, [Order::STATUS_SUCCESS])) {
+                return response()->json([
+                    'message' => 'Chỉ có thể hủy đơn hàng khi đơn hàng đang ở trạng thái giao hàng thành công.'
+                ], 400);
             }
             $order->order_status = $order_status;
         }
