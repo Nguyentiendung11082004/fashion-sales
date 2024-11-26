@@ -89,7 +89,7 @@ const BannersForm = lazy(
 const Posts = lazy(() => import("@/pages/admin/posts/Posts"));
 const FormPost = lazy(() => import("@/pages/admin/posts/components/FormPost"));
 const Chatbox = lazy(() => import("@/pages/admin/chatbox/Chatbox"));
-// const CommentPage = lazy(() => import("@/pages/admin/comments/Comments"));
+const CommentPage = lazy(() => import("@/pages/admin/comments/Comments"));
 
 const Router = () => {
   return (
@@ -158,8 +158,10 @@ const Router = () => {
           <Route path="vouchers/:id" element={<VoucherDetail />} />
           <Route path="vouchers/create" element={<FormVoucher />} />
           <Route path="vouchers/edit/:id" element={<FormVoucher />} />
+          <Route path="comments" element={<CommentPage />} />
           <Route path="orders" element={<OrderPage />} />
           <Route path="orders/:id" element={<OrderDetail />} />
+          {/* <Route path="/comments" element={<CommentPage/>} /> */}
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>

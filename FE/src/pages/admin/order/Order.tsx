@@ -28,16 +28,17 @@ const OrderPage = () => {
   });
   const queryClient = useQueryClient();
 
-  const dataOrder = data?.data;
+  const dataOrder = data?.data?.data;
   console.log("data đơn hàng", dataOrder);
 
   const orStatus = {
     1: "Đang chờ xác nhận",
     2: "Đã xác nhận",
     3: "Đang vận chuyển",
-    4: "Giao hàng thất bại",
+    4: "Hoàn trả hàng",
     5: "Giao hàng thành công",
     6: "Đã hủy",
+    7: "Hoàn thành",
   };
   const handleUpdateStatus = async (orderId: number, status: string) => {
     try {
@@ -74,7 +75,7 @@ const OrderPage = () => {
   };
 
   const dataSource = dataOrder
-    ? dataOrder.map((item: IOrder) => ({
+    ? dataOrder?.map((item: IOrder) => ({
         key: item?.id,
         ...item,
       }))
@@ -194,7 +195,6 @@ const OrderPage = () => {
         )}
       </div>
     </div>
-    
   );
 };
 export default OrderPage;

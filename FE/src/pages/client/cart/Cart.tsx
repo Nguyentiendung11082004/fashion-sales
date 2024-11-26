@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // import { useAuth } from "@/common/context/Auth/AuthContext";
 import AddCount from "@/components/icons/cart/AddCount";

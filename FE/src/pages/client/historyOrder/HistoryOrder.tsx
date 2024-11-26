@@ -1,24 +1,31 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useAuth } from "@/common/context/Auth/AuthContext";
-import { FormatMoney } from "@/common/utils/utils";
-import { Product4, Product5, Product6 } from "@/components/icons";
 import instance from "@/configs/axios";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button, Input, Modal, Table } from "antd";
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import {
+  useRealtimeOrders,
+  notifyOrdersChanged,
+} from "@/common/hooks/useRealtimeOrders";
+// import { notifyOrdersChanged, listenForOrdersChange } from '@/common/hooks/useRealtimeOrders';
 
 const HistoryOrder = () => {
   const [expandedOrders, setExpandedOrders] = useState<number[]>([]);
   const [currentCancelOrderId, setCurrentCancelOrderId] = useState<
     number | null
   >(null);
-  const [receivedOrders, setReceivedOrders] = useState<number[]>([]);
-  const [ratedOrders, setRatedOrders] = useState<number[]>([]);
+  // const [receivedOrders, setReceivedOrders] = useState<number[]>([]);
+  // const [ratedOrders, setRatedOrders] = useState<number[]>([]);
   const [isCancelPopupOpen, setCancelPopupOpen] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
   const queryClient = useQueryClient();
   const { token } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const isActive = (path: string) => location.pathname === path;
   const { data, isFetching, isError } = useQuery({
     queryKey: ["history-order"],
     queryFn: async () => {
@@ -29,7 +36,10 @@ const HistoryOrder = () => {
       });
       return response.data;
     },
+    // refetchInterval: 2000,
   });
+  useRealtimeOrders();
+
   const cancelOrder = async ({
     id,
     reason,
@@ -41,7 +51,6 @@ const HistoryOrder = () => {
       order_status: "Đã hủy",
       user_note: reason,
     };
-    console.log("Payload being sent:", payload);
     const response = await instance.put(`/order/${id}`, payload, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -49,12 +58,14 @@ const HistoryOrder = () => {
     });
     return response.data;
   };
+
   const { mutate } = useMutation({
     mutationFn: cancelOrder,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["history-order"] });
       toast.success("Đơn hàng đã được hủy thành công!");
       setCancelPopupOpen(false);
+      notifyOrdersChanged();
     },
     onError: () => {
       toast.error("Hủy đơn hàng thất bại.");
@@ -69,27 +80,48 @@ const HistoryOrder = () => {
     );
   };
 
-  // Khởi tạo trạng thái từ localStorage
-  useEffect(() => {
-    const savedReceivedOrders = JSON.parse(
-      localStorage.getItem("receivedOrders") || "[]"
-    );
-    const savedRatedOrders = JSON.parse(
-      localStorage.getItem("ratedOrders") || "[]"
-    );
+  const completeOrder = async (id: number) => {
+    const payload = {
+      order_status: "Hoàn thành",
+    };
+    console.log("Payload being sent:", payload);
+    const response = await instance.put(`/order/${id}`, payload, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  };
 
-    setReceivedOrders(savedReceivedOrders);
-    setRatedOrders(savedRatedOrders);
-  }, []);
+  const { mutate: mutateOk } = useMutation({
+    mutationFn: completeOrder,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["history-order"] });
+      // toast.success("Đơn hàng đã hoàn thành!");
+      notifyOrdersChanged();
+    },
+    onError: () => {
+      console.log("Lỗi!");
+    },
+  });
 
-  // Cập nhật localStorage khi trạng thái thay đổi
-  useEffect(() => {
-    localStorage.setItem("receivedOrders", JSON.stringify(receivedOrders));
-  }, [receivedOrders]);
-
-  useEffect(() => {
-    localStorage.setItem("ratedOrders", JSON.stringify(ratedOrders));
-  }, [ratedOrders]);
+  const { mutate: mutateReorder } = useMutation({
+    mutationFn: async (id: number) => {
+      const response = await instance.post("/cart", { order_id: id }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data;
+    },
+    onSuccess: () => {
+      navigate("/cart");
+      notifyOrdersChanged();
+    },
+    onError: () => {
+      console.log("Lỗi!");
+    },
+  });
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
@@ -116,7 +148,7 @@ const HistoryOrder = () => {
       key: "value",
     },
   ];
-
+  // if (isFetching) return <div>Loading...</div>;
   return (
     <>
       <main
@@ -146,19 +178,44 @@ const HistoryOrder = () => {
                 </span>
               </div>
               <hr className="mt-[1rem] h-0 border-solid border-b-2" />
-              <div className="hd-account-menu overflow-x-auto flex uppercase font-medium">
-                <Link to="account.html" className="hd-account-menu-item">
+              <div className="hd-account-menu overflow-x-auto flex uppercase font-medium ">
+                <Link
+                  to="/account"
+                  className={`${
+                    isActive("/account")
+                      ? "block w-1/4 lg:text-left text-center flex-shrink-0 py-[1.5rem] leading-4 relative border-b-[3px] border-[#00BADB]"
+                      : "hd-account-menu-item "
+                  }`}
+                >
                   Thông tin tài khoản
                 </Link>
-                <Link to="#" className="hd-account-menu-item">
+                <Link
+                  to="/wishlist"
+                  className={`${
+                    isActive("/wishlist")
+                      ? "block w-1/4 lg:text-left text-center flex-shrink-0 py-[1.5rem] leading-4 relative border-b-[3px] border-[#00BADB]"
+                      : "hd-account-menu-item "
+                  }`}
+                >
                   Yêu thích
                 </Link>
-                <Link to="history-order.html" className="hd-account-menu-item">
+                <Link
+                  to="/history-order"
+                  className={`${
+                    isActive("/history-order")
+                      ? "block w-1/4 lg:text-left text-center flex-shrink-0 py-[1.5rem] leading-4 relative border-b-[3px] border-[#00BADB]"
+                      : "hd-account-menu-item "
+                  }`}
+                >
                   Lịch sử mua hàng
                 </Link>
                 <Link
-                  to="updatepass-account.html"
-                  className="hd-account-menu-item"
+                  to="/password/reset"
+                  className={`${
+                    isActive("/password/reset")
+                      ? "block w-1/4 lg:text-left text-center flex-shrink-0 py-[1.5rem] leading-4 relative border-b-[3px] border-[#00BADB]"
+                      : "hd-account-menu-item "
+                  }`}
                 >
                   Đổi mật khẩu
                 </Link>
@@ -178,42 +235,43 @@ const HistoryOrder = () => {
                 const isDelivered =
                   order.order_status.toLowerCase() === "giao hàng thành công";
                 const isCancelOk =
-                  order.order_status.trim().toLowerCase() ===
-                    "đang chờ xác nhận" ||
+                  order.order_status.trim().toLowerCase() === "đang chờ xác nhận" ||
                   order.order_status.trim().toLowerCase() === "đã xác nhận";
                 const canCel =
                   order.order_status.trim().toLowerCase() === "đã hủy";
+                const shipOk =
+                  order.order_status.trim().toLowerCase() === "đang vận chuyển";
+                const complete =
+                  order.order_status.trim().toLowerCase() === "hoàn thành";
+                //   if (isCancelOk || canCel || shipOk) {
+                //     toast.warning(
+                //       "Không thể xác nhận nhận hàng ở trạng thái này."
+                //     );
+                //     return;
+                //   }
+                //   if (!receivedOrders.includes(orderId)) {
+                //     setReceivedOrders((prev) => [...prev, orderId]);
+                //     toast.success("Đơn hàng đã được xác nhận là đã nhận.");
+                //   } else {
+                //     toast.warning("Đơn hàng này đã được xác nhận trước đó.");
+                //   }
+                // };
 
-                const handleReceived = (orderId: number) => {
-                  if (isCancelOk || canCel) {
-                    toast.warning(
-                      "Không thể xác nhận nhận hàng ở trạng thái này."
-                    );
-                    return;
-                  }
-                  if (!receivedOrders.includes(orderId)) {
-                    setReceivedOrders((prev) => [...prev, orderId]);
-                    toast.success("Đơn hàng đã được xác nhận là đã nhận.");
-                  } else {
-                    toast.warning("Đơn hàng này đã được xác nhận trước đó.");
-                  }
-                };
+                // const handleRated = (orderId: number) => {
+                //   if (!receivedOrders.includes(orderId)) {
+                //     toast.warn(
+                //       "Vui lòng xác nhận đã nhận hàng trước khi đánh giá."
+                //     );
+                //     return;
+                //   }
 
-                const handleRated = (orderId: number) => {
-                  if (!receivedOrders.includes(orderId)) {
-                    toast.warn(
-                      "Vui lòng xác nhận đã nhận hàng trước khi đánh giá."
-                    );
-                    return;
-                  }
-
-                  if (!ratedOrders.includes(orderId)) {
-                    setRatedOrders((prev) => [...prev, orderId]);
-                    toast.success("Cảm ơn bạn đã đánh giá sản phẩm!");
-                  } else {
-                    toast.warning("Bạn đã đánh giá đơn hàng này trước đó.");
-                  }
-                };
+                //   if (!ratedOrders.includes(orderId)) {
+                //     setRatedOrders((prev) => [...prev, orderId]);
+                //     toast.success("Cảm ơn bạn đã đánh giá sản phẩm!");
+                //   } else {
+                //     toast.warning("Bạn đã đánh giá đơn hàng này trước đó.");
+                //   }
+                // };
 
                 const handleCancelClick = (id: number, status: string) => {
                   if (!isCancelOk) {
@@ -234,7 +292,6 @@ const HistoryOrder = () => {
                   }
 
                   if (currentCancelOrderId !== null) {
-                    // Chỉ hủy đơn hàng với ID được chọn
                     mutate({ id: currentCancelOrderId, reason: cancelReason });
                     // setCancelReason("");
                     // Xóa lý do sau khi hủy
@@ -244,15 +301,14 @@ const HistoryOrder = () => {
                 return (
                   <div
                     key={order.id}
-                    onClick={() => toggleOrderDetails(order.id)}
                     className="border border-slate-200 rounded-lg overflow-hidden z-0 mb-[30px]"
                   >
-                    <button className="hd-head-form-order w-full flex sm:flex-row justify-between lg:justify-between sm:justify-between sm:items-center p-4 sm:p-8 bg-slate-50 dark:bg-slate-500/5">
+                    <button
+                      onClick={() => toggleOrderDetails(order.id)}
+                      className="hd-head-form-order w-full flex sm:flex-row justify-between lg:justify-between sm:justify-between sm:items-center p-4 sm:p-8 bg-slate-50 dark:bg-slate-500/5"
+                    >
                       <div className="flex items-center">
-                        <button
-                          onClick={() => toggleOrderDetails(order.id)}
-                          className="text-base"
-                        >
+                        <button className="text-base">
                           {isExpanded ? "▼" : "▲"}{" "}
                           {/* Hiển thị mũi tên lên hoặc xuống */}
                         </button>
@@ -279,18 +335,23 @@ const HistoryOrder = () => {
                             footer={null}
                             className="-mt-10"
                             width={1000}
+                            maskStyle={{
+                              backgroundColor: "rgba(0, 0, 0, 0.2)",
+                            }}
                           >
                             <div className="text-lg uppercase font-medium flex">
                               <p>Mã đơn hàng . {selectedOrder.order_code}</p>
                               <p className="mx-2">|</p>
-                              <p className="text-[#00BADB]">{selectedOrder.order_status}</p>
+                              <p className="text-[#00BADB]">
+                                {selectedOrder.order_status}
+                              </p>
                             </div>
                             <p>
-                              <strong>Thời gian đặt hàng:</strong>{" "}
+                              <strong>Thời gian đặt hàng:</strong>
                               {selectedOrder.created_at}
                             </p>
                             <p>
-                              <strong>Trạng thái đơn hàng:</strong>{" "}
+                              <strong>Trạng thái đơn hàng:</strong>
                               {selectedOrder.order_status}
                             </p>
                             <p>
@@ -298,7 +359,7 @@ const HistoryOrder = () => {
                               <br />
                               Tên: {selectedOrder.ship_user_name}
                               <br />
-                              Số điện thoại:{" "}
+                              Số điện thoại:
                               {selectedOrder.ship_user_phonenumber}
                               <br />
                               Địa chỉ: {selectedOrder.ship_user_address}
@@ -336,7 +397,7 @@ const HistoryOrder = () => {
                                                     ? Object.values(value).join(
                                                         ", "
                                                       ) // Nếu là object
-                                                    : String(value)}{" "}
+                                                    : String(value)}
                                                 {/* Nếu là giá trị đơn lẻ */}
                                               </li>
                                             ))}
@@ -344,10 +405,14 @@ const HistoryOrder = () => {
                                         )}
                                     </p>
                                     <p>Số lượng: {item.quantity}</p>
-                                    <p>Giá: 
+                                    <p>
+                                      Giá:
                                       {/* {FormatMoney(item.price)} */}
-                                      {new Intl.NumberFormat("vi-VN").format(item.price)}
-                                      ₫</p>
+                                      {new Intl.NumberFormat("vi-VN").format(
+                                        item.price
+                                      )}
+                                      ₫
+                                    </p>
                                   </div>
                                 </div>
                               ))}
@@ -366,18 +431,16 @@ const HistoryOrder = () => {
                                 {
                                   key: "2",
                                   label: "Khuyến mãi",
-                                  value: 
-                                  // `-${FormatMoney(selectedOrder.voucher_discount)}₫`
-                                  `${new Intl.NumberFormat("vi-VN").format(selectedOrder.voucher_discount)}₫`
-                                  ,
+                                  value:
+                                    // `-${FormatMoney(selectedOrder.voucher_discount)}₫`
+                                    `${new Intl.NumberFormat("vi-VN").format(selectedOrder.voucher_discount)}₫`,
                                 },
                                 {
                                   key: "3",
                                   label: "Thành tiền",
-                                  value: 
-                                  // `${FormatMoney(selectedOrder.total)}₫`
-                                  `${new Intl.NumberFormat("vi-VN").format(selectedOrder.total)}₫`
-                                  ,
+                                  value:
+                                    // `${FormatMoney(selectedOrder.total)}₫`
+                                    `${new Intl.NumberFormat("vi-VN").format(selectedOrder.total)}₫`,
                                 },
                                 {
                                   key: "4",
@@ -436,7 +499,7 @@ const HistoryOrder = () => {
                                                     ? Object.values(value).join(
                                                         ", "
                                                       ) // Nếu là object
-                                                    : String(value)}{" "}
+                                                    : String(value)}
                                                 {/* Nếu là giá trị đơn lẻ */}
                                               </li>
                                             ))}
@@ -449,7 +512,10 @@ const HistoryOrder = () => {
                                       {/* <del className="mr-1">{detail.price}đ</del> */}
                                       <span className="text-base">
                                         {/* {FormatMoney(detail.price)}₫ */}
-                                        {new Intl.NumberFormat("vi-VN").format(detail.price)}₫
+                                        {new Intl.NumberFormat("vi-VN").format(
+                                          detail.price
+                                        )}
+                                        ₫
                                       </span>
                                     </div>
                                   </div>
@@ -462,30 +528,7 @@ const HistoryOrder = () => {
                                     {detail.quantity}
                                   </span>
                                 </p>
-                                {/* đánh giá  */}
-                                {/* <div className="flex">
-                                  
-                                  <button
-                                    type="button"
-                                    className={`font-medium ${
-                                      isDelivered
-                                        ? "hd-all-hover-bluelight"
-                                        : "text-gray-400 cursor-pointer"
-                                    }`}
-                                    onClick={() => {
-                                      if (!isReceived) {
-                                        toast.warn(
-                                          "Vui lòng xác nhận đã nhận hàng trước"
-                                        );
-                                      } else {
-                                        alert("đánh giá sản phẩm");
-                                        setIsRated(true);
-                                      }
-                                    }}
-                                  >
-                                    Đánh Giá
-                                  </button>
-                                </div> */}
+                                
                               </div>
                             </div>
                           </div>
@@ -496,57 +539,69 @@ const HistoryOrder = () => {
                     {/*end hd-body-form-order*/}
                     <div className="hd-head-form-order flex sm:flex-row justify-between lg:justify-between sm:justify-between sm:items-center p-4 sm:p-8">
                       <div className="mt-3 sm:mt-0">
-                        {ratedOrders.includes(order.id) ? (
-                          <button className="nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 ttnc-ButtonSecondary bg-[#00BADB] text-white">
-                            Mua Lại
-                          </button>
-                        ) : (
-                          <>
-                            <button
-                              className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm  py-2.5 px-4 sm:px-6 ttnc-ButtonSecondary  ${
-                                isDelivered
-                                  ? "bg-[#00BADB] text-white font-medium"
-                                  : "bg-gray-200 text-slate-400 cursor-pointer border border-gray-300"
-                              }
-                              
-                            `}
-                              onClick={() => handleReceived(order.id)}
-                              disabled={canCel}
-                            >
-                              {receivedOrders.includes(order.id)
-                                ? "Đã Nhận Được Hàng"
-                                : "Đã Nhận Hàng"}
-                            </button>
-                            {!isCancelOk && !canCel && (
+                        <div className="flex items-center space-x-2">
+                          {(isDelivered || shipOk) && (
+                            <>
                               <button
-                                type="button"
-                                className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 ttnc-ButtonSecondary text-slate-700 ${
-                                  !ratedOrders.includes(order.id)
-                                    ? "bg-[#00BADB] text-white font-medium"
-                                    : "bg-gray-200 text-slate-400 cursor-not-allowed border border-gray-300"
+                                className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB]  font-medium ${
+                                  shipOk ? "bg-gray-200 text-gray-400 border cursor-pointer border-gray-300" : "text-white"
                                 }`}
-                                onClick={() => handleRated(order.id)}
-                                disabled={ratedOrders.includes(order.id)}
+                                onClick={() => mutateOk(order.id)}
+                                disabled={shipOk}
+                              >
+                                Đã Nhận Hàng
+                              </button>
+
+                              <button
+                                className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB]  font-medium ${
+                                  shipOk ? "bg-gray-200 text-gray-400 border cursor-pointer border-gray-300" : "text-white"
+                                }`}
+                                disabled={shipOk}
+                                onClick={() => alert("Bạn muốn hoàn trả hàng!")}
+                              >
+                                Hoàn Trả Hàng
+                              </button>
+                            </>
+                          )}
+
+                          {complete && (
+                            <>
+                              <button
+                                className="nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB] text-white font-medium"
+                                onClick={() => alert("Đánh giá sản phẩm!")}
                               >
                                 Đánh Giá
                               </button>
-                            )}
-                          </>
-                        )}
+                            </>
+                          )}
 
-                        <button
-                          className={`nc-Button relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 ttnc-ButtonSecondary ${
-                            isCancelOk
-                              ? "bg-[#00BADB] text-white font-medium"
-                              : "bg-gray-200 text-slate-400 border cursor-pointer border-gray-300"
-                          }`}
-                          onClick={() =>
-                            handleCancelClick(order.id, order.order_status)
-                          }
-                          disabled={canCel}
-                        >
-                          Xác Nhận Hủy
-                        </button>
+                          {isCancelOk && (
+                            <button
+                              className={`nc-Button relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 ttnc-ButtonSecondary ${
+                                isCancelOk
+                                  ? "bg-[#00BADB] text-white font-medium"
+                                  : "bg-gray-200 text-slate-400 border cursor-pointer border-gray-300"
+                              }`}
+                              onClick={() =>
+                                handleCancelClick(order.id, order.order_status)
+                              }
+                              disabled={canCel}
+                            >
+                              Xác Nhận Hủy
+                            </button>
+                          )}
+
+                          {(canCel || complete) && (
+                              // Nút "Mua Lại" khi đơn hàng đã hủy hoặc hoàn thành
+                              <button
+                                className="nc-Button relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB] text-white font-medium"
+                                onClick={() => mutateReorder(order.id)}
+                              >
+                                Mua Lại
+                              </button>
+                            )}
+                        </div>
+
                         <Modal
                           title="Lý do hủy đơn hàng"
                           open={isCancelPopupOpen}
@@ -554,6 +609,9 @@ const HistoryOrder = () => {
                           onCancel={() => setCancelPopupOpen(false)}
                           okText="Gửi"
                           cancelText="Hủy"
+                          maskStyle={{
+                            backgroundColor: "rgba(0, 0, 0, 0.2)",
+                          }}
                         >
                           <Input.TextArea
                             value={cancelReason}
