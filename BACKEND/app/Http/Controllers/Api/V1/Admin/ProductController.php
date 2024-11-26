@@ -104,6 +104,7 @@ class ProductController extends Controller
                             "quantity" => $item["quantity"],
                             "image" => $item['image'],
                             "sku" => $item["sku"],
+                            "id_guid" => $item["id_guid"]
 
                         ]);
                         foreach ($item["attribute_item_id"] as  $value) {
@@ -243,8 +244,8 @@ class ProductController extends Controller
                         if (isset($item["image"]) ||empty($item["image"])) {
 
                             $url = $item["image"];
-                           
-                        } 
+
+                        }
                         // else {
                         //     // Giữ ảnh cũ nếu không upload ảnh mới
                         //     $url = $existingVariants[$keys]["image"] ?? null;
@@ -298,7 +299,7 @@ class ProductController extends Controller
                             // dd($attribute_id);
 
                             if ($attribute_id !== null) {
-                                
+
                                 $syncVariant[$attribute_id] = [
                                     "attribute_item_id" => $value["id"],
                                     "value" => $value["value"]
@@ -403,5 +404,26 @@ class ProductController extends Controller
                 ]
             );
         }
+    }
+    public function search(Request $request)
+    {
+        $query = $request->input('query'); // Lấy từ khóa tìm kiếm từ body request
+
+        if (!$query) {
+            return response()->json([
+                'message' => 'Vui lòng nhập từ khóa tìm kiếm.',
+                'data' => []
+            ], 400);
+        }
+
+        // Tìm kiếm trong cột `name` hoặc các cột khác nếu cần
+        $results = Product::where('name', 'LIKE', "%{$query}%")
+            ->orWhere('description', 'LIKE', "%{$query}%") // Thêm cột mô tả nếu có
+            ->get();
+
+        return response()->json([
+            'message' => 'Kết quả tìm kiếm.',
+            'data' => $results,
+        ]);
     }
 }

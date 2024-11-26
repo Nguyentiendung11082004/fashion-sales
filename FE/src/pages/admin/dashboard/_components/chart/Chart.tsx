@@ -10,12 +10,15 @@ interface ResponseData {
       order_counts_by_status: OrderStatistic[];
       total_quantity_in_order: string;
 }
-
-const Chart = () => {
+interface Props {
+      dataDonHang: (data: ResponseData) => void;
+}
+const Chart = ({ dataDonHang }: Props) => {
       const [dataStatic, setDataStatic] = useState<ResponseData | null>(null);
       const getData = async () => {
-            let res = await instance.get(`/getorderstatistics`);
+            let res = await instance.post(`/getorderstatistics`);
             setDataStatic(res?.data);
+            dataDonHang(res?.data)
       }
       const chartData = dataStatic?.order_counts_by_status?.map((e) => ({
             order_status: e.order_status,
@@ -24,11 +27,11 @@ const Chart = () => {
 
       const config = {
             data: chartData,
-            xField: 'order_status', // Trục X là trạng thái đơn hàng
-            yField: 'total_orders', // Trục Y là số lượng đơn hàng
-            columnWidth: 0.3, // Độ rộng của các cột
+            xField: 'order_status',
+            yField: 'total_orders',
+            columnWidth: 0.3,
             label: {
-                  position: 'middle', // Vị trí nhãn nằm ở giữa cột
+                  position: 'middle',
             },
       };
       useEffect(() => {

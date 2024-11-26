@@ -336,7 +336,7 @@ class StatisticsController extends Controller
                         $statusIds = $this->getStatusIds($statuses);
                         if (empty($statusFilter) || !empty(array_intersect($statusFilter, $statusIds))) {
                             $variant->status = implode('|', $statuses);
-                          
+
                             return $variant;
                         }
                         return null;
