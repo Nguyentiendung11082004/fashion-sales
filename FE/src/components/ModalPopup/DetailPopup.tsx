@@ -37,6 +37,7 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
   const [dataAttribute, setDataAttribute] = useState<any>(
     transformAttributes(attributes)
   );
+  console.log("dataAttribute", dataAttribute)
   const resultDataAttribute = Object.entries(
     productSeeMore?.unique_attributes ?? {}
   ).map(([key, value]) => ({
@@ -47,6 +48,7 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
     })),
   }));
 
+
   const priceProduct = productSeeMore?.variants?.map((e: any) => e?.price_sale);
   const minPrice =
     priceProduct && priceProduct.length > 0 ? Math.min(...priceProduct) : null;
@@ -54,36 +56,97 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
     priceProduct && priceProduct.length > 0 ? Math.max(...priceProduct) : null;
   const [selectedVariantId, setSelectedVariantId] = useState<any>(null);
   const [error, setError] = useState("");
-  const findMatchingVariant = () => {
+
+  const getSelectedVariantId = () => {
+    // Duyệt qua tất cả variants trong productSeeMore
     const matchingVariant = productSeeMore?.variants?.find((variant: any) => {
-      return Object.keys(dataAttribute).every((attrKey) => {
-        const attribute = variant.attributes.find(
-          (attr: any) =>
-            attr.name === attrKey && attr.pivot.value === dataAttribute[attrKey]
-        );
-        return attribute !== undefined;
+      // Kiểm tra sự kết hợp giữa các thuộc tính trong dataAttribute và attributes của variant
+      return variant.attributes.every((attribute: any) => {
+        // Lấy id của attribute trong dataAttribute
+        const attributeName = attribute.name.toLowerCase();
+        const attributeItemId = attribute.pivot.attribute_item_id;
+        
+        // Kiểm tra nếu dataAttribute có giá trị và nó trùng với attribute_item_id của pivot
+        return dataAttribute[attributeName] && dataAttribute[attributeName] === attributeItemId.toString();
       });
     });
+ 
+    // Nếu tìm thấy variant phù hợp, cập nhật state với product_variant_id
     if (matchingVariant) {
-      setSelectedVariantId(matchingVariant.id);
+      setSelectedVariantId(matchingVariant.id); // Lưu product_variant_id vào state
+    } else {
+      setSelectedVariantId(null); // Nếu không tìm thấy variant, set null
     }
   };
-
+   useEffect(() => {
+      // Gọi hàm để kiểm tra và gán product_variant_id khi dataAttribute thay đổi
+      getSelectedVariantId();
+    }, [dataAttribute]);
   const getAttribute = (attribute: any, id: any) => {
     setDataAttribute((prev: any) => ({
       ...prev,
       [attribute]: id,
     }));
-    findMatchingVariant();
+    // findMatchingVariant();
   };
-  console.log("dataAttribute", dataAttribute)
+  console.log("productSeeMore?.variants", productSeeMore?.variants)
+  console.log("selectedVariantId", selectedVariantId)
+
+  const result = productSeeMore?.variants
+    ?.filter(
+      (variant: any) =>
+        variant.attributes &&
+        variant.attributes.length > 0 &&
+        variant.quantity > 0
+    )
+    .map((variant: any) => {
+      const attributeObj = variant.attributes.reduce(
+        (acc: { [key: string]: string }, attribute: any) => {
+          acc[attribute.name] = attribute.pivot.attribute_item_id.toString();
+          return acc;
+        },
+        {}
+      );
+      return attributeObj;
+    });
+  console.log("result", result)
+  // useEffect(() => {
+  //   if (result && result.length > 0) {
+  //     setDataAttribute({ product_variant: result[0] });
+  //   }
+  // }, [result]);
+  const checkDisable = (attribute: string, value: any) => {
+    let res = false;
+    // Access dataAttribute (the state) instead of setDataAttribute (the setter function)
+    let matchingItems = result?.filter((x: any) => {
+      // Check if product_variant exists in dataAttribute
+      return Object.keys(dataAttribute?.product_variant || {}).every((key) => {
+        if (key !== attribute) {
+          return (
+            x[key] &&
+            x[key].toString() ===
+            dataAttribute?.product_variant[key]?.toString()
+          );
+        }
+        return true;
+      });
+    });
+
+    let isAttributeValid = matchingItems?.some(
+      (x: any) => x[attribute] && x[attribute].toString() === value.toString()
+    );
+
+    res = !isAttributeValid;
+
+    return res;
+  };
   const [qty, setQty] = useState(1);
   const _payload = {
     product_id: productSeeMore.id,
     product_variant_id: selectedVariantId,
     quantity: qty,
   };
-  console.log("_payload", _payload)
+
   const styles = {
     disable: {
       opacity: 0.2,
@@ -96,7 +159,7 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
     onClose();
   };
   const handleCheckout = () => {
-    if (_payload.product_variant_id) {
+    if (_payload.product_id || _payload.product_variant_id) {
       navigate("/checkout", { state: { _payload: _payload } });
     }
   };
@@ -195,6 +258,9 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
                 <p className="font-medium">{e?.attribute}</p>
                 <div className="flex mt-3 gap-2">
                   {e?.attributeValue?.map((item: any, index: number) => {
+                    const isDisabled = checkDisable(e.attribute, item.id);
+
+                    // Kiểm tra nếu item bị active (trạng thái đã được chọn hoặc chưa chọn nhưng là lựa chọn đầu tiên)
                     const isActive =
                       (dataAttribute[e.attribute.toLowerCase()] === item.id) ||
                       (index === 0 && !dataAttribute[e.attribute.toLowerCase()]);
@@ -203,9 +269,13 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
                       <div
                         key={item.id}
                         className={`relative flex-1 max-w-[75px] h-8 sm:h-8 rounded-full border-2 cursor-pointer p-2
-                          ${isActive ? "border-black" : ""}`}
+        ${isActive ? "border-black" : isDisabled ? "border-gray-200 opacity-50 cursor-not-allowed"
+                            : "border-2"}`}
                         style={isActive ? { backgroundColor: item.name.toLowerCase() } : {}}
-                        onClick={() => getAttribute(e.attribute.toLowerCase(), item.id)}
+                        onClick={() => {
+                          if (isDisabled) return; // Nếu bị disable thì không thực hiện gì
+                          getAttribute(e.attribute.toLowerCase(), item.id);
+                        }}
                       >
                         {e.attribute.toLowerCase() === "color" ? (
                           <div
@@ -218,6 +288,8 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
                       </div>
                     );
                   })}
+
+
                 </div>
               </div>
             );

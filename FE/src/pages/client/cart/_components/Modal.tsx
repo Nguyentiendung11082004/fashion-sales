@@ -22,7 +22,6 @@ const ModalCart = ({
   attributes,
 }: Props) => {
   const { token } = useAuth();
-  console.log("attributes", attributes);
   const [activeAttributes, setActiveAttributes] = useState<any>({});
   const [currentPrice, setCurrentPrice] = useState<number | null>(null);
   const transformAttributes = (attributes: any) => {
@@ -100,16 +99,20 @@ const ModalCart = ({
     },
   });
 
-  const formattedAttributes = cartAttribute? cartAttribute.cart_item.product.variants?.map((item: any) => {
-        const attributeObj: { [key: string]: number } = {};
-        item.attributes.forEach((attribute: any) => {
-          attributeObj[attribute.name] = attribute.pivot.attribute_item_id;
-        });
-        return {
-          ...attributeObj,
-          price_sale: item.price_sale,
-        };
-      })
+  const formattedAttributes = cartAttribute ? cartAttribute.cart_item?.product?.variants
+    ?.filter((item: any) =>
+      item.quantity > 0
+    )
+    ?.map((item: any) => {
+      const attributeObj: { [key: string]: number } = {};
+      item.attributes.forEach((attribute: any) => {
+        attributeObj[attribute.name] = attribute.pivot.attribute_item_id;
+      });
+      return {
+        ...attributeObj,
+        price_sale: item.price_sale,
+      };
+    })
     : [];
 
   const dataAttribute = cartAttribute?.getuniqueattributes;
@@ -117,6 +120,7 @@ const ModalCart = ({
   const checkDisable = (attribute: string, value: any) => {
     let result = false;
     // eslint-disable-next-line prefer-const
+
     let matchingItems = formattedAttributes.filter((x: any) => {
       return Object.keys(dataAttributes).every((key) => {
         if (key !== attribute) {
@@ -182,7 +186,7 @@ const ModalCart = ({
           <span className="text-2xl text-[#696969] mb-4">
             {FormatMoney(
               currentPrice ||
-                cartAttribute?.cart_item?.productvariant?.price_sale
+              cartAttribute?.cart_item?.productvariant?.price_sale
             )}
           </span>
           {resultDataAttribute.map((e) => (

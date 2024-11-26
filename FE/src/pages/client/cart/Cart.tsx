@@ -45,7 +45,6 @@ const Cart = () => {
     refetchOnWindowFocus: true,
     refetchOnMount: true,
   });
-  console.log("data", data)
   const pusher = new Pusher('4d3e0d70126f2605977e', {
     cluster: 'ap1',
     authEndpoint: 'http://localhost:8000/broadcasting/auth',
@@ -104,13 +103,11 @@ const Cart = () => {
       );
     },
     onSuccess: () => {
-      console.log("1")
       queryClient.invalidateQueries({
         queryKey: ["cart"],
       });
     },
     onError: (message: any) => {
-      console.log("message", message)
       toast.error(message?.response?.data?.message, {
         autoClose: 5000,
       });
@@ -186,7 +183,7 @@ const Cart = () => {
   };
 
   const handleAttribute = (idCart: any, variants: any) => {
-    setIdCart([idCart]);
+    setIdCart(idCart);
     setVisible(true);
     setUpdatedAttributes((prev: any) => ({
       ...prev,
@@ -261,7 +258,7 @@ const Cart = () => {
 
     setIsAllChecked(updatedIdCarts.length === carts.length);
   };
-
+  console.log("idCart", idCart)
   const handleCheckout = () => {
     if (!idCart || idCart.length === 0) {
       MySwal.fire({
@@ -459,13 +456,13 @@ const Cart = () => {
                                 </div>
                               </div>
 
-                              <ModalCart
-                                open={visiable}
-                                onClose={closeModal}
-                                idCart={idCart}
-                                onUpdateAttributes={handleUpdateAttributes}
-                                attributes={updatedAttributes[idCart] || []}
-                              />
+                                <ModalCart
+                                  open={visiable}
+                                  onClose={closeModal}
+                                  idCart={idCart}
+                                  onUpdateAttributes={handleUpdateAttributes}
+                                  attributes={updatedAttributes[idCart] || []}
+                                />
 
                               <div className="hd-qty-total block lg:hidden">
                                 <div className="flex items-center justify-between border-2 border-slate-200 rounded-full py-[10px] px-[10px]">
