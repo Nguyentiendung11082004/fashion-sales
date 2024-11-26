@@ -218,10 +218,11 @@ class CartController extends Controller
 
                         ]);
                     }
-                    // broadcast(new CartEvent($cart->id, $cartItem));
-                    // // ->toOthers();
+
                     return response()->json(['message' => 'Thêm vào giỏ hàng thành công'], Response::HTTP_OK);
                 }
+                // broadcast(new CartEvent($cart->id, $cartItem));
+                // // ->toOthers();
             });
         } catch (\Exception $ex) {
             return response()->json(
@@ -498,44 +499,127 @@ class CartController extends Controller
     /**
      * Update the specified resource in storage.
      */
+    // public function update(Request $request, string $id)
+    // {
+    //     //
+    //     try {
+
+    //         return DB::transaction(function () use ($request, $id) {
+    //             $request->validate([
+    //                 "quantity" => "required|integer|min:1"
+    //             ]);
+    //             $cart_item = CartItem::query()->findOrFail($id);
+    //             $product = Product::query()->findOrFail($cart_item->product_id);
+    //             if ($product->quantity < $request->input('quantity') && !$cart_item->product_variant_id) {
+    //                 return response()->json([
+    //                     "message" => "Số lượng bạn cập nhật đã vượt quá số lượng sản phẩm tồn kho",
+
+    //                 ], Response::HTTP_INTERNAL_SERVER_ERROR);
+    //             }
+
+    //             if ($cart_item->product_variant_id) {
+
+    //                 $getUniqueAttributes = new GetUniqueAttribute();
+    //                 $product_variant = Product::query()->findOrFail($cart_item->product_id)->load(["variants", "variants.attributes"])->toArray();
+
+    //                 $findVariant = $getUniqueAttributes->findVariantByAttributes($product_variant["variants"], $request->input('product_variant'));
+    //                 if ($findVariant["quantity"] < $request->input('quantity')) {
+    //                     return response()->json([
+    //                         "message" => "Số lượng bạn cập nhật đã vượt quá số lượng sản phẩm tồn kho",
+
+    //                     ], Response::HTTP_INTERNAL_SERVER_ERROR);
+    //                 }
+    //                 $cart_item->product_variant_id = $findVariant["id"];
+    //                 $cart_item->quantity = $request->input("quantity");
+    //             } else {
+    //                 $cart_item->quantity = $request->input("quantity");
+    //             }
+    //             $cart_item->save();
+
+    //             return response()->json(["message" => "cập nhật giỏ hàng thành công."], Response::HTTP_OK);
+    //         });
+    //     } catch (\Exception $ex) {
+    //         return response()->json([
+    //             "message" => $ex->getMessage()
+    //         ], Response::HTTP_INTERNAL_SERVER_ERROR);
+    //     }
+    // }
+
     public function update(Request $request, string $id)
     {
         //
         try {
-
             return DB::transaction(function () use ($request, $id) {
                 $request->validate([
-                    "quantity" => "required|integer|min:1"
+                    "quantity" => "required|integer|min:1",
+                    "product_variant" => "nullable|array" // Đảm bảo biến thể được gửi đúng định dạng
                 ]);
+
                 $cart_item = CartItem::query()->findOrFail($id);
                 $product = Product::query()->findOrFail($cart_item->product_id);
-                if ($product->quantity < $request->input('quantity') && !$cart_item->product_variant_id) {
-                    return response()->json([
-                        "message" => "Số lượng bạn cập nhật đã vượt quá số lượng sản phẩm tồn kho",
-
-                    ], Response::HTTP_INTERNAL_SERVER_ERROR);
-                }
 
                 if ($cart_item->product_variant_id) {
-
+                    // Nếu sản phẩm là biến thể
                     $getUniqueAttributes = new GetUniqueAttribute();
-                    $product_variant = Product::query()->findOrFail($cart_item->product_id)->load(["variants", "variants.attributes"])->toArray();
+                    $product_variant = Product::query()
+                        ->findOrFail($cart_item->product_id)
+                        ->load(["variants", "variants.attributes"])
+                        ->toArray();
 
-                    $findVariant = $getUniqueAttributes->findVariantByAttributes($product_variant["variants"], $request->input('product_variant'));
-                    if ($findVariant["quantity"] < $request->input('quantity')) {
+                    $findVariant = $getUniqueAttributes->findVariantByAttributes(
+                        $product_variant["variants"],
+                        $request->input('product_variant')
+                    );
+
+                    // Tìm trong giỏ hàng nếu đã có biến thể này
+                    $existingCartItem = CartItem::query()
+                        ->where('product_id', $cart_item->product_id)
+                        ->where('product_variant_id', $findVariant["id"])
+                        ->where('id', '!=', $cart_item->id) // Loại trừ chính nó
+                        ->first();
+
+                    // Nếu biến thể mới đã tồn tại, cộng số lượng lại
+                    if ($existingCartItem) {
+                        $newQuantity = $existingCartItem->quantity + $request->input('quantity');
+
+                        // Kiểm tra số lượng tồn kho
+                        if ($findVariant["quantity"] < $newQuantity) {
+                            return response()->json([
+                                "message" => "Số lượng bạn cập nhật đã vượt quá số lượng sản phẩm tồn kho",
+                            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+                        }
+
+                        // Cập nhật số lượng biến thể đã tồn tại
+                        $existingCartItem->quantity = $newQuantity;
+                        $existingCartItem->save();
+
+                        // Xóa mục hiện tại vì đã gộp vào mục khác
+                        $cart_item->delete();
+                    } else {
+                        // Nếu chưa tồn tại, cập nhật mục hiện tại
+                        if ($findVariant["quantity"] < $request->input('quantity')) {
+                            return response()->json([
+                                "message" => "Số lượng bạn cập nhật đã vượt quá số lượng sản phẩm tồn kho",
+                            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+                        }
+
+                        $cart_item->product_variant_id = $findVariant["id"];
+                        $cart_item->quantity = $request->input("quantity");
+                        $cart_item->save();
+                    }
+                } else {
+                    // Nếu sản phẩm không phải là biến thể
+                    if ($product->quantity < $request->input('quantity')) {
                         return response()->json([
                             "message" => "Số lượng bạn cập nhật đã vượt quá số lượng sản phẩm tồn kho",
-
                         ], Response::HTTP_INTERNAL_SERVER_ERROR);
                     }
-                    $cart_item->product_variant_id = $findVariant["id"];
-                    $cart_item->quantity = $request->input("quantity");
-                } else {
-                    $cart_item->quantity = $request->input("quantity");
-                }
-                $cart_item->save();
 
-                return response()->json(["message" => "cập nhật giỏ hàng thành công."], Response::HTTP_OK);
+                    $cart_item->quantity = $request->input("quantity");
+                    $cart_item->save();
+                }
+
+                return response()->json(["message" => "Cập nhật giỏ hàng thành công."], Response::HTTP_OK);
             });
         } catch (\Exception $ex) {
             return response()->json([
