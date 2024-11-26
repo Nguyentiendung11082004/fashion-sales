@@ -26,7 +26,6 @@ const ModalCart = ({
   const [activeAttributes, setActiveAttributes] = useState<any>({});
   const [currentPrice, setCurrentPrice] = useState<number | null>(null);
   const transformAttributes = (attributes: any) => {
-    console.log("attributes", attributes);
     return (Array.isArray(attributes) ? attributes : []).reduce(
       (acc: any, curr: any) => {
         acc[curr.name] = curr.pivot.attribute_item_id.toString();
@@ -38,7 +37,6 @@ const ModalCart = ({
   const [dataAttributes, setAttribute] = useState<any>(
     transformAttributes(attributes)
   );
-  console.log("dataAttributes", dataAttributes);
   useEffect(() => {
     if (open && attributes) {
       setAttribute(transformAttributes(attributes));
@@ -101,10 +99,8 @@ const ModalCart = ({
       );
     },
   });
-  // console.log("cartAttribute", cartAttribute);
 
-  const formattedAttributes = cartAttribute
-    ? cartAttribute.cart_item.product.variants?.map((item: any) => {
+  const formattedAttributes = cartAttribute? cartAttribute.cart_item.product.variants?.map((item: any) => {
         const attributeObj: { [key: string]: number } = {};
         item.attributes.forEach((attribute: any) => {
           attributeObj[attribute.name] = attribute.pivot.attribute_item_id;
@@ -115,7 +111,6 @@ const ModalCart = ({
         };
       })
     : [];
-  console.log("formattedAttributes", formattedAttributes);
 
   const dataAttribute = cartAttribute?.getuniqueattributes;
 
@@ -153,8 +148,6 @@ const ModalCart = ({
       })),
     })
   );
-  console.log("resultDataAttribute", resultDataAttribute);
-
   const handleConfirm = (idCart: any) => {
     onUpdateAttributes(idCart, { ...activeAttributes, dataAttributes });
     let qty = cartAttribute?.cart_item?.quantity;

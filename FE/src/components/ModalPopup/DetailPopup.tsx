@@ -37,7 +37,6 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
   const [dataAttribute, setDataAttribute] = useState<any>(
     transformAttributes(attributes)
   );
-
   const resultDataAttribute = Object.entries(
     productSeeMore?.unique_attributes ?? {}
   ).map(([key, value]) => ({
@@ -77,7 +76,6 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
     }));
     findMatchingVariant();
   };
-  console.log("resultDataAttribute", resultDataAttribute)
   console.log("dataAttribute", dataAttribute)
   const [qty, setQty] = useState(1);
   const _payload = {
