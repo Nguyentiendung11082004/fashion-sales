@@ -157,13 +157,13 @@ class OrderController extends Controller
                 'phone_number' => $data['ship_user_phonenumber'],
             ];
         }
-        return  $user;
+        return $user;
     }
 
     // Hàm tạo đơn hàng
     protected function createOrder($data, $user)
     {
-        return  Order::create([
+        return Order::create([
             'user_id' => $user['id'],
             'payment_method_id' => $data['payment_method_id'],
             'total_quantity' => 0,
@@ -172,7 +172,7 @@ class OrderController extends Controller
             'user_email' => $user['email'],
             'user_phonenumber' => $user['phone_number'],
             'user_address' => $user['address'],
-            'user_note' => $data['user_note']?? '',
+            'user_note' => $data['user_note'] ?? '',
             'ship_user_name' => $data['ship_user_name'],
             'ship_user_phonenumber' => $data['ship_user_phonenumber'],
             'ship_user_address' => $data['ship_user_address'] . ', ' .
@@ -454,6 +454,70 @@ class OrderController extends Controller
     /**
      * Update the specified resource in storage.
      */
+    // public function update(UpdateOrderRequest $request, Order $order)
+    // {
+    //     if (!auth('sanctum')->check()) {
+    //         return response()->json(['message' => 'Không có quyền truy cập'], 403);
+    //     }
+
+    //     $user_id = auth('sanctum')->id();
+
+    //     if ($order->user_id !== $user_id) {
+    //         return response()->json(['message' => 'Không có quyền truy cập'], 403);
+    //     }
+
+
+    //     if ($order->order_status === Order::STATUS_CANCELED) {
+    //         return response()->json(['message' => 'Đơn hàng đã được hủy.'], 400);
+    //     }
+
+    //     if ($order->order_status === Order::STATUS_COMPLETED) {
+    //         return response()->json(['message' => 'Đơn hàng đã hoàn thành.'], 400);
+    //     }
+
+    //     $order_status = $request->input('order_status');
+
+    //     if ($order_status === Order::STATUS_CANCELED) {
+    //         if (!in_array($order->order_status, [Order::STATUS_PENDING, Order::STATUS_CONFIRMED])) {
+    //             return response()->json([
+    //                 'message' => 'Chỉ có thể hủy đơn hàng khi đơn hàng đang ở trạng thái Đang chờ xác nhận hoặc Đã xác nhận.'
+    //             ], 400);
+    //         }
+
+    //         $user_note = $request->input('user_note');
+
+    //         if (empty($user_note)) {
+    //             return response()->json(['message' => 'Ghi chú là bắt buộc khi hủy đơn hàng.'], 400);
+    //         }
+
+    //         $this->handleOrderCancellation($order, $user_note);
+    //         $voucher_logs = VoucherLog::query()
+    //             ->where('user_id', '=', $user_id)
+    //             ->where('order_id', '=', $order->id)
+    //             ->first();
+
+    //         if ($voucher_logs) {
+    //             $voucher_logs->update([
+    //                 'action' => 'reverted',
+    //             ]);
+    //         }
+    //         $order->order_status = $order_status;
+    //     }
+    //     if ($order_status === Order::STATUS_COMPLETED) {
+    //         if (!in_array($order->order_status, [Order::STATUS_SUCCESS])) {
+    //             return response()->json([
+    //                 'message' => 'Chỉ có thể hủy đơn hàng khi đơn hàng đang ở trạng thái giao hàng thành công.'
+    //             ], 400);
+    //         }
+    //         $order->order_status = $order_status;
+    //     }
+    //     $order->save();
+    //     return response()->json([
+    //         'message' => 'Trạng thái đơn hàng đã được cập nhật thành công.',
+    //         'order' => $order->load('orderDetails'),
+    //     ]);
+    // }
+
     public function update(UpdateOrderRequest $request, Order $order)
     {
         if (!auth('sanctum')->check()) {
@@ -462,52 +526,57 @@ class OrderController extends Controller
 
         $user_id = auth('sanctum')->id();
 
-        // Kiểm tra xem đơn hàng có thuộc về người dùng đã xác thực không
+        // Kiểm tra quyền sở hữu
         if ($order->user_id !== $user_id) {
             return response()->json(['message' => 'Không có quyền truy cập'], 403);
         }
 
-        // Kiểm tra trạng thái đơn hàng
-        if ($order->order_status === Order::STATUS_CANCELED) {
-            return response()->json(['message' => 'Đơn hàng đã được hủy.'], 400);
+        // Kiểm tra trạng thái không hợp lệ
+        if (in_array($order->order_status, [Order::STATUS_CANCELED, Order::STATUS_COMPLETED])) {
+            return response()->json(['message' => 'Đơn hàng không thể cập nhật vì đã hoàn thành hoặc đã bị hủy.'], 400);
         }
 
-        // Lấy trạng thái mới từ request
         $order_status = $request->input('order_status');
 
-        // Chỉ cho phép hủy đơn hàng khi trạng thái hiện tại là "Đang chờ xác nhận" hoặc "Đã xác nhận"
-        if ($order_status === Order::STATUS_CANCELED) {
-            if (!in_array($order->order_status, [Order::STATUS_PENDING, Order::STATUS_CONFIRMED])) {
-                return response()->json([
-                    'message' => 'Chỉ có thể hủy đơn hàng khi đơn hàng đang ở trạng thái Đang chờ xác nhận hoặc Đã xác nhận.'
-                ], 400);
-            }
+        // Xử lý các trạng thái
+        switch ($order_status) {
+            case Order::STATUS_CANCELED:
+                if (!in_array($order->order_status, [Order::STATUS_PENDING, Order::STATUS_CONFIRMED])) {
+                    return response()->json([
+                        'message' => 'Chỉ có thể hủy đơn hàng khi đơn hàng đang ở trạng thái Đang chờ xác nhận hoặc Đã xác nhận.'
+                    ], 400);
+                }
 
-            // Lấy lý do hủy từ request
-            $user_note = $request->input('user_note');
+                $user_note = $request->input('user_note');
+                $this->handleOrderCancellation($order, $user_note);
 
-            // Kiểm tra lý do hủy
-            if (empty($user_note)) {
-                return response()->json(['message' => 'Ghi chú là bắt buộc khi hủy đơn hàng.'], 400);
-            }
-            // Xử lý hủy đơn hàng và lưu lý do hủy
-            $this->handleOrderCancellation($order, $user_note);
-            // Kiểm tra nếu đơn hàng có sử dụng voucher
-            $voucher_logs = VoucherLog::query()
-                ->where('user_id', '=', $user_id)
-                ->where('order_id', '=', $order->id)
-                ->first();
+                // Cập nhật trạng thái voucher nếu cần
+                $voucher_logs = VoucherLog::query()
+                    ->where('user_id', $user_id)
+                    ->where('order_id', $order->id)
+                    ->first();
 
-            if ($voucher_logs) {
-                // Cập nhật trạng thái hành động của voucher
-                $voucher_logs->update([
-                    'action' => 'reverted',
-                ]);
-            }
-            $order->order_status = $order_status;
+                if ($voucher_logs) {
+                    $voucher_logs->update(['action' => 'reverted']);
+                }
+                $order->order_status = $order_status;
+                break;
+
+            case Order::STATUS_COMPLETED:
+                if ($order->order_status !== Order::STATUS_SUCCESS) {
+                    return response()->json([
+                        'message' => 'Chỉ có thể hoàn thành đơn hàng khi đơn hàng đang ở trạng thái giao hàng thành công.'
+                    ], 400);
+                }
+                $order->order_status = $order_status;
+                break;
+
+            default:
+                return response()->json(['message' => 'Trạng thái không hợp lệ.'], 400);
         }
+
         $order->save();
-        // Trả về thông báo cập nhật thành công
+
         return response()->json([
             'message' => 'Trạng thái đơn hàng đã được cập nhật thành công.',
             'order' => $order->load('orderDetails'),
