@@ -50,9 +50,10 @@ use App\Http\Controllers\API\V1\Service\PaymentController;
 */
 
 Route::prefix("v1/")->group(function () {
-        Route::middleware(['auth:sanctum', 'role:4'])->group(function () {
-        Route::resource('vouchers', VoucherController::class);
-    });
+//         // Route::middleware(['auth:sanctum', 'role:4'])->group(function () {
+//         // Route::resource('vouchers', VoucherController::class);
+//     }
+// );
 
     Route::resource("products", ProductController::class);
     Route::resource("comments", CommentsController::class);
@@ -60,7 +61,7 @@ Route::prefix("v1/")->group(function () {
     Route::resource("tags", TagController::class);
     Route::resource('employees', EmployeeController::class);
     Route::resource('clients', ClientController::class);
-    // Route::resource('vouchers', VoucherController::class);
+    Route::resource('vouchers', VoucherController::class);
     Route::apiResource('attribute', AttributeController::class);
     Route::apiResource('attributeItem', AttributeItemController::class);
     Route::apiResource('category', CategoryController::class);

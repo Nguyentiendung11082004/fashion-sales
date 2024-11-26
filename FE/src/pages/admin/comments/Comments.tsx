@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Loading from "@/common/Loading/Loading";
 import { Icomments } from "@/common/types/comments";
 import { deleteComment, getComments } from "@/services/api/admin/comments.api";
@@ -7,7 +8,6 @@ import { Button, Modal, Pagination, Table } from "antd";
 import { ColumnType } from "antd/es/table";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-
 
 const CommentPage = () => {
   const queryClient = useQueryClient();
@@ -21,6 +21,7 @@ const CommentPage = () => {
     queryKey: ["comments"],
     queryFn: getComments,
   });
+  console.log("comments  nè:", data);
 
   const { mutate } = useMutation({
     mutationFn: deleteComment,
@@ -75,10 +76,12 @@ const CommentPage = () => {
       title: "image",
       dataIndex: "image",
       render: (record: string) => {
-        return <div>
-          <img src={record} alt="cmt-img" style={{ height: '60px' }} />
-        </div>    
-       }
+        return (
+          <div>
+            <img src={record} alt="cmt-img" style={{ height: "60px" }} />
+          </div>
+        );
+      },
     },
     {
       title: "status",
@@ -100,7 +103,7 @@ const CommentPage = () => {
   ];
 
   const dataSource =
-    data?.data?.comments?.map((item: Icomments) => ({
+    data?.map((item: Icomments) => ({
       key: item?.id,
       ...item,
     })) || [];

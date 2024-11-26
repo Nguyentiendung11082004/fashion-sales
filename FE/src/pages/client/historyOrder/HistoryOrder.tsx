@@ -1,12 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useAuth } from "@/common/context/Auth/AuthContext";
-import { FormatMoney } from "@/common/utils/utils";
-import { Product4, Product5, Product6 } from "@/components/icons";
 import instance from "@/configs/axios";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Button, Input, Modal, Table } from "antd";
-import React, { useEffect, useState } from "react";
+import { Input, Modal, Table } from "antd";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
+import CommentProduct from "../productDetail/CommentProduct";
 
 const HistoryOrder = () => {
   const [expandedOrders, setExpandedOrders] = useState<number[]>([]);
@@ -41,7 +41,6 @@ const HistoryOrder = () => {
       order_status: "Đã hủy",
       user_note: reason,
     };
-    console.log("Payload being sent:", payload);
     const response = await instance.put(`/order/${id}`, payload, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -68,7 +67,6 @@ const HistoryOrder = () => {
           : [...prev, orderId] // Nếu chưa mở, thì mở
     );
   };
-
   // Khởi tạo trạng thái từ localStorage
   useEffect(() => {
     const savedReceivedOrders = JSON.parse(
@@ -116,6 +114,14 @@ const HistoryOrder = () => {
       key: "value",
     },
   ];
+  //  đánh giá sản phẩm
+  const [isShowFormCmtOpen, setShowFormCmtOpen] = useState(false);
+  const showFormCmt = () => {
+    setShowFormCmtOpen(true);
+  };
+  const closeFormCmt = () => {
+    setShowFormCmtOpen(false);
+  };
 
   return (
     <>
@@ -253,7 +259,7 @@ const HistoryOrder = () => {
                           onClick={() => toggleOrderDetails(order.id)}
                           className="text-base"
                         >
-                          {isExpanded ? "▼" : "▲"}{" "}
+                          {isExpanded ? "▼" : "▲"}
                           {/* Hiển thị mũi tên lên hoặc xuống */}
                         </button>
                         <p className="text-base font-semibold mx-2">
@@ -283,14 +289,16 @@ const HistoryOrder = () => {
                             <div className="text-lg uppercase font-medium flex">
                               <p>Mã đơn hàng . {selectedOrder.order_code}</p>
                               <p className="mx-2">|</p>
-                              <p className="text-[#00BADB]">{selectedOrder.order_status}</p>
+                              <p className="text-[#00BADB]">
+                                {selectedOrder.order_status}
+                              </p>
                             </div>
                             <p>
-                              <strong>Thời gian đặt hàng:</strong>{" "}
+                              <strong>Thời gian đặt hàng:</strong>
                               {selectedOrder.created_at}
                             </p>
                             <p>
-                              <strong>Trạng thái đơn hàng:</strong>{" "}
+                              <strong>Trạng thái đơn hàng:</strong>
                               {selectedOrder.order_status}
                             </p>
                             <p>
@@ -298,7 +306,7 @@ const HistoryOrder = () => {
                               <br />
                               Tên: {selectedOrder.ship_user_name}
                               <br />
-                              Số điện thoại:{" "}
+                              Số điện thoại:
                               {selectedOrder.ship_user_phonenumber}
                               <br />
                               Địa chỉ: {selectedOrder.ship_user_address}
@@ -336,7 +344,7 @@ const HistoryOrder = () => {
                                                     ? Object.values(value).join(
                                                         ", "
                                                       ) // Nếu là object
-                                                    : String(value)}{" "}
+                                                    : String(value)}
                                                 {/* Nếu là giá trị đơn lẻ */}
                                               </li>
                                             ))}
@@ -344,10 +352,14 @@ const HistoryOrder = () => {
                                         )}
                                     </p>
                                     <p>Số lượng: {item.quantity}</p>
-                                    <p>Giá: 
+                                    <p>
+                                      Giá:
                                       {/* {FormatMoney(item.price)} */}
-                                      {new Intl.NumberFormat("vi-VN").format(item.price)}
-                                      ₫</p>
+                                      {new Intl.NumberFormat("vi-VN").format(
+                                        item.price
+                                      )}
+                                      ₫
+                                    </p>
                                   </div>
                                 </div>
                               ))}
@@ -366,18 +378,16 @@ const HistoryOrder = () => {
                                 {
                                   key: "2",
                                   label: "Khuyến mãi",
-                                  value: 
-                                  // `-${FormatMoney(selectedOrder.voucher_discount)}₫`
-                                  `${new Intl.NumberFormat("vi-VN").format(selectedOrder.voucher_discount)}₫`
-                                  ,
+                                  value:
+                                    // `-${FormatMoney(selectedOrder.voucher_discount)}₫`
+                                    `${new Intl.NumberFormat("vi-VN").format(selectedOrder.voucher_discount)}₫`,
                                 },
                                 {
                                   key: "3",
                                   label: "Thành tiền",
-                                  value: 
-                                  // `${FormatMoney(selectedOrder.total)}₫`
-                                  `${new Intl.NumberFormat("vi-VN").format(selectedOrder.total)}₫`
-                                  ,
+                                  value:
+                                    // `${FormatMoney(selectedOrder.total)}₫`
+                                    `${new Intl.NumberFormat("vi-VN").format(selectedOrder.total)}₫`,
                                 },
                                 {
                                   key: "4",
@@ -436,7 +446,7 @@ const HistoryOrder = () => {
                                                     ? Object.values(value).join(
                                                         ", "
                                                       ) // Nếu là object
-                                                    : String(value)}{" "}
+                                                    : String(value)}
                                                 {/* Nếu là giá trị đơn lẻ */}
                                               </li>
                                             ))}
@@ -449,7 +459,10 @@ const HistoryOrder = () => {
                                       {/* <del className="mr-1">{detail.price}đ</del> */}
                                       <span className="text-base">
                                         {/* {FormatMoney(detail.price)}₫ */}
-                                        {new Intl.NumberFormat("vi-VN").format(detail.price)}₫
+                                        {new Intl.NumberFormat("vi-VN").format(
+                                          detail.price
+                                        )}
+                                        ₫
                                       </span>
                                     </div>
                                   </div>
@@ -517,20 +530,51 @@ const HistoryOrder = () => {
                                 ? "Đã Nhận Được Hàng"
                                 : "Đã Nhận Hàng"}
                             </button>
-                            {!isCancelOk && !canCel && (
+                            {/* {!isCancelOk && !canCel && (
                               <button
                                 type="button"
-                                className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 ttnc-ButtonSecondary text-slate-700 ${
+                                className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 ttnc-ButtonSecondary text-slate-700 
+                                  ${
                                   !ratedOrders.includes(order.id)
                                     ? "bg-[#00BADB] text-white font-medium"
                                     : "bg-gray-200 text-slate-400 cursor-not-allowed border border-gray-300"
-                                }`}
+                                }`
+                              }
                                 onClick={() => handleRated(order.id)}
                                 disabled={ratedOrders.includes(order.id)}
                               >
                                 Đánh Giá
                               </button>
-                            )}
+                            )} */}
+                            
+                            <button
+                              type="button"
+                              className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 ttnc-ButtonSecondary
+                                bg-[#00BADB] text-white font-medium 
+                                `}
+                              onClick={() => showFormCmt()}
+                            >
+                              Đánh giá
+                            </button>
+                            <Modal
+                              title="Thêm đánh giá"
+                              visible={isShowFormCmtOpen}
+                              onCancel={closeFormCmt}
+                              footer={null} // Xóa nút footer mặc định
+                              centered
+                            >
+                              <CommentProduct
+                                // productId={order?.id}
+                                productId={(() => {
+                                  console.log("Order ID:", order?.id);
+                                  return order?.id;
+                                })()}
+                                editIdComment={null} // Giá trị mặc định
+                                InForCommentId={null} // Giá trị mặc định
+                                setInForCommentId={() => {}} // Hàm rỗng hoặc logic bạn cần
+                                setEditIdComment={() => {}}
+                              />
+                            </Modal>
                           </>
                         )}
 
@@ -545,7 +589,7 @@ const HistoryOrder = () => {
                           }
                           disabled={canCel}
                         >
-                          Xác Nhận Hủy
+                          Xác nhận hủy
                         </button>
                         <Modal
                           title="Lý do hủy đơn hàng"
