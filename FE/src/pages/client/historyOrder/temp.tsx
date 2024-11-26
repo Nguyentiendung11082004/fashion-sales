@@ -4,7 +4,7 @@ import instance from "@/configs/axios";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Input, Modal, Table } from "antd";
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import CommentProduct from "../productDetail/CommentProduct";
 
@@ -19,6 +19,7 @@ const HistoryOrder = () => {
   const [cancelReason, setCancelReason] = useState("");
   const queryClient = useQueryClient();
   const { token } = useAuth();
+  const navigate = useNavigate();
   const { data, isFetching, isError } = useQuery({
     queryKey: ["history-order"],
     queryFn: async () => {
@@ -30,6 +31,8 @@ const HistoryOrder = () => {
       return response.data;
     },
   });
+
+  console.log("data order : ", data);
   const cancelOrder = async ({
     id,
     reason,
@@ -67,6 +70,7 @@ const HistoryOrder = () => {
           : [...prev, orderId] // Nếu chưa mở, thì mở
     );
   };
+  console.log("toggleOrderDetails", toggleOrderDetails);
   // Khởi tạo trạng thái từ localStorage
   useEffect(() => {
     const savedReceivedOrders = JSON.parse(
@@ -91,7 +95,7 @@ const HistoryOrder = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
-
+  console.log("selecOrder: ", selectedOrder);
   const showOrderDetails = (order: any) => {
     setSelectedOrder(order);
     setIsModalOpen(true);
@@ -122,6 +126,38 @@ const HistoryOrder = () => {
   const closeFormCmt = () => {
     setShowFormCmtOpen(false);
   };
+  // mua lại hàng
+
+  // const [idAddToCart, setIdAddToCart] = useState<any>();
+  // const handleBuyBack = (orderId?: string | number) => {
+  //   console.log("ID thêm vào giỏ hàng: ", orderId);
+  //   setIdAddToCart(orderId);
+
+  //   buyBackProduct.mutate({ order_id: orderId });
+  // };
+
+  // const buyBackProduct = useMutation({
+  //   mutationFn: async (data: { order_id: string | number }) => {
+  //     try {
+  //       const res = await instance.post("/cart", data, {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //       });
+  //       return res.data.data;
+  //     } catch (error) {
+  //       console.error("Không thể mua lại sản phẩm:", error);
+  //       throw new Error("Không thể mua lại sản phẩm");
+  //     }
+  //   },
+  //   onSuccess: () => {
+  //     queryClient.invalidateQueries({ queryKey: ["cart"] });
+  //     navigate("/cart");
+  //   },
+  //   onError: () => {
+  //     toast.error("Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng!");
+  //   },
+  // });
 
   return (
     <>
@@ -246,17 +282,17 @@ const HistoryOrder = () => {
                     // Xóa lý do sau khi hủy
                   }
                 };
-                console.log("data order:", order);
-                const listIdProduct = order.order_details.map(
-                  (detail: any) => detail.product_id
-                );
-
-                console.log("Danh sách product_id:", listIdProduct);
 
                 return (
                   <div
                     key={order.id}
-                    onClick={() => toggleOrderDetails(order.id)}
+                    onClick={() => {
+                      console.log(
+                        "order id khi thêm vào giỏ hàng: ",
+                        order?.id
+                      ),
+                        toggleOrderDetails(order.id);
+                    }}
                     className="border border-slate-200 rounded-lg overflow-hidden z-0 mb-[30px]"
                   >
                     <button className="hd-head-form-order w-full flex sm:flex-row justify-between lg:justify-between sm:justify-between sm:items-center p-4 sm:p-8 bg-slate-50 dark:bg-slate-500/5">
@@ -515,8 +551,17 @@ const HistoryOrder = () => {
                     {/*end hd-body-form-order*/}
                     <div className="hd-head-form-order flex sm:flex-row justify-between lg:justify-between sm:justify-between sm:items-center p-4 sm:p-8">
                       <div className="mt-3 sm:mt-0">
-                        {ratedOrders.includes(order?.id) ? (
-                          <button className="nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 ttnc-ButtonSecondary bg-[#00BADB] text-white">
+                        {ratedOrders.includes(order.id) ? (
+                          <button
+                            onClick={() => {
+                              console.log(
+                                "kiểm tra id khi thêm vào giỏ hàng: ",
+                                order?.id
+                              );
+                              // handleBuyBack(order?.id);
+                            }}
+                            className="nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 ttnc-ButtonSecondary bg-[#00BADB] text-white"
+                          >
                             Mua Lại
                           </button>
                         ) : (
@@ -571,12 +616,11 @@ const HistoryOrder = () => {
                             >
                               <CommentProduct
                                 // productId={order?.id}
-                                products={listIdProduct}
-                                // productId={(() => {
-                                //   console.log("Order ID đang tìm:", order?.id);
-                                //   return order?.id;
-                                // })()}
-                                // editIdComment={null} // Giá trị mặc định
+                                productId={(() => {
+                                  console.log("id đang tìm:", order?.id);
+                                  return order?.id;
+                                })()}
+                                editIdComment={null} // Giá trị mặc định
                                 InForCommentId={null} // Giá trị mặc định
                                 setInForCommentId={() => {}} // Hàm rỗng hoặc logic bạn cần
                                 setEditIdComment={() => {}}

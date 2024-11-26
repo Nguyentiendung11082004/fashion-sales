@@ -60,7 +60,7 @@ const CartPopup = forwardRef((props: any, ref) => {
   };
 
   const result = product?.variants
-    .filter(
+    ?.filter(
       (variant: any) =>
         variant.attributes &&
         variant.attributes.length > 0 &&

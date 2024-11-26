@@ -13,8 +13,6 @@ import {
   Upload,
   UploadProps,
 } from "antd";
-import Loading from "@/common/Loading/Loading";
-
 
 import { useAuth } from "@/common/context/Auth/AuthContext";
 import { IPost } from "@/common/types/post";
@@ -92,7 +90,6 @@ const FormPost = () => {
   });
   const location = useLocation();
   const currentPage = location.state?.currentPage || 1;
-
 
   const updatePost = useMutation({
     mutationFn: async ({ data, id }: { data: IPost; id: string }) => {

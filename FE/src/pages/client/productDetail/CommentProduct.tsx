@@ -15,6 +15,7 @@ interface UpdateCommentPayload {
 }
 const CommentProduct = ({
   productId,
+  listIdProduct,
   editIdComment,
   InForCommentId,
   setInForCommentId,
@@ -26,7 +27,13 @@ const CommentProduct = ({
   const [form] = Form.useForm();
   const [urlImage, setUrlImage] = useState<string | null>(null);
   const [errors, setErrors] = useState<any>("");
-
+  const [formsData, setFormsData] = useState<Record<number, any>>(
+    listIdProduct?.reduce((acc: any, id: any) => {
+      acc[id] = { rating: 0, content: "", image: null };
+      console.log("acc: ", acc);
+      return acc;
+    }, {})
+  );
   const { token } = useAuth();
 
   const postCommentProduct = useMutation({
@@ -136,98 +143,102 @@ const CommentProduct = ({
   };
 
   return (
-    <Form
-      form={form}
-      layout="vertical"
-      onFinish={onFinish}
-      initialValues={{
-        ...InForCommentId,
-      }}
-      className="m-auto w-full max-w-lg p-6 bg-white shadow-lg rounded-lg"
-    >
-      <h1 className="font-semibold lg:text-2xl text-base mb-4 text-center">
-        {editIdComment ? "Sửa bình luận" : "Thêm bình luận"}
-      </h1>
-
-      <label className="mb-2 block lg:text-sm text-[10px] font-medium text-gray-700">
-        Chất lượng sản phẩm:
-      </label>
-      <Form.Item className="mb-4" name="rating">
-        <Rate value={rating} onChange={(value) => setRating(value)} />
-      </Form.Item>
-      {errors ? <div className="text-red-600">{errors.rating}</div> : ""}
-
-      <label className="block lg:text-sm text-[10px] font-medium text-gray-700">
-        Nhận xét:
-      </label>
-      <Form.Item name="content" className="mb-4">
-        <TextArea
-          className="px-2 py-2 border-black placeholder:lg:text-sm text-[10px] mt-1 block w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-          placeholder="Nhập nhận xét của bạn"
-          rows={3}
-        />
-      </Form.Item>
-      {errors ? <div className="text-red-600">{errors.content}</div> : ""}
-
-      <Form.Item name="image">
-        <label className="block lg:text-sm text-[10px] font-medium text-gray-700">
-          Tải hình ảnh lên:
-        </label>
-        <Upload
-          {...propImgComment}
-          showUploadList={{ showPreviewIcon: false, showRemoveIcon: true }}
-          onRemove={() => setUrlImage(null)}
-        >
-          {urlImage ? (
-            <>
-              <img
-                src={urlImage}
-                alt="Uploaded"
-                style={{ marginTop: 16, width: 100, marginBottom: "10px" }}
-              />
-            </>
-          ) : (
-            InForCommentId?.image && (
-              <>
-                <img
-                  src={InForCommentId.image}
-                  alt="Uploaded"
-                  style={{
-                    marginTop: 16,
-                    width: 100,
-                    marginBottom: "10px",
-                  }}
-                />
-              </>
-            )
-          )}
-          <Button className="mt-4" icon={<UploadOutlined />}>
-            Tải lên ảnh
-          </Button>
-        </Upload>
-      </Form.Item>
-      {errors && <div className="text-red-600">{errors.image}</div>}
-
-      <div className="flex justify-center items-center ">
-        <Button
-          className="text-center text-red-500 mr-[20px]"
-          onClick={() => {
-            setEditIdComment(null);
-            setInForCommentId(null);
+    <>
+      {listIdProduct?.map((id: any) => (
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={onFinish}
+          initialValues={{
+            ...InForCommentId,
           }}
+          className="m-auto w-full max-w-lg p-6 bg-white shadow-lg rounded-lg"
         >
-          <span className="text-[12px]">Hủy</span>
-        </Button>
-        <Button
-          className="text-center "
-          htmlType="submit"
-          type="primary"
-          loading={isLoading}
-        >
-          {editIdComment ? "Cập nhật" : "Thêm"}
-        </Button>
-      </div>
-    </Form>
+          <h1 className="font-semibold lg:text-2xl text-base mb-4 text-center">
+            {editIdComment ? "Sửa bình luận" : "Thêm bình luận"}
+          </h1>
+
+          <label className="mb-2 block lg:text-sm text-[10px] font-medium text-gray-700">
+            Chất lượng sản phẩm:
+          </label>
+          <Form.Item className="mb-4" name="rating">
+            <Rate value={rating} onChange={(value) => setRating(value)} />
+          </Form.Item>
+          {errors ? <div className="text-red-600">{errors.rating}</div> : ""}
+
+          <label className="block lg:text-sm text-[10px] font-medium text-gray-700">
+            Nhận xét:
+          </label>
+          <Form.Item name="content" className="mb-4">
+            <TextArea
+              className="px-2 py-2 border-black placeholder:lg:text-sm text-[10px] mt-1 block w-full rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              placeholder="Nhập nhận xét của bạn"
+              rows={3}
+            />
+          </Form.Item>
+          {errors ? <div className="text-red-600">{errors.content}</div> : ""}
+
+          <Form.Item name="image">
+            <label className="block lg:text-sm text-[10px] font-medium text-gray-700">
+              Tải hình ảnh lên:
+            </label>
+            <Upload
+              {...propImgComment}
+              showUploadList={{ showPreviewIcon: false, showRemoveIcon: true }}
+              onRemove={() => setUrlImage(null)}
+            >
+              {urlImage ? (
+                <>
+                  <img
+                    src={urlImage}
+                    alt="Uploaded"
+                    style={{ marginTop: 16, width: 100, marginBottom: "10px" }}
+                  />
+                </>
+              ) : (
+                InForCommentId?.image && (
+                  <>
+                    <img
+                      src={InForCommentId.image}
+                      alt="Uploaded"
+                      style={{
+                        marginTop: 16,
+                        width: 100,
+                        marginBottom: "10px",
+                      }}
+                    />
+                  </>
+                )
+              )}
+              <Button className="mt-4" icon={<UploadOutlined />}>
+                Tải lên ảnh
+              </Button>
+            </Upload>
+          </Form.Item>
+          {errors && <div className="text-red-600">{errors.image}</div>}
+
+          <div className="flex justify-center items-center ">
+            <Button
+              className="text-center text-red-500 mr-[20px]"
+              onClick={() => {
+                setEditIdComment(null);
+                setInForCommentId(null);
+              }}
+            >
+              <span className="text-[12px]">Hủy</span>
+            </Button>
+            <Button
+              className="text-center "
+              htmlType="submit"
+              type="primary"
+              loading={isLoading}
+            >
+              {editIdComment ? "Cập nhật" : "Thêm"}
+            </Button>
+          </div>
+        </Form>
+      ))}
+    </>
   );
 };
 
