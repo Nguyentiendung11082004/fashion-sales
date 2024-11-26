@@ -21,6 +21,7 @@ const { RangePicker } = DatePicker;
 import type { DatePickerProps, GetProps } from 'antd';
 type RangePickerProps = GetProps<typeof DatePicker.RangePicker>;
 import dayjs from 'dayjs';
+import { FormatMoney } from "@/common/utils/utils";
 export const DashboardContext = createContext<any | undefined>(undefined);
 
 const Dashboard = () => {
@@ -32,11 +33,10 @@ const Dashboard = () => {
   })
   const [inputRange, setInputRange] = useState(false);
   const onChange: DatePickerProps['onChange'] = (date, dateString) => {
-    console.log("date",date)
     let formattedDate = '';
     if (filter.filter_type === 'day') {
       formattedDate = date ? date.format('YYYY-MM-DD') : '';
-    }  else if (filter.filter_type === 'week') {
+    } else if (filter.filter_type === 'week') {
       // Nếu là "week", tính toán và lưu tuần (chỉ lưu năm và tuần)
       if (date) {
         // const year = date.year(); 
@@ -95,9 +95,13 @@ const Dashboard = () => {
         break;
     }
   }
-  const [tongDonHang, setTongDonHang] = useState<any>([])
+  const [tongDonHang, setTongDonHang] = useState<any>([]);
+  const [tongDoanhThu, setTongDoanhThu] = useState<any>([]);
   const handleDonHang = (data: any) => {
     setTongDonHang(data)
+  }
+  const handleDoanhThu = (data:any) => {
+    setTongDoanhThu(FormatMoney(data))
   }
   const _props = {
     filter,
@@ -110,16 +114,15 @@ const Dashboard = () => {
           <div className="page-dashboard__header__left">
             <p className="text-[14px] font-medium">Good Morning, Anna!</p>
           </div>
-          <div>
+          <div >
             <Select
               placeholder="Chọn kiểu tìm kiếm"
-              style={{ width: 280 }}
-              className="border-none "
+              style={{ width: 280, height: '38px' }}
+              className="border-none mr-5"
               onChange={hanldeChangeType}
               allowClear
             >
               <Option value="day">Tìm theo ngày</Option>
-              {/* <Option value="week">Tìm theo tuần</Option> */}
               <Option value="month">Tìm theo tháng</Option>
               <Option value="year">Tìm theo năm</Option>
               <Option value="range">Tìm theo khoảng</Option>
@@ -147,7 +150,7 @@ const Dashboard = () => {
               />
             }
           </div>
-          <div className="page-dashboard__header__right flex items-center">
+          {/* <div className="page-dashboard__header__right flex items-center">
             <div className="relative">
               <input type="date" className="w-[210px] h-[31px] rounded-md pl-3" />
               <FontAwesomeIcon
@@ -161,17 +164,17 @@ const Dashboard = () => {
             <button className="bedpulse w-[33px] h-[33px] bg-[#DFF0FA] hover:bg-[#299CDB] rounded-md">
               <FontAwesomeIcon icon={faBedPulse} />
             </button>
-          </div>
+          </div> */}
         </div>
         <div className="page-dashboard__card bg-gray-100 py-0 flex  w-[100%] font-poppins">
           <div className="card-item flex-wrap bg-white w-1/4 p-3 mr-4 rounded shadow-sm hover:transform hover:-translate-y-1 transition-all ease duration-400">
             <div className="flex justify-between">
               <h3 className="text-xs text-gray-400 font-medium">
-                TOTAL EARNINGS
+                Doanh thu
               </h3>
-              <span className="text-green-500 font-medium">+16.24 %</span>
+              {/* <span className="text-green-500 font-medium">+16.24 %</span> */}
             </div>
-            <p className="text-xl font-semibold text-gray-600 mt-4">$559.25k</p>
+            <p className="text-xl font-semibold text-gray-600 mt-4">{tongDoanhThu}</p>
             <div className="flex justify-between items-center">
               <a
                 href="#"
@@ -241,21 +244,27 @@ const Dashboard = () => {
         </div>
 
         <div className="page-dashboard__chart flex mt-5">
-          <div className="chart-left bg-white w-[68%] mr-5 shadow">
+          {/* <div className="chart-left bg-white w-[29%] mr-5 shadow">
             <div className="title flex justify-between m-5">
               <p className="text-[#495057] text-[18px] font-medium">Thống kê đơn hàng</p>
 
             </div>
             <Chart dataDonHang={handleDonHang} />
-          </div>
-          <div className="chart-right bg-white w-[32%] shadow">
-            <p className="title text-[#495057] text-[18px] font-medium m-5">
-              Sales by Locations
-            </p>
-            <LocationChart />
+          </div> */}
+          <div className="chart-right bg-white w-[100%] shadow">
+            <DonutChartWithStats dataDoanhThu={handleDoanhThu} />
           </div>
         </div>
 
+        <div className="chart-left bg-white w-[100%] mr-5 shadow">
+          <div className="title flex justify-between m-5">
+            <h3 className="text-xl font-semibold text-gray-800 mt-5">
+              Thống kê đơn hàng
+            </h3>
+
+          </div>
+          <Chart dataDonHang={handleDonHang} />
+        </div>
         <div className="page-dashboard__table ">
           <div className="table-product mt-[20px]">
             <TableProduct />
@@ -266,7 +275,7 @@ const Dashboard = () => {
         </div>
         <div className="w-[50%]">
           <div className="chart-source">
-            <DonutChartWithStats />
+            {/* <DonutChartWithStats /> */}
           </div>
           <div className="table-order">
             {/* <TableOrder />   */}
