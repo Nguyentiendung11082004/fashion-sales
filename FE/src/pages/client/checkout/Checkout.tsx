@@ -200,25 +200,23 @@ const Checkout = () => {
     //   console.log("1")
     //   return; // Dừng lại nếu không có đủ thông tin
     // }
-    setIsLoading(true);
+    // setIsLoading(true);
     try {
-      let weight = dataCheckout?.order_items?.map((e: any) => Number(e.product.weight));
-      let totalWeight = weight?.reduce((sum: any, currentWeight: any) => sum + currentWeight, 0);
-      // Nếu không có payloadDiaChi.ward, sử dụng idXa, và nếu không có payloadDiaChi.district, sử dụng idQuanHuyen
-      let toWardCode = payloadDiaChi?.ward?.id || idXa;  // Nếu không có ward từ payloadDiaChi, dùng idXa
-      let toDistrictId = payloadDiaChi?.district?.id || idQuanHuyen;  // Nếu không có district từ payloadDiaChi, dùng idQuanHuyen
-
-      let res = await instance.post(`/calculateshippingfee`, {
-        to_ward_code: String(toWardCode), // ID xã/phường
-        to_district_id: Number(toDistrictId), // ID quận/huyện
-        weight: totalWeight // Tổng trọng lượng sản phẩm
-      });
-
-      setShipPing(res?.data?.fee?.total); // Cập nhật phí vận chuyển
+      setTimeout(async () => {
+        // Tiến hành các bước tính toán phí vận chuyển
+        let weight = dataCheckout?.order_items?.map((e: any) => Number(e.product.weight));
+        let totalWeight = weight?.reduce((sum: any, currentWeight: any) => sum + currentWeight, 0);
+        let toWardCode = payloadDiaChi?.ward?.id || idXa;
+        let toDistrictId = payloadDiaChi?.district?.id || idQuanHuyen;
+        let res = await instance.post(`/calculateshippingfee`, {
+          to_ward_code: String(toWardCode),
+          to_district_id: Number(toDistrictId),
+          weight: totalWeight
+        });
+        setShipPing(res?.data?.fee?.total); // Cập nhật phí vận chuyển
+      }, 2000);
     } catch (error) {
       console.error("Error calculating shipping fee", error); // In lỗi nếu có
-    } finally {
-      setIsLoading(false); // Kết thúc loading
     }
   };
   useEffect(() => {
@@ -306,12 +304,14 @@ const Checkout = () => {
     handleBuyCart()
   }, [payloadDiaChi]);
   useEffect(() => {
-    if (payloadDiaChi?.ward && payloadDiaChi?.district) {
+    if (payloadDiaChi && payloadDiaChi.district && payloadDiaChi.ward) {
       getShipp();
-    } else if (idXa && idQuanHuyen) {
+    }
+    else if (idQuanHuyen && idXa) {
       getShipp();
     }
   }, [_payload, payloadDiaChi, idXa, idQuanHuyen]);
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
