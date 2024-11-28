@@ -317,7 +317,7 @@ const Checkout = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-  if (isLoading) return <Loading />
+  // if (isLoading) return <Loading />
   return (
     <>
       <main
@@ -339,7 +339,7 @@ const Checkout = () => {
         <div className="hd-CheckoutPage">
           <main className="container py-16 lg:pb-28 lg:pt-20">
             {
-              isLoading ? <Loading /> :
+              // isLoading ? <Loading /> :
               <div className="flex flex-col lg:flex-row">
                 <div className="flex-1">
                   <div className="space-y-8">
@@ -672,7 +672,7 @@ const Checkout = () => {
                 <div className="w-full lg:w-[36%]">
                   <h3 className="text-lg font-semibold mb-4">Đặt hàng</h3>
                   {
-                    isLoading ? <Loading /> :
+                    // isLoading ? <Loading /> :
                     dataCheckout?.order_items.map((e: any) => (
                       <>
                         <div className="relative flex  first:pt-0 last:pb-0">

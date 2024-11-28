@@ -31,9 +31,14 @@ const ReplyComment = ({
 
   useEffect(() => {
     if (InForCommentId) {
+      form.setFieldsValue(InForCommentId);
+      setContent(InForCommentId.content || "");
       setUrlImage(InForCommentId.image);
+    } else {
+      form.resetFields();
+      setContent("");
     }
-  }, [InForCommentId]);
+  }, [InForCommentId, form]);
 
   const propImgComment: UploadProps = {
     name: "file",
@@ -104,6 +109,7 @@ const ReplyComment = ({
   });
 
   const onFinish = (values: any) => {
+    console.log("kiểm tra value: ", values);
     if (urlImage) {
       values.image = urlImage;
     } else {
@@ -111,11 +117,16 @@ const ReplyComment = ({
     }
 
     if (InForCommentId && replyToCommentId) {
+      console.log("Payload gửi lên API: ", {
+        data: values as Icomments,
+        replyToCommentId,
+      });
+
       updatReplyComment.mutate({ data: values as Icomments, replyToCommentId });
     } else {
       replyComment.mutate({
         ...values,
-        rating: null,
+        rating: 1,
         product_id: productId,
         parent_id: replyToCommentId,
         image: urlImage,
@@ -124,7 +135,7 @@ const ReplyComment = ({
 
     setUrlImage(null);
   };
-
+  const [content, setContent] = useState("");
   return (
     <div className="w-[90%] border ml-[48px] flex items-center">
       <Form
@@ -136,6 +147,8 @@ const ReplyComment = ({
         <div className="w-[90%] flex items-center">
           <Form.Item name="content" className="w-[85%]">
             <TextArea
+              value={InForCommentId?.content}
+              onChange={(e) => setContent(e.target.value)}
               autoFocus
               placeholder="Nhập nhận xét của bạn"
               rows={4}
@@ -186,6 +199,10 @@ const ReplyComment = ({
             htmlType="submit"
             type="primary"
             loading={isLoading}
+            disabled={!content && !urlImage}
+            // onClick={() => {
+            //   setInForCommentId("");
+            // }}
           >
             <span className="text-[12px]">Gửi</span>
           </Button>
@@ -195,6 +212,7 @@ const ReplyComment = ({
             onClick={() => {
               setReplyToCommentId(null);
               setUrlImage(null);
+              setContent("");
             }}
           >
             <span className="text-[12px]">Hủy</span>
