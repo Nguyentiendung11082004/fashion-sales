@@ -134,7 +134,10 @@ Route::prefix("v1/")->group(function () {
    
 
     //Quản lí hoàn đơn Admin
-    Route::post('return-items/status/{returnItemId}', [ReturnAdminController::class, 'updateReturnItemStatus']);
+    // Route::post('return-items/status/{returnItemId}', [ReturnAdminController::class, 'updateReturnItemStatus']);
+     Route::get('return-requests', [ReturnAdminController::class, 'getReturnRequests']);
+
+
 });
 
 Route::middleware('auth:sanctum')->prefix('v1/')->group(function () {
@@ -164,8 +167,16 @@ Route::middleware('auth:sanctum')->prefix('v1/')->group(function () {
 
     // hoàn trả hàng
     Route::post('return-requests/create', [ReturnController::class, 'createReturnRequest']);
-    Route::post('return-requests/cancel', [ReturnController::class, 'cancelReturnItems']);
+    Route::post('return-requests/cancel', [ReturnController::class, 'cancelReturnRequest']);
+
+// admin hoàn trả
+    Route::post('return-items/status/{returnItemId}', [ReturnAdminController::class, 'updateReturnItemStatus']);
+//list hoàn trả hàng client
+    Route::get('user/return-requests', [ReturnController::class, 'getUserReturnRequests'])
     // Route::post('return-requests/action', [ReturnAdminController::class, 'handleReturnRequest']);
+
+    ;
+
 
 
 });
