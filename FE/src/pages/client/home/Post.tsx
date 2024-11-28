@@ -20,12 +20,13 @@ const Post = () => {
           },
         });
       } catch (error) {
-        throw new Error("Error");
-        console.log("Error");
+        console.log("error");
+        // console.log("Error");
       }
     },
   });
 
+  console.log("data post: ", data);
   if (isLoading) return <div>isLoading...</div>;
   if (isError) return <div>{error.message}</div>;
   return (

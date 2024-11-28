@@ -13,8 +13,6 @@ import {
   Upload,
   UploadProps,
 } from "antd";
-import Loading from "@/common/Loading/Loading";
-
 
 import { useAuth } from "@/common/context/Auth/AuthContext";
 import { IPost } from "@/common/types/post";
@@ -64,7 +62,7 @@ const FormPost = () => {
       setUrlImage(data?.img_thumbnail);
     }
   }, [data, form]);
-
+  console.log("token: ", token);
   const createPost = useMutation({
     mutationFn: async (data: IPost) => {
       const res = await instance.post("/posts", data, {
@@ -92,7 +90,6 @@ const FormPost = () => {
   });
   const location = useLocation();
   const currentPage = location.state?.currentPage || 1;
-
 
   const updatePost = useMutation({
     mutationFn: async ({ data, id }: { data: IPost; id: string }) => {
@@ -265,9 +262,7 @@ const FormPost = () => {
               <Option value="0">Không nêu bật</Option>
             </Select>
           </Form.Item>
-          {errors.featured && (
-            <div className="text-red-600">{errors.featured}</div>
-          )}
+          {errors && <div className="text-red-600">{errors.featured}</div>}
 
           <Form.Item label="Trạng thái bài viết" name="status">
             <Select placeholder="Trạng thái">
@@ -275,7 +270,7 @@ const FormPost = () => {
               <Option value="0">Hiện</Option>
             </Select>
           </Form.Item>
-          {errors.status && <div className="text-red-600">{errors.status}</div>}
+          {errors && <div className="text-red-600">{errors.status}</div>}
 
           {/* delete */}
           <Form.Item name="post_view" label="post_view">

@@ -13,7 +13,6 @@ import instance from "@/configs/axios";
 import { MinusOutlined } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "antd";
-import Pusher from "pusher-js";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -45,38 +44,7 @@ const Cart = () => {
     refetchOnWindowFocus: true,
     refetchOnMount: true,
   });
-  const pusher = new Pusher('4d3e0d70126f2605977e', {
-    cluster: 'ap1',
-    authEndpoint: 'http://localhost:8000/broadcasting/auth',
-    auth: {
-      headers: {
-        Authorization: `${token}`
-      }
-    }
-  });
-  useEffect(() => {
-    const channel = pusher.subscribe(`private-cart.${9}`);
-    // Lắng nghe sự kiện 'CartEvent'
-    channel.bind("CartEvent", (data: any) => {
-      queryClient.invalidateQueries({
-        queryKey: ["cart"],
-      });
-    });
 
-    pusher.connection.bind("connected", () => { });
-
-    pusher.connection.bind("error", (err: any) => { });
-
-    // Giả sử cartId là id của giỏ hàng hiện tại
-
-    // Đăng ký vào kênh 'private-cart.{idCart}'
-
-    // Huỷ đăng ký kênh khi component bị unmount hoặc khi `idCart` thay đổi
-    return () => {
-      pusher.unsubscribe(`private-cart.${idCart}`);
-    };
-  }, [data, queryClient]); // Cập nhật khi idCart hoặc token thay đổi
-  // Đảm bảo rằng cartId không thay đổi khi component mount/unmount
 
 
   const updateQuantity = useMutation({
