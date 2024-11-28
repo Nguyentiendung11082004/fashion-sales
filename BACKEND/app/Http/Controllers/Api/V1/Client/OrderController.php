@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1\Client;
 
+use Exception;
 use App\Models\Cart;
 use App\Models\User;
 use App\Models\Order;
@@ -12,15 +13,15 @@ use App\Models\VoucherLog;
 use App\Models\OrderDetail;
 use App\Models\VoucherMeta;
 use App\Models\VoucherUser;
-use App\Events\OrderCreated;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Models\ProductVariant;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Notification;
 use App\Http\Requests\Order\StoreOrderRequest;
 use App\Http\Requests\Order\UpdateOrderRequest;
+use App\Notifications\OrderConfirmationNotification;
 use App\Http\Controllers\API\V1\Service\PaymentController;
 
 class OrderController extends Controller
@@ -133,7 +134,13 @@ class OrderController extends Controller
                     // Chuyển hướng người dùng đến trang thanh toán
                     return response()->json(['payment_url' => $response['payment_url']], Response::HTTP_OK);
                 }
-                broadcast(new OrderCreated($order));
+                if (!auth('sanctum')->check()) {
+                    // dd($order->orderDetails->toArray());
+                    // Gửi notification cho người dùng với email nhận thông báo
+                    Notification::route('mail', $order->user_email)
+                        ->notify(new OrderConfirmationNotification($order, $order->user_email,$order->orderDetails));
+                }
+                // broadcast(new OrderCreated($order));
                 return response()->json($order->load('orderDetails')->toArray(), Response::HTTP_CREATED);
             });
             return $response;
