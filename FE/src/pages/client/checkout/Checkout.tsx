@@ -155,6 +155,7 @@ const Checkout = () => {
       tinh: e.label,
     })),
       setIdTinh(Number(e.value));
+    setShipPing('')
     setIdQuanHuyen(null)
     setIdXa(null)
   };
@@ -163,7 +164,8 @@ const Checkout = () => {
       ...prev,
       huyen: e.label,
     })),
-      setIdXa(null)
+      setShipPing('')
+    setIdXa(null)
     setIdQuanHuyen(e.value);
   };
   const handleChangeXa = async (e: any) => {
@@ -315,7 +317,7 @@ const Checkout = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-  // if (isLoading) return <Loading />
+  if (isLoading) return <Loading />
   return (
     <>
       <main
@@ -337,7 +339,7 @@ const Checkout = () => {
         <div className="hd-CheckoutPage">
           <main className="container py-16 lg:pb-28 lg:pt-20">
             {
-              // isLoading ? <Loading /> :
+              isLoading ? <Loading /> :
               <div className="flex flex-col lg:flex-row">
                 <div className="flex-1">
                   <div className="space-y-8">
@@ -670,7 +672,7 @@ const Checkout = () => {
                 <div className="w-full lg:w-[36%]">
                   <h3 className="text-lg font-semibold mb-4">Đặt hàng</h3>
                   {
-                    // isLoading ? <Loading /> :
+                    isLoading ? <Loading /> :
                     dataCheckout?.order_items.map((e: any) => (
                       <>
                         <div className="relative flex  first:pt-0 last:pb-0">
@@ -770,42 +772,47 @@ const Checkout = () => {
                   </div>
                   {/*end hd-checkout-pro*/}
                   <div className="hd-checkout-text-count mt-10 pt-6 text-sm text-slate-500 border-t border-slate-200/70 dark:border-slate-700">
-                    <div>
-                      <label
-                        className="nc-Label text-base font-medium text-neutral-900"
-                        data-nc-id="Label"
-                      >
-                        Mã giảm giá
-                      </label>
-                      <div className="flex mt-1.5">
-                        <Select
-                          onChange={(e) => setVoucher(e)}
-                          className="hd-Select outline-0 h-11 mt-1.5 block w-[80%] text-sm rounded-2xl border border-neutral-200
+                    {
+                      token && <>
+                        <div>
+                          <label
+                            className="nc-Label text-base font-medium text-neutral-900"
+                            data-nc-id="Label"
+                          >
+                            Mã giảm giá
+                          </label>
+                          <div className="flex mt-1.5">
+                            <Select
+                              onChange={(e) => setVoucher(e)}
+                              className="hd-Select outline-0 h-11 mt-1.5 block w-[80%] text-sm rounded-2xl border border-neutral-200
                              focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:bg-neutral-50
                               dark:focus:ring-primary-6000 dark:focus:ring-opacity-25"
-                        >
-                          {
-                            dataCheckout?.listVoucher
-                              ?.map((e: any) => (
-                                <Option value={`${e.code}`}>
-                                  {e?.title}
-                                </Option>
-                              ))
-                          }
-                        </Select>
-                        <button onClick={() => handleVoucher()} className="ml-5 bg-[#00BADB] hover:bg-[#23b6cd] text-white rounded-lg my-2 p-2">
-                          Áp dụng
-                        </button>
-                      </div>
-                    </div>
+                            >
+                              {
+                                dataCheckout?.listVoucher
+                                  ?.map((e: any) => (
+                                    <Option value={`${e.code}`}>
+                                      {e?.title}
+                                    </Option>
+                                  ))
+                              }
+                            </Select>
+                            <button onClick={() => handleVoucher()} className="ml-5 bg-[#00BADB] hover:bg-[#23b6cd] text-white rounded-lg my-2 p-2">
+                              Áp dụng
+                            </button>
+                          </div>
+                        </div>
+                        <div className="flex justify-between py-2.5">
+                          <span>Voucher</span>
+                          <span className="font-semibold text-slate-900"> {totalDiscount !== undefined ? FormatMoney(totalDiscount) : FormatMoney(0)}</span>
+                        </div>
+                      </>
+                    }
                     <div className="flex justify-between py-2.5 mt-2">
                       <span>Phí ship</span>
                       <span className="font-semibold text-slate-900">{FormatMoney(Number(shiping)) || 0}</span>
                     </div>
-                    <div className="flex justify-between py-2.5">
-                      <span>Voucher</span>
-                      <span className="font-semibold text-slate-900"> {totalDiscount !== undefined ? FormatMoney(totalDiscount) : FormatMoney(0)}</span>
-                    </div>
+
                     <div className="flex justify-between font-semibold text-slate-900 text-base pt-4">
                       <span>Tổng tiền</span>
                       <span>

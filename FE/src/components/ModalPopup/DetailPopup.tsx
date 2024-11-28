@@ -9,6 +9,7 @@ import { FormatMoney } from "@/common/utils/utils";
 import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
+import { toast } from "react-toastify";
 type Props = {
   open: boolean;
   onClose: () => void;
@@ -65,12 +66,12 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
         // Lấy id của attribute trong dataAttribute
         const attributeName = attribute.name.toLowerCase();
         const attributeItemId = attribute.pivot.attribute_item_id;
-        
+
         // Kiểm tra nếu dataAttribute có giá trị và nó trùng với attribute_item_id của pivot
         return dataAttribute[attributeName] && dataAttribute[attributeName] === attributeItemId.toString();
       });
     });
- 
+
     // Nếu tìm thấy variant phù hợp, cập nhật state với product_variant_id
     if (matchingVariant) {
       setSelectedVariantId(matchingVariant.id); // Lưu product_variant_id vào state
@@ -78,10 +79,10 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
       setSelectedVariantId(null); // Nếu không tìm thấy variant, set null
     }
   };
-   useEffect(() => {
-      // Gọi hàm để kiểm tra và gán product_variant_id khi dataAttribute thay đổi
-      getSelectedVariantId();
-    }, [dataAttribute]);
+  useEffect(() => {
+    // Gọi hàm để kiểm tra và gán product_variant_id khi dataAttribute thay đổi
+    getSelectedVariantId();
+  }, [dataAttribute]);
   const getAttribute = (attribute: any, id: any) => {
     setDataAttribute((prev: any) => ({
       ...prev,
@@ -90,7 +91,6 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
     // findMatchingVariant();
   };
   console.log("productSeeMore?.variants", productSeeMore?.variants)
-  console.log("selectedVariantId", selectedVariantId)
 
   const result = productSeeMore?.variants
     ?.filter(
@@ -109,7 +109,6 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
       );
       return attributeObj;
     });
-  console.log("result", result)
   // useEffect(() => {
   //   if (result && result.length > 0) {
   //     setDataAttribute({ product_variant: result[0] });
@@ -158,11 +157,28 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
     setSelectedVariantId(null);
     onClose();
   };
+  console.log("productSeeMore.quantity", productSeeMore.quantity)
+  // const handleCheckout = () => {
+  //   if (productSeeMore.quantity <= 0) {
+  //     toast.error("Sản phẩm này đã hết hàng")
+  //     return;
+  //   } else if (_payload.product_id || _payload.product_variant_id) {
+  //     navigate("/checkout", { state: { _payload: _payload } });
+  //   }
+  // };
   const handleCheckout = () => {
-    if (_payload.product_id || _payload.product_variant_id) {
+    if (!_payload.product_variant_id) {
+      if (productSeeMore.quantity <= 0) {
+        toast.error("Sản phẩm này đã hết hàng");
+        return;
+      } else {
+        navigate("/checkout", { state: { _payload: _payload } });
+      }
+    } else if (_payload.product_id || _payload.product_variant_id) {
       navigate("/checkout", { state: { _payload: _payload } });
     }
   };
+
   useEffect(() => {
     if (open && productSeeMore?.variants?.length > 0) {
       const firstVariant = productSeeMore.variants[0];
