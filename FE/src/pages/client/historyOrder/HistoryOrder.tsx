@@ -1,15 +1,18 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useAuth } from "@/common/context/Auth/AuthContext";
+import {
+  notifyOrdersChanged,
+  useRealtimeOrders,
+} from "@/common/hooks/useRealtimeOrders";
 import instance from "@/configs/axios";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Button, Input, Modal, Table } from "antd";
-import React, { useEffect, useState } from "react";
+import { Input, Modal, Table } from "antd";
+import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import {
-  useRealtimeOrders,
-  notifyOrdersChanged,
-} from "@/common/hooks/useRealtimeOrders";
+import CommentProduct from "../productDetail/CommentProduct";
 // import { notifyOrdersChanged, listenForOrdersChange } from '@/common/hooks/useRealtimeOrders';
 
 const HistoryOrder = () => {
@@ -153,6 +156,26 @@ const HistoryOrder = () => {
     },
   ];
   // if (isFetching) return <div>Loading...</div>;
+
+  //  đánh giá sản phẩm
+  const [InForCommentId, setInForCommentId] = useState<string | null>(null);
+
+  const [listIdProduct, setListIdProduct] = useState<any[]>([]);
+
+  const [isShowFormCmtOpen, setShowFormCmtOpen] = useState(false);
+
+  const showFormCmt = (order: any) => {
+    setShowFormCmtOpen(true);
+    setSelectedOrder(order);
+    const listIdProducts = order?.order_details?.map(
+      (detail: any) => detail.product_id
+    );
+    setListIdProduct(listIdProducts || []);
+  };
+
+  const closeFormCmt = () => {
+    setShowFormCmtOpen(false);
+  };
   return (
     <>
       <main
@@ -248,35 +271,6 @@ const HistoryOrder = () => {
                   order.order_status.trim().toLowerCase() === "đang vận chuyển";
                 const complete =
                   order.order_status.trim().toLowerCase() === "hoàn thành";
-                //   if (isCancelOk || canCel || shipOk) {
-                //     toast.warning(
-                //       "Không thể xác nhận nhận hàng ở trạng thái này."
-                //     );
-                //     return;
-                //   }
-                //   if (!receivedOrders.includes(orderId)) {
-                //     setReceivedOrders((prev) => [...prev, orderId]);
-                //     toast.success("Đơn hàng đã được xác nhận là đã nhận.");
-                //   } else {
-                //     toast.warning("Đơn hàng này đã được xác nhận trước đó.");
-                //   }
-                // };
-
-                // const handleRated = (orderId: number) => {
-                //   if (!receivedOrders.includes(orderId)) {
-                //     toast.warn(
-                //       "Vui lòng xác nhận đã nhận hàng trước khi đánh giá."
-                //     );
-                //     return;
-                //   }
-
-                //   if (!ratedOrders.includes(orderId)) {
-                //     setRatedOrders((prev) => [...prev, orderId]);
-                //     toast.success("Cảm ơn bạn đã đánh giá sản phẩm!");
-                //   } else {
-                //     toast.warning("Bạn đã đánh giá đơn hàng này trước đó.");
-                //   }
-                // };
 
                 const handleCancelClick = (id: number, status: string) => {
                   if (!isCancelOk) {
@@ -302,12 +296,6 @@ const HistoryOrder = () => {
                     // Xóa lý do sau khi hủy
                   }
                 };
-                console.log("data order:", order);
-                const listIdProduct = order.order_details.map(
-                  (detail: any) => detail.product_id
-                );
-
-                console.log("Danh sách product_id:", listIdProduct);
 
                 return (
                   <div
@@ -582,10 +570,26 @@ const HistoryOrder = () => {
                             <>
                               <button
                                 className="nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB] text-white font-medium"
-                                onClick={() => alert("Đánh giá sản phẩm!")}
+                                onClick={() => {
+                                  showFormCmt(order);
+                                }}
                               >
                                 Đánh Giá
                               </button>
+                              <Modal
+                                visible={isShowFormCmtOpen}
+                                onCancel={closeFormCmt}
+                                footer={null}
+                                centered
+                              >
+                                <CommentProduct
+                                  listIdProduct={listIdProduct}
+                                  InForCommentId={InForCommentId}
+                                  isShowFormCmtOpen={isShowFormCmtOpen}
+                                  dataProductIdQuery={data}
+                                  setShowFormCmtOpen={setShowFormCmtOpen}
+                                />
+                              </Modal>
                             </>
                           )}
 

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignIdFor(User::class)->constrained();
             $table->foreignIdFor(Product::class)->constrained();
             $table->foreignId('parent_id')->nullable()->constrained('comments')->onDelete('cascade');
-            $table->text('content');
+            $table->text('content')->nullable();
             $table->integer('rating')->nullable();
             $table->string('image')->nullable();
             $table->boolean('status')->default(true);
