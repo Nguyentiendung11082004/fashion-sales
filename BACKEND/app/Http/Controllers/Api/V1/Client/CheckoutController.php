@@ -10,6 +10,7 @@ use App\Models\CartItem;
 use App\Models\VoucherMeta;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use App\Models\ProductVariant;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -73,21 +74,52 @@ class CheckoutController extends Controller
                             'invalid_items' => $invalid_items // Gửi danh sách sản phẩm không hợp lệ để người dùng biết
                         ], 400);
                     }
-
+                    $message = [];
                     foreach ($cart->cartitems as $cart_item) {
+                        // dd($cart_item->productvariant->product_id);
                         $quantity = $cart_item->quantity;
-                        $total_items += 1;
+                        
 
                         if ($cart_item->productvariant) {
                             $variant_price = $cart_item->productvariant->price_sale;
+                            $available_quantity = $cart_item->productvariant->quantity;
+                            if ($quantity > $available_quantity) {
+                                // Nếu số lượng mua lớn hơn số lượng còn lại trong kho, điều chỉnh lại số lượng và thông báo cho người dùng
+                                $quantity = $available_quantity;
+                                $message[$cart_item->productvariant->product_id] = "Số lượng sản phẩm này trong kho không đủ. Bạn chỉ có thể mua tối đa $available_quantity sản phẩm.";
+                                // Bạn có thể lưu thông báo này vào session hoặc trả về cho người dùng để hiển thị
+                            }
+
+                            if ($available_quantity == 0) {
+                                // Nếu trong kho không còn sản phẩm, bỏ qua sản phẩm này 
+                                // Thông báo có thể được lưu lại cho người dùng ở đây
+                                $message[$cart_item->productvariant->product_id] = "Sản phẩm này đã hết hàng.";
+                                continue;
+                            }
                             $total_price = $variant_price * $quantity;
                         } else {
                             $product_price = $cart_item->product->price_sale;
+                            $available_quantity = $cart_item->product->quantity;
+                            if ($quantity > $available_quantity) {
+                                // Nếu số lượng mua lớn hơn số lượng còn lại trong kho, điều chỉnh lại số lượng và thông báo cho người dùng
+                                $quantity = $available_quantity;
+                                $message[$cart_item->product->id] = "Số lượng sản phẩm này trong kho không đủ. Bạn chỉ có thể mua tối đa $available_quantity sản phẩm.";
+                                // Bạn có thể lưu thông báo này vào session hoặc trả về cho người dùng để hiển thị
+                            }
+
+                            if ($available_quantity == 0) {
+                                // Nếu trong kho không còn sản phẩm, bỏ qua sản phẩm này 
+                                // Thông báo có thể được lưu lại cho người dùng ở đây
+                                $message[$cart_item->product->id] = "Sản phẩm này đã hết hàng.";
+                                continue;
+                            }
+                            $total_items += 1;
                             $total_price = $product_price * $quantity;
                         }
 
                         $sub_total += $total_price;
                         $order_items[] = [
+                            "message" => $message,
                             'quantity' => $quantity,
                             'total_price' => $total_price,
                             'product' => $cart_item->product,
@@ -174,7 +206,7 @@ class CheckoutController extends Controller
             }
 
             return response()->json([
-                "message" => "Dữ liệu thành công",
+                "message" => $message,
                 "user" => auth('sanctum')->check() ? $user : null,
                 "sub_total" => $sub_total,
                 "total_items" => $total_items,

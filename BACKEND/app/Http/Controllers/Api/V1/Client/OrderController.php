@@ -126,6 +126,12 @@ class OrderController extends Controller
                     'total_quantity' => $order->orderDetails()->count(),
                     'total' => $totalPrice,
                 ]);
+                if (!auth('sanctum')->check()) {
+                    // Gửi notification cho người dùng với email nhận thông báo
+                    Notification::route('mail', $order->user_email)
+                        ->notify(new OrderConfirmationNotification($order, $order->user_email, $order->orderDetails));
+                          // Gửi email xác nhận đơn hàng cho khách hàng
+                }
                 // Thực hiện thanh toán nếu chọn phương thức online (VNPay)
                 if ($data['payment_method_id'] == 2) {
                     $payment = new PaymentController();
@@ -134,12 +140,7 @@ class OrderController extends Controller
                     // Chuyển hướng người dùng đến trang thanh toán
                     return response()->json(['payment_url' => $response['payment_url']], Response::HTTP_OK);
                 }
-                if (!auth('sanctum')->check()) {
-                    // dd($order->orderDetails->toArray());
-                    // Gửi notification cho người dùng với email nhận thông báo
-                    Notification::route('mail', $order->user_email)
-                        ->notify(new OrderConfirmationNotification($order, $order->user_email,$order->orderDetails));
-                }
+
                 // broadcast(new OrderCreated($order));
                 return response()->json($order->load('orderDetails')->toArray(), Response::HTTP_CREATED);
             });
@@ -202,10 +203,10 @@ class OrderController extends Controller
 
         // Kiểm tra nếu sản phẩm có biến thể
         if ($product->type == 1) {
-            if (!isset($data['product_variant_id'])) {
+            // if (!isset($data['product_variant_id'])) {
 
-                return response()->json(['message' => 'Sản phẩm này có biến thể. Vui lòng chọn biến thể.'], Response::HTTP_BAD_REQUEST);
-            }
+            //     return response()->json(['message' => 'Sản phẩm này có biến thể. Vui lòng chọn biến thể.'], Response::HTTP_BAD_REQUEST);
+            // }
             $variant = ProductVariant::with('attributes')->findOrFail($data['product_variant_id']);
             $variantPrice = $variant->price_sale > 0 ? $variant->price_sale : $variant->price_regular;
             $productPrice = $variantPrice;
@@ -227,10 +228,6 @@ class OrderController extends Controller
     // Hàm thêm sản phẩm từ giỏ hàng vào đơn hàng
     protected function addCartItemsToOrder($data, $user, $order)
     {
-        // Kiểm tra người dùng đã đăng nhập chưa trước khi tiến hành mua từ giỏ hàng
-        if (!auth('sanctum')->check()) {
-            return response()->json(['message' => 'Vui lòng đăng nhập để mua hàng từ giỏ hàng.'], Response::HTTP_UNAUTHORIZED);
-        }
         $cartItemIds = $data['cart_item_ids'];
         $quantities = $data['quantityOfCart'];
 
