@@ -18,7 +18,7 @@ const OrderDetail = () => {
   console.log("data order nè : ", dataOrderDetail);
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>{error.message}</div>;
-
+  console.log("order-detail: ", data);
   return (
     <div className="bg-gray-50 min-h-screen p-8">
       {/* Title */}
@@ -117,7 +117,7 @@ const OrderDetail = () => {
       {/* Products Information */}
       <div className="bg-white rounded-lg shadow-md p-6">
         <h2 className="text-2xl font-bold text-gray-800 mb-4 border-b pb-2 border-gray-200">
-          Sản phẩm trong Đơn hàng
+          Sản phẩm trong đơn hàng
         </h2>
         <div className="space-y-6">
           {dataOrderDetail?.order_details?.map(
@@ -135,6 +135,24 @@ const OrderDetail = () => {
                   <div className="text-gray-800 font-semibold text-lg">
                     {product?.product_name}
                   </div>
+                  
+                  <div className="text-gray-800 text-base font-semibold">
+                    <span>Phân loại sản phẩm:</span>
+                    {product?.attributes &&
+                    Object.entries(product.attributes).length > 0 ? (
+                      <ul className="list-disc ml-4">
+                        {Object.entries(product.attributes).map(
+                          ([key, value]: [string, any]) => (
+                            <li key={key}>
+                              <strong>{key}:</strong> {value}
+                            </li>
+                          )
+                        )}
+                      </ul>
+                    ) : (
+                      <div></div>
+                    )}
+                  </div>
                   <div className="text-gray-600">
                     <strong>Số lượng:</strong> {product?.quantity}
                   </div>
@@ -142,14 +160,14 @@ const OrderDetail = () => {
                     <strong>Giá: </strong>
                     {new Intl.NumberFormat("vi-VN").format(
                       parseInt(product?.price)
-                    )}
+                    )}{" "}
                     VNĐ
                   </div>
                   <div className="text-gray-600">
                     <strong>Tổng tiền: </strong>
                     {new Intl.NumberFormat("vi-VN").format(
                       parseInt(product?.total_price)
-                    )}
+                    )}{" "}
                     VNĐ
                   </div>
                 </div>
