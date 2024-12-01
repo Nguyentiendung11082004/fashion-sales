@@ -133,11 +133,16 @@ class ReturnAdminController extends Controller
                         $returnRequest->update([
                             'status' => 'rejected',
                         ]);
+
+
+                        $this->updateOrder($returnRequest->id);
                     } else {
                         // Nếu có ít nhất một item được chấp nhận
                         $returnRequest->update([
                             'status' => 'completed', // hoặc trạng thái phù hợp
                         ]);
+                        $this->updateOrder($returnRequest->id);
+
                     }
                 }
             });
