@@ -34,8 +34,8 @@ class Order extends Model
     const STATUS_SHIPPING = 'Đang vận chuyển';
     const STATUS_SUCCESS = 'Giao hàng thành công';
     const STATUS_CANCELED = 'Đã hủy';
-    const STATUS_RETURNED = 'Trả hàng';
-
+    const STATUS_RETURNED = 'Hoàn trả hàng';
+    const STATUS_COMPLETED = 'Hoàn thành';
     // Payment status constants
     const PAYMENT_PENDING = 'Chưa Thanh Toán';
     const PAYMENT_PAID = 'Đã thanh toán';
@@ -46,10 +46,10 @@ class Order extends Model
             self::STATUS_PENDING,
             self::STATUS_CONFIRMED,
             self::STATUS_SHIPPING,
-            self::STATUS_FAILED,
             self::STATUS_SUCCESS,
             self::STATUS_CANCELED,
             self::STATUS_RETURNED,
+            self::STATUS_COMPLETED,
         ];
     }
 
@@ -91,4 +91,5 @@ class Order extends Model
     {
         return $this->hasMany(VoucherLog::class);
     }
+    
 }
