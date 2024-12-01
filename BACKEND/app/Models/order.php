@@ -32,6 +32,7 @@ class Order extends Model
     const STATUS_PENDING = 'Đang chờ xác nhận';
     const STATUS_CONFIRMED = 'Đã xác nhận';
     const STATUS_SHIPPING = 'Đang vận chuyển';
+ 
     const STATUS_SUCCESS = 'Giao hàng thành công';
     const STATUS_CANCELED = 'Đã hủy';
     const STATUS_RETURNED = 'Hoàn trả hàng';
