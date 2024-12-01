@@ -10,6 +10,7 @@ use App\Models\CartItem;
 use App\Models\VoucherMeta;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use App\Models\ProductVariant;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -18,7 +19,15 @@ use App\Http\Requests\Checkout\StoreCheckoutRequest;
 
 class CheckoutController extends Controller
 {
+    protected $api_key;
+    protected $shop_id;
 
+    public function __construct()
+    {
+        $this->api_key=env('API_KEY');
+        $this->shop_id=env('SHOP_ID');
+
+    }
     public function store(StoreCheckoutRequest $request)
     {
         try {
@@ -41,6 +50,7 @@ class CheckoutController extends Controller
             $sub_total = 0;
             $total_items = 0;
             $order_items = [];
+            $message = [];
             $voucher_discount = 0;
 
             // Kiểm tra thông tin người dùng nếu đã đăng nhập
@@ -73,21 +83,54 @@ class CheckoutController extends Controller
                             'invalid_items' => $invalid_items // Gửi danh sách sản phẩm không hợp lệ để người dùng biết
                         ], 400);
                     }
-
                     foreach ($cart->cartitems as $cart_item) {
+                        // dd($cart_item->productvariant->product_id);
                         $quantity = $cart_item->quantity;
-                        $total_items += 1;
-
                         if ($cart_item->productvariant) {
                             $variant_price = $cart_item->productvariant->price_sale;
+                            $available_quantity = $cart_item->productvariant->quantity;
+                            if ($quantity > $available_quantity) {
+                                // Nếu số lượng mua lớn hơn số lượng còn lại trong kho, điều chỉnh lại số lượng và thông báo cho người dùng
+                                $quantity = $available_quantity;
+                                $message[$cart_item->productvariant->product_id] = "Số lượng sản phẩm này trong kho không đủ. Bạn chỉ có thể mua tối đa $available_quantity sản phẩm.";
+                                // Bạn có thể lưu thông báo này vào session hoặc trả về cho người dùng để hiển thị
+                                $cart_item->update([
+                                    'quantity' => $available_quantity
+                                ]);
+                            }
+                            if ($available_quantity == 0) {
+                                // Nếu trong kho không còn sản phẩm, bỏ qua sản phẩm này 
+                                // Thông báo có thể được lưu lại cho người dùng ở đây
+                                $message[$cart_item->productvariant->product_id] = "Sản phẩm này đã hết hàng.";
+                                continue;
+                            }
                             $total_price = $variant_price * $quantity;
                         } else {
                             $product_price = $cart_item->product->price_sale;
+                            $available_quantity = $cart_item->product->quantity;
+                            if ($quantity > $available_quantity) {
+                                // Nếu số lượng mua lớn hơn số lượng còn lại trong kho, điều chỉnh lại số lượng và thông báo cho người dùng
+                                $quantity = $available_quantity;
+                                $message[$cart_item->product->id] = "Số lượng sản phẩm này trong kho không đủ. Bạn chỉ có thể mua tối đa $available_quantity sản phẩm.";
+                                $cart_item->update([
+                                    'quantity' => $available_quantity
+                                ]);
+                                // Bạn có thể lưu thông báo này vào session hoặc trả về cho người dùng để hiển thị
+                            }
+
+                            if ($available_quantity == 0) {
+                                // Nếu trong kho không còn sản phẩm, bỏ qua sản phẩm này 
+                                // Thông báo có thể được lưu lại cho người dùng ở đây
+                                $message[$cart_item->product->id] = "Sản phẩm này đã hết hàng.";
+                                continue;
+                            }
+                            $total_items += 1;
                             $total_price = $product_price * $quantity;
                         }
 
                         $sub_total += $total_price;
                         $order_items[] = [
+                            "message" => $message,
                             'quantity' => $quantity,
                             'total_price' => $total_price,
                             'product' => $cart_item->product,
@@ -174,7 +217,7 @@ class CheckoutController extends Controller
             }
 
             return response()->json([
-                "message" => "Dữ liệu thành công",
+                "message" => $message,
                 "user" => auth('sanctum')->check() ? $user : null,
                 "sub_total" => $sub_total,
                 "total_items" => $total_items,
@@ -315,14 +358,15 @@ class CheckoutController extends Controller
     {
         try {
 
-            $api_key = '18f28540-8fbc-11ef-839a-16ebf09470c6';
+            // $api_key = '18f28540-8fbc-11ef-839a-16ebf09470c6';
+            
 
             $ch = curl_init();
 
             curl_setopt($ch, CURLOPT_URL, "https://online-gateway.ghn.vn/shiip/public-api/master-data/province");
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($ch, CURLOPT_HTTPHEADER, [
-                'Token: ' . $api_key,
+                'Token: ' . $this->api_key,
                 'Content-Type: application/json'
             ]);
 
@@ -350,7 +394,7 @@ class CheckoutController extends Controller
                 "province_id" => "required|integer",
             ]);
             $province_id = $request->province_id;
-            $api_key = '18f28540-8fbc-11ef-839a-16ebf09470c6';
+            // $api_key = '18f28540-8fbc-11ef-839a-16ebf09470c6';
 
             $ch = curl_init();
 
@@ -359,7 +403,7 @@ class CheckoutController extends Controller
             curl_setopt($ch, CURLOPT_POST, 1);
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(['province_id' => $province_id]));
             curl_setopt($ch, CURLOPT_HTTPHEADER, [
-                'Token: ' . $api_key,
+                'Token: ' . $this->api_key,
                 'Content-Type: application/json'
             ]);
 
@@ -388,7 +432,7 @@ class CheckoutController extends Controller
             ]);
 
             $district_id = $request->district_id;
-            $api_key = '18f28540-8fbc-11ef-839a-16ebf09470c6';
+            // $api_key = '18f28540-8fbc-11ef-839a-16ebf09470c6';
 
 
             $ch = curl_init();
@@ -398,7 +442,7 @@ class CheckoutController extends Controller
             curl_setopt($ch, CURLOPT_POST, 1);
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(['district_id' => $district_id]));
             curl_setopt($ch, CURLOPT_HTTPHEADER, [
-                'Token: ' . $api_key,
+                'Token: ' . $this->api_key,
                 'Content-Type: application/json'
             ]);
 
@@ -421,29 +465,31 @@ class CheckoutController extends Controller
     public function getAvailableServices($request)
     {
         try {
+            // dd($request->toArray());
             $to_district_id = $request["to_district_id"];
             $weight = $request["weight"];
-            $api_key = '18f28540-8fbc-11ef-839a-16ebf09470c6';
+            // $api_key = '18f28540-8fbc-11ef-839a-16ebf09470c6';
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, "https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/available-services");
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($ch, CURLOPT_POST, 1);
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
-                'shop_id' => 5404595,  // Thay YOUR_SHOP_ID bằng mã shop GHN của bạn
+                // 'shop_id' => 5404595,  // Thay YOUR_SHOP_ID bằng mã shop GHN của bạn
+
+                'shop_id' =>(int) $this->shop_id,  // Thay YOUR_SHOP_ID bằng mã shop GHN của bạn
+                
                 'from_district' => 1804, //đan phượng
                 'to_district' => $to_district_id,
                 'weight' => $weight
             ]));
             curl_setopt($ch, CURLOPT_HTTPHEADER, [
-                'Token: ' . $api_key,
+                'Token: ' . $this->api_key,
                 'Content-Type: application/json'
             ]);
 
             $response = curl_exec($ch);
             curl_close($ch);
-
             $services = json_decode($response, true)['data'][0];
-            // dd($services);
 
             return  $services;
         } catch (\Exception $ex) {
@@ -476,21 +522,23 @@ class CheckoutController extends Controller
             $services = $this->getAvailableServices($request);
             // dd($services);
             $service_id = $services["service_id"];
-            $api_key = '18f28540-8fbc-11ef-839a-16ebf09470c6';
+            // $api_key = '18f28540-8fbc-11ef-839a-16ebf09470c6';
             $ch = curl_init();
 
             curl_setopt($ch, CURLOPT_URL, "https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee");
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($ch, CURLOPT_POST, 1);
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
-                "shop_id" => 5404595,
+                // "shop_id" => 5404595,
+                "shop_id" => (int) $this->shop_id,
+
                 'service_id' => $service_id,
                 'to_district_id' => $to_district_id,
                 "to_ward_code" => $to_ward_code,
                 'weight' => $weight,
             ]));
             curl_setopt($ch, CURLOPT_HTTPHEADER, [
-                'Token: ' . $api_key,
+                'Token: ' . $this->api_key,
                 'Content-Type: application/json'
             ]);
 
