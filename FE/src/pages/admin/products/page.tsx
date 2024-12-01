@@ -126,7 +126,7 @@ const ProductPageManager = () => {
     {
       title: "Thao tác",
       fixed: "right",
-      render: (record: Iproduct) => (
+      render: (record: any) => (
         <div>
           <Link to={`${record?.id}`}>
             <Button className="btn-info" style={{ width: "46px" }}>
