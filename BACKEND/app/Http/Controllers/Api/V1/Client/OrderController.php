@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1\Client;
 
+use Exception;
 use App\Models\Cart;
 use App\Models\User;
 use App\Models\Order;
@@ -12,15 +13,15 @@ use App\Models\VoucherLog;
 use App\Models\OrderDetail;
 use App\Models\VoucherMeta;
 use App\Models\VoucherUser;
-use App\Events\OrderCreated;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Models\ProductVariant;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Notification;
 use App\Http\Requests\Order\StoreOrderRequest;
 use App\Http\Requests\Order\UpdateOrderRequest;
+use App\Notifications\OrderConfirmationNotification;
 use App\Http\Controllers\API\V1\Service\PaymentController;
 
 class OrderController extends Controller
@@ -125,6 +126,12 @@ class OrderController extends Controller
                     'total_quantity' => $order->orderDetails()->count(),
                     'total' => $totalPrice,
                 ]);
+                if (!auth('sanctum')->check()) {
+                    // Gửi notification cho người dùng với email nhận thông báo
+                    Notification::route('mail', $order->user_email)
+                        ->notify(new OrderConfirmationNotification($order, $order->user_email, $order->orderDetails));
+                          // Gửi email xác nhận đơn hàng cho khách hàng
+                }
                 // Thực hiện thanh toán nếu chọn phương thức online (VNPay)
                 if ($data['payment_method_id'] == 2) {
                     $payment = new PaymentController();
@@ -133,7 +140,8 @@ class OrderController extends Controller
                     // Chuyển hướng người dùng đến trang thanh toán
                     return response()->json(['payment_url' => $response['payment_url']], Response::HTTP_OK);
                 }
-                broadcast(new OrderCreated($order));
+
+                // broadcast(new OrderCreated($order));
                 return response()->json($order->load('orderDetails')->toArray(), Response::HTTP_CREATED);
             });
             return $response;
@@ -180,6 +188,7 @@ class OrderController extends Controller
                 $data['huyen'] . ', ' .
                 $data['tinh'],
             'shipping_method' => $data['shipping_method'],
+            'shipping_fee' => $data['shipping_fee'],
             'voucher_id' => null,
             'voucher_discount' => 0,
         ]);
@@ -194,10 +203,10 @@ class OrderController extends Controller
 
         // Kiểm tra nếu sản phẩm có biến thể
         if ($product->type == 1) {
-            if (!isset($data['product_variant_id'])) {
+            // if (!isset($data['product_variant_id'])) {
 
-                return response()->json(['message' => 'Sản phẩm này có biến thể. Vui lòng chọn biến thể.'], Response::HTTP_BAD_REQUEST);
-            }
+            //     return response()->json(['message' => 'Sản phẩm này có biến thể. Vui lòng chọn biến thể.'], Response::HTTP_BAD_REQUEST);
+            // }
             $variant = ProductVariant::with('attributes')->findOrFail($data['product_variant_id']);
             $variantPrice = $variant->price_sale > 0 ? $variant->price_sale : $variant->price_regular;
             $productPrice = $variantPrice;
@@ -219,10 +228,6 @@ class OrderController extends Controller
     // Hàm thêm sản phẩm từ giỏ hàng vào đơn hàng
     protected function addCartItemsToOrder($data, $user, $order)
     {
-        // Kiểm tra người dùng đã đăng nhập chưa trước khi tiến hành mua từ giỏ hàng
-        if (!auth('sanctum')->check()) {
-            return response()->json(['message' => 'Vui lòng đăng nhập để mua hàng từ giỏ hàng.'], Response::HTTP_UNAUTHORIZED);
-        }
         $cartItemIds = $data['cart_item_ids'];
         $quantities = $data['quantityOfCart'];
 
@@ -446,7 +451,9 @@ class OrderController extends Controller
             $order->load('orderDetails');
 
             // Trả về dữ liệu đơn hàng cùng với chi tiết dưới dạng JSON
-            return response()->json($order, 200);
+            return response()->json([
+                'order' => $order,
+            ], 200);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Đã xảy ra lỗi khi lấy thông tin đơn hàng', 'error' => $e->getMessage()], 500);
         }
@@ -454,70 +461,83 @@ class OrderController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    // public function update(UpdateOrderRequest $request, Order $order)
-    // {
-    //     if (!auth('sanctum')->check()) {
-    //         return response()->json(['message' => 'Không có quyền truy cập'], 403);
-    //     }
 
-    //     $user_id = auth('sanctum')->id();
+    /**public function update(UpdateOrderRequest $request, Order $order)
+    {
+        if (!auth('sanctum')->check()) {
+            return response()->json(['message' => 'Không có quyền truy cập'], 403);
+        }
 
-    //     if ($order->user_id !== $user_id) {
-    //         return response()->json(['message' => 'Không có quyền truy cập'], 403);
-    //     }
+        $user_id = auth('sanctum')->id();
 
+        // Kiểm tra quyền sở hữu
+        if ($order->user_id !== $user_id) {
+            return response()->json(['message' => 'Không có quyền truy cập'], 403);
+        }
 
-    //     if ($order->order_status === Order::STATUS_CANCELED) {
-    //         return response()->json(['message' => 'Đơn hàng đã được hủy.'], 400);
-    //     }
+        // Kiểm tra trạng thái không hợp lệ
+        if (in_array($order->order_status, [Order::STATUS_CANCELED, Order::STATUS_COMPLETED])) {
+            return response()->json(['message' => 'Đơn hàng không thể cập nhật vì đã hoàn thành hoặc đã bị hủy.'], 400);
+        }
+        // Kiểm tra trạng thái đơn hàng
+        if ($order->order_status === Order::STATUS_COMPLETED) {
+            return response()->json(['message' => 'Đơn hàng đã hoàn thành.'], 400);
+        }
 
-    //     if ($order->order_status === Order::STATUS_COMPLETED) {
-    //         return response()->json(['message' => 'Đơn hàng đã hoàn thành.'], 400);
-    //     }
+        $order_status = $request->input('order_status');
 
-    //     $order_status = $request->input('order_status');
+        // Xử lý các trạng thái
+        switch ($order_status) {
+            case Order::STATUS_CANCELED:
+                if (!in_array($order->order_status, [Order::STATUS_PENDING, Order::STATUS_CONFIRMED])) {
+                    return response()->json([
+                        'message' => 'Chỉ có thể hủy đơn hàng khi đơn hàng đang ở trạng thái Đang chờ xác nhận hoặc Đã xác nhận.'
+                    ], 400);
+                }
 
-    //     if ($order_status === Order::STATUS_CANCELED) {
-    //         if (!in_array($order->order_status, [Order::STATUS_PENDING, Order::STATUS_CONFIRMED])) {
-    //             return response()->json([
-    //                 'message' => 'Chỉ có thể hủy đơn hàng khi đơn hàng đang ở trạng thái Đang chờ xác nhận hoặc Đã xác nhận.'
-    //             ], 400);
-    //         }
+                $user_note = $request->input('user_note');
+                $this->handleOrderCancellation($order, $user_note);
 
-    //         $user_note = $request->input('user_note');
+                // Cập nhật trạng thái voucher nếu cần
+                $voucher_logs = VoucherLog::query()
+                    ->where('user_id', $user_id)
+                    ->where('order_id', $order->id)
+                    ->first();
 
-    //         if (empty($user_note)) {
-    //             return response()->json(['message' => 'Ghi chú là bắt buộc khi hủy đơn hàng.'], 400);
-    //         }
+                if ($voucher_logs) {
+                    $voucher_logs->update(['action' => 'reverted']);
+                }
+                $order->order_status = $order_status;
+                break;
 
-    //         $this->handleOrderCancellation($order, $user_note);
-    //         $voucher_logs = VoucherLog::query()
-    //             ->where('user_id', '=', $user_id)
-    //             ->where('order_id', '=', $order->id)
-    //             ->first();
+            case Order::STATUS_COMPLETED:
+                if ($order->order_status !== Order::STATUS_SUCCESS) {
+                    return response()->json([
+                        'message' => 'Chỉ có thể hoàn thành đơn hàng khi đơn hàng đang ở trạng thái giao hàng thành công.'
+                    ], 400);
+                }
+                $order->order_status = $order_status;
+                break;
 
-    //         if ($voucher_logs) {
-    //             $voucher_logs->update([
-    //                 'action' => 'reverted',
-    //             ]);
-    //         }
-    //         $order->order_status = $order_status;
-    //     }
-    //     if ($order_status === Order::STATUS_COMPLETED) {
-    //         if (!in_array($order->order_status, [Order::STATUS_SUCCESS])) {
-    //             return response()->json([
-    //                 'message' => 'Chỉ có thể hủy đơn hàng khi đơn hàng đang ở trạng thái giao hàng thành công.'
-    //             ], 400);
-    //         }
-    //         $order->order_status = $order_status;
-    //     }
-    //     $order->save();
-    //     return response()->json([
-    //         'message' => 'Trạng thái đơn hàng đã được cập nhật thành công.',
-    //         'order' => $order->load('orderDetails'),
-    //     ]);
-    // }
+            default:
+                return response()->json(['message' => 'Trạng thái không hợp lệ.'], 400);
+        }
+        if ($order_status === Order::STATUS_COMPLETED) {
+            if (!in_array($order->order_status, [Order::STATUS_SUCCESS])) {
+                return response()->json([
+                    'message' => 'Chỉ có thể hủy đơn hàng khi đơn hàng đang ở trạng thái giao hàng thành công.'
+                ], 400);
+            }
+            $order->order_status = $order_status;
+        }
+        $order->save();
 
+        return response()->json([
+            'message' => 'Trạng thái đơn hàng đã được cập nhật thành công.',
+            'order' => $order->load('orderDetails'),
+        ]);
+    }
+     */
     public function update(UpdateOrderRequest $request, Order $order)
     {
         if (!auth('sanctum')->check()) {
@@ -582,7 +602,6 @@ class OrderController extends Controller
             'order' => $order->load('orderDetails'),
         ]);
     }
-
     protected function handleOrderCancellation(Order $order, string $user_note)
     {
         // Lưu lý do hủy vào ghi chú

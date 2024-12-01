@@ -18,7 +18,7 @@ class PaymentController extends Controller
     public function createPayment($request)
     {
         try {
-         
+
             $vnp_TmnCode = $this->vnp_TmnCode;
             $vnp_HashSecret = $this->vnp_HashSecret;
             $vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
@@ -95,7 +95,7 @@ class PaymentController extends Controller
                 if ($order) {
                     // Cập nhật trạng thái thanh toán và các thông tin liên quan
                     $order->update([
-                        'payment_status' => 'Đã thanh toán', // Cập nhật trạng thái thành công
+                        'payment_status' => Order::STATUS_COMPLETED, // Cập nhật trạng thái thành công
                     ]);
                     // return [
                     //     'status' => 'success',
@@ -113,8 +113,7 @@ class PaymentController extends Controller
                 }
             } else {
                 $order->update([
-                    'payment_status' => 'Chưa thanh toán', // Cập nhật trạng thái
-                    'order_status' => 'Hủy',
+                    'order_status' => Order::STATUS_CANCELED,
                 ]);
                 // if($order->voucher_id){
 
@@ -142,8 +141,7 @@ class PaymentController extends Controller
                 //     'order_id' => $vnp_TxnRef,
                 //     'error_code' => $vnp_ResponseCode,
                 // ];
-            return redirect()->away("http://localhost:5173/thank?status=error&message=Payment_failed!&order_id=$vnp_TxnRef&error_code=$vnp_ResponseCode");
-                
+                return redirect()->away("http://localhost:5173/thank?status=error&message=Payment_failed!&order_id=$vnp_TxnRef&error_code=$vnp_ResponseCode");
             }
         } else {
             // return [
