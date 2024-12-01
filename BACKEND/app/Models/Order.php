@@ -26,7 +26,8 @@ class Order extends Model
         'ship_user_address',
         'voucher_id',
         'voucher_discount',
-        'return_notes'
+        'return_notes',
+        'shipping_fee'
     ];
     // Order status constants
     const STATUS_PENDING = 'Đang chờ xác nhận';
@@ -91,4 +92,5 @@ class Order extends Model
     {
         return $this->hasMany(VoucherLog::class);
     }
+    
 }
