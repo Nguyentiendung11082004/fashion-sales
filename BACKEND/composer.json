@@ -6,7 +6,6 @@
     "license": "MIT",
     "require": {
         "php": "^8.1",
-        "barryvdh/laravel-dompdf": "^3.0",
         "ezyang/htmlpurifier": "^4.17",
         "laravel/framework": "^10.10",
         "laravel/sanctum": "^3.3",

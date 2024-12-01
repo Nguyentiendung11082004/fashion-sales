@@ -28,9 +28,9 @@ class UpdateProduct extends FormRequest
             'category_id' => 'required|integer|exists:categories,id',
             'tags' => 'required|array|min:1',
             'tags.*' => 'integer|exists:tags,id',
-            'gallery' => 'array|min:1',
-            'gallery.*.id' => 'integer|exists:product_galleries,id', // Kiểm tra 'id' tồn tại trong bảng galleries
-            'gallery.*.image' => 'string', // Kiểm tra 'image' là chuỗi
+            'galleries' => 'array|min:1',
+            'galleries.*.id' => 'integer|exists:product_galleries,id', // Kiểm tra 'id' tồn tại trong bảng galleries
+            'galleries.*.image' => 'string', // Kiểm tra 'image' là chuỗi
             "weight"=>"required",
             'type' => 'required|integer|in:0,1', // Type chỉ có 2 loại: 0 (simple) và 1 (variant)
             'sku' => 'required|string|max:255|unique:products,sku,' . $productId,
