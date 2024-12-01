@@ -203,7 +203,7 @@ const RequestOrder = () => {
               </div>
             ))}
 
-            <div className=" fixed bottom-0 left-[220px] right-[220px]  flex justify-between items-center p-6 border border-gray-200 rounded-lg shadow-md bg-white hover:shadow-lg transition-shadow duration-300">
+            <div className=" fixed bottom-0 left-[134px] right-[134px]  flex justify-between items-center p-6 border border-gray-200 rounded-lg shadow-md bg-white hover:shadow-lg transition-shadow duration-300">
               <div className="flex items-center space-x-2">
                 <input
                   type="checkbox"

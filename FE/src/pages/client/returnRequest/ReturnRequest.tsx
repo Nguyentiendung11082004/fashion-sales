@@ -2,9 +2,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useAuth } from "@/common/context/Auth/AuthContext";
 import instance from "@/configs/axios";
-import { MinusOutlined } from "@ant-design/icons";
 import { useMutation } from "@tanstack/react-query";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
@@ -58,8 +57,9 @@ const ReturnRequest = () => {
   });
 
   const [checkRequest, setCheckRequest] = useState<boolean>(false);
+
   const handleContinue = () => {
-    const items = filteredProduct.map((item: any) => ({
+    const items = updatedProducts.map((item: any) => ({
       order_detail_id: item.id,
       quantity: item.quantity,
     }));
@@ -72,6 +72,16 @@ const ReturnRequest = () => {
 
     mutate(request);
   };
+
+  const [refund, setRefund] = useState<number>(0);
+
+  useEffect(() => {
+    // Calculate total refund
+    const totalRefund = updatedProducts.reduce((acc: number, product: any) => {
+      return acc + product.price * product.quantity;
+    }, 0);
+    setRefund(totalRefund); // Set the calculated refund amount
+  }, [updatedProducts]); // Recalculate when updatedProducts changes
 
   console.log("sp đã cập nhật số lượng: ", updatedProducts);
 
@@ -165,22 +175,20 @@ const ReturnRequest = () => {
                   Thông tin hoàn tiền
                 </h2>
                 <span className="text-base mb-4 ml-4">
-                  Số tiền hoàn lại : 100.000 VNĐ
+                  Số tiền hoàn lại: {refund.toLocaleString("vi-VN")} VNĐ
                 </span>
                 <br />
                 <span className="text-base pb-4 ml-4">Hoàn tiền vào: ???</span>
               </div>
 
-              <div className=" fixed bottom-0 left-[220px] right-[220px]  flex justify-between items-center p-6 border border-gray-200 rounded-lg shadow-md bg-white hover:shadow-lg transition-shadow duration-300">
+              <div className="fixed bottom-0 left-[134px] right-[134px] flex justify-between items-center p-6 border border-gray-200 rounded-lg shadow-md bg-white hover:shadow-lg transition-shadow duration-300">
                 <div className="flex items-center space-x-2">
                   <p className="ml-4 text-sm font-medium text-gray-800">
-                    Số tiền được hoàn lại: 100.000 VNĐ
-                    {/* <span>{value?.quantity * value?.price}</span> */}
+                    Số tiền hoàn lại: {refund.toLocaleString("vi-VN")} VNĐ
                   </p>
                 </div>
                 <button
-                  className={` "bg-gray-300 cursor-not-allowed" : "bg-blue-600 text-white"} ml-auto px-6 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-300 transform hover:scale-105 active:scale-95`}
-                  //   disabled={isContinueDisabled}
+                  className="bg-blue-600 text-white hover:bg-blue-700 rounded-lg shadow-md px-6 py-2"
                   onClick={handleContinue}
                 >
                   Hoàn thành

@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useState } from "react";
+import React, { memo, useState } from "react";
 import {
   AreaChartOutlined,
   CommentOutlined,
@@ -62,6 +62,24 @@ const SidebarMenu = memo(({ selectedKey }: { selectedKey: string }) => (
         ),
       },
       {
+        key: "48",
+        icon: <ShoppingCartOutlined />,
+        label: (
+          <NavLink className="text-white" to="/admin/returnRequests">
+            Hoàn hàng
+          </NavLink>
+        ),
+      },
+      {
+        key: "49",
+        icon: <ShoppingCartOutlined />,
+        label: (
+          <NavLink className="text-white" to="/admin/fastDelivery">
+            Giao hàng nhanh
+          </NavLink>
+        ),
+      },
+      {
         key: "3",
         icon: <UploadOutlined />,
         label: (
@@ -115,10 +133,7 @@ const SidebarMenu = memo(({ selectedKey }: { selectedKey: string }) => (
           {
             key: "6",
             label: (
-              <NavLink
-                className="text-white"
-                to="/admin/attribute-values"
-              >
+              <NavLink className="text-white" to="/admin/attribute-values">
                 Giá trị thuộc tính
               </NavLink>
             ),

@@ -260,12 +260,6 @@ const OrderPage = () => {
             >
               Hóa đơn
             </Button>
-            <Link
-              to={`/admin/returnOrderAdmin`}
-              className="btn-info h-[33px] ml-4 flex items-center justify-center text-white bg-blue-600 hover:bg-blue-700 border border-transparent rounded-lg"
-            >
-              Yêu cầu hoàn hàng
-            </Link>
           </div>
 
           <div>

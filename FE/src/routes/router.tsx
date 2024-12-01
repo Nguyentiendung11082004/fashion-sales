@@ -1,4 +1,5 @@
 import Loading from "@/common/Loading/Loading";
+// import FastDelivery from "@/pages/admin/fastDelivery/FastDelivery";
 import ReturnOrder from "@/pages/admin/order/components/ReturnOrder";
 import RequestOrder from "@/pages/client/requestOrder/RequestOrder";
 import ReturnRequest from "@/pages/client/returnRequest/ReturnRequest";
@@ -165,7 +166,8 @@ const Router = () => {
           <Route path="vouchers/edit/:id" element={<FormVoucher />} />
           <Route path="comments" element={<CommentPage />} />
           <Route path="orders" element={<OrderPage />} />
-          <Route path="returnOrderAdmin" element={<ReturnOrder />} />
+          <Route path="returnRequests" element={<ReturnOrder />} />
+          {/* <Route path="fastDelivery" element={<FastDelivery />} /> */}
           <Route path="orders/:id" element={<OrderDetail />} />
           {/* <Route path="/comments" element={<CommentPage/>} /> */}
         </Route>
