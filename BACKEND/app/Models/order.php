@@ -91,4 +91,5 @@ class Order extends Model
     {
         return $this->hasMany(VoucherLog::class);
     }
+    
 }

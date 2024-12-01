@@ -18,7 +18,15 @@ use App\Http\Requests\Checkout\StoreCheckoutRequest;
 
 class CheckoutController extends Controller
 {
+    protected $api_key;
+    protected $shop_id;
 
+    public function __construct()
+    {
+        $this->api_key=env('API_KEY');
+        $this->shop_id=env('SHOP_ID');
+
+    }
     public function store(StoreCheckoutRequest $request)
     {
         try {
@@ -315,14 +323,15 @@ class CheckoutController extends Controller
     {
         try {
 
-            $api_key = '18f28540-8fbc-11ef-839a-16ebf09470c6';
+            // $api_key = '18f28540-8fbc-11ef-839a-16ebf09470c6';
+            
 
             $ch = curl_init();
 
             curl_setopt($ch, CURLOPT_URL, "https://online-gateway.ghn.vn/shiip/public-api/master-data/province");
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($ch, CURLOPT_HTTPHEADER, [
-                'Token: ' . $api_key,
+                'Token: ' . $this->api_key,
                 'Content-Type: application/json'
             ]);
 
@@ -350,7 +359,7 @@ class CheckoutController extends Controller
                 "province_id" => "required|integer",
             ]);
             $province_id = $request->province_id;
-            $api_key = '18f28540-8fbc-11ef-839a-16ebf09470c6';
+            // $api_key = '18f28540-8fbc-11ef-839a-16ebf09470c6';
 
             $ch = curl_init();
 
@@ -359,7 +368,7 @@ class CheckoutController extends Controller
             curl_setopt($ch, CURLOPT_POST, 1);
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(['province_id' => $province_id]));
             curl_setopt($ch, CURLOPT_HTTPHEADER, [
-                'Token: ' . $api_key,
+                'Token: ' . $this->api_key,
                 'Content-Type: application/json'
             ]);
 
@@ -388,7 +397,7 @@ class CheckoutController extends Controller
             ]);
 
             $district_id = $request->district_id;
-            $api_key = '18f28540-8fbc-11ef-839a-16ebf09470c6';
+            // $api_key = '18f28540-8fbc-11ef-839a-16ebf09470c6';
 
 
             $ch = curl_init();
@@ -398,7 +407,7 @@ class CheckoutController extends Controller
             curl_setopt($ch, CURLOPT_POST, 1);
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(['district_id' => $district_id]));
             curl_setopt($ch, CURLOPT_HTTPHEADER, [
-                'Token: ' . $api_key,
+                'Token: ' . $this->api_key,
                 'Content-Type: application/json'
             ]);
 
@@ -421,29 +430,31 @@ class CheckoutController extends Controller
     public function getAvailableServices($request)
     {
         try {
+            // dd($request->toArray());
             $to_district_id = $request["to_district_id"];
             $weight = $request["weight"];
-            $api_key = '18f28540-8fbc-11ef-839a-16ebf09470c6';
+            // $api_key = '18f28540-8fbc-11ef-839a-16ebf09470c6';
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, "https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/available-services");
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($ch, CURLOPT_POST, 1);
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
-                'shop_id' => 5404595,  // Thay YOUR_SHOP_ID bằng mã shop GHN của bạn
+                // 'shop_id' => 5404595,  // Thay YOUR_SHOP_ID bằng mã shop GHN của bạn
+
+                'shop_id' =>(int) $this->shop_id,  // Thay YOUR_SHOP_ID bằng mã shop GHN của bạn
+                
                 'from_district' => 1804, //đan phượng
                 'to_district' => $to_district_id,
                 'weight' => $weight
             ]));
             curl_setopt($ch, CURLOPT_HTTPHEADER, [
-                'Token: ' . $api_key,
+                'Token: ' . $this->api_key,
                 'Content-Type: application/json'
             ]);
 
             $response = curl_exec($ch);
             curl_close($ch);
-
             $services = json_decode($response, true)['data'][0];
-            // dd($services);
 
             return  $services;
         } catch (\Exception $ex) {
@@ -476,21 +487,23 @@ class CheckoutController extends Controller
             $services = $this->getAvailableServices($request);
             // dd($services);
             $service_id = $services["service_id"];
-            $api_key = '18f28540-8fbc-11ef-839a-16ebf09470c6';
+            // $api_key = '18f28540-8fbc-11ef-839a-16ebf09470c6';
             $ch = curl_init();
 
             curl_setopt($ch, CURLOPT_URL, "https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee");
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
             curl_setopt($ch, CURLOPT_POST, 1);
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
-                "shop_id" => 5404595,
+                // "shop_id" => 5404595,
+                "shop_id" => (int) $this->shop_id,
+
                 'service_id' => $service_id,
                 'to_district_id' => $to_district_id,
                 "to_ward_code" => $to_ward_code,
                 'weight' => $weight,
             ]));
             curl_setopt($ch, CURLOPT_HTTPHEADER, [
-                'Token: ' . $api_key,
+                'Token: ' . $this->api_key,
                 'Content-Type: application/json'
             ]);
 

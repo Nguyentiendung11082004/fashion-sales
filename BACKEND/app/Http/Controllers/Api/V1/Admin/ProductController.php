@@ -192,7 +192,7 @@ class ProductController extends Controller
                             "quantity" => $variant["quantity"],
                             "image" => $variant['image'],
                             "sku" => $variant["sku"],
-                            "id_guid" => $variant["id_guid"]??null
+                            "id_guid" => $variant["id_guid"] ?? null
                         ]);
 
                         // Gắn attribute_item_id cho biến thể
@@ -271,10 +271,7 @@ class ProductController extends Controller
     {
 
         try {
-
-
             $product = Product::query()->findOrFail($id);
-
 
             DB::transaction(function () use ($request, $product) {
                 $dataProduct = $request->except([
@@ -288,18 +285,34 @@ class ProductController extends Controller
                 $dataProduct['slug'] = Str::slug($dataProduct["name"]);
 
                 if (isset($request->gallery)) {
+                    // Lấy danh sách các ID ảnh từ request
+                    $galleryIdsToKeep = collect($request->gallery)
+                        ->whereNotNull('id') // Chỉ lấy các phần tử có 'id'
+                        ->pluck('id')        // Lấy danh sách ID
+                        ->toArray();
 
+                    // Xóa các ảnh không nằm trong danh sách $galleryIdsToKeep
+                    ProductGallery::where('product_id', $product->id)
+                        ->whereNotIn('id', $galleryIdsToKeep)
+                        ->delete();
                     foreach ($request->gallery as $galleryItem) {
-
+                        // Nếu có 'id' thì thực hiện cập nhật
                         if (isset($galleryItem['id']) && isset($galleryItem['image'])) {
-
                             $gallery = ProductGallery::query()->findOrFail($galleryItem['id']);
                             $gallery->update([
                                 "image" => $galleryItem['image']
                             ]);
                         }
+                        // Nếu không có 'id', nghĩa là ảnh mới, thì tạo mới trong database
+                        elseif (!isset($galleryItem['id']) && isset($galleryItem['image'])) {
+                            ProductGallery::create([
+                                "product_id" => $product->id,
+                                "image" => $galleryItem['image']
+                            ]);
+                        }
                     }
                 }
+
 
 
                 $product->tags()->sync($request->tags);
