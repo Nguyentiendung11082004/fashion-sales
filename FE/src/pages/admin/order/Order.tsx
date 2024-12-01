@@ -189,8 +189,13 @@ const OrderPage = () => {
                 <EyeOutlined />
               </Button>
             </Link>
+            {/* <Link>
+              <Button className="  flex items-center justify-center bg-[red] text-white ">
+                Yêu cầu hoàn hàng
+              </Button>
+            </Link> */}
             <Button
-              className="btn-info w-32 flex items-center justify-center"
+              className="btn-info  flex items-center justify-center"
               onClick={() => prinfOrderId(record?.id)}
             >
               Xuất hóa đơn
@@ -248,12 +253,20 @@ const OrderPage = () => {
           Quản lí đơn hàng
         </h1>
         <div>
-          <Button
-            className="btn-info w-32 flex items-center justify-center"
-            onClick={() => prinfOrderAll()}
-          >
-            Hóa đơn
-          </Button>
+          <div className="flex ">
+            <Button
+              className="btn-info w-32 flex items-center justify-center"
+              onClick={() => prinfOrderAll()}
+            >
+              Hóa đơn
+            </Button>
+            <Link
+              to={`/admin/returnOrderAdmin`}
+              className="btn-info h-[33px] ml-4 flex items-center justify-center text-white bg-blue-600 hover:bg-blue-700 border border-transparent rounded-lg"
+            >
+              Yêu cầu hoàn hàng
+            </Link>
+          </div>
 
           <div>
             {pdfUrl && (

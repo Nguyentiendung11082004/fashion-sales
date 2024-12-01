@@ -9,11 +9,11 @@ import {
 import instance from "@/configs/axios";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Input, Modal, Table } from "antd";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import CommentProduct from "../productDetail/CommentProduct";
-// import { notifyOrdersChanged, listenForOrdersChange } from '@/common/hooks/useRealtimeOrders';
+import ReasonReturn from "../requestOrder/components/ReasonReturn";
 
 const HistoryOrder = () => {
   const [expandedOrders, setExpandedOrders] = useState<number[]>([]);
@@ -27,7 +27,6 @@ const HistoryOrder = () => {
   const queryClient = useQueryClient();
   const { token } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
   const isActive = (path: string) => location.pathname === path;
   const { data, isFetching, isError } = useQuery({
     queryKey: ["history-order"],
@@ -42,6 +41,9 @@ const HistoryOrder = () => {
     // refetchInterval: 2000,
   });
   useRealtimeOrders();
+
+  const location = useLocation();
+  const checkRequest = location.state?.checkRequest;
 
   const cancelOrder = async ({
     id,
@@ -175,6 +177,18 @@ const HistoryOrder = () => {
 
   const closeFormCmt = () => {
     setShowFormCmtOpen(false);
+  };
+
+  //  hoàn hàng
+  const [dataOrderRequest, setDataOrderRequest] = useState({});
+  const [reason, setReason] = useState<string | null>(null);
+  const [visiable, setVisible] = useState(false);
+  const handleOpenFormReason = (order: any) => {
+    setVisible(true);
+    setDataOrderRequest(order);
+  };
+  const handleCloseFormReason = () => {
+    setVisible(false);
   };
   return (
     <>
@@ -559,10 +573,15 @@ const HistoryOrder = () => {
                                     : "text-white"
                                 }`}
                                 disabled={shipOk}
-                                onClick={() => alert("Bạn muốn hoàn trả hàng!")}
+                                onClick={() => handleOpenFormReason(order)}
                               >
-                                Hoàn Trả Hàng
+                                Yêu cầu trả hàng
                               </button>
+                              <ReasonReturn
+                                open={visiable}
+                                onClose={handleCloseFormReason}
+                                dataOrderRequest={dataOrderRequest}
+                              />
                             </>
                           )}
 
