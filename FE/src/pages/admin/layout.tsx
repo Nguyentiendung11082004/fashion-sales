@@ -22,7 +22,7 @@ import {
   faShoppingBag,
   faTable,
 } from "@fortawesome/free-solid-svg-icons";
-import { LogoAdmin } from "@/components/icons";
+import { LogoAdmin, LogoM } from "@/components/icons";
 import { Content } from "antd/es/layout/layout";
 
 const { Sider } = Layout;
@@ -115,10 +115,7 @@ const SidebarMenu = memo(({ selectedKey }: { selectedKey: string }) => (
           {
             key: "6",
             label: (
-              <NavLink
-                className="text-white"
-                to="/admin/attribute-values"
-              >
+              <NavLink className="text-white" to="/admin/attribute-values">
                 Giá trị thuộc tính
               </NavLink>
             ),
@@ -269,6 +266,7 @@ const LayoutAdmin: React.FC = () => {
 
   // Tính toán selectedKeys ngay lập tức
   const currentKey = pathToKeyMap[location.pathname] || "1";
+  
 
   return (
     <Layout>
@@ -282,9 +280,16 @@ const LayoutAdmin: React.FC = () => {
         <div className="flex items-center justify-center h-[25px] bg-[black]">
           <div className="demo-logo-vertical" />
         </div>
-        <div className="w-[150px] my-[-10px] m-auto">
-          <img src={LogoAdmin} alt="" className="" />
-        </div>
+
+        {collapsed ? (
+          <div className="w-[50px] mt-3 mb-11 m-auto">
+            <img src={LogoM} alt="" className="" />
+          </div>
+        ) : (
+          <div className="w-[150px] -mt-8 -mb-3 m-auto">
+            <img src={LogoAdmin} alt="" className="" />
+          </div>
+        )}
         <SidebarMenu selectedKey={currentKey} />
       </Sider>
       <Layout>

@@ -3,6 +3,7 @@
 /* eslint-disable prefer-const */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useCart } from "@/common/context/Cart/CartContext";
+import { useWishlist } from "@/common/context/Wishlist/WishlistContext";
 import HeartBlack from "@/components/icons/detail/HeartBlack";
 import {
   findProductVariant,
@@ -12,11 +13,13 @@ import { CloseOutlined, MinusOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import { Modal as AntModal, Button } from "antd";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
+import HeartRedPopup from "../icons/detail/HeartRedPopup";
 
 const CartPopup = forwardRef((props: any, ref) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { idProduct, setIdProduct }: any = props;
   const [product, setProduct] = useState<any>();
+  const { handleAddToWishlist, isInWishlist } = useWishlist();
 
   const [selectedAttributes, setSelectedAttributes] = useState<{ product_variant: Record<string, string | number>;
   }>({
@@ -201,7 +204,7 @@ const CartPopup = forwardRef((props: any, ref) => {
               {data?.product?.name}
             </h2>
             <span className="text-2xl text-[#696969]">
-              {product?.price_sale} VNĐ
+              {product?.price_sale} ₫
             </span>
             {/* Chọn màu */}
             {resultGetUniqueAttribute?.map((value: any) => (
@@ -261,7 +264,7 @@ const CartPopup = forwardRef((props: any, ref) => {
               </div>
             ))}
 
-            <div className="hd-quantity-item flex items-center">
+            <div className="hd-quantity-item flex items-center mt-5">
               <div className="hd-quantity mb-2 relative block min-w-[120px] w-[120px] h-10 hd-all-btn">
                 <button
                   onClick={decreaseQuantity}
@@ -295,9 +298,13 @@ const CartPopup = forwardRef((props: any, ref) => {
                 </button>
               </div>
               <div className="mx-5 mb-[2px]">
-                <button>
+              <button onClick={() => handleAddToWishlist(data.product)}>
+                {isInWishlist(data.product.id) ? (
+                  <HeartRedPopup />
+                ) : (
                   <HeartBlack />
-                </button>
+                )}
+              </button>
               </div>
             </div>
 

@@ -25,6 +25,9 @@ import CommentProduct from "./CommentProduct";
 import RelatedProducts from "./RelatedProducts";
 import ReplyComment from "./ReplyComment";
 import Loading from "@/common/Loading/Loading";
+import HeartRedPopup from "@/components/icons/detail/HeartRedPopup";
+import HeartBlack from "@/components/icons/detail/HeartBlack";
+import { useWishlist } from "@/common/context/Wishlist/WishlistContext";
 
 interface IinitialAttributes {
   [key: string]: string;
@@ -34,6 +37,7 @@ const ProductDetail = () => {
   const productId = Number(id);
   const [product, setProduct] = useState<any>();
   const [selectedImage, setSelectedImage] = useState<string>();
+  const { handleAddToWishlist, isInWishlist } = useWishlist();
 
   const { data, isLoading } = useQuery({
     queryKey: ["product", id],
@@ -538,7 +542,7 @@ const ProductDetail = () => {
                 <div className="flex items-center mt-5 lg:mx-[15%] sm:mx-[42%] xl:mx-0 sm:mt-2 space-x-4">
                   <div className="">
                     <span className="lg:text-xl sm:text-[25px] text-lg text-[#747474] my-2">
-                      {product?.price_sale} VNĐ
+                      {product?.price_sale} ₫
                     </span>
                   </div>
 
@@ -612,7 +616,7 @@ const ProductDetail = () => {
                                 className={`relative flex-1 max-w-[60px] h-8 sm:h-9 rounded-full cursor-pointer flex items-center justify-center
                                    ${
                                      isSelected
-                                       ? "border-gray-800 border-4"
+                                       ? "border-gray-800 border-2"
                                        : isDisabled
                                          ? "border-gray-200 border-2 opacity-50 cursor-not-allowed"
                                          : ""
@@ -742,22 +746,13 @@ const ProductDetail = () => {
                 </Button>
 
                 <br />
-                <div className="flex border border-slate-600 rounded-full items-center px-2 h-10 hover:border-red-500 hover:text-red-500">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    className="size-6 "
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
-                    />
-                  </svg>
-                </div>
+                <button onClick={() => handleAddToWishlist(data.product)}>
+                  {isInWishlist(data.product.id) ? (
+                    <HeartRedPopup />
+                  ) : (
+                    <HeartBlack />
+                  )}
+                </button>
               </div>
               {/* mua ngay */}
               <button className=" nc-Button relative right-2 h-11 w-full inline-flex items-center justify-center rounded-full text-sm sm:text-base font-medium sm:py-3.5 sm:px-2 lg:px-2 shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0 text-md mt-3 border bg-[#222222] text-white">

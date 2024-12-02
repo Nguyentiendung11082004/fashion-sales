@@ -208,10 +208,10 @@ const HomePage = () => {
                     )}
                   </div>
                   <div>
-                    <p className="text-base font-medium text-black mb-1 cursor-pointer hd-all-hover-bluelight">
+                    <Link to={`/products/${product?.id}`} className="text-base font-medium text-black mb-1 cursor-pointer hd-all-hover-bluelight">
                       {product.name.charAt(0).toUpperCase() +
                         product.name.slice(1).toLowerCase()}
-                    </p>
+                    </Link>
                     {(product?.price_regular || product?.variants?.length) && (
                       <div>
                         {(() => {
@@ -252,7 +252,7 @@ const HomePage = () => {
                             // Nếu có giá sale
                             if (
                               productPriceSale &&
-                              productPriceSale < productPriceRegular
+                              productPriceSale < productPriceRegular || productPriceSale === 0
                             ) {
                               return (
                                 <>
@@ -509,7 +509,10 @@ const HomePage = () => {
                     </div>
                     <div className="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100">
                       <Link to="" className="group/btn relative m-auto">
-                        <button className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]">
+                        <button
+                          className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]"
+                          onClick={() => handleOpenSeeMore(product)}
+                        >
                           <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
                             Xem thêm
                           </p>
@@ -539,7 +542,7 @@ const HomePage = () => {
       group-hover:translate-y-0
       opacity-0
       group-hover:opacity-100
-      "
+    "
                       >
                         <ul className="flex">
                           {product.unique_attributes &&
@@ -606,10 +609,10 @@ const HomePage = () => {
                     )}
                   </div>
                   <div>
-                    <p className="text-base font-medium text-black mb-1 cursor-pointer hd-all-hover-bluelight">
+                    <Link to={`/products/${product?.id}`} className="text-base font-medium text-black mb-1 cursor-pointer hd-all-hover-bluelight">
                       {product.name.charAt(0).toUpperCase() +
                         product.name.slice(1).toLowerCase()}
-                    </p>
+                    </Link>
                     {(product?.price_regular || product?.variants?.length) && (
                       <div>
                         {(() => {
@@ -650,7 +653,7 @@ const HomePage = () => {
                             // Nếu có giá sale
                             if (
                               productPriceSale &&
-                              productPriceSale < productPriceRegular
+                              productPriceSale < productPriceRegular || productPriceSale === 0
                             ) {
                               return (
                                 <>
@@ -732,7 +735,6 @@ const HomePage = () => {
                       </div>
                     )}
                   </div>
-
                   <div className="t4s-product-colors flex">
                     {product.unique_attributes &&
                       Object.entries(product.unique_attributes)

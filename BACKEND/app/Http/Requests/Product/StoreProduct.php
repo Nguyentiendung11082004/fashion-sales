@@ -39,7 +39,7 @@ class StoreProduct extends FormRequest
 
             // Nếu type = 0 thì các trường này là bắt buộc, nếu type = 1 thì không bắt buộc
             'price_regular' => 'numeric|min:0|required_if:type,0',
-            'price_sale' => 'numeric|min:0|lt:price_regular|required_if:type,0',
+            'price_sale' => 'numeric|min:0|lte:price_regular|required_if:type,0',
             'quantity' => 'integer|min:1|required_if:type,0',
 
             'description' => 'required|string',
@@ -64,7 +64,7 @@ class StoreProduct extends FormRequest
             'product_variant.*.sku' => 'required_if:type,1|string|max:255|distinct',
             'product_variant.*.quantity' => 'integer|min:1|required_if:type,1',
             'product_variant.*.price_regular' => 'numeric|min:0|required_if:type,1',
-            'product_variant.*.price_sale' => 'numeric|min:0|lt:product_variant.*.price_regular|required_if:type,1',
+            'product_variant.*.price_sale' => 'numeric|min:0|lte:product_variant.*.price_regular|required_if:type,1',
             'product_variant.*.image' => 'nullable|string',
 
 

@@ -9,6 +9,8 @@ import { FormatMoney } from "@/common/utils/utils";
 import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
+import { useWishlist } from "@/common/context/Wishlist/WishlistContext";
+import HeartRedPopup from "../icons/detail/HeartRedPopup";
 type Props = {
   open: boolean;
   onClose: () => void;
@@ -18,6 +20,7 @@ type Props = {
 const MySwal = withReactContent(Swal);
 const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
   const navigate = useNavigate();
+  const { handleAddToWishlist, isInWishlist } = useWishlist();
   console.log("productSeeMore", productSeeMore);
   const attributes = productSeeMore?.variants;
 
@@ -37,7 +40,7 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
   const [dataAttribute, setDataAttribute] = useState<any>(
     transformAttributes(attributes)
   );
-  console.log("dataAttribute", dataAttribute)
+  console.log("dataAttribute", dataAttribute);
   const resultDataAttribute = Object.entries(
     productSeeMore?.unique_attributes ?? {}
   ).map(([key, value]) => ({
@@ -47,7 +50,6 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
       name,
     })),
   }));
-
 
   const priceProduct = productSeeMore?.variants?.map((e: any) => e?.price_sale);
   const minPrice =
@@ -65,12 +67,15 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
         // Lấy id của attribute trong dataAttribute
         const attributeName = attribute.name.toLowerCase();
         const attributeItemId = attribute.pivot.attribute_item_id;
-        
+
         // Kiểm tra nếu dataAttribute có giá trị và nó trùng với attribute_item_id của pivot
-        return dataAttribute[attributeName] && dataAttribute[attributeName] === attributeItemId.toString();
+        return (
+          dataAttribute[attributeName] &&
+          dataAttribute[attributeName] === attributeItemId.toString()
+        );
       });
     });
- 
+
     // Nếu tìm thấy variant phù hợp, cập nhật state với product_variant_id
     if (matchingVariant) {
       setSelectedVariantId(matchingVariant.id); // Lưu product_variant_id vào state
@@ -78,10 +83,10 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
       setSelectedVariantId(null); // Nếu không tìm thấy variant, set null
     }
   };
-   useEffect(() => {
-      // Gọi hàm để kiểm tra và gán product_variant_id khi dataAttribute thay đổi
-      getSelectedVariantId();
-    }, [dataAttribute]);
+  useEffect(() => {
+    // Gọi hàm để kiểm tra và gán product_variant_id khi dataAttribute thay đổi
+    getSelectedVariantId();
+  }, [dataAttribute]);
   const getAttribute = (attribute: any, id: any) => {
     setDataAttribute((prev: any) => ({
       ...prev,
@@ -89,8 +94,8 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
     }));
     // findMatchingVariant();
   };
-  console.log("productSeeMore?.variants", productSeeMore?.variants)
-  console.log("selectedVariantId", selectedVariantId)
+  console.log("productSeeMore?.variants", productSeeMore?.variants);
+  console.log("selectedVariantId", selectedVariantId);
 
   const result = productSeeMore?.variants
     ?.filter(
@@ -109,7 +114,7 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
       );
       return attributeObj;
     });
-  console.log("result", result)
+  console.log("result", result);
   // useEffect(() => {
   //   if (result && result.length > 0) {
   //     setDataAttribute({ product_variant: result[0] });
@@ -125,7 +130,7 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
           return (
             x[key] &&
             x[key].toString() ===
-            dataAttribute?.product_variant[key]?.toString()
+              dataAttribute?.product_variant[key]?.toString()
           );
         }
         return true;
@@ -167,10 +172,14 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
     if (open && productSeeMore?.variants?.length > 0) {
       const firstVariant = productSeeMore.variants[0];
       setSelectedVariantId(firstVariant.id);
-      const initialAttributes = firstVariant.attributes.reduce((acc: any, attr: any) => {
-        acc[attr.name.toLowerCase()] = attr.pivot.attribute_item_id.toString();
-        return acc;
-      }, {});
+      const initialAttributes = firstVariant.attributes.reduce(
+        (acc: any, attr: any) => {
+          acc[attr.name.toLowerCase()] =
+            attr.pivot.attribute_item_id.toString();
+          return acc;
+        },
+        {}
+      );
       setDataAttribute(initialAttributes);
     }
   }, [open, productSeeMore]);
@@ -180,7 +189,8 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
         return Object.keys(dataAttribute).every((attrKey) => {
           const attribute = variant.attributes.find(
             (attr: any) =>
-              attr.name.toLowerCase() === attrKey && attr.pivot.value === dataAttribute[attrKey]
+              attr.name.toLowerCase() === attrKey &&
+              attr.pivot.value === dataAttribute[attrKey]
           );
           return attribute !== undefined;
         });
@@ -262,16 +272,26 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
 
                     // Kiểm tra nếu item bị active (trạng thái đã được chọn hoặc chưa chọn nhưng là lựa chọn đầu tiên)
                     const isActive =
-                      (dataAttribute[e.attribute.toLowerCase()] === item.id) ||
-                      (index === 0 && !dataAttribute[e.attribute.toLowerCase()]);
+                      dataAttribute[e.attribute.toLowerCase()] === item.id ||
+                      (index === 0 &&
+                        !dataAttribute[e.attribute.toLowerCase()]);
 
                     return (
                       <div
                         key={item.id}
                         className={`relative flex-1 max-w-[75px] h-8 sm:h-8 rounded-full border-2 cursor-pointer p-2
-        ${isActive ? "border-black" : isDisabled ? "border-gray-200 opacity-50 cursor-not-allowed"
-                            : "border-2"}`}
-                        style={isActive ? { backgroundColor: item.name.toLowerCase() } : {}}
+        ${
+          isActive
+            ? "border-black"
+            : isDisabled
+              ? "border-gray-200 opacity-50 cursor-not-allowed"
+              : "border-2"
+        }`}
+                        style={
+                          isActive
+                            ? { backgroundColor: item.name.toLowerCase() }
+                            : {}
+                        }
                         onClick={() => {
                           if (isDisabled) return; // Nếu bị disable thì không thực hiện gì
                           getAttribute(e.attribute.toLowerCase(), item.id);
@@ -283,13 +303,13 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
                             style={{ backgroundColor: item.name.toLowerCase() }}
                           ></div>
                         ) : (
-                          <p className="flex items-center justify-center h-full text-sm">{item.name}</p>
+                          <p className="flex items-center justify-center h-full text-sm">
+                            {item.name}
+                          </p>
                         )}
                       </div>
                     );
                   })}
-
-
                 </div>
               </div>
             );
@@ -299,7 +319,7 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
             <div className="hd-quantity relative block min-w-[120px] w-[120px] h-10 hd-all-btn">
               <button
                 type="button"
-                onClick={() => setQty(prev => (prev > 1 ? prev - 1 : 1))}
+                onClick={() => setQty((prev) => (prev > 1 ? prev - 1 : 1))}
                 className="hd-btn-item left-0 text-left pl-[15px] p-0 top-0 text-sm cursor-pointer shadow-none transform-none touch-manipulation"
               >
                 <MinusOutlined />
@@ -309,7 +329,7 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
               </span>
               <button
                 type="button"
-                onClick={() => setQty(prev => prev + 1)}
+                onClick={() => setQty((prev) => prev + 1)}
                 className="hd-btn-item right-0 text-right pr-[15px] p-0 top-0 text-sm cursor-pointer shadow-none transform-none touch-manipulation"
               >
                 <svg
@@ -338,20 +358,24 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
               </Button>
             </div>
             <div className="mt-2">
-              <button>
-                <HeartBlack />
+              <button onClick={() => handleAddToWishlist(productSeeMore)}>
+                {isInWishlist(productSeeMore.id) ? (
+                  <HeartRedPopup />
+                ) : (
+                  <HeartBlack />
+                )}
               </button>
             </div>
           </div>
-          <div className="flex mt-2">
-            <p className="mr-1 font-medium">Xem chi tiết</p>
+          <Link to={`/products/${productSeeMore?.id}`} className="flex mt-2">
+            <p className="mr-1 font-medium text-black">Xem chi tiết</p>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
               stroke-width="1.5"
               stroke="currentColor"
-              className="size-6"
+              className="size-6 text-black"
             >
               <path
                 stroke-linecap="round"
@@ -359,7 +383,7 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
                 d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3"
               />
             </svg>
-          </div>
+          </Link>
         </div>
       </div>
     </AntModal>

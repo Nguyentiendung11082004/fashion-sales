@@ -50,33 +50,30 @@ const Login = () => {
     // login(data)
   };
 
-  const handleGoogleLogin = () => {
-    try {
-        window.location.href = 'http://127.0.0.1:8000/api/v1/login/google';
-    } catch (error) {
-        console.error();
-    }
-};
+//   const handleGoogleLogin = () => {
+//     try {
+//         window.location.href = 'http://127.0.0.1:8000/api/v1/login/google';
+//     } catch (error) {
+//         console.error();
+//     }
+// };
 
-const [token, setToken] = useState(localStorage.getItem('token') || null);
+// const [token, setToken] = useState(localStorage.getItem('token') || null);
 
-useEffect(() => {
-  const urlParams = new URLSearchParams(window.location.search);
-  const urlToken = urlParams.get('token');
+// useEffect(() => {
+//   const urlParams = new URLSearchParams(window.location.search);
+//   const urlToken = urlParams.get('token');
 
-  if (urlToken) {
-    // Lưu token vào state và localStorage
-    setToken(urlToken);
-    localStorage.setItem('token', urlToken);
+//   if (urlToken) {
+//     setToken(urlToken);
+//     localStorage.setItem('token', urlToken);
 
-    // Xóa token khỏi URL
-    const newUrl = window.location.origin + window.location.pathname;
-    window.history.replaceState(null, "", newUrl);
+//     const newUrl = window.location.origin + window.location.pathname;
+//     window.history.replaceState(null, "", newUrl);
 
-    // Chuyển hướng về trang chủ
-    window.location.href = "/";
-  }
-}, []);  // empty dependency array để `useEffect` chỉ chạy một lần khi component mount
+//     window.location.href = "/";
+//   }
+// }, []); 
 
   return (
     <>
@@ -99,7 +96,7 @@ useEffect(() => {
             <h2 className="text-2xl font-semibold text-gray-700 text-center">Đăng nhập</h2>
             <p className="text-xl text-gray-600 text-center">Chào mừng trở lại</p>
             <Button 
-              onClick={handleGoogleLogin}
+              // onClick={handleGoogleLogin}
              className="flex items-center justify-center w-full h-11 mt-4 bg-white rounded-lg shadow-md hover:bg-gray-100">
               <div className="px-1 py-3">
                 <LoginIcon1 />

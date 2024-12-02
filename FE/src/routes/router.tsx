@@ -108,9 +108,9 @@ const Router = () => {
           <Route path="about" element={<About />} />
           <Route path="" element={<Permission />}>
             <Route path="cart" element={<Cart />} />
+            <Route path="account" element={<Account />} />
+            <Route path="wishlist" element={<Wishlist />} />
           </Route>
-          <Route path="account" element={<Account />} />
-          <Route path="wishlist" element={<Wishlist />} />
           <Route path="checkout" element={<Checkout />} />
           <Route path="contact" element={<Contact />} />
           <Route path="thank" element={<Thanks />} />

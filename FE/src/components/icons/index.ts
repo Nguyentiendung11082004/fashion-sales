@@ -9,7 +9,7 @@ import Map from "@/assets/icons/map.svg";
 import LogoAdmin from "@/assets/images/logo-admin.png";
 import LogoClient from "@/assets/images/logo-client.png";
 import EyeBoxPr from "@/assets/icons/icon11.svg";
-import HeroRight from "@/assets/images/hero-right1.webp";
+import HeroRight from "@/assets/images/hero-right1.png";
 import User1 from "@/assets/images/z5513883787421_7d1f10db8a5171d1da722feb02185edd.jpg";
 import CatoryShore from "@/assets/images/category-shore.jpg";
 import CatoryAccess from "@/assets/images/category-accessory.avif";
@@ -37,6 +37,7 @@ import Is3 from "@/assets/images/is3.webp";
 import Is4 from "@/assets/images/is4.jpg";
 import Is5 from "@/assets/images/is5.webp";
 import Is6 from "@/assets/images/is6.jpg";
+import LogoM from "@/assets/images/M.png";
 
 export {
   Icon1,
@@ -78,4 +79,5 @@ export {
   Is4,
   Is5,
   Is6,
+  LogoM,
 };

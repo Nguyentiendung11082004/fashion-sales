@@ -25,7 +25,7 @@ const Contact = () => {
         {/*end hd-page-head*/}
         <div className="hd-se_contact_map">
           <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3154.8939060848147!2d144.81158271584684!3d-37.74563313792195!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6ad65fa6debeb781%3A0xe1d23f5d1759961e!2s184%20Main%20Rd%20E%2C%20St%20Albans%20VIC%203021%2C%20%C3%9Ac!5e0!3m2!1svi!2s!4v1618277125252!5m2!1svi!2s"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3723.8050738736556!2d105.73874749999999!3d21.040484100000008!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3134550ab1db2433%3A0x9febb50e17509deb!2zMTMgUC4gVHLhu4tuaCBWxINuIELDtCwgWHXDom4gUGjGsMahbmcsIE5hbSBU4burIExpw6ptLCBIw6AgTuG7mWksIFZp4buHdCBOYW0!5e0!3m2!1svi!2sus!4v1732869902634!5m2!1svi!2sus"
             width="100%"
             height={450}
             className=" lg:block hidden"
@@ -34,7 +34,7 @@ const Contact = () => {
             loading="lazy"
           />
           <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3154.8939060848147!2d144.81158271584684!3d-37.74563313792195!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6ad65fa6debeb781%3A0xe1d23f5d1759961e!2s184%20Main%20Rd%20E%2C%20St%20Albans%20VIC%203021%2C%20%C3%9Ac!5e0!3m2!1svi!2s!4v1618277125252!5m2!1svi!2s"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3723.8050738736556!2d105.73874749999999!3d21.040484100000008!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3134550ab1db2433%3A0x9febb50e17509deb!2zMTMgUC4gVHLhu4tuaCBWxINuIELDtCwgWHXDom4gUGjGsMahbmcsIE5hbSBU4burIExpw6ptLCBIw6AgTuG7mWksIFZp4buHdCBOYW0!5e0!3m2!1svi!2sus!4v1732869902634!5m2!1svi!2sus"
             width="100%"
             height={225}
             className="block lg:hidden"
@@ -56,7 +56,7 @@ const Contact = () => {
                 <span className="block mt-2 text-neutral-500 dark:text-neutral-400">
                   <span style={{ verticalAlign: "inherit" }}>
                     <span style={{ verticalAlign: "inherit" }}>
-                      Trịnh Văn Bô, Bắc Từ Liêm, Hà Nội, Việt Nam
+                      13 Trịnh Văn Bô, Bắc Từ Liêm, Hà Nội, Việt Nam
                     </span>
                   </span>
                 </span>

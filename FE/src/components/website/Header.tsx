@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useUser } from "@/common/context/User/UserContext";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Flag, LogoClient } from "../icons";
 import CartHome from "../icons/headerWebsite/CartHome";
 import EmailHome from "../icons/headerWebsite/EmailHome";
@@ -18,10 +18,13 @@ import { useWishlist } from "@/common/context/Wishlist/WishlistContext";
 import instance from "@/configs/axios";
 import { useQuery } from "@tanstack/react-query";
 import Loading from "@/common/Loading/Loading";
+import { useEffect } from "react";
+
 type Props = {};
 const Header = (props: Props) => {
+  const location = useLocation();
   const navigator = useNavigate();
-  const { data :  wishlist = []} = useWishlist();
+  const { data: wishlist = [] } = useWishlist();
   const { user, urlImage } = useUser();
   let infoUser;
   if (user) {
@@ -30,14 +33,14 @@ const Header = (props: Props) => {
   const { logout } = useAuth();
   const logoutUser = () => {
     logout();
-    navigator("/login")
-  }
+    navigator("/login");
+  };
   const wishlistCount = wishlist.length;
   const { token } = useAuth();
   const { data, isLoading } = useQuery({
-    queryKey: ['cart'],
+    queryKey: ["cart"],
     queryFn: async () => {
-      const res = await instance.get('/cart', {
+      const res = await instance.get("/cart", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -52,10 +55,12 @@ const Header = (props: Props) => {
     cartItems.forEach((item: any) => {
       qty += item.quantity;
     });
-  } else if (cartItems && typeof cartItems === 'object') {
+  } else if (cartItems && typeof cartItems === "object") {
     qty += cartItems.quantity;
   }
-  if (isLoading) return <Loading />
+  
+
+  if (isLoading) return <Loading />;
   return (
     <>
       <div>
@@ -99,7 +104,7 @@ const Header = (props: Props) => {
             </div>
           </div>
         </section>
-        
+
         <div className="w-[100%] bg-[#fff]">
           <header className="lg:mx-10 bg-[#fff] h-[70px] grid grid-cols-12 gap-4 top-0 z-40">
             <div className="lg:col-span-2 col-span-4 flex justify-center items-center md:items-center md:justify-center lg:justify-start  order-2 lg:order-1">
@@ -111,36 +116,64 @@ const Header = (props: Props) => {
             <div className="lg:col-span-8  lg:flex lg:items-center lg:justify-center md:hidden  hidden lg:order-2">
               <ul className="flex space-x-16 lg:space-x-12 ml-10 text-[14px]">
                 <li>
-                  <Link to="" className="font-normal text-hover">
+                  <Link
+                    to="/"
+                    className={`font-medium text-hover uppercase ${
+                      location.pathname === "/" ? "text-[#00BADB]" : ""
+                    }`}
+                  >
                     Trang Chủ
                   </Link>
                 </li>
                 <li className="relative">
-                  <Link to="/products" className="font-normal text-hover">
-                    Sản Phẩm
-                    <span className="absolute text-xs rounded-full px-2 py-[2px] text-white bg-primary top-[-10px] left-16 ">
-                      New
+                  <Link
+                    to="/products"
+                    className={`font-medium text-hover uppercase ${
+                      location.pathname === "/products" && !location.state?.sale
+                        ? "text-[#00BADB]"
+                        : ""
+                    }`}
+                  >
+                    <p className="uppercase">Sản Phẩm</p>
+                    <span className="absolute text-xs rounded-full px-2 py-[2px] text-white bg-primary top-[-16px] left-16">
+                      Mới
                     </span>
                   </Link>
                 </li>
                 <li>
-                  <Link to="" className="font-normal text-hover">
-                    Phụ Kiện
+                  <Link
+                    to={{
+                      pathname: "/products",
+                    }}
+                    state={{ sale: true }}
+                    className={`font-medium text-hover uppercase ${
+                      location.pathname === "/products" && location.state?.sale
+                        ? "text-[#00BADB]"
+                        : ""
+                    }`}
+                  >
+                    Sale
                   </Link>
                 </li>
+
                 <li>
-                  <Link to="" className="font-normal text-hover">
-                    Giày
-                  </Link>
-                </li>
-                <li>
-                  <Link to="" className="font-normal text-hover">
-                    Bài Viết
-                  </Link>
-                </li>
-                <li>
-                  <Link to="" className="font-normal text-hover">
+                  <Link
+                    to="/contact"
+                    className={`font-medium text-hover uppercase ${
+                      location.pathname === "/contact" ? "text-[#00BADB]" : ""
+                    }`}
+                  >
                     Liên Hệ
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/about"
+                    className={`font-medium text-hover uppercase ${
+                      location.pathname === "/about" ? "text-[#00BADB]" : ""
+                    }`}
+                  >
+                    Giới thiệu
                   </Link>
                 </li>
               </ul>
@@ -149,9 +182,15 @@ const Header = (props: Props) => {
               <div className="flex items-center space-x-4">
                 <div className="relative group">
                   <Link to="/account">
-                    {
-                      user ? (<img src={urlImage || infoUser?.avatar} className="h-10 w-10 rounded-full object-cover" alt={infoUser?.name} />) : <UserHome />
-                    }
+                    {user ? (
+                      <img
+                        src={urlImage || infoUser?.avatar}
+                        className="h-10 w-10 rounded-full object-cover"
+                        alt={infoUser?.name}
+                      />
+                    ) : (
+                      <UserHome />
+                    )}
                   </Link>
                   <div className="absolute left-[-50px] hidden group-hover:flex flex-col items-start mt-0 space-y-2 p-4 bg-white shadow-lg rounded-lg transition-all duration-300 z-20">
                     {user ? (
@@ -193,9 +232,8 @@ const Header = (props: Props) => {
                 </Link>
               </div>
             </div>
-          </header>   
+          </header>
         </div>
-
       </div>
     </>
   );

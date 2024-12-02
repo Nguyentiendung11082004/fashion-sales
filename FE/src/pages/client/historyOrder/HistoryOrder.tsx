@@ -114,7 +114,8 @@ const HistoryOrder = () => {
       });
       return response.data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      // setSelectedItems(data.items);
       navigate("/cart");
       notifyOrdersChanged();
     },
@@ -243,35 +244,6 @@ const HistoryOrder = () => {
                   order.order_status.trim().toLowerCase() === "đang vận chuyển";
                 const complete =
                   order.order_status.trim().toLowerCase() === "hoàn thành";
-                //   if (isCancelOk || canCel || shipOk) {
-                //     toast.warning(
-                //       "Không thể xác nhận nhận hàng ở trạng thái này."
-                //     );
-                //     return;
-                //   }
-                //   if (!receivedOrders.includes(orderId)) {
-                //     setReceivedOrders((prev) => [...prev, orderId]);
-                //     toast.success("Đơn hàng đã được xác nhận là đã nhận.");
-                //   } else {
-                //     toast.warning("Đơn hàng này đã được xác nhận trước đó.");
-                //   }
-                // };
-
-                // const handleRated = (orderId: number) => {
-                //   if (!receivedOrders.includes(orderId)) {
-                //     toast.warn(
-                //       "Vui lòng xác nhận đã nhận hàng trước khi đánh giá."
-                //     );
-                //     return;
-                //   }
-
-                //   if (!ratedOrders.includes(orderId)) {
-                //     setRatedOrders((prev) => [...prev, orderId]);
-                //     toast.success("Cảm ơn bạn đã đánh giá sản phẩm!");
-                //   } else {
-                //     toast.warning("Bạn đã đánh giá đơn hàng này trước đó.");
-                //   }
-                // };
 
                 const handleCancelClick = (id: number, status: string) => {
                   if (!isCancelOk) {
@@ -464,7 +436,7 @@ const HistoryOrder = () => {
                             className="flex py-4 sm:py-7 last:pb-0 first:pt-0"
                             key={detail.id}
                           >
-                            <div className="relative h-[88px] w-16 sm:w-20 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
+                            <div className="relative sm:w-20 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
                               <img
                                 alt={detail.product_name}
                                 loading="lazy"
