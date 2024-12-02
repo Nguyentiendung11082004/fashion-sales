@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\Product;
 use App\Models\ProductVariant;
@@ -14,139 +15,110 @@ use Illuminate\Support\Facades\DB;
 
 class ReturnAdminController extends Controller
 {
-    // public function handleReturnRequest(Request $request)
-    // {
-    //     try {
-    //         // Validate dữ liệu từ client
-    //         $validated = $request->validate([
-    //             'return_request_id' => 'required|exists:return_requests,id', // ID của yêu cầu hoàn trả
-    //             'action' => 'required|in:approved,rejected', // Hành động: duyệt hoặc từ chối
-    //             'items' => 'nullable|array', // Danh sách item cần xử lý (nếu không truyền => xử lý toàn bộ)
-    //             'items.*.return_item_id' => 'required|exists:return_items,id',
-    //         ]);
 
-    //         // Lấy yêu cầu hoàn trả
-    //         $returnRequest = ReturnRequest::findOrFail($validated['return_request_id']);
+    public function getReturnRequests(Request $request)
+    {
+        try {
+            // Lấy danh sách return_request cùng các item liên quan
+            $returnRequests = ReturnRequest::with(['items', 'order'])
+                ->orderBy('created_at', 'desc')
+                ->get()
+                ->map(function ($returnRequest) {
+                    return [
+                        'id' => $returnRequest->id,
+                        'order_id' => $returnRequest->order_id,
+                        'user_id' => $returnRequest->user_id,
+                        'reason' => $returnRequest->reason,
+                        'status' => $returnRequest->status,
+                        'created_at' => $returnRequest->created_at->format('Y-m-d H:i:s'),
+                        'updated_at' => $returnRequest->updated_at->format('Y-m-d H:i:s'),
+                        'items' => $returnRequest->items->map(function ($item) {
+                            return [
+                                'id' => $item->id,
+                                'order_detail_id' => $item->order_detail_id,
+                                'quantity' => $item->quantity,
+                                'status' => $item->status,
+                            ];
+                        }),
+                    ];
+                });
 
-    //         // Chỉ xử lý các item có trạng thái `pending`
-    //         if (empty($validated['items'])) {
-    //             $itemsToProcess = ReturnItem::where('return_request_id', $returnRequest->id)
-    //                 ->where('status', 'pending')
-    //                 ->get();
-    //         } else {
-    //             $itemsToProcess = ReturnItem::whereIn('id', collect($validated['items'])->pluck('return_item_id'))
-    //                 ->where('return_request_id', $returnRequest->id)
-    //                 ->where('status', 'pending')
-    //                 ->get();
-    //         }
-
-    //         // Duyệt hoặc từ chối từng item
-    //         foreach ($itemsToProcess as $returnItem) {
-    //             // dd($returnItem->toArray());
-    //             // Cập nhật trạng thái cho item
-    //             $returnItem->update(['status' => $validated['action']]);
-
-    //             // Nếu hành động là "approved", cộng lại số lượng sản phẩm
-    //             if ($validated['action'] === 'approved') {
-    //                 // Kiểm tra xem item liên quan đến `product` hay `product_variant`
-    //                 if ($returnItem->product_variant_id) {
-    //                     // Nếu là product_variant, cập nhật số lượng trong bảng `product_variants`
-    //                     $variant = ProductVariant::find($returnItem->product_variant_id);
-    //                     if ($variant) {
-    //                         $variant->increment('quantity', $returnItem->quantity); // Cộng thêm số lượng
-    //                     }
-    //                 } else {
-    //                     // Nếu không có `product_variant_id`, cập nhật số lượng trong bảng `products`
-    //                     $product = Product::find($returnItem->product_id);
-    //                     if ($product) {
-    //                         $product->increment('quantity', $returnItem->quantity); // Cộng thêm số lượng
-    //                     }
-    //                 }
-    //             }
-
-    //             // Ghi log trạng thái vào bảng `return_logs`
-    //             ReturnLog::create([
-    //                 'return_request_id' => $returnRequest->id,
-    //                 'user_id' => auth()->id(), // Admin đang xử lý
-    //                 'action' => $validated['action'],
-    //                 'comment' => "Admin {$validated['action']} item with ID: {$returnItem->id}",
-    //             ]);
-    //         }
-
-    //         // Kiểm tra xem tất cả các item đã được xử lý chưa
-    //         $remainingItems = ReturnItem::where('return_request_id', $returnRequest->id)
-    //             ->where('status', 'pending')
-    //             ->count();
-
-    //         if ($remainingItems === 0) {
-    //             // Nếu tất cả các item đã được xử lý, cập nhật trạng thái yêu cầu hoàn trả
-    //             $returnRequest->update(['status' => $validated['action']]);
-
-    //             // Ghi log trạng thái yêu cầu
-    //             ReturnLog::create([
-    //                 'return_request_id' => $returnRequest->id,
-    //                 'user_id' => auth()->id(), // Admin đang xử lý
-    //                 'action' => $validated['action'],
-    //                 'comment' => "Admin {$validated['action']} the return request.",
-    //             ]);
-    //         }
-
-    //         return response()->json([
-    //             'message' => 'Return request processed successfully.',
-    //             'total_processed' => $itemsToProcess->count(),
-    //             'remaining_items' => $remainingItems,
-    //         ], 200);
-    //     } catch (\Exception $ex) {
-    //         return response()->json([
-    //             "message" => $ex->getMessage()
-    //         ], 500);
-    //     }
-    // }
-
+            return response()->json([
+                'message' => 'Return requests retrieved successfully.',
+                'data' => $returnRequests,
+            ], 200);
+        } catch (\Exception $ex) {
+            return response()->json([
+                'message' => $ex->getMessage(),
+            ], 500);
+        }
+    }
 
     public function updateReturnItemStatus(Request $request, $returnItemId)
     {
+
         try {
+
             DB::transaction(function () use ($request, $returnItemId) {
+                $user = auth()->user();
                 // Validate input
                 $validated = $request->validate([
                     'status' => 'required|in:pending,canceled,approved,rejected',
+                    'reason' => 'nullable|string', // Lý do từ chối chỉ cần khi trạng thái là "rejected" và khi admin thao tác
                 ]);
 
                 // Tìm return_item cần xử lý
                 $returnItem = ReturnItem::findOrFail($returnItemId);
 
-                // Cập nhật trạng thái của return_item
-                $returnItem->update([
-                    'status' => $validated['status'],
-                ]);
-
-                if ($validated['status'] === 'approved') {
-                    $orderDetail = OrderDetail::findOrFail($returnItem->order_detail_id);
-                    $product = Product::findOrFail($orderDetail->product_id);
-
-                    // Cộng số lượng vào kho
-                    $product->update([
-                        'quantity' => $product->quantity + $returnItem->quantity,
-                    ]);
+                // Lưu lịch sử vào return_log
+                $logComment = "Updated status to {$validated['status']}";
+                if ($validated['status'] === 'rejected' && $validated['reason']) {
+                    // Chỉ ghi lý do từ chối khi trạng thái là "rejected" và khi admin thao tác
+                    $logComment .= ". Reason: {$validated['reason']}";
                 }
 
-                //Case 1: Không phân biệt từ chối hoặc chấp nhận(tức là hoàn tất return_items sẽ chuyển status = completed)
+                ReturnLog::create([
+                    'return_request_id' => $returnItem->return_request_id,
+                    'user_id' => $user->id,
+                    'action' => $validated['status'],
+                    'comment' => $logComment,
+                ]);
 
-                // // Kiểm tra nếu tất cả các return_item liên quan đến return_request đã xử lý
-                // $returnRequest = ReturnRequest::findOrFail($returnItem->return_request_id);
-                // $allItemsProcessed = $returnRequest->items()->where('status', 'pending')->count() === 0;
+                // Nếu trạng thái là "rejected", xử lý lý do và reset số lượng nếu cần
+                if ($validated['status'] === 'rejected') {
+                    if ($returnItem->status === 'approved') {
+                        // Nếu trạng thái trước đó là "approved", reset số lượng trong kho
+                        $orderDetail = OrderDetail::findOrFail($returnItem->order_detail_id);
+                        $product = Product::findOrFail($orderDetail->product_id);
 
-                // if ($allItemsProcessed) {
-                //     // Nếu tất cả các item đã xử lý, cập nhật trạng thái return_request
-                //     $returnRequest->update([
-                //         'status' => 'completed', // hoặc trạng thái phù hợp, ví dụ: "processed"
-                //     ]);
-                // }
+                        // Trừ số lượng sản phẩm trong kho
+                        $product->update([
+                            'quantity' => $product->quantity - $returnItem->quantity,
+                        ]);
+                    }
 
-                
+                    // Lưu lý do vào return_item khi trạng thái là "rejected"
+                    $returnItem->update([
+                        'status' => 'rejected',
+                        'reason' => $validated['reason'], // Lưu lý do từ chối vào return_item
+                    ]);
+                } else {
+                    // Nếu trạng thái là "approved", cộng số lượng vào kho
+                    if ($validated['status'] === 'approved') {
+                        $orderDetail = OrderDetail::findOrFail($returnItem->order_detail_id);
+                        $product = Product::findOrFail($orderDetail->product_id);
 
-                // Case 2: Phân biệt từ chối và hoàn thành
+                        // Cộng số lượng vào kho
+                        $product->update([
+                            'quantity' => $product->quantity + $returnItem->quantity,
+                        ]);
+                    }
+
+                    // Cập nhật trạng thái cho return_item
+                    $returnItem->update([
+                        'status' => $validated['status'],
+                    ]);
+                }
 
                 // Tìm return_request liên quan
                 $returnRequest = ReturnRequest::findOrFail($returnItem->return_request_id);
@@ -161,11 +133,16 @@ class ReturnAdminController extends Controller
                         $returnRequest->update([
                             'status' => 'rejected',
                         ]);
+
+
+                        $this->updateOrder($returnRequest->id);
                     } else {
                         // Nếu có ít nhất một item được chấp nhận
                         $returnRequest->update([
                             'status' => 'completed', // hoặc trạng thái phù hợp
                         ]);
+                        $this->updateOrder($returnRequest->id);
+
                     }
                 }
             });
@@ -173,6 +150,108 @@ class ReturnAdminController extends Controller
             return response()->json([
                 'message' => 'Return item status updated successfully.',
             ]);
+        } catch (\Exception $ex) {
+            return response()->json([
+                'message' => $ex->getMessage(),
+            ], 500);
+        }
+    }
+
+
+    public function updateOrder($returnRequestId)
+    {
+        try {
+            return DB::transaction(function () use ($returnRequestId) {
+
+                // Tìm return_request và load các return_items
+                $returnRequest = ReturnRequest::query()->findOrFail($returnRequestId)->load(["items"]);
+                $order = Order::findOrFail($returnRequest->order_id);
+
+                // Lấy danh sách return_items
+                $returnItems = $returnRequest->items;
+
+                // Kiểm tra trạng thái của tất cả return_items
+                $allApproved = $returnItems->every(fn($item) => $item->status === 'approved');
+                $allRejected = $returnItems->every(fn($item) => $item->status === 'rejected');
+
+                if ($allApproved) {
+                    // Nếu tất cả các item được chấp nhận
+                    $returnRequest->update(['status' => 'completed']);
+
+                    foreach ($returnItems as $returnItem) {
+                        $orderDetail = OrderDetail::findOrFail($returnItem->order_detail_id);
+
+                        // Cập nhật số lượng và tổng giá trong order_detail
+                        $newQuantity = $orderDetail->quantity - $returnItem->quantity;
+                        $newTotalPrice = $newQuantity * $orderDetail->price;
+
+                        $orderDetail->update([
+                            'quantity' => $newQuantity,
+                            'total_price' => $newTotalPrice,
+                        ]);
+                    }
+
+                    // Cập nhật tổng số lượng và tổng giá của order
+                    $totalQuantity = $order->orderDetails->sum('quantity');
+                    $totalPrice = $order->orderDetails->sum('total_price');
+
+                    $order->update([
+                        'total_quantity' => $totalQuantity,
+                        'total' => $totalPrice,
+                        'order_status' => Order::STATUS_RETURNED, // Đặt trạng thái là 'Hoàn trả hàng'
+                    ]);
+
+                    return [
+                        'status'=>true,
+                        'message' => 'Đơn hàng đã đổi sang trạng thái là hoàn trả hàng',
+                    ];
+                }
+
+                if ($allRejected) {
+                    // Nếu tất cả các item bị từ chối
+                    $returnRequest->update(['status' => 'rejected']);
+
+                    $order->update([
+                        'order_status' => Order::STATUS_COMPLETED, // Đặt trạng thái là 'Hoàn thành'
+                    ]);
+
+                    return [
+                        'status'=>true,
+                        'message' => 'Đơn hàng đã đổi sang trạng thái hoàn thành',
+                    ];
+                }
+
+                // Nếu có một số item được chấp nhận, một số bị từ chối
+                $returnRequest->update(['status' => 'completed']);
+
+                foreach ($returnItems->where('status', 'approved') as $returnItem) {
+                    $orderDetail = OrderDetail::findOrFail($returnItem->order_detail_id);
+
+                    // Cập nhật số lượng và tổng giá trong order_detail
+                    $newQuantity = $orderDetail->quantity - $returnItem->quantity;
+                    $newTotalPrice = $newQuantity * $orderDetail->price;
+
+                    $orderDetail->update([
+                        'quantity' => $newQuantity,
+                        'total_price' => $newTotalPrice,
+                    ]);
+                }
+
+                // Cập nhật tổng số lượng và tổng giá của order
+                $totalQuantity = $order->orderDetails->sum('quantity');
+                $totalPrice = $order->orderDetails->sum('total_price');
+
+                $order->update([
+                    'total_quantity' => $totalQuantity,
+                    'total' => $totalPrice,
+                    'order_status' => Order::STATUS_RETURNED, // Đặt trạng thái là 'Hoàn trả hàng'
+                ]);
+
+                return [
+                    'status'=>true,
+                    'message' => 'Đơn hàng đã đổi sang trạng thái là hoàn trả hàng',
+                ];
+            });
         } catch (\Exception $ex) {
             return response()->json([
                 'message' => $ex->getMessage(),

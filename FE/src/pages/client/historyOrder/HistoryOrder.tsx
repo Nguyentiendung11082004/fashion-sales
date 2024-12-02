@@ -1,15 +1,18 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useAuth } from "@/common/context/Auth/AuthContext";
+import {
+  notifyOrdersChanged,
+  useRealtimeOrders,
+} from "@/common/hooks/useRealtimeOrders";
 import instance from "@/configs/axios";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Button, Input, Modal, Table } from "antd";
-import React, { useEffect, useState } from "react";
+import { Input, Modal, Table } from "antd";
+import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import {
-  useRealtimeOrders,
-  notifyOrdersChanged,
-} from "@/common/hooks/useRealtimeOrders";
+import CommentProduct from "../productDetail/CommentProduct";
 // import { notifyOrdersChanged, listenForOrdersChange } from '@/common/hooks/useRealtimeOrders';
 
 const HistoryOrder = () => {
@@ -107,11 +110,15 @@ const HistoryOrder = () => {
 
   const { mutate: mutateReorder } = useMutation({
     mutationFn: async (id: number) => {
-      const response = await instance.post("/cart", { order_id: id }, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await instance.post(
+        "/cart",
+        { order_id: id },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       return response.data;
     },
     onSuccess: (data) => {
@@ -150,6 +157,26 @@ const HistoryOrder = () => {
     },
   ];
   // if (isFetching) return <div>Loading...</div>;
+
+  //  đánh giá sản phẩm
+  const [InForCommentId, setInForCommentId] = useState<string | null>(null);
+
+  const [listIdProduct, setListIdProduct] = useState<any[]>([]);
+
+  const [isShowFormCmtOpen, setShowFormCmtOpen] = useState(false);
+
+  const showFormCmt = (order: any) => {
+    setShowFormCmtOpen(true);
+    setSelectedOrder(order);
+    const listIdProducts = order?.order_details?.map(
+      (detail: any) => detail.product_id
+    );
+    setListIdProduct(listIdProducts || []);
+  };
+
+  const closeFormCmt = () => {
+    setShowFormCmtOpen(false);
+  };
   return (
     <>
       <main
@@ -236,7 +263,8 @@ const HistoryOrder = () => {
                 const isDelivered =
                   order.order_status.toLowerCase() === "giao hàng thành công";
                 const isCancelOk =
-                  order.order_status.trim().toLowerCase() === "đang chờ xác nhận" ||
+                  order.order_status.trim().toLowerCase() ===
+                    "đang chờ xác nhận" ||
                   order.order_status.trim().toLowerCase() === "đã xác nhận";
                 const canCel =
                   order.order_status.trim().toLowerCase() === "đã hủy";
@@ -500,7 +528,6 @@ const HistoryOrder = () => {
                                     {detail.quantity}
                                   </span>
                                 </p>
-                                
                               </div>
                             </div>
                           </div>
@@ -516,7 +543,9 @@ const HistoryOrder = () => {
                             <>
                               <button
                                 className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB]  font-medium ${
-                                  shipOk ? "bg-gray-200 text-gray-400 border cursor-pointer border-gray-300" : "text-white"
+                                  shipOk
+                                    ? "bg-gray-200 text-gray-400 border cursor-pointer border-gray-300"
+                                    : "text-white"
                                 }`}
                                 onClick={() => mutateOk(order.id)}
                                 disabled={shipOk}
@@ -526,7 +555,9 @@ const HistoryOrder = () => {
 
                               <button
                                 className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB]  font-medium ${
-                                  shipOk ? "bg-gray-200 text-gray-400 border cursor-pointer border-gray-300" : "text-white"
+                                  shipOk
+                                    ? "bg-gray-200 text-gray-400 border cursor-pointer border-gray-300"
+                                    : "text-white"
                                 }`}
                                 disabled={shipOk}
                                 onClick={() => alert("Bạn muốn hoàn trả hàng!")}
@@ -540,10 +571,26 @@ const HistoryOrder = () => {
                             <>
                               <button
                                 className="nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB] text-white font-medium"
-                                onClick={() => alert("Đánh giá sản phẩm!")}
+                                onClick={() => {
+                                  showFormCmt(order);
+                                }}
                               >
                                 Đánh Giá
                               </button>
+                              <Modal
+                                visible={isShowFormCmtOpen}
+                                onCancel={closeFormCmt}
+                                footer={null}
+                                centered
+                              >
+                                <CommentProduct
+                                  listIdProduct={listIdProduct}
+                                  InForCommentId={InForCommentId}
+                                  isShowFormCmtOpen={isShowFormCmtOpen}
+                                  dataProductIdQuery={data}
+                                  setShowFormCmtOpen={setShowFormCmtOpen}
+                                />
+                              </Modal>
                             </>
                           )}
 
@@ -564,14 +611,14 @@ const HistoryOrder = () => {
                           )}
 
                           {(canCel || complete) && (
-                              // Nút "Mua Lại" khi đơn hàng đã hủy hoặc hoàn thành
-                              <button
-                                className="nc-Button relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB] text-white font-medium"
-                                onClick={() => mutateReorder(order.id)}
-                              >
-                                Mua Lại
-                              </button>
-                            )}
+                            // Nút "Mua Lại" khi đơn hàng đã hủy hoặc hoàn thành
+                            <button
+                              className="nc-Button relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB] text-white font-medium"
+                              onClick={() => mutateReorder(order.id)}
+                            >
+                              Mua Lại
+                            </button>
+                          )}
                         </div>
 
                         <Modal

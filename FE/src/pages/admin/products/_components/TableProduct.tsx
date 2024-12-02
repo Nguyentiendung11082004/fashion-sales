@@ -84,7 +84,6 @@ const columns: ColumnType<any>[] = [
     render: (attributes: string) => <span>{attributes}</span>,
   }
 ];
-
 const TableProduct: React.FC = () => {
   const [filter, setFilter] = useState<{
     type: number[];

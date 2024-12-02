@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Column } from '@ant-design/charts';
 import instance from '@/configs/axios';
+import { DashboardContext } from '../../Dashboard';
 interface OrderStatistic {
       order_status: string;
       total_orders: number;
@@ -14,9 +15,10 @@ interface Props {
       dataDonHang: (data: ResponseData) => void;
 }
 const Chart = ({ dataDonHang }: Props) => {
+      const { filter, setFilter } = useContext(DashboardContext)
       const [dataStatic, setDataStatic] = useState<ResponseData | null>(null);
       const getData = async () => {
-            let res = await instance.post(`/getorderstatistics`);
+            let res = await instance.post(`/getorderstatistics`, filter);
             setDataStatic(res?.data);
             dataDonHang(res?.data)
       }
@@ -36,7 +38,7 @@ const Chart = ({ dataDonHang }: Props) => {
       };
       useEffect(() => {
             getData()
-      }, [])
+      }, [filter])
       return (
             <div>
                   <h3 className="text-xl font-semibold text-gray-800 text-center ">

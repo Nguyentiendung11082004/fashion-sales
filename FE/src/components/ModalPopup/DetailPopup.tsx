@@ -11,6 +11,7 @@ import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { useWishlist } from "@/common/context/Wishlist/WishlistContext";
 import HeartRedPopup from "../icons/detail/HeartRedPopup";
+import { toast } from "react-toastify";
 type Props = {
   open: boolean;
   onClose: () => void;
@@ -94,8 +95,7 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
     }));
     // findMatchingVariant();
   };
-  console.log("productSeeMore?.variants", productSeeMore?.variants);
-  console.log("selectedVariantId", selectedVariantId);
+  console.log("productSeeMore?.variants", productSeeMore?.variants)
 
   const result = productSeeMore?.variants
     ?.filter(
@@ -114,7 +114,6 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
       );
       return attributeObj;
     });
-  console.log("result", result);
   // useEffect(() => {
   //   if (result && result.length > 0) {
   //     setDataAttribute({ product_variant: result[0] });
@@ -163,11 +162,28 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
     setSelectedVariantId(null);
     onClose();
   };
+  console.log("productSeeMore.quantity", productSeeMore.quantity)
+  // const handleCheckout = () => {
+  //   if (productSeeMore.quantity <= 0) {
+  //     toast.error("Sản phẩm này đã hết hàng")
+  //     return;
+  //   } else if (_payload.product_id || _payload.product_variant_id) {
+  //     navigate("/checkout", { state: { _payload: _payload } });
+  //   }
+  // };
   const handleCheckout = () => {
-    if (_payload.product_id || _payload.product_variant_id) {
+    if (!_payload.product_variant_id) {
+      if (productSeeMore.quantity <= 0) {
+        toast.error("Sản phẩm này đã hết hàng");
+        return;
+      } else {
+        navigate("/checkout", { state: { _payload: _payload } });
+      }
+    } else if (_payload.product_id || _payload.product_variant_id) {
       navigate("/checkout", { state: { _payload: _payload } });
     }
   };
+
   useEffect(() => {
     if (open && productSeeMore?.variants?.length > 0) {
       const firstVariant = productSeeMore.variants[0];
