@@ -495,10 +495,13 @@ class ProductController extends Controller
         $query = $request->input('query'); // Lấy từ khóa tìm kiếm từ body request
 
         if (!$query) {
+            // Nếu không nhập từ khóa, lấy tất cả sản phẩm
+            $results = Product::all();
+
             return response()->json([
-                'message' => 'Vui lòng nhập từ khóa tìm kiếm.',
-                'data' => []
-            ], 400);
+                'message' => 'Hiển thị tất cả sản phẩm.',
+                'data' => $results,
+            ]);
         }
 
         // Tìm kiếm trong cột `name` hoặc các cột khác nếu cần
