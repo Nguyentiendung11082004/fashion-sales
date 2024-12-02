@@ -16,19 +16,38 @@ class OrderController extends Controller
      * Display a listing of the resource.
      */
 
+    // public function index()
+    // {
+    //     try {
+
+    //         Order::where('order_status', 'Giao hàng thành công')
+    //             ->whereDate('updated_at', '<', now()->subDays(3))
+    //             ->update(['order_status' => 'Hoàn thành']);
+
+
+    //         $orders = Order::with('orderDetails')
+    //             ->latest()
+    //             ->get();
+
+    //         // Trả lại dữ liệu cho frontend
+    //         return response()->json([
+    //             'message' => 'Thông tin đơn hàng',
+    //             'data' => $orders,  // Dữ liệu đơn hàng và chi tiết
+    //         ]);
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'error' => 'Có lỗi xảy ra: ' . $e->getMessage(),
+    //         ], 500);
+    //     }
+    // }
     public function index()
     {
         try {
-
-            Order::where('order_status', 'Giao hàng thành công')
-                ->whereDate('updated_at', '<', now()->subDays(3))
-                ->update(['order_status' => 'Hoàn thành']);
-
-
+            // Lấy dữ liệu đơn hàng mới nhất với chi tiết đơn hàng
             $orders = Order::with('orderDetails')
                 ->latest()
                 ->get();
-
+    
             // Trả lại dữ liệu cho frontend
             return response()->json([
                 'message' => 'Thông tin đơn hàng',
@@ -40,7 +59,7 @@ class OrderController extends Controller
             ], 500);
         }
     }
-
+    
 
     /**
      * Show the form for creating a new resource.
@@ -158,14 +177,20 @@ class OrderController extends Controller
                 $newStatus = 'Hoàn thành';
             }
 
-
+          
 
             // Nếu có trạng thái mới từ request, thực hiện thay đổi trạng thái
             if ($newStatus && $newStatus !== $order->order_status) {
                 $order->order_status = $newStatus;
             }
-
+            if ($newStatus === 'Giao hàng thành công') {
+                $order->payment_status = 'Đã thanh toán';
+            }
             $order->save();
+            if ($newStatus === 'Đang vận chuyển') {
+                $createOrder = new OrderGHNController();
+                $createOrder->createOrder($id);  // Gọi hàm tạo đơn hàng giao hàng nhanh với ID đơn hàng
+            }
 
             return response()->json(['message' => 'Cập nhật trạng thái đơn hàng thành công.', 'order' => $order], Response::HTTP_OK);
         } catch (\Exception $e) {
