@@ -72,6 +72,7 @@ const Checkout = () => {
     ship_user_address: '',
     shipping_method: paymentMethhod,
     voucher_code: voucher,
+    shipping_fee: shiping,
     cart_item_ids: cartIds || [],
     quantityOfCart: quantityOfCart || {},
     product_id: _payload?.product_id || null,
@@ -216,7 +217,8 @@ const Checkout = () => {
           weight: totalWeight
         });
         setShipPing(res?.data?.fee?.total); // Cập nhật phí vận chuyển
-      }, 2000);
+        setOrder((prev)=> ({...prev,shipping_fee:res?.data?.fee?.total}))
+      }, 200);
     } catch (error) {
       console.error("Error calculating shipping fee", error); // In lỗi nếu có
     }
