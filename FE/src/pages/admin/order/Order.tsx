@@ -5,8 +5,8 @@ import { IOrder } from "@/common/types/order";
 import { IVouchers } from "@/common/types/vouchers";
 import instance from "@/configs/axios";
 import { EyeOutlined } from "@ant-design/icons";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Button, Pagination, Select, Skeleton } from "antd";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Button, Pagination, Select } from "antd";
 import Table, { ColumnType } from "antd/es/table";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
@@ -79,20 +79,17 @@ const OrderPage = () => {
   const orStatus = {
     1: "Đang chờ xác nhận",
     2: "Đã xác nhận",
-    3: "Đang vận chuyển",
-    4: "Hoàn trả hàng",
+    3: "Đã hủy",
+    4: "Đang vận chuyển",
     5: "Giao hàng thành công",
-    6: "Đã hủy",
-    7: "Hoàn thành",
+    6: "Yêu cầu hoàn trả hàng",
+    7: "Hoàn trả hàng",
+    8: "Hoàn thành",
   };
   const handleUpdateStatus = async (orderId: number, status: string) => {
     try {
       console.log("orderId: ", orderId);
       console.log("status: ", status);
-
-      const orderToUpdate = dataOrder?.find(
-        (order: IOrder) => order.id === orderId
-      );
 
       const response = await instance.put(`/order-status/${orderId}`, {
         order_status: status,
