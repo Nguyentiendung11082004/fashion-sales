@@ -84,7 +84,7 @@ const ProductPageManager = () => {
       title: "Type",
       dataIndex: "type",
       render: (text, record: Iproduct) => (
-        <p>{record.type === 0 ? "Sản phẩm đơn" : "Sản phẩm biến thể"}</p>
+        <p>{record.type == 0 ? "Sản phẩm đơn" : "Sản phẩm biến thể"}</p>
       ),
     },
     {

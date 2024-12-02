@@ -30,8 +30,10 @@ const ProductForm = () => {
     const [isLoading, setIsLoading] = useState(false);
     const queryClient = useQueryClient();
     const [selectedItems, setSelectedItems] = useState<any>([]); // giá trị khi lưu ở table 
+
     const [isTableVisible, setIsTableVisible] = useState(false); // State điều khiển hiển thị bảng
     const [selectedValues, setSelectedValues] = useState<any>([]); // State lưu trữ giá trị đã chọn cho từng thuộc tính
+    console.log("selectedValues", selectedValues)
     const [isColumnsVisible, setIsColumnsVisible] = useState(false); // state cột
     const [error, setError] = useState<any>()
     const [valueHome, setValueHome] = useState(1);
@@ -53,12 +55,18 @@ const ProductForm = () => {
     const [checkedItems, setCheckedItems] = useState<any[]>([]);
 
     const [variants, setVariants] = useState([
-        { id_guid: '', image: '', price_regular: '', price_sale: '', quantity: '', sku: '', attributes: '' }
+        { id_guid: '', image: '', price_regular: '', price_sale: '', quantity: '', sku: '' }
     ]);
-    const handleInputChange = (index: number, field: string, value: any) => {
-        const newVariants = [...variants];
-        newVariants[index] = { ...newVariants[index], [field]: value };
-        setVariants(newVariants); // Cập nhật variants mà không làm mất ảnh
+    console.log("variants", variants)
+    const handleInputChange = (id_guid: any, field: string, value: any) => {
+        const newVariants = variants.map(variant => {
+            if (variant.id_guid === id_guid) {
+                return { ...variant, [field]: value }; // Update the matching variant
+            }
+            return variant; // Return other variants unchanged
+        });
+    
+        setVariants(newVariants); // Update the state with the modified array
     };
 
     const { data, isFetching } = useQuery({
@@ -70,8 +78,10 @@ const ProductForm = () => {
         if (value === attribute) return;
 
         setAttribute(value);
+        setSelectedAttributeChildren([]);
         setIsTableVisible(false);
         setSelectedItems([]);
+
         // Reset giá trị đã chọn
         const newCheckedItems = Array(variants.length).fill(false);
         setCheckedItems(newCheckedItems);
@@ -149,9 +159,6 @@ const ProductForm = () => {
         setSelectedItems(combinedItems);
         setIsColumnsVisible(combinedItems.length > 0);
     };
-
-
-
     const getPropsImgThumbnail = (index: number): UploadProps => ({
         name: 'file',
         action: 'https://api.cloudinary.com/v1_1/dlvwxauhf/image/upload',
@@ -185,7 +192,6 @@ const ProductForm = () => {
             return true;
         }
     });
-
     const propsGallery: UploadProps = {
         name: 'file',
         action: 'https://api.cloudinary.com/v1_1/dlvwxauhf/image/upload',
@@ -219,7 +225,6 @@ const ProductForm = () => {
             return true;
         }
     };
-
     const propsImgThumbnail: UploadProps = {
         name: 'file',
         action: 'https://api.cloudinary.com/v1_1/dlvwxauhf/image/upload',
@@ -251,7 +256,6 @@ const ProductForm = () => {
             return true;
         },
     };
-
     const columns: any = [
         {
             title: "Checkox",
@@ -348,7 +352,7 @@ const ProductForm = () => {
                 return (
                     <Input
                         value={matchingVariant?.price_regular || ''}
-                        onChange={(e) => handleInputChange(index, 'price_regular', e.target.value)}
+                        onChange={(e) => handleInputChange(matchingVariant?.id_guid, 'price_regular', e.target.value)}
                     />
                 );
             }
@@ -357,20 +361,15 @@ const ProductForm = () => {
             title: 'Price Sale',
             dataIndex: 'price_sale',
             render: (text: any, record: any, index: number) => {
-                // Tách image ra khỏi record, chỉ lấy các thuộc tính còn lại
                 const { image, ...otherAttributes } = record;
-
-                // Tìm variant trong mảng variants với thuộc tính matching
                 const matchingVariant = variants.find((variant: any) => {
                     return Object.keys(otherAttributes).every((key) => variant.attributes[key] === otherAttributes[key]);
                 });
-
                 console.log("matchingVariant for Price Sale", matchingVariant);
-
                 return (
                     <Input
-                        defaultValue={matchingVariant?.price_sale || ''}  // Lấy giá trị price_sale từ matchingVariant
-                        onChange={(e) => handleInputChange(index, 'price_sale', e.target.value)}  // Hàm để xử lý thay đổi
+                        defaultValue={matchingVariant?.price_sale || ''} 
+                        onChange={(e) => handleInputChange(index, 'price_sale', e.target.value)} 
                     />
                 );
             }
@@ -421,6 +420,7 @@ const ProductForm = () => {
         }
 
     ];
+
 
     useEffect(() => {
         if (Object.keys(selectedValues).length > 0) {
@@ -558,9 +558,6 @@ const ProductForm = () => {
         });
     };
 
-    console.log("variants", variants)
-
-
 
     useEffect(() => {
         if (productShow) {
@@ -600,7 +597,6 @@ const ProductForm = () => {
                         quantity: '',
                         sku: '',
                         image: '',
-                        attributes: '',
                     };
                     return newVariants;
                 });
@@ -712,7 +708,6 @@ const ProductForm = () => {
         }
     };
 
-    // const dataVariant = [...selectedItems, ...variants];
     return (
         <div className="p-6 min-h-screen">
             <div className="flex items-center justify-between mb-6">
@@ -808,7 +803,9 @@ const ProductForm = () => {
                                 label="Chọn mảng nhiều ảnh"
                                 className="col-span-1"
                             >
-                                <Upload {...propsGallery}>
+                                <Upload
+                                    {...propsGallery}
+                                >
                                     <Button icon={<UploadOutlined />}>Tải lên gallery</Button>
                                 </Upload>
                                 {productShow?.galleries && (
@@ -823,10 +820,8 @@ const ProductForm = () => {
                                         ))}
                                     </>
                                 )}
-
-                                {error?.gallery && <div className="text-red-600">{error.gallery.join(', ')}</div>}
+                                {error?.gallery && <div className='text-red-600'>{error.gallery.join(', ')}</div>}
                             </Form.Item>
-
                             <Form.Item name="type" label="Kiểu sản phẩm" className="col-span-3">
                                 <Select
                                     value={productShow?.type ? 1 : 0}
@@ -885,7 +880,7 @@ const ProductForm = () => {
                                         setSelectedAttributeChildren([]);
                                         setSelectedValues({});
                                         setIsTableVisible(false);
-                                        setAttribute(0)
+setAttribute(0)
                                         form.resetFields();
                                     }}>Hủy</Button>
                                 } */}
