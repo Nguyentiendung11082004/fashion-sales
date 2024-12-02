@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderDetail;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
@@ -13,8 +14,9 @@ use Illuminate\Support\Facades\DB;
 class StatisticsController extends Controller
 {
     // bộ lọc
-    private function applyDateFilter($query, Request $request, $column)
+    public function applyDateFilter($query, Request $request, $column)
     {
+        // dd($request->all());
         // Lấy filter_type và filter_value từ request
         $filterType = $request->input('filter_type', 'day'); // Mặc định là lọc theo ngày
         $filterValue = $request->input('filter_value', now()->format('Y-m-d')); // Giá trị lọc
@@ -104,10 +106,34 @@ class StatisticsController extends Controller
         }
     }
 
+    // thống kê user
+    public function getTotalUsers($request)
+    {
+        try {
+            // Bắt đầu truy vấn với model User
+            $query = User::query();
+
+            // Áp dụng bộ lọc ngày
+            $this->applyDateFilter($query, $request, 'created_at');
+
+            // Đếm tổng số người dùng
+            $totalUsers = $query->count();
+
+            return  $totalUsers;
+        } catch (\Exception $e) {
+            // Xử lý lỗi nếu có
+            return [
+                'success' => false,
+                'message' => $e->getMessage(),
+            ];
+        }
+    }
+
     // Thống kê doanh thu
     public function getRevenueStatistics(Request $request)
     {
         try {
+
             // Khởi tạo truy vấn cơ bản
             $query = OrderDetail::select(
                 'order_details.product_id',
@@ -172,6 +198,7 @@ class StatisticsController extends Controller
             return response()->json([
                 'status' => 'success',
                 'total_revenue' => $totalRevenue,
+                'totalUsers' => $this->getTotalUsers($request),
                 'data' => $result,
             ], 200);
         } catch (\Exception $e) {

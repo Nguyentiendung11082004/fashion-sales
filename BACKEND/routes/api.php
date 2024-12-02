@@ -131,8 +131,14 @@ Route::prefix("v1/")->group(function () {
     Route::post('getrevenuestatistics', [StatisticsController::class, "getRevenueStatistics"]);
 
     // order create ghn
-    Route::post('createorderghn', [OrderGHNController::class, 'createOrder']);
+    // Route::post('createorderghn', [OrderGHNController::class, 'createOrder']);
+    Route::get('ghn_get_order', [OrderGHNController::class, 'ghnGetOrder']);
+    Route::post('ghn_update_order', [OrderGHNController::class, 'ghnUpdateOrder']);
 
+
+    //test 
+    // Route::get('updatehh/{requestid}', [ReturnAdminController::class, 'updateOrder']);
+    // Route::get('search',[AdminOrderController::class,'searchOrders']);
 
     //Quản lí hoàn đơn Admin
     // Route::post('return-items/status/{returnItemId}', [ReturnAdminController::class, 'updateReturnItemStatus']);
