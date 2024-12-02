@@ -14,8 +14,9 @@ use Illuminate\Support\Facades\DB;
 class StatisticsController extends Controller
 {
     // bộ lọc
-    private function applyDateFilter($query, Request $request, $column)
+    public function applyDateFilter($query, Request $request, $column)
     {
+        // dd($request->all());
         // Lấy filter_type và filter_value từ request
         $filterType = $request->input('filter_type', 'day'); // Mặc định là lọc theo ngày
         $filterValue = $request->input('filter_value', now()->format('Y-m-d')); // Giá trị lọc

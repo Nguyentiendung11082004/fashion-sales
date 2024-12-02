@@ -16,10 +16,14 @@ class OrderController extends Controller
      * Display a listing of the resource.
      */
 
-    public function index()
+    public function index(Request $request)
     {
         try {
+            // dd($request->all());
+            if (!empty($request->all())) {
 
+                return $this->searchOrders($request);
+            }
             Order::where('order_status', 'Giao hàng thành công')
                 ->whereDate('updated_at', '<', now()->subDays(3))
                 ->update(['order_status' => 'Hoàn thành']);
@@ -138,7 +142,7 @@ class OrderController extends Controller
             }
 
             if ($currentStatus === 'Đã xác nhận' && !in_array($newStatus, ['Đang vận chuyển', 'Đã hủy'])) {
-                
+
                 return response()->json(['message' => 'Trạng thái tiếp theo chỉ có thể là "Đang vận chuyển" hoặc "Đã hủy".'], Response::HTTP_BAD_REQUEST);
             }
 
@@ -181,26 +185,62 @@ class OrderController extends Controller
         //
     }
 
-    public function search(Request $request)
+    public function searchOrders($request)
     {
-        $query = $request->input('query'); // Lấy từ khóa tìm kiếm từ body request
+        // Danh sách trạng thái hợp lệ
+        $validStatuses = [
+            Order::STATUS_PENDING,
+            Order::STATUS_CONFIRMED,
+            Order::STATUS_SHIPPING,
+            Order::STATUS_SUCCESS,
+            Order::STATUS_CANCELED,
+            Order::STATUS_RETURNED,
+            Order::STATUS_COMPLETED,
+        ];
 
-        if (!$query) {
-            return response()->json([
-                'message' => 'Vui lòng nhập từ khóa tìm kiếm.',
-                'data' => []
-            ], 400);
+        $request->validate([
+            'search' => 'nullable|string|max:255',
+            'statuses' => 'nullable|array',
+            'statuses.*' => ['string', function ($attribute, $value, $fail) use ($validStatuses) {
+                if (!in_array($value, $validStatuses)) {
+                    $fail("Giá trị $value của $attribute không hợp lệ.");
+                }
+            }],
+            'filter_type' => 'nullable|string|in:day,week,month,year,range',
+            'filter_value' => 'nullable|string',
+            'filter_start_date' => 'required_if:filter_type,range|date',
+            'filter_end_date' => 'required_if:filter_type,range|date|after_or_equal:filter_start_date',
+        ]);
+
+        // Lấy các tham số tìm kiếm
+        $searchTerm = $request->input('search');
+        $statuses = $request->input('statuses');
+
+        // Tạo query cơ bản
+        $orders = Order::query();
+
+        // 1. Lọc theo từ khóa tìm kiếm
+        if ($searchTerm) {
+            $orders->where(function ($query) use ($searchTerm) {
+                $query->where('user_name', 'LIKE', "$searchTerm")
+                    ->orWhere('user_email', 'LIKE', "$searchTerm");
+            });
+            // $orders->ddRawSql();
         }
 
-        // Tìm kiếm trong cột `name` hoặc các cột khác nếu cần
-        $results = Order::where('order_code', 'LIKE', "%{$query}%")
-            ->orWhere('user_name', 'LIKE', "%{$query}%")
-            ->orWhere('user_email', 'LIKE', "%{$query}%")
-            ->get();
+        // 2. Lọc theo trạng thái đơn hàng
+        if ($statuses && is_array($statuses)) {
+            $orders->whereIn('order_status', $statuses);
+        }
+
+        // 3. Lọc theo ngày tháng
+        $applyDateFilter = new StatisticsController();
+        $applyDateFilter->applyDateFilter($orders, $request, 'created_at');
+
 
         return response()->json([
-            'message' => 'Kết quả tìm kiếm.',
-            'data' => $results,
-        ]);
+            'success' => true,
+            'data' => $orders->with(["orderDetails"])->get(),
+        ], Response::HTTP_OK);
     }
 }
