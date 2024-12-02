@@ -28,9 +28,9 @@ class UpdateProduct extends FormRequest
             'category_id' => 'required|integer|exists:categories,id',
             'tags' => 'required|array|min:1',
             'tags.*' => 'integer|exists:tags,id',
-            'gallery' => 'array|min:1',
-            'gallery.*.id' => 'integer|exists:product_galleries,id', // Kiểm tra 'id' tồn tại trong bảng galleries
-            'gallery.*.image' => 'string', // Kiểm tra 'image' là chuỗi
+            'galleries' => 'array|min:1',
+            'galleries.*.id' => 'integer|exists:product_galleries,id', // Kiểm tra 'id' tồn tại trong bảng galleries
+            'galleries.*.image' => 'string', // Kiểm tra 'image' là chuỗi
             "weight"=>"required",
             'type' => 'required|integer|in:0,1', // Type chỉ có 2 loại: 0 (simple) và 1 (variant)
             'sku' => 'required|string|max:255|unique:products,sku,' . $productId,
@@ -40,7 +40,7 @@ class UpdateProduct extends FormRequest
 
             // Nếu type = 0 thì các trường này là bắt buộc, nếu type = 1 thì không bắt buộc
             'price_regular' => 'numeric|min:0|required_if:type,0',
-            'price_sale' => 'numeric|min:0|lt:price_regular|required_if:type,0',
+            'price_sale' => 'numeric|min:0|lte:price_regular|required_if:type,0',
             'quantity' => 'integer|min:1|required_if:type,0',
 
             'description' => 'required|string',
@@ -65,7 +65,7 @@ class UpdateProduct extends FormRequest
             'product_variant.*.sku' => 'required_if:type,1|string|max:255|distinct',
             'product_variant.*.quantity' => 'integer|min:1|required_if:type,1',
             'product_variant.*.price_regular' => 'numeric|min:0|required_if:type,1',
-            'product_variant.*.price_sale' => 'numeric|min:0|lt:product_variant.*.price_regular|required_if:type,1',
+            'product_variant.*.price_sale' => 'numeric|min:0|lte:product_variant.*.price_regular|required_if:type,1',
             'product_variant.*.image' => 'nullable|string',
 
 

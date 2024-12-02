@@ -32,7 +32,6 @@ const ProductForm = () => {
     const [selectedItems, setSelectedItems] = useState<any>([]); // giá trị khi lưu ở table 
     const [isTableVisible, setIsTableVisible] = useState(false); // State điều khiển hiển thị bảng
     const [selectedValues, setSelectedValues] = useState<any>([]); // State lưu trữ giá trị đã chọn cho từng thuộc tính
-    console.log("selectedValues",selectedValues)
     const [isColumnsVisible, setIsColumnsVisible] = useState(false); // state cột
     const [error, setError] = useState<any>()
     const [valueHome, setValueHome] = useState(1);
@@ -54,14 +53,15 @@ const ProductForm = () => {
     const [checkedItems, setCheckedItems] = useState<any[]>([]);
 
     const [variants, setVariants] = useState([
-        { image: '', price_regular: '', price_sale: '', quantity: '', sku: '' }
+        { id_guid: '', image: '', price_regular: '', price_sale: '', quantity: '', sku: '', attributes: '' }
     ]);
     const handleInputChange = (index: number, field: string, value: any) => {
         const newVariants = [...variants];
         newVariants[index] = { ...newVariants[index], [field]: value };
-        setVariants(newVariants);
+        setVariants(newVariants); // Cập nhật variants mà không làm mất ảnh
     };
-const { data, isFetching } = useQuery({
+
+    const { data, isFetching } = useQuery({
         queryKey: ['productCreate'],
         queryFn: productCreate,
     });
@@ -70,10 +70,8 @@ const { data, isFetching } = useQuery({
         if (value === attribute) return;
 
         setAttribute(value);
-        setSelectedAttributeChildren([]);
         setIsTableVisible(false);
         setSelectedItems([]);
-
         // Reset giá trị đã chọn
         const newCheckedItems = Array(variants.length).fill(false);
         setCheckedItems(newCheckedItems);
@@ -91,7 +89,6 @@ const { data, isFetching } = useQuery({
     const handleChangeAttributeChildren = (values: any) => {
         setSelectedAttributeChildren(values);
         const newSelectedValues = { ...selectedValues };
-
         values.forEach((attrId: any) => {
             if (!(attrId in newSelectedValues)) {
                 newSelectedValues[attrId] = [];
@@ -105,7 +102,6 @@ const { data, isFetching } = useQuery({
             ...prevValues,
             [attrId]: values,
         }));
-        // Nếu giá trị rỗng, xóa thuộc tính
         if (values.length === 0) {
             setSelectedAttributeChildren(prev => {
                 const newChildren = prev.filter(id => id !== attrId);
@@ -119,20 +115,24 @@ const { data, isFetching } = useQuery({
         handleSaveAttributes();
     };
 
-
     const handleSaveAttributes = () => {
         const combinedItems: { [key: string]: string }[] = [];
         const attributeNames = Object.keys(selectedValues).filter(attrId => selectedValues[attrId]?.length > 0);
+
         const createCombinations = (index: number, currentCombination: { [key: string]: string }) => {
             if (index === attributeNames.length) {
                 if (Object.keys(currentCombination).length > 0) {
-                    combinedItems.push({ ...currentCombination });
+                    // Kết hợp với ảnh
+                    const variantWithImage = variants[index] ? { ...currentCombination, image: variants[index].image } : currentCombination;
+                    combinedItems.push(variantWithImage);
                 }
                 return;
             }
+
             const attrName = attributeNames[index];
             const items = selectedValues[attrName] || [];
-if (items.length === 0) return;
+
+            if (items.length === 0) return;
 
             items.forEach((itemId: any) => {
                 const item = data?.attribute.find((attr: any) => attr.id === Number(attrName))
@@ -144,10 +144,12 @@ if (items.length === 0) return;
                 }
             });
         };
+
         createCombinations(0, {});
         setSelectedItems(combinedItems);
         setIsColumnsVisible(combinedItems.length > 0);
     };
+
 
 
     const getPropsImgThumbnail = (index: number): UploadProps => ({
@@ -165,14 +167,25 @@ if (items.length === 0) return;
                     const imageUrl = info.file.response.url;
                     const newVariants = [...variants];
                     newVariants[index] = { ...newVariants[index], image: imageUrl };
-                    setVariants(newVariants);
+                    setVariants(newVariants); // Cập nhật lại variants
                     message.open({ type: 'success', content: 'Upload ảnh thành công' });
                 }
             } else if (info.file.status === "error") {
                 message.error(`${info.file.name} file upload failed.`);
             }
         },
+        onRemove(file) {
+            // Khi xóa ảnh, cần cập nhật lại variants
+            setVariants(prevVariants => {
+                const newVariants = [...prevVariants];
+                newVariants[index] = { ...newVariants[index], image: '' }; // Reset ảnh
+                return newVariants;
+            });
+            message.info(`${file.name} đã bị xóa.`);
+            return true;
+        }
     });
+
     const propsGallery: UploadProps = {
         name: 'file',
         action: 'https://api.cloudinary.com/v1_1/dlvwxauhf/image/upload',
@@ -187,7 +200,10 @@ if (items.length === 0) return;
                 const isImage = /^image\//.test(info?.file?.type);
                 if (isImage) {
                     const newImageUrl = info.file.response.secure_url || info.file.response.url;
-                    setImageGaller((prev) => [...prev, newImageUrl])
+                    setImageGaller((prev) => {
+                        const newGallery = [...prev, newImageUrl];
+                        return newGallery;
+                    });
                     message.open({
                         type: 'success',
                         content: 'Upload ảnh thành công',
@@ -202,16 +218,16 @@ if (items.length === 0) return;
             message.info(`${file.name} đã bị xóa.`);
             return true;
         }
-    }
-    const [fileList, setFileList] = useState<UploadFile[]>([]);
+    };
+
     const propsImgThumbnail: UploadProps = {
         name: 'file',
         action: 'https://api.cloudinary.com/v1_1/dlvwxauhf/image/upload',
-data: {
+        data: {
             upload_preset: "fashion-sales",
             folder: "fashion-sales"
         },
-        fileList,
+        listType: "picture",
         onChange(info: any) {
             if (info.file.status === "done") {
                 const isImage = /^image\//.test(info.file.type);
@@ -228,15 +244,14 @@ data: {
             } else if (info.file.status === "error") {
                 message.error(`${info.file.name} file upload failed.`);
             }
-            setFileList(info.fileList.slice(-1));
         },
         onRemove(file) {
-            setFileList([]);
             setUrlImage(null);
             message.info(`${file.name} đã bị xóa.`);
             return true;
         },
     };
+
     const columns: any = [
         {
             title: "Checkox",
@@ -269,59 +284,140 @@ data: {
             dataIndex: 'image',
             render: (text: any, record: any, index: number) => (
                 <>
-                    <Upload {...getPropsImgThumbnail(index)}
+                    <Upload
+                        {...getPropsImgThumbnail(index)}
+                        onChange={(info) => {
+                            if (info.file.status === 'done') {
+                                const imageUrl = info.file.response.secure_url;
+                                setVariants(prevVariants => {
+                                    const newVariants = [...prevVariants];
+                                    newVariants[index] = { ...newVariants[index], image: imageUrl };
+                                    return newVariants;
+                                });
+                            }
+                        }}
                     >
                         <Button icon={<UploadOutlined />}>Tải lên ảnh</Button>
                     </Upload>
-                    {id ? variants && variants[index] && variants[index].image && (
-                        <img
-                            src={variants[index].image}
-                            alt="Uploaded"
-                            style={{ marginTop: 16, width: 100, marginBottom: '10px' }}
-                        />
-                    ) : ''}
+                    {
+                        productShow?.galleries && (
+                            <div className="flex">
+                                {
+                                    productShow?.variants?.map((e: any) => (
+                                        <>
+                                            <img src={e.image} alt="Uploaded" style={{ marginTop: 16, width: 30, height: '30px', marginBottom: '10px' }} />
+                                        </>
+                                    ))
+                                }
+                            </div>
+                        )
+                    }
                 </>
             )
         },
+        // {
+        //     title: 'Price Regular',
+        //     dataIndex: 'price_regular',
+        //     render: (text: any, record: any, index: number) => {
+        //         // Loại bỏ image khỏi record
+        //         const { image, ...otherAttributes } = record;
+        //         const matchingVariant = variants.find((variant: any) => {
+        //             return Object.keys(otherAttributes).every((key) => variant.attributes[key] === otherAttributes[key]);
+        //         });
+        //         return (
+        //             <Input
+        //                 value={matchingVariant?.price_regular || ''}  // Chỉ hiển thị giá trị price_regular
+        //                 onChange={(e) => handleInputChange(index, 'price_regular', e.target.value)}
+        //             />
+        //         );
+        //     }
+        // },
         {
             title: 'Price Regular',
             dataIndex: 'price_regular',
-            render: (text: any, record: any, index: number) => (
-<Input
-                    value={variants[index]?.price_regular || ''}
-                    onChange={(e) => handleInputChange(index, 'price_regular', e.target.value)}
-                />
-            )
+            render: (text: any, record: any, index: number) => {
+                const { image, ...otherAttributes } = record;
+
+                // Tìm variant khớp với các thuộc tính
+                const matchingVariant = variants.find((variant: any) => {
+                    return Object.keys(otherAttributes).every(
+                        (key) => variant.attributes[key] === otherAttributes[key]
+                    );
+                });
+
+                return (
+                    <Input
+                        value={matchingVariant?.price_regular || ''}
+                        onChange={(e) => handleInputChange(index, 'price_regular', e.target.value)}
+                    />
+                );
+            }
         },
         {
             title: 'Price Sale',
             dataIndex: 'price_sale',
-            render: (text: any, record: any, index: number) => (
-                <Input
-                    value={variants[index]?.price_sale || ''}
-                    onChange={(e) => handleInputChange(index, 'price_sale', e.target.value)}
-                />
-            )
+            render: (text: any, record: any, index: number) => {
+                // Tách image ra khỏi record, chỉ lấy các thuộc tính còn lại
+                const { image, ...otherAttributes } = record;
+
+                // Tìm variant trong mảng variants với thuộc tính matching
+                const matchingVariant = variants.find((variant: any) => {
+                    return Object.keys(otherAttributes).every((key) => variant.attributes[key] === otherAttributes[key]);
+                });
+
+                console.log("matchingVariant for Price Sale", matchingVariant);
+
+                return (
+                    <Input
+                        defaultValue={matchingVariant?.price_sale || ''}  // Lấy giá trị price_sale từ matchingVariant
+                        onChange={(e) => handleInputChange(index, 'price_sale', e.target.value)}  // Hàm để xử lý thay đổi
+                    />
+                );
+            }
         },
         {
             title: 'Số lượng',
             dataIndex: 'quantity',
-            render: (text: any, record: any, index: number) => (
-                <Input
-                    value={variants[index]?.quantity || ''}
-                    onChange={(e) => handleInputChange(index, 'quantity', e.target.value)}
-                />
-            )
+            render: (text: any, record: any, index: number) => {
+                // Tách image ra khỏi record, chỉ lấy các thuộc tính còn lại
+                const { image, ...otherAttributes } = record;
+
+                // Tìm variant trong mảng variants với thuộc tính matching
+                const matchingVariant = variants.find((variant: any) => {
+                    return Object.keys(otherAttributes).every((key) => variant.attributes[key] === otherAttributes[key]);
+                });
+
+                console.log("matchingVariant for Quantity", matchingVariant);
+
+                return (
+                    <Input
+                        defaultValue={matchingVariant?.quantity || ''}  // Lấy giá trị quantity từ matchingVariant
+                        onChange={(e) => handleInputChange(index, 'quantity', e.target.value)}  // Hàm để xử lý thay đổi
+                    />
+                );
+            }
         },
         {
             title: 'SKU',
             dataIndex: 'sku',
-            render: (text: any, record: any, index: number) => (
-                <Input
-                    value={variants[index]?.sku || ''}
-                    onChange={(e) => handleInputChange(index, 'sku', e.target.value)}
-                />
-            )
+            render: (text: any, record: any, index: number) => {
+                // Tách image ra khỏi record, chỉ lấy các thuộc tính còn lại
+                const { image, ...otherAttributes } = record;
+
+                // Tìm variant trong mảng variants với thuộc tính matching
+                const matchingVariant = variants.find((variant: any) => {
+                    return Object.keys(otherAttributes).every((key) => variant.attributes[key] === otherAttributes[key]);
+                });
+
+                console.log("matchingVariant for SKU", matchingVariant);
+
+                return (
+                    <Input
+                        defaultValue={matchingVariant?.sku || ''}  // Lấy giá trị sku từ matchingVariant
+                        onChange={(e) => handleInputChange(index, 'sku', e.target.value)}  // Hàm để xử lý thay đổi
+                    />
+                );
+            }
         }
 
     ];
@@ -340,33 +436,39 @@ data: {
         },
         enabled: !!id
     });
-
     const getProduct = (productShow: any) => {
-
         const productTags = productShow.tags.map((tag: any) => tag.id);
         const productType = productShow.type ? 1 : 0;
         const productAttribute = productShow.attributes.map((attribute: any) => attribute.id);
+
+        // Chuyển các attribute_item_ids thành một object để dễ dàng lấy giá trị của từng attribute
         const productAttributeValue = productShow.attributes.reduce((acc: any, attribute: any) => {
             acc[attribute.id] = attribute.pivot.attribute_item_ids;
             return acc;
         }, {});
+
         const initialGalleryFiles = (productShow.gallery || []).map((galleryItem: any, index: number) => ({
             uid: String(galleryItem.id || index),
             name: galleryItem.image.substring(galleryItem.image.lastIndexOf('/') + 1),
             status: 'done',
             url: galleryItem.image,
         }));
+
+        // Thiết lập dữ liệu cho gallery, attributes, và variants
         setImageGaller(initialGalleryFiles.map((item: any) => item.url));
         setAttribute(productType);
         setSelectedAttributeChildren(productAttribute);
         setSelectedValues(productAttributeValue);
+
+        // Xử lý variants và cập nhật theo id_guid
         const initialItems = productShow.variants.map((item: any) => {
             const itemAttributes = productAttribute.reduce((acc: any, attrId: any) => {
                 acc[attrId] = item[attrId] || [];
                 return acc;
-}, {});
+            }, {});
 
             return {
+                id_guid: item.id_guid,
                 price_regular: item.price_regular,
                 price_sale: item.price_sale,
                 quantity: item.quantity,
@@ -374,19 +476,67 @@ data: {
                 ...itemAttributes
             };
         });
+
         setSelectedItems(initialItems);
-        const initialVariants = productShow.variants.map((variant: any) => ({
-            image: variant.image || '',
-            price_regular: variant.price_regular || '',
-            price_sale: variant.price_sale || '',
-            quantity: variant.quantity || '',
-            sku: variant.sku || ''
-        }));
-        setVariants(initialVariants);
+
+
+        // Xử lý variants và so sánh attributes với selectedItems
+        const initialVariants = productShow.variants.map((variant: any) => {
+
+            // Chuyển đổi attributes thành đối tượng key-value với id làm key và value từ pivot
+            const variantAttributes = variant.attributes.reduce((acc: any, attribute: any) => {
+                const { id, pivot } = attribute;
+                const value = pivot ? pivot.value : null;
+
+                if (value) {
+                    acc[id] = value; // Thêm giá trị vào đối tượng với id làm khóa
+                }
+
+                return acc;
+            }, {});
+
+
+            // Tìm xem variantAttributes có trùng với selectedItems không
+            const matchingItem = selectedItems.find((selectedItem: any) => {
+                // Kiểm tra nếu attributes của variant khớp với selectedItem
+                return Object.keys(variantAttributes).every(attrId => selectedItem[attrId] === variantAttributes[attrId]);
+            });
+
+            if (matchingItem) {
+                // Nếu có trùng, trả về item đã đồng bộ
+                return {
+                    ...matchingItem,
+                    id_guid: variant.id_guid,
+                    image: variant.image || '',
+                    price_regular: variant.price_regular || '',
+                    price_sale: variant.price_sale || '',
+                    quantity: variant.quantity || '',
+                    sku: variant.sku || '',
+                    attributes: variantAttributes, // Đồng bộ attributes
+                };
+            } else {
+                // Nếu không có trùng, giữ nguyên thông tin variant
+                return {
+                    id_guid: variant.id_guid,
+                    image: variant.image || '',
+                    price_regular: variant.price_regular || '',
+                    price_sale: variant.price_sale || '',
+                    quantity: variant.quantity || '',
+                    sku: variant.sku || '',
+                    attributes: variantAttributes,
+                };
+            }
+        });
+
+        setVariants(initialVariants);  // Cập nhật state variants
+
+        // Cập nhật trạng thái các flag (status, home, trend, new)
         setValueStatus(productShow.status ? 1 : 0);
         setValueHome(productShow.is_show_home ? 1 : 0);
         setValueTrend(productShow.trend ? 1 : 0);
         setValueNew(productShow.is_new ? 1 : 0);
+
+        // Cập nhật form với dữ liệu mới
         form.setFieldsValue({
             ...productShow,
             status: productShow.status ? 1 : 0,
@@ -397,15 +547,21 @@ data: {
             type: productType,
             attribute_id: productAttribute,
             gallery: initialGalleryFiles.map((item: any) => item.url),
-            variants: initialVariants,
-            ...productAttributeValue,
+            variants: initialVariants,  // Điền thông tin variants đã được chuẩn hóa
+            ...productAttributeValue,  // Điền các thuộc tính của sản phẩm vào form
         });
 
+        // Cập nhật selectedValues và các attribute
         productAttribute.forEach((attrId: any) => {
             const values = productAttributeValue[attrId] || [];
             handleChangeAttributeItem(attrId, values);
         });
     };
+
+    console.log("variants", variants)
+
+
+
     useEffect(() => {
         if (productShow) {
             getProduct(productShow);
@@ -438,11 +594,13 @@ data: {
                 setVariants(prev => {
                     const newVariants = [...prev];
                     newVariants[index] = {
-price_regular: '',
+                        id_guid: '',
+                        price_regular: '',
                         price_sale: '',
                         quantity: '',
                         sku: '',
                         image: '',
+                        attributes: '',
                     };
                     return newVariants;
                 });
@@ -518,7 +676,7 @@ price_regular: '',
                 quantity: Number(variant?.quantity),
                 image: variant?.image,
                 sku: variant?.sku,
-                IdGuid: generateGUID()
+                id_guid: generateGUID()
             });
         });
 
@@ -554,6 +712,7 @@ price_regular: '',
         }
     };
 
+    // const dataVariant = [...selectedItems, ...variants];
     return (
         <div className="p-6 min-h-screen">
             <div className="flex items-center justify-between mb-6">
@@ -591,7 +750,7 @@ price_regular: '',
 
                                 {error?.tags && <div className='text-red-600'>{error.tags.join(', ')}</div>}
                             </Form.Item>
-<Form.Item name="brand_id" label="Thương hiệu" className="col-span-1">
+                            <Form.Item name="brand_id" label="Thương hiệu" className="col-span-1">
                                 <Select
                                     size='large'
                                     options={data?.brand.map((item: any) => ({
@@ -627,7 +786,6 @@ price_regular: '',
                             <Form.Item name="img_thumbnail" label="Ảnh sản phẩm" >
                                 <Upload
                                     {...propsImgThumbnail}
-
                                 >
                                     <Button icon={<UploadOutlined />}>Tải lên ảnh</Button>
                                 </Upload>
@@ -638,7 +796,7 @@ price_regular: '',
                                 ) : (
                                     productShow?.img_thumbnail && (
                                         <>
-<img src={productShow.img_thumbnail} alt="Uploaded" style={{ marginTop: 16, width: 100, marginBottom: '10px' }} />
+                                            <img src={productShow.img_thumbnail} alt="Uploaded" style={{ marginTop: 16, width: 100, marginBottom: '10px' }} />
                                         </>
                                     )
                                 )}
@@ -650,30 +808,25 @@ price_regular: '',
                                 label="Chọn mảng nhiều ảnh"
                                 className="col-span-1"
                             >
-                                <Upload
-                                    {...propsGallery}
-                                >
+                                <Upload {...propsGallery}>
                                     <Button icon={<UploadOutlined />}>Tải lên gallery</Button>
                                 </Upload>
-                                {
-                                    // imageGallery ? (
-                                    //     <img src={`${imageGallery}`} alt="Uploaded" style={{ marginTop: 16, width: 100, marginBottom: '10px' }} />
-                                    // ) : (
-                                    productShow?.gallery && (
-                                        <>
-                                            {
-                                                productShow?.gallery?.map((e: any) => (
-                                                    <>
-                                                        <img src={e.image} alt="Uploaded" style={{ marginTop: 16, width: 100, marginBottom: '10px' }} />
-                                                    </>
-                                                ))
-                                            }
-                                        </>
-                                    )
-                                    // )
-                                }
-                                {error?.gallery && <div className='text-red-600'>{error.gallery.join(', ')}</div>}
+                                {productShow?.galleries && (
+                                    <>
+                                        {productShow.galleries.map((e: any) => (
+                                            <div >
+                                                <img
+                                                    src={e.image}
+                                                    style={{ marginTop: 16, width: 100, marginBottom: '10px' }}
+                                                />
+                                            </div>
+                                        ))}
+                                    </>
+                                )}
+
+                                {error?.gallery && <div className="text-red-600">{error.gallery.join(', ')}</div>}
                             </Form.Item>
+
                             <Form.Item name="type" label="Kiểu sản phẩm" className="col-span-3">
                                 <Select
                                     value={productShow?.type ? 1 : 0}
@@ -687,7 +840,7 @@ price_regular: '',
                                 />
                                 {error?.type && <div className='text-red-600'>{error.type.join(', ')}</div>}
                             </Form.Item>
-<Form.Item className="col-span-3">
+                            <Form.Item className="col-span-3">
                                 {attribute == 1 && (
                                     <Form.Item name="attribute_id" label="Chọn thuộc tính">
                                         <Select
@@ -732,7 +885,7 @@ price_regular: '',
                                         setSelectedAttributeChildren([]);
                                         setSelectedValues({});
                                         setIsTableVisible(false);
-setAttribute(0)
+                                        setAttribute(0)
                                         form.resetFields();
                                     }}>Hủy</Button>
                                 } */}
@@ -781,7 +934,7 @@ setAttribute(0)
                                 <div className="border border-gray-300 rounded-lg p-4 flex items-center space-x-4">
                                     <Radio.Group onChange={onChangeStatus} value={valueStatus} className="flex space-x-4">
                                         <Radio
-value={1}
+                                            value={1}
                                             className="text-lg font-semibold focus:outline-none"
                                         >
                                             Còn hàng
@@ -833,7 +986,7 @@ value={1}
                                         </Radio>
                                     </Radio.Group>
                                 </div>
-</Form.Item>
+                            </Form.Item>
                             <Form.Item name="is_new" label="Is New" className="col-span-1" >
                                 <div className="border border-gray-300 rounded-lg p-4 flex items-center space-x-4">
                                     <Radio.Group onChange={onChangeNew} value={valueNew} className="flex space-x-4">

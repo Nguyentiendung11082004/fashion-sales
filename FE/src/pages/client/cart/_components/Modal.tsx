@@ -22,11 +22,9 @@ const ModalCart = ({
   attributes,
 }: Props) => {
   const { token } = useAuth();
-  console.log("attributes", attributes);
   const [activeAttributes, setActiveAttributes] = useState<any>({});
   const [currentPrice, setCurrentPrice] = useState<number | null>(null);
   const transformAttributes = (attributes: any) => {
-    console.log("attributes", attributes);
     return (Array.isArray(attributes) ? attributes : []).reduce(
       (acc: any, curr: any) => {
         acc[curr.name] = curr.pivot.attribute_item_id.toString();
@@ -38,7 +36,6 @@ const ModalCart = ({
   const [dataAttributes, setAttribute] = useState<any>(
     transformAttributes(attributes)
   );
-  console.log("dataAttributes", dataAttributes);
   useEffect(() => {
     if (open && attributes) {
       setAttribute(transformAttributes(attributes));
@@ -101,27 +98,29 @@ const ModalCart = ({
       );
     },
   });
-  // console.log("cartAttribute", cartAttribute);
 
-  const formattedAttributes = cartAttribute
-    ? cartAttribute.cart_item.product.variants?.map((item: any) => {
-        const attributeObj: { [key: string]: number } = {};
-        item.attributes.forEach((attribute: any) => {
-          attributeObj[attribute.name] = attribute.pivot.attribute_item_id;
-        });
-        return {
-          ...attributeObj,
-          price_sale: item.price_sale,
-        };
-      })
+  const formattedAttributes = cartAttribute ? cartAttribute.cart_item?.product?.variants
+    ?.filter((item: any) =>
+      item.quantity > 0
+    )
+    ?.map((item: any) => {
+      const attributeObj: { [key: string]: number } = {};
+      item.attributes.forEach((attribute: any) => {
+        attributeObj[attribute.name] = attribute.pivot.attribute_item_id;
+      });
+      return {
+        ...attributeObj,
+        price_sale: item.price_sale,
+      };
+    })
     : [];
-  console.log("formattedAttributes", formattedAttributes);
 
   const dataAttribute = cartAttribute?.getuniqueattributes;
 
   const checkDisable = (attribute: string, value: any) => {
     let result = false;
     // eslint-disable-next-line prefer-const
+
     let matchingItems = formattedAttributes.filter((x: any) => {
       return Object.keys(dataAttributes).every((key) => {
         if (key !== attribute) {
@@ -153,8 +152,6 @@ const ModalCart = ({
       })),
     })
   );
-  console.log("resultDataAttribute", resultDataAttribute);
-
   const handleConfirm = (idCart: any) => {
     onUpdateAttributes(idCart, { ...activeAttributes, dataAttributes });
     let qty = cartAttribute?.cart_item?.quantity;
@@ -189,7 +186,7 @@ const ModalCart = ({
           <span className="text-2xl text-[#696969] mb-4">
             {FormatMoney(
               currentPrice ||
-                cartAttribute?.cart_item?.productvariant?.price_sale
+              cartAttribute?.cart_item?.productvariant?.price_sale
             )}
           </span>
           {resultDataAttribute.map((e) => (

@@ -18,8 +18,7 @@ const CartPopup = forwardRef((props: any, ref) => {
   const { idProduct, setIdProduct }: any = props;
   const [product, setProduct] = useState<any>();
 
-  const [selectedAttributes, setSelectedAttributes] = useState<{
-    product_variant: Record<string, string | number>;
+  const [selectedAttributes, setSelectedAttributes] = useState<{ product_variant: Record<string, string | number>;
   }>({
     product_variant: {},
   });
@@ -38,8 +37,10 @@ const CartPopup = forwardRef((props: any, ref) => {
     enabled: !!idProduct,
   });
 
+
   const getUniqueAttributes = data?.getUniqueAttributes;
 
+  console.log("data", data)
   useEffect(() => {
     if (data && data.product) {
       setProduct(data.product);
@@ -60,7 +61,7 @@ const CartPopup = forwardRef((props: any, ref) => {
   };
 
   const result = product?.variants
-    .filter(
+    ?.filter(
       (variant: any) =>
         variant.attributes &&
         variant.attributes.length > 0 &&
@@ -76,7 +77,6 @@ const CartPopup = forwardRef((props: any, ref) => {
       );
       return attributeObj;
     });
-
   const checkDisable = (attribute: string, value: any) => {
     let res = false;
 
@@ -86,7 +86,7 @@ const CartPopup = forwardRef((props: any, ref) => {
           return (
             x[key] &&
             x[key].toString() ===
-              selectedAttributes?.product_variant[key].toString()
+            selectedAttributes?.product_variant[key].toString()
           );
         }
         return true;
@@ -217,13 +217,12 @@ const CartPopup = forwardRef((props: any, ref) => {
                     return (
                       <div
                         key={item.id}
-                        className={`${
-                          isSelected
-                            ? "border-black "
-                            : isDisabled
-                              ? "border-gray-200 opacity-50 cursor-not-allowed"
-                              : "border-2"
-                        } rounded-full cursor-pointer border-2`}
+                        className={`${isSelected
+                          ? "border-black "
+                          : isDisabled
+                            ? "border-gray-200 opacity-50 cursor-not-allowed"
+                            : "border-2"
+                          } rounded-full cursor-pointer border-2`}
                       >
                         <div
                           className="flex items-center justify-center w-[60px] h-8"

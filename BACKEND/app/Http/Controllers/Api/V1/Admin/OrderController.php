@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1\Admin;
 
+use App\Http\Controllers\Api\V1\Service\OrderGHNController;
 use App\Models\Order;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
@@ -14,31 +15,31 @@ class OrderController extends Controller
     /**
      * Display a listing of the resource.
      */
-   
-    public function index()
-{
-    try {
-      
-        Order::where('order_status', 'Giao hàng thành công')
-            ->whereDate('updated_at', '<', now()->subDays(3))
-            ->update(['order_status' => 'Hoàn thành']);
-        
-      
-        $orders = Order::with('orderDetails')  
-                        ->latest()  
-                        ->get();
 
-        // Trả lại dữ liệu cho frontend
-        return response()->json([
-            'message' => 'Thông tin đơn hàng',
-            'data' => $orders,  // Dữ liệu đơn hàng và chi tiết
-        ]);
-    } catch (\Exception $e) {
-        return response()->json([
-            'error' => 'Có lỗi xảy ra: ' . $e->getMessage(),
-        ], 500);
+    public function index()
+    {
+        try {
+
+            Order::where('order_status', 'Giao hàng thành công')
+                ->whereDate('updated_at', '<', now()->subDays(3))
+                ->update(['order_status' => 'Hoàn thành']);
+
+
+            $orders = Order::with('orderDetails')
+                ->latest()
+                ->get();
+
+            // Trả lại dữ liệu cho frontend
+            return response()->json([
+                'message' => 'Thông tin đơn hàng',
+                'data' => $orders,  // Dữ liệu đơn hàng và chi tiết
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Có lỗi xảy ra: ' . $e->getMessage(),
+            ], 500);
+        }
     }
-}
 
 
     /**
@@ -99,6 +100,9 @@ class OrderController extends Controller
     public function update(Request $request, $id)
     {
         try {
+            // $test=new OrderGHNController();
+            // dd($test->createOrder($id));
+
             $order = Order::findOrFail($id);
 
             $currentStatus = $order->order_status;
@@ -114,8 +118,8 @@ class OrderController extends Controller
                 'Hoàn thành' => 7,
                 'Đã nhận hàng' => 8
             ];
-            
-         
+
+
             if (is_numeric($newStatus) && in_array((int)$newStatus, $statusMap)) {
                 $newStatus = array_search((int)$newStatus, $statusMap);
             }
@@ -134,6 +138,7 @@ class OrderController extends Controller
             }
 
             if ($currentStatus === 'Đã xác nhận' && !in_array($newStatus, ['Đang vận chuyển', 'Đã hủy'])) {
+                
                 return response()->json(['message' => 'Trạng thái tiếp theo chỉ có thể là "Đang vận chuyển" hoặc "Đã hủy".'], Response::HTTP_BAD_REQUEST);
             }
 
@@ -141,7 +146,7 @@ class OrderController extends Controller
                 return response()->json(['message' => 'Khi đang vận chuyển, chỉ có thể cập nhật thành "Giao hàng thành công".'], Response::HTTP_BAD_REQUEST);
             }
 
-            if ($currentStatus === 'Giao hàng thành công' && !in_array($newStatus, ['Hoàn trả hàng','Đã nhận hàng', 'Hoàn thành'])) {
+            if ($currentStatus === 'Giao hàng thành công' && !in_array($newStatus, ['Hoàn trả hàng', 'Đã nhận hàng', 'Hoàn thành'])) {
                 return response()->json(['message' => 'Sau "Giao hàng thành công", chỉ có thể chuyển sang "Hoàn trả hàng" hoặc "Hoàn thành".'], Response::HTTP_BAD_REQUEST);
             }
 
@@ -152,8 +157,8 @@ class OrderController extends Controller
             if ($newStatus === 'Đã nhận hàng') {
                 $newStatus = 'Hoàn thành';
             }
-    
-          
+
+
 
             // Nếu có trạng thái mới từ request, thực hiện thay đổi trạng thái
             if ($newStatus && $newStatus !== $order->order_status) {

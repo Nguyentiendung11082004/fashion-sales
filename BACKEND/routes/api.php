@@ -35,6 +35,8 @@ use App\Http\Controllers\Api\V1\Client\InforUserController;
 use App\Http\Controllers\Api\V1\Client\ReturnController;
 use App\Http\Controllers\Api\V1\Client\SocialiteController;
 use App\Http\Controllers\Api\V1\Client\TryOnController;
+use App\Http\Controllers\Api\V1\Service\OrderGHNController;
+use App\Http\Controllers\Api\V1\Service\OrderPdfController;
 use App\Http\Controllers\API\V1\Service\PaymentController;
 
 /*
@@ -49,9 +51,9 @@ use App\Http\Controllers\API\V1\Service\PaymentController;
 */
 
 Route::prefix("v1/")->group(function () {
-        Route::middleware(['auth:sanctum', 'role:4'])->group(function () {
-        Route::resource('vouchers', VoucherController::class);
-    });
+    //     Route::middleware(['auth:sanctum', 'role:4'])->group(function () {
+    //     Route::resource('vouchers', VoucherController::class);
+    // });
 
     Route::resource("products", ProductController::class);
     Route::resource("comments", CommentsController::class);
@@ -59,7 +61,7 @@ Route::prefix("v1/")->group(function () {
     Route::resource("tags", TagController::class);
     Route::resource('employees', EmployeeController::class);
     Route::resource('clients', ClientController::class);
-    // Route::resource('vouchers', VoucherController::class);
+    Route::resource('vouchers', VoucherController::class);
     Route::apiResource('attribute', AttributeController::class);
     Route::apiResource('attributeItem', AttributeItemController::class);
     Route::apiResource('category', CategoryController::class);
@@ -124,9 +126,28 @@ Route::prefix("v1/")->group(function () {
     Route::post('try-on', [TryOnController::class, 'tryOn']);
 
     // thống kê
-    Route::post('getproductstatistics',[StatisticsController::class,"getProductStatistics"]);
-    Route::post('getorderstatistics',[StatisticsController::class,"getOrderStatistics"]);
-    Route::post('getrevenuestatistics',[StatisticsController::class,"getRevenueStatistics"]); 
+    Route::post('getproductstatistics', [StatisticsController::class, "getProductStatistics"]);
+    Route::post('getorderstatistics', [StatisticsController::class, "getOrderStatistics"]);
+    Route::post('getrevenuestatistics', [StatisticsController::class, "getRevenueStatistics"]);
+
+    // order create ghn
+    // Route::post('createorderghn', [OrderGHNController::class, 'createOrder']);
+    Route::get('ghn_get_order', [OrderGHNController::class, 'ghnGetOrder']);
+    Route::post('ghn_update_order', [OrderGHNController::class, 'ghnUpdateOrder']);
+
+
+    //test 
+    // Route::get('updatehh/{requestid}', [ReturnAdminController::class, 'updateOrder']);
+
+
+    //Quản lí hoàn đơn Admin
+    // Route::post('return-items/status/{returnItemId}', [ReturnAdminController::class, 'updateReturnItemStatus']);
+    Route::get('return-requests', [ReturnAdminController::class, 'getReturnRequests']);
+
+
+    //  xuất order pdf
+
+    Route::post("pdf-order", [OrderPdfController::class, "exportOrdersPDF"]);
 });
 
 Route::middleware('auth:sanctum')->prefix('v1/')->group(function () {
@@ -153,10 +174,16 @@ Route::middleware('auth:sanctum')->prefix('v1/')->group(function () {
     Route::delete('chat-message/{conversation}', [ChatController::class, "deleteMessage"]);
 
     Route::apiResource('comment', CommentController::class);
-    
+
     // hoàn trả hàng
     Route::post('return-requests/create', [ReturnController::class, 'createReturnRequest']);
-    Route::post('return-requests/cancel', [ReturnController::class, 'cancelReturnItems']);
-    Route::post('return-requests/action', [ReturnAdminController::class, 'handleReturnRequest']);
-    
+    Route::post('return-requests/cancel', [ReturnController::class, 'cancelReturnRequest']);
+
+    // admin hoàn trả
+    Route::post('return-items/status/{returnItemId}', [ReturnAdminController::class, 'updateReturnItemStatus']);
+    //list hoàn trả hàng client
+    Route::get('user/return-requests', [ReturnController::class, 'getUserReturnRequests'])
+        // Route::post('return-requests/action', [ReturnAdminController::class, 'handleReturnRequest']);
+
+    ;
 });

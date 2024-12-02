@@ -62,6 +62,7 @@ class StoreOrderRequest extends FormRequest
             'tinh'=> 'required|string|max:255',
             'ship_user_address' => 'required|string|max:255',
             'shipping_method' => 'required|string|max:50',
+            'shipping_fee' => 'required|numeric|min:0|regex:/^\d+(\.\d{1,2})?$/',
             'product_id' => 'required_without:cart_item_ids|integer|exists:products,id',
             'product_variant_id' => 'required_if:is_variant,true|integer|exists:product_variants,id|nullable',
             'quantity' => 'required_without:cart_item_ids|integer|min:1',

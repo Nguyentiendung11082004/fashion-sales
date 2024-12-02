@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderDetail;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
@@ -104,10 +105,34 @@ class StatisticsController extends Controller
         }
     }
 
+    // thống kê user
+    public function getTotalUsers($request)
+    {
+        try {
+            // Bắt đầu truy vấn với model User
+            $query = User::query();
+
+            // Áp dụng bộ lọc ngày
+            $this->applyDateFilter($query, $request, 'created_at');
+
+            // Đếm tổng số người dùng
+            $totalUsers = $query->count();
+
+            return  $totalUsers;
+        } catch (\Exception $e) {
+            // Xử lý lỗi nếu có
+            return [
+                'success' => false,
+                'message' => $e->getMessage(),
+            ];
+        }
+    }
+
     // Thống kê doanh thu
     public function getRevenueStatistics(Request $request)
     {
         try {
+
             // Khởi tạo truy vấn cơ bản
             $query = OrderDetail::select(
                 'order_details.product_id',
@@ -172,6 +197,7 @@ class StatisticsController extends Controller
             return response()->json([
                 'status' => 'success',
                 'total_revenue' => $totalRevenue,
+                'totalUsers' => $this->getTotalUsers($request),
                 'data' => $result,
             ], 200);
         } catch (\Exception $e) {
@@ -188,29 +214,29 @@ class StatisticsController extends Controller
         try {
             // Tạo query cơ bản cho Order
             $ordersQuery = Order::query();
-    
+
             // Áp dụng bộ lọc thời gian
             $this->applyDateFilter($ordersQuery, $request, 'created_at');
-    
+
             // Clone query ban đầu để tránh bị ảnh hưởng bởi groupBy
             $orderIdsQuery = clone $ordersQuery;
-    
+
             // Thống kê số lượng đơn hàng theo trạng thái
             $orderCountsByStatus = $ordersQuery
                 ->select('order_status', DB::raw('count(*) as total_orders'))
                 ->groupBy('order_status')
                 ->get();
-    
+
             // Lọc số lượng sản phẩm trong các đơn hàng dựa trên bộ lọc thời gian
             $orderIds = $orderIdsQuery->pluck('id'); // Tách riêng query để lấy ID
             $totalQuantityInOrder = OrderDetail::whereIn('order_id', $orderIds)->sum('quantity');
-    
+
             // Tạo kết quả trả về
             $result = [
                 'order_counts_by_status' => $orderCountsByStatus,
                 'total_quantity_in_order' => $totalQuantityInOrder,
             ];
-    
+
             return response()->json($result);
         } catch (\Exception $ex) {
             return response()->json([
@@ -218,7 +244,7 @@ class StatisticsController extends Controller
             ], 500);
         }
     }
- 
+
     public function getProductStatistics(Request $request)
     {
         try {
@@ -336,13 +362,17 @@ class StatisticsController extends Controller
                         $statusIds = $this->getStatusIds($statuses);
                         if (empty($statusFilter) || !empty(array_intersect($statusFilter, $statusIds))) {
                             $variant->status = implode('|', $statuses);
+
                             return $variant;
-          }
+                        }
                         return null;
                     })
-                    ->filter(); // Loại bỏ các sản phẩm không khớp filter
-
+                    ->filter() // Loại bỏ các sản phẩm không khớp filter
+                    ->values() // Đặt lại chỉ số key để đảm bảo trả về là mảng
+                    ->toArray(); // Chuyển đổi Collection thành mảng
                 $results['variant_products'] = $variantProducts;
+                // dd($results['variant_products']);
+
             }
 
             // Trả về kết quả

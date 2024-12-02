@@ -15,7 +15,7 @@ import {
   productShow_client,
 } from "@/services/api/client/productClient.api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Button, Popconfirm } from "antd";
+import { Button, Modal, Popconfirm } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
@@ -34,6 +34,12 @@ const ProductDetail = () => {
   const productId = Number(id);
   const [product, setProduct] = useState<any>();
   const [selectedImage, setSelectedImage] = useState<string>();
+
+  // sửa bình luận
+  const closeFormCmt = () => {
+    setShowFormCmtOpen(false);
+  };
+  const [listIdProduct, setListIdProduct] = useState<any[]>([]);
 
   const { data, isLoading } = useQuery({
     queryKey: ["product", id],
@@ -149,6 +155,7 @@ const ProductDetail = () => {
     return sortedComments.map((comment) => {
       if (displayedComments.has(comment.id)) return null;
       displayedComments.add(comment.id);
+      // setListIdProduct([comment?.id]);
 
       const isChild = level >= 3;
       const hasChildren =
@@ -213,11 +220,30 @@ const ProductDetail = () => {
               {comment?.user_id === idUser && (
                 <>
                   <button
-                    onClick={() => onHandleEdit(comment?.id, comment)}
+                    onClick={() => {
+                      setListIdProduct([comment?.id]),
+                        onHandleEdit(comment?.id, comment);
+                    }}
                     className="font-bold text-[12px] text-blue-500 mr-2"
                   >
                     Sửa
                   </button>
+                  <Modal
+                    visible={isShowFormCmtOpen}
+                    onCancel={closeFormCmt}
+                    footer={null}
+                    centered
+                  >
+                    <CommentProduct
+                      listIdProduct={listIdProduct}
+                      setListIdProduct={setListIdProduct}
+                      editIdComment={editIdComment}
+                      InForCommentId={InForCommentId}
+                      isShowFormCmtOpen={isShowFormCmtOpen}
+                      dataProductIdQuery={data}
+                      setShowFormCmtOpen={setShowFormCmtOpen}
+                    />
+                  </Modal>
                   <Popconfirm
                     title="Xóa sản phẩm"
                     description="Bạn chắc chắn muốn xóa không?"
@@ -283,7 +309,6 @@ const ProductDetail = () => {
 
   useEffect(() => {
     if (imgPr) {
-      // setMainImage(imgPr);
       setSelectedImage(imgPr);
     }
   }, [imgPr, galleryImages]);
@@ -291,7 +316,6 @@ const ProductDetail = () => {
   const handleGalleryClick = (image: string) => {
     setSelectedImage(image);
     setMainImage(image);
-    // setPriceProduct({ priceMax: undefined, priceMin: undefined });
   };
   const { token } = useAuth();
 
@@ -415,6 +439,8 @@ const ProductDetail = () => {
       name,
     })),
   }));
+  const [isShowFormCmtOpen, setShowFormCmtOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   console.log("resultGetUniqueAttribute", resultGetUniqueAttribute);
   console.log("getUniqueAttributes", getUniqueAttributes);
@@ -422,11 +448,15 @@ const ProductDetail = () => {
   const [editIdComment, setEditIdComment] = useState<string | null>(null);
   const [InForCommentId, setInForCommentId] = useState<string | null>(null);
 
+  console.log("InForCommentId: ", InForCommentId);
+
   const onHandleEdit = (id: any, value: any) => {
     if (value.parent_id) {
       setReplyToCommentId(id);
     } else {
-      setActiveButton("comment");
+      setIsModalOpen(true);
+
+      setShowFormCmtOpen(true);
       setEditIdComment(id);
     }
     setInForCommentId(value);
@@ -464,7 +494,7 @@ const ProductDetail = () => {
     }
   };
 
-  if (isLoading) return <Loading/>;
+  if (isLoading) return <Loading />;
   // if (isError) return <p>{error.message}</p>;
 
   return (
@@ -487,23 +517,23 @@ const ProductDetail = () => {
             <div className="lg:flex lg:gap-3">
               <div className="lg:w-4/5 h-full w-full lg:order-2">
                 <div
-                  className="group lg:w-[550px] lg:h-[600px] h-full relative overflow-hidden"
+                  className="group lg:w-[500px] lg:h-[500px] h-full relative overflow-hidden"
                   onMouseMove={handleMouseMove}
                 >
                   <img
                     ref={imgRef}
                     alt="product detail"
                     data-nimg="fill"
-                    className="w-full lg:h-[100%] h-full lg:w-[550px] object-cover transition-transform ease-in-out duration-300 group-hover:scale-150"
-                    // src={mainImage || selectedImage}
-                    src={selectedImage}
+                    className="w-full lg:h-[100%] h-full lg:w-[500px] object-cover transition-transform ease-in-out duration-300 group-hover:scale-150"
+                    src={mainImage || selectedImage}
+                    // src={selectedImage}
                   />
                 </div>
               </div>
 
               {/* galleries */}
               <div
-                className="lg:order-1 hd-img-soft lg:w-1/5 w-full lg:h-[600px] max-h-[600px] overflow-x-auto lg:overflow-y-auto flex lg:flex-col flex-row"
+                className="  lg:order-1 hd-img-soft lg:w-1/5 w-full lg:h-[500px] max-h-[500px] overflow-x-auto lg:overflow-y-auto flex lg:flex-col flex-row"
                 onWheel={handleWheel}
                 ref={containerRef}
                 style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
@@ -515,14 +545,14 @@ const ProductDetail = () => {
                   galleryImages.map((value: any) => (
                     <img
                       key={value.id}
-                      alt={`Gallery image ${value.id}`}
-                      className="w-24 h-[150px] lg:w-auto flex-shrink-0 cursor-pointer"
+                      // alt={`Gallery image ${value.id}`}
+                      className="mb-2 w-24 h-[150px] lg:w-auto flex-shrink-0 cursor-pointer"
                       src={value.image}
                       onClick={() => handleGalleryClick(value.image)}
                     />
                   ))
                 ) : (
-                  <img src="" alt="" />
+                  <p>No images available</p> // Hoặc bạn có thể thay thế bằng placeholder khác
                 )}
               </div>
               {/* end galleries */}
@@ -532,13 +562,13 @@ const ProductDetail = () => {
           <div className="w-full lg:w-[45%] pt-10 lg:pt-0 lg:pl-7 xl:pl-9 2xl:pl-10 ">
             <div className="h-full">
               <div>
-                <h2 className="text-[16px] xl:text-start sm:text-center sm:text-3xl font-bold mb-3 ">
+                <h2 className="text-[16px] xl:text-start sm:text-center sm:text-3xl mb-3 ">
                   {product?.name}
                 </h2>
                 <div className="flex items-center mt-5 lg:mx-[15%] sm:mx-[42%] xl:mx-0 sm:mt-2 space-x-4">
                   <div className="">
-                    <span className="lg:text-xl sm:text-[25px] text-lg text-[#747474] my-2">
-                      {product?.price_sale} VNĐ
+                    <span className="lg:text-[18px] sm:text-[16px] text-lg text-[#747474] my-2">
+                      {product?.price_sale?.toLocaleString("vi-VN")} VNĐ
                     </span>
                   </div>
 
@@ -569,7 +599,7 @@ const ProductDetail = () => {
                     </Link>
                   </div>
                 </div>
-                <p className="mt-4 hd-all-text grey  mb-3">
+                <p className="mt-1 hd-all-text grey text-sm">
                   {product?.description_title}
                 </p>
               </div>
@@ -609,10 +639,10 @@ const ProductDetail = () => {
                             return (
                               <div
                                 key={item.id}
-                                className={`relative flex-1 max-w-[60px] h-8 sm:h-9 rounded-full cursor-pointer flex items-center justify-center
+                                className={`relative flex-1 max-w-[70px] h-6 sm:h-9 rounded-full cursor-pointer flex items-center justify-center
                                    ${
                                      isSelected
-                                       ? "border-gray-800 border-4"
+                                       ? "border-gray-800 border-2"
                                        : isDisabled
                                          ? "border-gray-200 border-2 opacity-50 cursor-not-allowed"
                                          : ""
@@ -640,7 +670,7 @@ const ProductDetail = () => {
                                 }}
                               >
                                 {key.attribute !== "color" && (
-                                  <div className="absolute inset-0 rounded-full flex items-center justify-center overflow-hidden z-0 bg-gray-300 text-sm md:text-base text-center">
+                                  <div className="absolute inset-0 rounded-full flex items-center justify-center overflow-hidden z-0 bg-gray-300 text-[8px] md:text-base text-center">
                                     {item.name}
                                   </div>
                                 )}
@@ -805,21 +835,6 @@ const ProductDetail = () => {
                 } btn_cmt text-[10px] lg:text-base font-medium cursor-pointer lg:py-2 lg:px-6 px-2 py-2 rounded-full`}
               >
                 Xem đánh giá sản phẩm
-              </button>
-              <button
-                onClick={() => {
-                  handleButtonClick("comment"), setEditIdComment(null);
-                  setInForCommentId(null);
-                  setReplyToCommentId(null);
-                  setInForCommentId("");
-                }}
-                className={`${
-                  activeButton === "comment"
-                    ? "border-black text-black border-2"
-                    : "border-black text-[#8e8e8e]"
-                } btn_cmt text-[10px] lg:text-base font-medium cursor-pointer lg:py-2 lg:px-6 px-2 py-2 rounded-full`}
-              >
-                Viết bình luận
               </button>
             </div>
 

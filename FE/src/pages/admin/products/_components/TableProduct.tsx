@@ -84,7 +84,6 @@ const columns: ColumnType<any>[] = [
     render: (attributes: string) => <span>{attributes}</span>,
   }
 ];
-
 const TableProduct: React.FC = () => {
   const [filter, setFilter] = useState<{
     type: number[];
@@ -115,7 +114,7 @@ const TableProduct: React.FC = () => {
       type: value
     }));
   };
-  const variantProducts = dataProduct?.variant_products?.map((item: any) => ({
+  const variantProducts = (dataProduct?.variant_products || [])?.map((item: any) => ({
     key: item.variant_id,
     name: item.product_name + ' - ' + item.variant_sku,
     sku: item.variant_sku,
@@ -124,7 +123,7 @@ const TableProduct: React.FC = () => {
     status: item.status,
     attributes: item.attributes.map((attr: any) => `${attr.attribute_name}: ${attr.attribute_value}`).join(", "),
   })) || [];
-
+  console.log("variantProducts", variantProducts)
   const simpleProducts = Object.values(dataProduct?.simple_products || {}).map((item: any) => ({
     key: item.id,
     name: item.name,

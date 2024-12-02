@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import instance from "@/configs/axios";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ReactNode, createContext, useContext } from "react";
+import { ReactNode, createContext, useContext, useState } from "react";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import { useAuth } from "../Auth/AuthContext";
@@ -10,6 +10,7 @@ const MySwal = withReactContent(Swal);
 interface CartContextType {
   data: any;
   isLoading: boolean;
+  activateCart: () => void; 
   addToCart: (
     idProduct: number,
     idProductVariant: number,
@@ -30,20 +31,30 @@ export const useCart = () => {
 };
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
+  const [isActive, setIsActive] = useState(false); 
   const { token } = useAuth();
   const queryClient = useQueryClient();
+
   const { data, isLoading } = useQuery({
     queryKey: ["cart"],
     queryFn: async () => {
-      const res = await instance.get("/cart", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      return res.data;
+      if(token) {
+        const res = await instance.get("/cart", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        return res.data;
+      }
     },
-    enabled: !!token,
+    enabled: !!token && isActive,
   });
+
+  const activateCart = () => {
+    if (!isActive) {
+      setIsActive(true); 
+    }
+  };
 
   const addCartMutation = useMutation({
     mutationFn: async ({
@@ -70,6 +81,9 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       );
     },
     onSuccess: () => {
+      if (!isActive) {
+        setIsActive(true);
+      }
       queryClient.invalidateQueries({
         queryKey: ["cart"],
       });
@@ -99,6 +113,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     idProductVariant: number,
     quantity: number
   ) => {
+    activateCart();
     addCartMutation.mutate({ idProduct, idProductVariant, quantity });
   };
 
@@ -128,18 +143,20 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   });
 
   const handleIncrease = (idCart: number, currentQuantity: number) => {
+    activateCart();
     const newQuantity = currentQuantity + 1;
     updateQuantity.mutate({ idCart, newQuantity });
   };
 
   const handleDecrease = (idCart: number, currentQuantity: number) => {
+    activateCart();
     const newQuantity = currentQuantity > 1 ? currentQuantity - 1 : 1;
     updateQuantity.mutate({ idCart, newQuantity });
   };
 
   return (
     <CartContext.Provider
-      value={{ data, isLoading, addToCart, handleIncrease, handleDecrease }}
+      value={{ data, isLoading, activateCart, addToCart, handleIncrease, handleDecrease }}
     >
       {children}
     </CartContext.Provider>
