@@ -1,17 +1,19 @@
-import { Outlet } from "react-router-dom"
-import Header from "../../components/website/Header"
-import Footer from "../../components/website/Footer"
-
-
+import { Outlet, useLocation } from "react-router-dom";
+import Header from "../../components/website/Header";
+import Footer from "../../components/website/Footer";
 
 const LayoutWebsite = () => {
+  const location = useLocation();
+  const hideFooterRoutes = ["/requestOrder", "/return/request_order"];
+  const shouldHideFooter = hideFooterRoutes.includes(location.pathname);
+
   return (
     <div>
-        <Header />
-        <Outlet />
-        <Footer />
+      <Header />
+      <Outlet />
+      {!shouldHideFooter && <Footer />}
     </div>
-  )
-}
+  );
+};
 
-export default LayoutWebsite
+export default LayoutWebsite;

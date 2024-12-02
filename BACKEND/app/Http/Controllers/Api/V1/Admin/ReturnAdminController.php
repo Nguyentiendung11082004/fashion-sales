@@ -19,8 +19,11 @@ class ReturnAdminController extends Controller
     public function getReturnRequests(Request $request)
     {
         try {
-            // Lấy danh sách return_request cùng các item liên quan
-            $returnRequests = ReturnRequest::with(['items', 'order'])
+            // Lấy danh sách return_request cùng các item, đơn hàng và sản phẩm liên quan
+            $returnRequests = ReturnRequest::with([
+                'items.orderDetail.product', // Thêm chi tiết sản phẩm từ order_detail
+                'order'                      // Thông tin đơn hàng
+            ])
                 ->orderBy('created_at', 'desc')
                 ->get()
                 ->map(function ($returnRequest) {
@@ -32,12 +35,23 @@ class ReturnAdminController extends Controller
                         'status' => $returnRequest->status,
                         'created_at' => $returnRequest->created_at->format('Y-m-d H:i:s'),
                         'updated_at' => $returnRequest->updated_at->format('Y-m-d H:i:s'),
+                        'order' => [
+                            'id' => $returnRequest->order->id,
+                            'total_price' => $returnRequest->order->total_price,
+                            'status' => $returnRequest->order->status,
+                        ],
                         'items' => $returnRequest->items->map(function ($item) {
                             return [
                                 'id' => $item->id,
                                 'order_detail_id' => $item->order_detail_id,
                                 'quantity' => $item->quantity,
                                 'status' => $item->status,
+                                'product' => [
+                                    'id' => $item->orderDetail->product->id,
+                                    'name' => $item->orderDetail->product->name,
+                                    'price' => $item->orderDetail->product->price,
+                                    'sku' => $item->orderDetail->product->sku,
+                                ],
                             ];
                         }),
                     ];

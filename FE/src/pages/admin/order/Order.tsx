@@ -6,7 +6,7 @@ import { IVouchers } from "@/common/types/vouchers";
 import instance from "@/configs/axios";
 import { EyeOutlined } from "@ant-design/icons";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Button, Pagination, Select, Skeleton } from "antd";
+import { Button, Pagination, Select } from "antd";
 import Table, { ColumnType } from "antd/es/table";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
@@ -26,35 +26,74 @@ const OrderPage = () => {
       }
     },
   });
+
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+
+  const prinfOrderAll = async () => {
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/v1/pdf-order", {
+        method: "POST",
+      });
+      if (!response.ok) {
+        throw new Error("Không thể tải PDF");
+      }
+
+      const blob = await response.blob();
+
+      const blobUrl = URL.createObjectURL(blob);
+      setPdfUrl(blobUrl);
+    } catch (error) {
+      console.error(error);
+      toast.error("Có lỗi khi tải PDF");
+    }
+  };
+
+  const prinfOrderId = async (order_id: any) => {
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/v1/pdf-order", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ order_ids: [order_id] }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Không thể tải PDF");
+      }
+
+      const blob = await response.blob();
+
+      const blobUrl = URL.createObjectURL(blob);
+      setPdfUrl(blobUrl);
+    } catch (error: any) {
+      console.error(error);
+      toast.error("Có lỗi khi tải PDF");
+    }
+  };
+
   const queryClient = useQueryClient();
 
   const dataOrder = data?.data?.data;
-  console.log("data đơn hàng", dataOrder);
 
   const orStatus = {
     1: "Đang chờ xác nhận",
     2: "Đã xác nhận",
-    3: "Đang vận chuyển",
-    4: "Hoàn trả hàng",
+    3: "Đã hủy",
+    4: "Đang vận chuyển",
     5: "Giao hàng thành công",
-    6: "Đã hủy",
-    7: "Hoàn thành",
+    6: "Yêu cầu hoàn trả hàng",
+    7: "Hoàn trả hàng",
+    8: "Hoàn thành",
   };
   const handleUpdateStatus = async (orderId: number, status: string) => {
     try {
       console.log("orderId: ", orderId);
       console.log("status: ", status);
 
-      const orderToUpdate = dataOrder?.find(
-        (order: IOrder) => order.id === orderId
-      );
-
-      console.log("orderToUpdate: ", orderToUpdate);
-
       const response = await instance.put(`/order-status/${orderId}`, {
         order_status: status,
       });
-      console.log("response:", response);
 
       if (response.status === 200) {
         queryClient.invalidateQueries({ queryKey: ["order-status"] });
@@ -62,10 +101,13 @@ const OrderPage = () => {
         toast.success("Cập nhật trạng thái đơn hàng thành công!");
       } else {
         const errorMessage = response.data?.message;
+
         toast.error(errorMessage);
       }
     } catch (error: any) {
       if (error.response) {
+        queryClient.invalidateQueries({ queryKey: ["order-status"] });
+
         const errorMessage = error.response.data?.message;
         toast.error(errorMessage);
       } else {
@@ -132,17 +174,57 @@ const OrderPage = () => {
         </div>
       ),
     },
+
     {
       title: "Thao tác",
       fixed: "right",
       render: (record: IVouchers) => {
         return (
-          <div>
+          <div className="flex gap-2">
             <Link to={`${record?.id}`}>
-              <Button className="btn-info" style={{ width: "46px" }}>
-                <EyeOutlined className="" />
+              <Button className="btn-info w-12 flex items-center justify-center">
+                <EyeOutlined />
               </Button>
             </Link>
+            {/* <Link>
+              <Button className="  flex items-center justify-center bg-[red] text-white ">
+                Yêu cầu hoàn hàng
+              </Button>
+            </Link> */}
+            <Button
+              className="btn-info  flex items-center justify-center"
+              onClick={() => prinfOrderId(record?.id)}
+            >
+              Xuất hóa đơn
+            </Button>
+            {pdfUrl && (
+              <>
+                <div className="fixed inset-0 bg-gray-800 opacity-50 z-10"></div>
+
+                <div className="fixed inset-0 flex justify-center items-center z-20">
+                  <div className="w-full max-w-3xl bg-gray-100 border rounded-lg shadow-lg overflow-hidden p-4 relative">
+                    <button
+                      onClick={closePdfViewer}
+                      className="absolute top-1 right-1 text-white bg-red-600 rounded-full w-8 h-8 flex items-center justify-center border-2 border-red-600 transition-all duration-300 ease-in-out shadow-lg z-50"
+                    >
+                      <span className="text-xl font-bold transform">
+                        &times;
+                      </span>
+                    </button>
+
+                    <div className="relative w-full">
+                      <iframe
+                        src={pdfUrl}
+                        width="100%"
+                        height="600px"
+                        className="border-0 rounded-lg"
+                        title="PDF Invoice"
+                      ></iframe>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         );
       },
@@ -155,7 +237,9 @@ const OrderPage = () => {
       setHasError(true);
     }
   }, [isError, hasError]);
-
+  const closePdfViewer = () => {
+    setPdfUrl(null);
+  };
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>{error.message}</div>;
 
@@ -165,6 +249,44 @@ const OrderPage = () => {
         <h1 className="text-3xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2">
           Quản lí đơn hàng
         </h1>
+        <div>
+          <div className="flex ">
+            <Button
+              className="btn-info w-32 flex items-center justify-center"
+              onClick={() => prinfOrderAll()}
+            >
+              Hóa đơn
+            </Button>
+          </div>
+
+          <div>
+            {pdfUrl && (
+              <>
+                <div className="fixed inset-0 flex justify-center items-center z-20">
+                  <div className="w-full max-w-3xl bg-gray-100 border rounded-lg shadow-lg overflow-hidden p-4 relative">
+                    <button
+                      onClick={closePdfViewer}
+                      className="absolute top-1 right-1 text-white bg-red-600 rounded-full w-8 h-8 flex items-center justify-center border-2 border-red-600 transition-all duration-300 ease-in-out shadow-lg z-50"
+                    >
+                      <span className="text-xl font-bold transform">
+                        &times;
+                      </span>
+                    </button>
+                    <div className="relative w-full">
+                      <iframe
+                        src={pdfUrl}
+                        width="100%"
+                        height="600px"
+                        className="border-0 rounded-lg"
+                        title="PDF Invoice"
+                      ></iframe>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
       </div>
       <div className="">
         {isFetching ? (

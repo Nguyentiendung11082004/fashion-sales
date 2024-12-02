@@ -37,11 +37,7 @@ const FormPost = () => {
     queryKey: ["posts", id],
     queryFn: async () => {
       if (!id) return "";
-      const response = await instance.get(`/posts/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await instance.get(`/posts/${id}`, {});
       return response.data.data;
     },
     enabled: !!id,
@@ -236,11 +232,6 @@ const FormPost = () => {
             ""
           )}
 
-          <Form.Item name="slug" label="Slug">
-            <Input placeholder="Slug" />
-          </Form.Item>
-          {errors ? <div className=" text-red-600">{errors.slug}</div> : ""}
-
           <Form.Item label="Danh mục" name="category_id">
             <Select placeholder="Chọn danh mục">
               {listCategories?.map((category: any) => (
@@ -273,14 +264,14 @@ const FormPost = () => {
           {errors && <div className="text-red-600">{errors.status}</div>}
 
           {/* delete */}
-          <Form.Item name="post_view" label="post_view">
+          {/* <Form.Item name="post_view" label="post_view">
             <Input placeholder="" />
           </Form.Item>
           {errors ? (
             <div className=" text-red-600">{errors.post_view}</div>
           ) : (
             ""
-          )}
+          )} */}
           <Button
             htmlType="submit"
             type="primary"
