@@ -150,18 +150,17 @@ const Products = () => {
 
   useEffect(() => {
     if (saleFromLink) {
-      setIsSale(true); 
-      applyFilters(); 
+      setIsSale(true);
+      applyFilters();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [saleFromLink]);
 
   useEffect(() => {
     if (selectedCategoryId) {
-      setSelectedCategories([selectedCategoryId.toString()]); 
+      setSelectedCategories([selectedCategoryId.toString()]);
     }
   }, [selectedCategoryId]);
-  
 
   const handleCheckboxChange = (name: string, value: any) => {
     console.log(`Checkbox changed: ${name} -> ${value}`);
@@ -204,9 +203,9 @@ const Products = () => {
         break;
       case "sale":
         setIsSale((prev) => {
-          const newSale = !prev; 
+          const newSale = !prev;
           if (!newSale) {
-            navigate("/products");  
+            navigate("/products");
           }
           applyFilters();
           return newSale;
@@ -221,7 +220,6 @@ const Products = () => {
     applyFilters();
   }, [selectedCategories, selectedSizes, selectedColors, isSale]);
 
-
   const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchTerm(value);
@@ -235,21 +233,28 @@ const Products = () => {
     } else {
       const fetchSuggestions = async () => {
         const response = await instance.post("/product-shop", {
-          search: trimmedValue, // Gửi giá trị đã loại bỏ khoảng trắng đầu
+          search: trimmedValue, // Gửi mảng từ khóa lên server
         });
         const suggestionsData = response.data.products.map(
           (item: any) => item.product.name
         );
 
-        // Lọc gợi ý chỉ hiển thị những từ khóa bắt đầu bằng searchTerm (có phân biệt dấu)
-        const filteredSuggestions = suggestionsData.filter(
-          (suggestion: string) => {
-            const normalizedSuggestion = unorm.nfkd(suggestion.toLowerCase()); // Chuẩn hóa gợi ý
-            const normalizedValue = unorm.nfkd(trimmedValue.toLowerCase()); // Chuẩn hóa giá trị tìm kiếm
-            return normalizedSuggestion.startsWith(normalizedValue); // So sánh
-          }
-        );
-
+        const filteredSuggestions = suggestionsData.filter((suggestion: string) => {
+          const removeDiacritics = (str: string) =>
+            unorm.nfkd(str).replace(/[\u0300-\u036f]/g, "");
+        
+          const normalizedSuggestion = removeDiacritics(suggestion).toLowerCase();
+          const normalizedValue = removeDiacritics(trimmedValue).toLowerCase();
+        
+          console.log("Suggestion:", suggestion); 
+          console.log("Normalized Suggestion:", normalizedSuggestion);
+          console.log("Normalized Value:", normalizedValue);
+        
+          return normalizedSuggestion.startsWith(normalizedValue);
+        });
+        
+        console.log("Filtered Suggestions:", filteredSuggestions);        
+        
         setSuggestions(filteredSuggestions);
       };
       fetchSuggestions();
@@ -1322,8 +1327,10 @@ const Products = () => {
                                   if (minPriceSale > 0) {
                                     // Nếu có giá sale
                                     if (
-                                      productPriceSale &&
-                                      productPriceSale < productPriceRegular || productPriceSale === 0
+                                      (productPriceSale &&
+                                        productPriceSale <
+                                          productPriceRegular) ||
+                                      productPriceSale === 0
                                     ) {
                                       return (
                                         <>
