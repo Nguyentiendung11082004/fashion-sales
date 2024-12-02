@@ -130,12 +130,14 @@ class OrderController extends Controller
             $statusMap = [
                 'Đang chờ xác nhận' => 1,
                 'Đã xác nhận' => 2,
-                'Đang vận chuyển' => 3,
-                'Hoàn trả hàng' => 4,
+                'Đã hủy' => 3,
+                'Đang vận chuyển' => 4,
                 'Giao hàng thành công' => 5,
-                'Đã hủy' => 6,
-                'Hoàn thành' => 7,
-                'Đã nhận hàng' => 8
+                'Yêu cầu hoàn trả hàng'=> 6,
+                'Hoàn trả hàng' => 7,
+                'Hoàn thành' => 8,
+                'Đã nhận hàng' => 9,
+              
             ];
 
 
@@ -165,13 +167,13 @@ class OrderController extends Controller
                 return response()->json(['message' => 'Khi đang vận chuyển, chỉ có thể cập nhật thành "Giao hàng thành công".'], Response::HTTP_BAD_REQUEST);
             }
 
-            if ($currentStatus === 'Giao hàng thành công' && !in_array($newStatus, ['Hoàn trả hàng', 'Đã nhận hàng', 'Hoàn thành'])) {
-                return response()->json(['message' => 'Sau "Giao hàng thành công", chỉ có thể chuyển sang "Hoàn trả hàng" hoặc "Hoàn thành".'], Response::HTTP_BAD_REQUEST);
+            if ($currentStatus === 'Giao hàng thành công' && !in_array($newStatus, [ 'Đã nhận hàng', 'Hoàn thành'])) {
+                return response()->json(['message' => 'Sau "Giao hàng thành công", chỉ có thể chuyển sang "Hoàn thành".'], Response::HTTP_BAD_REQUEST);
             }
 
-            if ($currentStatus === 'Hoàn trả hàng' && $newStatus !== 'Hoàn thành') {
-                return response()->json(['message' => 'Từ "Hoàn trả hàng", chỉ có thể chuyển sang "Hoàn thành".'], Response::HTTP_BAD_REQUEST);
-            }
+            // if ($currentStatus === 'Hoàn trả hàng' && $newStatus !== 'Hoàn thành') {
+            //     return response()->json(['message' => 'Từ "Hoàn trả hàng", chỉ có thể chuyển sang "Hoàn thành".'], Response::HTTP_BAD_REQUEST);
+            // }
 
             if ($newStatus === 'Đã nhận hàng') {
                 $newStatus = 'Hoàn thành';
@@ -189,7 +191,12 @@ class OrderController extends Controller
             $order->save();
             if ($newStatus === 'Đang vận chuyển') {
                 $createOrder = new OrderGHNController();
-                $createOrder->createOrder($id);  // Gọi hàm tạo đơn hàng giao hàng nhanh với ID đơn hàng
+             $createResponse = $createOrder->createOrder($id);  // Gọi hàm tạo đơn hàng giao hàng nhanh với ID đơn hàng
+                // return response()->json([
+                //     // 'message' => 'Trạng thái đơn hàng được cập nhật thành công. Đơn hàng GHN đã được tạo.',
+                //     'message' =>  $createResponse  // Trả về kết quả từ GHN
+                // ], Response::HTTP_OK);
+                return $createResponse ;
             }
 
             return response()->json(['message' => 'Cập nhật trạng thái đơn hàng thành công.', 'order' => $order], Response::HTTP_OK);
