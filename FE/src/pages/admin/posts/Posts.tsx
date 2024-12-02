@@ -23,11 +23,7 @@ const Posts = () => {
   const { data, isLoading } = useQuery({
     queryKey: ["posts"],
     queryFn: async () => {
-      const res = await instance.get("/posts", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const res = await instance.get("/posts", {});
       return res.data;
     },
   });

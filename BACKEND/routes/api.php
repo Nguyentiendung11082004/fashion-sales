@@ -138,7 +138,7 @@ Route::prefix("v1/")->group(function () {
 
     //test 
     // Route::get('updatehh/{requestid}', [ReturnAdminController::class, 'updateOrder']);
-
+    // Route::get('search',[AdminOrderController::class,'searchOrders']);
 
     //Quản lí hoàn đơn Admin
     // Route::post('return-items/status/{returnItemId}', [ReturnAdminController::class, 'updateReturnItemStatus']);

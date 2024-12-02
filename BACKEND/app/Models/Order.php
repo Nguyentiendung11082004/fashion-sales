@@ -32,11 +32,14 @@ class Order extends Model
     // Order status constants
     const STATUS_PENDING = 'Đang chờ xác nhận';
     const STATUS_CONFIRMED = 'Đã xác nhận';
+    const STATUS_CANCELED = 'Đã hủy';
     const STATUS_SHIPPING = 'Đang vận chuyển';
     const STATUS_SUCCESS = 'Giao hàng thành công';
-    const STATUS_CANCELED = 'Đã hủy';
     const STATUS_RETURNED = 'Hoàn trả hàng';
     const STATUS_COMPLETED = 'Hoàn thành';
+    const STATUS_RETURN_REQUESTED = 'Yêu cầu hoàn trả hàng';
+
+  
     // Payment status constants
     const PAYMENT_PENDING = 'Chưa Thanh Toán';
     const PAYMENT_PAID = 'Đã thanh toán';
@@ -46,11 +49,12 @@ class Order extends Model
         return [
             self::STATUS_PENDING,
             self::STATUS_CONFIRMED,
+            self::STATUS_CANCELED,
             self::STATUS_SHIPPING,
             self::STATUS_SUCCESS,
-            self::STATUS_CANCELED,
             self::STATUS_RETURNED,
             self::STATUS_COMPLETED,
+            self::STATUS_RETURN_REQUESTED
         ];
     }
 

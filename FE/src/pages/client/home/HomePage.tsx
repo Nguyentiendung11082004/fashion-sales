@@ -2,28 +2,23 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   BannerIntro1,
-  BannerIntro2,
-  Blog1,
-  Blog2,
-  Blog3,
+  BannerIntro2
 } from "@/components/icons";
 import CartDetail from "@/components/icons/detail/CartDetail";
 import Eye from "@/components/icons/detail/Eye";
-import HeartWhite from "@/components/icons/detail/HeartWhite";
-import React, { useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import Banner from "./Banner/Banner";
-import Slideshow from "./SampleSlider/SampleSlider";
-import axios from "axios";
-import CategoryCarousel from "./SampleSlider/CategorySlider";
-import { convertColorNameToClass } from "@/common/colors/colorUtils";
-import { useWishlist } from "../../../common/context/Wishlist/WishlistContext";
 import HeartRed from "@/components/icons/detail/HeartRed";
-import LiveChat from "../liveChat/liveChat";
+import HeartWhite from "@/components/icons/detail/HeartWhite";
 import CartPopup from "@/components/ModalPopup/CartPopup";
 import DetailPopup from "@/components/ModalPopup/DetailPopup";
 import { Button } from "antd";
+import axios from "axios";
+import { useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useWishlist } from "../../../common/context/Wishlist/WishlistContext";
+import Banner from "./Banner/Banner";
 import Post from "./Post";
+import CategoryCarousel from "./SampleSlider/CategorySlider";
+import Slideshow from "./SampleSlider/SampleSlider";
 
 const HomePage = () => {
   const [trendProducts, setTrendProducts] = useState<any[]>([]);
@@ -41,6 +36,8 @@ const HomePage = () => {
         console.error("Có lỗi xảy ra khi lấy sản phẩm", error);
       });
   }, []);
+
+  
   const modalRef = useRef<HTMLDialogElement>(null);
 
   const [productSeeMore, setProductSeeMore] = useState({});

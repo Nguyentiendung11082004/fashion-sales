@@ -1,4 +1,8 @@
 import Loading from "@/common/Loading/Loading";
+import FastDelivery from "@/pages/admin/fastDelivery/FastDelivery";
+import ReturnOrder from "@/pages/admin/order/components/ReturnOrder";
+import RequestOrder from "@/pages/client/requestOrder/RequestOrder";
+import ReturnRequest from "@/pages/client/returnRequest/ReturnRequest";
 import React, { Suspense, lazy } from "react";
 import { Route, Routes } from "react-router-dom";
 
@@ -115,6 +119,8 @@ const Router = () => {
           <Route path="contact" element={<Contact />} />
           <Route path="thank" element={<Thanks />} />
           <Route path="history-order" element={<HistoryOrder />} />
+          <Route path="requestOrder" element={<RequestOrder />} />
+          <Route path="return/request_order" element={<ReturnRequest />} />
           <Route path="/order" element={<Order />} />
         </Route>
         <Route path="login" element={<Login />} />
@@ -160,6 +166,8 @@ const Router = () => {
           <Route path="vouchers/edit/:id" element={<FormVoucher />} />
           <Route path="comments" element={<CommentPage />} />
           <Route path="orders" element={<OrderPage />} />
+          <Route path="returnRequests" element={<ReturnOrder />} />
+          <Route path="fastDelivery" element={<FastDelivery />} />
           <Route path="orders/:id" element={<OrderDetail />} />
           {/* <Route path="/comments" element={<CommentPage/>} /> */}
         </Route>
