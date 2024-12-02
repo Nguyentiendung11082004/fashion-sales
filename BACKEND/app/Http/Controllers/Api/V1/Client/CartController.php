@@ -105,15 +105,14 @@ class CartController extends Controller
                     $products = Product::whereIn('id', $productIds)->get()->keyBy('id');
                     $variants = ProductVariant::whereIn('id', $variantIds)->get()->keyBy('id');
 
-                    $skippedItems = []; // Lưu danh sách sản phẩm không được thêm vào giỏ hàng
+                    $skippedItems = [];
 
                     foreach ($order->orderDetails as $item) {
                         $product = $products->get($item->product_id);
                         $variant = $item->product_variant_id ? $variants->get($item->product_variant_id) : null;
 
                         if (!$product) {
-                            $skippedItems[] = [
-                                'product_id' => $item->product_id,
+                            $skippedItems[$item->product_id] = [
                                 'reason' => 'Sản phẩm không tồn tại'
                             ];
                             continue;
@@ -121,10 +120,13 @@ class CartController extends Controller
 
                         $availableQuantity = $variant ? $variant->quantity : $product->quantity;
                         $quantityToAdd = min($item->quantity, $availableQuantity);
-
+                        if ($quantityToAdd < $item->quantity) {
+                            $skippedItems[$item->product_id] = [
+                                'reason' => 'Số lượng yêu cầu vượt quá số lượng tồn kho, chỉ thêm được ' . $quantityToAdd . ' sản phẩm'
+                            ];
+                        }
                         if ($quantityToAdd <= 0) {
-                            $skippedItems[] = [
-                                'product_id' => $item->product_id,
+                            $skippedItems[$item->product_id] = [
                                 'reason' => 'Không đủ tồn kho'
                             ];
                             continue;
@@ -149,8 +151,7 @@ class CartController extends Controller
                                 $cartItem->quantity += $quantityToAdd;
                                 $cartItem->save();
                             } else {
-                                $skippedItems[] = [
-                                    'product_id' => $item->product_id,
+                                $skippedItems[$item->product_id] = [
                                     'reason' => 'Sản phẩm đã đạt số lượng tối đa trong giỏ hàng'
                                 ];
                             }

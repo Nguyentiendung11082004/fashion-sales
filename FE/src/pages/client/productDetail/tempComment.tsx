@@ -8,7 +8,7 @@ import {
   PlusOutlined,
   UploadOutlined,
 } from "@ant-design/icons";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button, Form, message, Rate, Upload, UploadProps } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import { useEffect, useState } from "react";
@@ -36,41 +36,28 @@ const CommentProduct = ({
     }, {})
   );
 
-
-  
-
+  console.log("kIểm tra inForCommentId: ", InForCommentId);
   const [urlImage, setUrlImage] = useState<string | null>(null);
   const [errors, setErrors] = useState<any>("");
   const handleStateUpdate = (id: number, field: string, value: any) => {
+    const currentRating = formsData[id]?.rating;
+
     let newValue = value;
 
+    // Ensure rating is never less than 1
     if (field === "rating") {
-      const currentRating = formsData[id]?.rating;
-      if (value === currentRating) {
-        newValue = 1;
-      } else if (value < currentRating) {
-        newValue = value;
-      }
       newValue = newValue < 1 ? 1 : newValue;
-    }
-
-    if (field === "content" && value === "") {
-      newValue = null;
-    }
-
-    if (field === "image" && value === "") {
-      newValue = null;
-      if (InForCommentId) {
-        setUrlImage(null);
+      // If the value is the same as the current rating, set it to 1 (if you want to prevent no change)
+      if (newValue === currentRating) {
+        newValue = 1;
       }
     }
 
-    // Cập nhật trạng thái
     setFormsData((prev) => ({
       ...prev,
       [id]: {
         ...prev[id],
-        [field]: newValue,
+        [field]: newValue || prev[id][field], // Only update if newValue is provided
       },
     }));
   };
@@ -84,10 +71,10 @@ const CommentProduct = ({
             rating: 5,
             content: "",
             image: "",
-            ...(InForCommentId?.id === id && {
+            ...(InForCommentId?.product_id === id && {
               rating: InForCommentId?.rating,
-              content: InForCommentId?.content || "",
-              image: InForCommentId?.image || "",
+              content: InForCommentId?.content,
+              image: InForCommentId?.image,
             }),
           };
           return acc;
@@ -151,7 +138,6 @@ const CommentProduct = ({
       toast.error(error.response?.data?.message);
     },
   });
-
   const propImgComment: UploadProps = {
     name: "file",
     action: "https://api.cloudinary.com/v1_1/dn94v5jkq/image/upload",
@@ -183,9 +169,12 @@ const CommentProduct = ({
           listIdProduct?.map((id: any) => {
             const { rating, content, image } = formsData[id];
             const payload = {
-              rating,
-              content,
-              image,
+              rating:
+                InForCommentId?.rating && InForCommentId.rating < 5
+                  ? InForCommentId?.rating
+                  : rating,
+              content: content || InForCommentId?.content,
+              image: image || InForCommentId?.image,
               product_id: id,
             };
             if (editIdComment && InForCommentId) {
@@ -212,7 +201,7 @@ const CommentProduct = ({
             </label>
             <Form.Item className="mb-4">
               <Rate
-                value={formsData[id]?.rating}
+                value={formsData[id]?.rating || InForCommentId?.rating}
                 onChange={(value) => handleStateUpdate(id, "rating", value)}
                 count={5}
               />
@@ -222,7 +211,7 @@ const CommentProduct = ({
             </label>
             <Form.Item className="mb-4">
               <TextArea
-                value={formsData[id]?.content}
+                value={formsData[id]?.content || InForCommentId?.content}
                 onChange={(e) =>
                   handleStateUpdate(id, "content", e.target.value)
                 }
@@ -249,11 +238,11 @@ const CommentProduct = ({
                     {formsData[id]?.image ? "Tải ảnh khác" : "Tải lên ảnh"}
                   </Button>
                 </Upload>
-                {formsData[id] && formsData[id].image && (
+                {(formsData[id]?.image || InForCommentId?.image) && (
                   <div className="mb-8 mt-4 group">
                     <div className="relative w-[100px] h-[100px]">
                       <img
-                        src={formsData[id].image}
+                        src={formsData[id]?.image || InForCommentId?.image}
                         alt="Uploaded"
                         className="absolute inset-0 w-full h-full object-cover rounded-lg transition-opacity duration-200 group-hover:opacity-50"
                       />
