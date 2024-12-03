@@ -174,7 +174,7 @@ const Checkout = () => {
       ...prev,
       xa: e.label,
     }));
-    setIdXa(Number(e.value));
+    setIdXa((e.value));
   };
 
   const handleOpenModal = () => {

@@ -1,4 +1,5 @@
 import Loading from "@/common/Loading/Loading";
+import OrderLookup from "@/components/website/OrderLookup";
 import FastDelivery from "@/pages/admin/fastDelivery/FastDelivery";
 import ReturnOrder from "@/pages/admin/order/components/ReturnOrder";
 import RequestOrder from "@/pages/client/requestOrder/RequestOrder";
@@ -122,6 +123,7 @@ const Router = () => {
           <Route path="requestOrder" element={<RequestOrder />} />
           <Route path="return/request_order" element={<ReturnRequest />} />
           <Route path="/order" element={<Order />} />
+          <Route path="/order_lookup" element={<OrderLookup />} />
         </Route>
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />

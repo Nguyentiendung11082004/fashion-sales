@@ -1,9 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import {
-  BannerIntro1,
-  BannerIntro2
-} from "@/components/icons";
+import { BannerIntro1, BannerIntro2 } from "@/components/icons";
 import CartDetail from "@/components/icons/detail/CartDetail";
 import Eye from "@/components/icons/detail/Eye";
 import HeartRed from "@/components/icons/detail/HeartRed";
@@ -25,6 +22,27 @@ const HomePage = () => {
   const [homeProducts, setHomeProducts] = useState<any[]>([]);
   const { handleAddToWishlist, isInWishlist } = useWishlist();
   const [idProduct, setIdProduct] = useState();
+  const [visibleProducts, setVisibleProducts] = useState(8);
+  const [visProducts, setVisProducts] = useState(8);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpand, setIsExpand] = useState(false);
+
+  const loadMore = () => {
+    if (isExpanded) {
+      setVisibleProducts((prev) => prev - 8);
+    } else {
+      setVisibleProducts((prev) => prev + 8);
+    }
+    setIsExpanded(!isExpanded);
+  };
+  const loadMoreVis = () => {
+    if (isExpand) {
+      setVisProducts((prev) => prev - 8);
+    } else {
+      setVisProducts((prev) => prev + 8);
+    }
+    setIsExpand(!isExpand);
+  };
   useEffect(() => {
     axios
       .get("http://127.0.0.1:8000/api/v1/product-home")
@@ -37,7 +55,6 @@ const HomePage = () => {
       });
   }, []);
 
-  
   const modalRef = useRef<HTMLDialogElement>(null);
 
   const [productSeeMore, setProductSeeMore] = useState({});
@@ -70,7 +87,7 @@ const HomePage = () => {
             <i>Sản phẩm xu hướng hiện nay</i>
           </div>
           <div className="grid grid-cols-2 gap-4 lg:ml-2.5 lg:grid-cols-3 xl:grid-cols-4 lg:gap-8 xl:gap-8 md:grid-cols-3 md:gap-6 mx-auto">
-            {trendProducts.map((product) => (
+            {trendProducts.slice(0, visibleProducts).map((product) => (
               <div key={product.id} className="product-item">
                 <div className="lg:mb-[25px] mb-[20px]">
                   <div className="cursor-pointer lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] sm:h-[345px] overflow-hidden">
@@ -205,7 +222,10 @@ const HomePage = () => {
                     )}
                   </div>
                   <div>
-                    <Link to={`/products/${product?.id}`} className="text-base font-medium text-black mb-1 cursor-pointer hd-all-hover-bluelight">
+                    <Link
+                      to={`/products/${product?.id}`}
+                      className="text-base font-medium text-black mb-1 cursor-pointer hd-all-hover-bluelight"
+                    >
                       {product.name.charAt(0).toUpperCase() +
                         product.name.slice(1).toLowerCase()}
                     </Link>
@@ -248,8 +268,9 @@ const HomePage = () => {
                           if (minPriceSale > 0) {
                             // Nếu có giá sale
                             if (
-                              productPriceSale &&
-                              productPriceSale < productPriceRegular || productPriceSale === 0
+                              (productPriceSale &&
+                                productPriceSale < productPriceRegular) ||
+                              productPriceSale === 0
                             ) {
                               return (
                                 <>
@@ -421,9 +442,11 @@ const HomePage = () => {
           />
         </section>
         <section className="container my-16 text-center">
-          <Link to="">
-            <Button className="btn-load">Tải Thêm</Button>
-          </Link>
+          {trendProducts.length > 8 && (
+            <Button className="btn-load" onClick={loadMore}>
+              {isExpanded ? "Thu gọn" : "Tải Thêm"}
+            </Button>
+          )}
         </section>
         <section className="container">
           <div className="grid lg:grid-cols-2 md:grid-cols-2 md:gap-4 lg:gap-8 ">
@@ -471,7 +494,7 @@ const HomePage = () => {
             <i>Sản phẩm nổi bật </i>
           </div>
           <div className="grid grid-cols-2 gap-4 lg:ml-2.5 lg:grid-cols-3 xl:grid-cols-4 lg:gap-8 xl:gap-8 md:grid-cols-3 md:gap-6 mx-auto">
-            {homeProducts.map((product) => (
+            {homeProducts.slice(0, visProducts).map((product) => (
               <div key={product.id} className="product-item">
                 <div className="lg:mb-[25px] mb-[20px]">
                   <div className="cursor-pointer lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] sm:h-[345px] overflow-hidden">
@@ -606,7 +629,10 @@ const HomePage = () => {
                     )}
                   </div>
                   <div>
-                    <Link to={`/products/${product?.id}`} className="text-base font-medium text-black mb-1 cursor-pointer hd-all-hover-bluelight">
+                    <Link
+                      to={`/products/${product?.id}`}
+                      className="text-base font-medium text-black mb-1 cursor-pointer hd-all-hover-bluelight"
+                    >
                       {product.name.charAt(0).toUpperCase() +
                         product.name.slice(1).toLowerCase()}
                     </Link>
@@ -649,8 +675,9 @@ const HomePage = () => {
                           if (minPriceSale > 0) {
                             // Nếu có giá sale
                             if (
-                              productPriceSale &&
-                              productPriceSale < productPriceRegular || productPriceSale === 0
+                              (productPriceSale &&
+                                productPriceSale < productPriceRegular) ||
+                              productPriceSale === 0
                             ) {
                               return (
                                 <>
@@ -809,6 +836,13 @@ const HomePage = () => {
               </div>
             ))}
           </div>
+        </section>
+        <section className="container my-16 text-center">
+          {homeProducts.length > 8 && (
+            <Button className="btn-load" onClick={loadMoreVis}>
+              {isExpand ? "Thu gọn" : "Tải Thêm"}
+            </Button>
+          )}
         </section>
         <Post />
 
