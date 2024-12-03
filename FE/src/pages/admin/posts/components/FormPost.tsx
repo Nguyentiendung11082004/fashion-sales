@@ -58,7 +58,9 @@ const FormPost = () => {
       setUrlImage(data?.img_thumbnail);
     }
   }, [data, form]);
+
   console.log("token: ", token);
+  
   const createPost = useMutation({
     mutationFn: async (data: IPost) => {
       const res = await instance.post("/posts", data, {

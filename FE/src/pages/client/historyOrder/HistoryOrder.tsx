@@ -190,6 +190,11 @@ const HistoryOrder = () => {
   const handleCloseFormReason = () => {
     setVisible(false);
   };
+
+  const handleGetReturnRequest = (order_id: number) => {
+    navigate(`return_requests`, { state: { order_id } });
+  };
+
   return (
     <>
       <main
@@ -285,6 +290,9 @@ const HistoryOrder = () => {
                   order.order_status.trim().toLowerCase() === "đang vận chuyển";
                 const complete =
                   order.order_status.trim().toLowerCase() === "hoàn thành";
+                const requestReturn =
+                  order.order_status.trim().toLowerCase() ===
+                  "yêu cầu hoàn trả hàng";
 
                 const handleCancelClick = (id: number, status: string) => {
                   if (!isCancelOk) {
@@ -552,7 +560,7 @@ const HistoryOrder = () => {
                     <div className="hd-head-form-order flex sm:flex-row justify-between lg:justify-between sm:justify-between sm:items-center p-4 sm:p-8">
                       <div className="mt-3 sm:mt-0">
                         <div className="flex items-center space-x-2">
-                          {(isDelivered || shipOk) && (
+                          {(isDelivered || requestReturn || shipOk) && (
                             <>
                               <button
                                 className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB]  font-medium ${
@@ -566,22 +574,40 @@ const HistoryOrder = () => {
                                 Đã Nhận Hàng
                               </button>
 
-                              <button
-                                className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB]  font-medium ${
-                                  shipOk
-                                    ? "bg-gray-200 text-gray-400 border cursor-pointer border-gray-300"
-                                    : "text-white"
-                                }`}
-                                disabled={shipOk}
-                                onClick={() => handleOpenFormReason(order)}
-                              >
-                                Yêu cầu trả hàng
-                              </button>
-                              <ReasonReturn
-                                open={visiable}
-                                onClose={handleCloseFormReason}
-                                dataOrderRequest={dataOrderRequest}
-                              />
+                              {requestReturn ? (
+                                <button
+                                  className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB]  font-medium ${
+                                    shipOk
+                                      ? "bg-gray-200 text-gray-400 border cursor-pointer border-gray-300"
+                                      : "text-white"
+                                  }`}
+                                  disabled={shipOk}
+                                  onClick={() =>
+                                    handleGetReturnRequest(order?.id)
+                                  }
+                                >
+                                  Xem yêu cầu hoàn trả
+                                </button>
+                              ) : (
+                                <>
+                                  <button
+                                    className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB]  font-medium ${
+                                      shipOk
+                                        ? "bg-gray-200 text-gray-400 border cursor-pointer border-gray-300"
+                                        : "text-white"
+                                    }`}
+                                    disabled={shipOk}
+                                    onClick={() => handleOpenFormReason(order)}
+                                  >
+                                    Yêu cầu trả hàng
+                                  </button>
+                                  <ReasonReturn
+                                    open={visiable}
+                                    onClose={handleCloseFormReason}
+                                    dataOrderRequest={dataOrderRequest}
+                                  />
+                                </>
+                              )}
                             </>
                           )}
 
@@ -628,7 +654,7 @@ const HistoryOrder = () => {
                             </button>
                           )}
 
-                          {(canCel || complete) && (
+                          {(canCel || complete ) && (
                             // Nút "Mua Lại" khi đơn hàng đã hủy hoặc hoàn thành
                             <button
                               className="nc-Button relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB] text-white font-medium"

@@ -1,10 +1,19 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import instance from "@/configs/axios";
-import { useQuery } from "@tanstack/react-query";
-import { Select, Table } from "antd";
+import { EyeOutlined } from "@ant-design/icons";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Button, Select, Table } from "antd";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 const ReturnOrder = () => {
+  const queryClient = useQueryClient();
+  const initialPage = queryClient.getQueryData(["currentPage"]) || 1;
+  const [currentPage, setCurrentPage] = useState(Number(initialPage));
+  const [pageSize] = useState(5);
+  const navigate = useNavigate();
+
   const { data } = useQuery({
     queryKey: ["return-requests"],
     queryFn: async () => {
@@ -22,11 +31,14 @@ const ReturnOrder = () => {
         ...value,
       }))
     : [];
+  console.log("data trả hàng : ", dataSource);
 
   const column: any = [
     {
       title: "Stt",
-      render: (_: any, __: any, index: number) => <div>{index + 1}</div>,
+      render: (__: any, _: any, index: number) => (
+        <div>{index + 1 + pageSize * (currentPage - 1)}</div>
+      ),
     },
     {
       title: "Tài khoản",
@@ -36,23 +48,20 @@ const ReturnOrder = () => {
       title: "Tên sản phẩm",
       render: (record: any) => (
         <div>
-          {record.order_details?.map((value: any, index: any) => (
-            <div key={index}>{value.product_name}</div>
+          {record?.items?.map((item: any, index: any) => (
+            <div key={index}>{item.product.name}</div>
           ))}
         </div>
       ),
     },
+
     {
-      title: "Mã đơn hàng",
-      dataIndex: "order_code",
+      title: "Trạng thái xử lí",
+      dataIndex: "status",
     },
     {
-      title: "Phương thức thanh toán",
-      dataIndex: "payment_method_id",
-      render: (method: number | undefined) => {
-        if (typeof method !== "number") return "";
-        return method === 1 ? "Thanh toán khi nhận hàng" : "Thanh toán online";
-      },
+      title: "Lí do hoàn hàng",
+      dataIndex: "reason",
     },
 
     {
@@ -60,19 +69,17 @@ const ReturnOrder = () => {
       fixed: "right",
       render: (record: any) => {
         return (
-          <div className="flex gap-2">
-            huệ
-            {/* <Link to={`${record?.id}`}>
-              <Button className="btn-info w-12 flex items-center justify-center">
-                <EyeOutlined />
-              </Button>
-            </Link> */}
-            {/* <Link>
-              <Button className="  flex items-center justify-center bg-[red] text-white ">
-                Yêu cầu hoàn hàng
-              </Button>
-            </Link> */}
-          </div>
+          <Link to={`/admin/return-items/status/${record?.order_id}`}>
+            <Button
+              className={` ${
+                dataSource?.status === "pending"
+                  ? "bg-red-500 text-white"
+                  : "bg-green-400"
+              }`}
+            >
+              Xử lí yêu cầu hoàn hàng
+            </Button>
+          </Link>
         );
       },
     },
@@ -88,7 +95,10 @@ const ReturnOrder = () => {
       <div className="">
         <Table
           className="custom-table"
-          dataSource={dataSource}
+          dataSource={dataSource.slice(
+            (currentPage - 1) * pageSize,
+            currentPage * pageSize
+          )}
           columns={column}
           scroll={{ x: "max-content" }}
           pagination={false}

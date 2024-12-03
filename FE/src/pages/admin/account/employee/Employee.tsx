@@ -2,10 +2,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Loading from "@/common/Loading/Loading";
 import { IUser } from "@/common/types/users";
+import instance from "@/configs/axios";
 import { deleteEmployee, getEmployees } from "@/services/api/admin/employee";
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Button, Image, Modal, Pagination } from "antd";
+import { Button, Image, Input, Modal, Pagination } from "antd";
 import Table, { ColumnType } from "antd/es/table";
 import dayjs from "dayjs";
 import { useState, useEffect } from "react";
@@ -164,12 +165,43 @@ const EmployeePage = () => {
       }))
     : [];
 
+  //  tìm kiếm theo tên  ;
+  const [query, setQuery] = useState<string>("");
+  const [dataSearch, setDataSearch] = useState<IUser[]>([]);
+
+  const handleSearch = async () => {
+    try {
+      const res = await instance.post(`/employee/search`, { query });
+      setDataSearch(res?.data?.data || []);
+      setCurrentPage(1);
+    } catch (error) {
+      toast.error("Lỗi khi tìm kiếm");
+    }
+  };
+
   return (
     <div className="p-6 min-h-screen">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2">
+        {/* <h1 className="text-3xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2">
           Nhân viên
-        </h1>
+        </h1> */}
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 md:gap-8">
+          <h1 className="text-3xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2">
+            Nhân viên
+          </h1>
+          <Input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Tìm kiếm"
+            className="w-full md:w-64 px-4 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
+          />
+          <Button
+            onClick={handleSearch}
+            className="bg-indigo-500 hover:bg-indigo-600 text-white font-medium py-2 px-4 rounded-lg shadow"
+          >
+            Tìm kiếm
+          </Button>
+        </div>
         <Link to={`create`}>
           <Button
             className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 flex items-center"
