@@ -78,7 +78,9 @@ Route::prefix("v1/")->group(function () {
     Route::resource('checkout', CheckoutController::class);
     Route::apiResource('posts', PostController::class);
     Route::apiResource('order-status', AdminOrderController::class);
-
+    // Tìm kiếm đơn hàng khi k đăng nhập
+    Route::post('/search-order', [OrderController::class, 'searchOrder']);
+    Route::post('/verify-otp', [OrderController::class, 'verifyOtp']);
     //Tìm kiếm trong Admin
     Route::post('/client/search', [ClientController::class, 'search']);
     Route::post('/employee/search', [EmployeeController::class, 'search']);
@@ -92,9 +94,6 @@ Route::prefix("v1/")->group(function () {
     Route::post('/brand/search', [BrandController::class, 'search']);
     Route::post('/comment/search', [CommentsController::class, 'search']);
     Route::post('/tag/search', [TagController::class, 'search']);
-
-
-
     //Login with Google
     Route::middleware(['web'])->group(function () {
         Route::get('login/google', [SocialiteController::class, 'redirectToGoogle']);

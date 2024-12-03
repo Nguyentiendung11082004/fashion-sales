@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers\Api\V1\Client;
 
-use Exception;
+use Carbon\Carbon;
 use App\Models\Cart;
 use App\Models\User;
 use App\Models\Order;
+use App\Mail\OtpEmail;
 use App\Models\Product;
 use App\Models\Voucher;
 use App\Models\CartItem;
+use App\Jobs\SendOtpEmail;
 use App\Models\VoucherLog;
 use App\Models\OrderDetail;
 use App\Models\VoucherMeta;
@@ -18,6 +20,7 @@ use Illuminate\Http\Response;
 use App\Models\ProductVariant;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Notification;
 use App\Http\Requests\Order\StoreOrderRequest;
 use App\Http\Requests\Order\UpdateOrderRequest;
@@ -123,14 +126,14 @@ class OrderController extends Controller
                 }
                 // Cập nhật tổng số lượng và tổng tiền cho đơn hàng
                 $order->update([
-                    'total_quantity' => $order->orderDetails()->count(),
+                    'total_quantity' => $totalQuantity,
                     'total' => $totalPrice,
                 ]);
                 if (!auth('sanctum')->check()) {
                     // Gửi notification cho người dùng với email nhận thông báo
                     Notification::route('mail', $order->user_email)
                         ->notify(new OrderConfirmationNotification($order, $order->user_email, $order->orderDetails));
-                          // Gửi email xác nhận đơn hàng cho khách hàng
+                    // Gửi email xác nhận đơn hàng cho khách hàng
                 }
                 // Thực hiện thanh toán nếu chọn phương thức online (VNPay)
                 if ($data['payment_method_id'] == 2) {
@@ -618,5 +621,96 @@ class OrderController extends Controller
                 }
             }
         }
+    }
+    public function searchOrder(Request $request)
+    {
+        // Validate dữ liệu đầu vào
+        $request->validate([
+            'email' => 'required|email',
+            'order_code' => 'required|string',
+        ]);
+
+        // Tìm đơn hàng với order_code và email
+        $order = Order::where('order_code', $request->order_code)
+            ->where('user_email', $request->email)
+            ->first();
+
+        // Nếu không tìm thấy đơn hàng
+        if (!$order) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Không tìm thấy đơn hàng với mã đơn hàng và email này.',
+            ], 400);
+        }
+        // Kiểm tra xem người dùng đã yêu cầu OTP trước đó chưa
+        $existingOtp = DB::table('order_otp_verifications')
+            ->where('order_code', $request->order_code)
+            ->where('email', $request->email)
+            ->orderBy('expires_at', 'desc')
+            ->first();
+
+        // Nếu đã có OTP trước đó và OTP chưa hết hạn
+        if ($existingOtp && Carbon::parse($existingOtp->expires_at)->isFuture()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Bạn đã yêu cầu mã OTP trước đó. Vui lòng đợi cho đến khi mã OTP cũ hết hiệu lực.',
+            ], 400);
+        }
+        // Tạo mã OTP ngẫu nhiên
+        $otp = rand(100000, 999999);
+        $expiresAt = Carbon::now()->addMinutes(3); // Mã OTP hết hạn sau 3 phút
+
+        // Lưu mã OTP và thời gian hết hạn vào bảng order_otp_verifications
+        DB::table('order_otp_verifications')->insert([
+            'order_code' => $request->order_code,
+            'email' => $request->email,
+            'otp' => $otp,
+            'expires_at' => $expiresAt,
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now(),
+        ]);
+
+        // Đẩy việc gửi email OTP vào queue
+        SendOtpEmail::dispatch($request->email, $otp);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Mã OTP đã được gửi đến email của bạn.',
+        ], 200);
+    }
+    public function verifyOtp(Request $request)
+    {
+        // Validate dữ liệu đầu vào
+        $request->validate([
+            'email' => 'required|email',
+            'order_code' => 'required|string',
+            'otp' => 'required|string',
+        ]);
+
+        // Kiểm tra mã OTP trong bảng order_otp_verifications
+        $otpRecord = DB::table('order_otp_verifications')
+            ->where('order_code', $request->order_code)
+            ->where('email', $request->email)
+            ->where('otp', $request->otp)
+            ->first();
+
+        // Nếu không tìm thấy OTP hoặc OTP đã hết hạn
+        if (!$otpRecord || Carbon::now()->gt(Carbon::parse($otpRecord->expires_at))) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Mã OTP không hợp lệ hoặc đã hết hạn.',
+            ], 400);
+        }
+
+        $order = Order::query()
+            ->with('orderDetails')
+            ->where("order_code", "=", $otpRecord->order_code)
+            ->first();
+        // Xác minh OTP thành công
+
+        return response()->json([
+            'status' => 'success',
+            'order' => $order,
+        ], 200);
     }
 }
