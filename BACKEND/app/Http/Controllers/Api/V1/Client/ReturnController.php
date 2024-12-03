@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1\Client;
 
 use App\Http\Controllers\Controller;
+use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\ReturnItem;
 use App\Models\ReturnLog;
@@ -75,6 +76,9 @@ class ReturnController extends Controller
                         // 'status' => 'pending',
                     ]);
                 }
+                Order::query()->findOrFail($validated["order_id"])->update([
+                   "order_status"=>"Yêu cầu hoàn trả hàng" 
+                ]);
 
                 return [
                     'message' => 'Return request created successfully.',
