@@ -52,22 +52,41 @@ const ProductForm = () => {
     const onChangeStatus = (e: RadioChangeEvent) => {
         setValueStatus(e.target.value);
     };
-    const [checkedItems, setCheckedItems] = useState<any[]>([]);
+    // const [checkedItems, setCheckedItems] = useState<any[]>([]);
 
     const [variants, setVariants] = useState([
         { id_guid: '', image: '', price_regular: '', price_sale: '', quantity: '', sku: '' }
     ]);
     console.log("variants", variants)
-    const handleInputChange = (id_guid: any, field: string, value: any) => {
-        const newVariants = variants.map(variant => {
-            if (variant.id_guid === id_guid) {
-                return { ...variant, [field]: value }; // Update the matching variant
-            }
-            return variant; // Return other variants unchanged
-        });
-    
-        setVariants(newVariants); // Update the state with the modified array
+    // const handleInputChange = (idOrIndex: any, field: string, value: any) => {
+    //     console.log("idOrIndex", typeof idOrIndex);
+
+    //     const newVariants = [...variants];
+
+    //     // Kiểm tra nếu idOrIndex là id_guid hoặc index
+    //     if (typeof idOrIndex === 'string') {  // Nếu idOrIndex là id_guid (string)
+    //         console.log("bienthe");
+    //         // Duyệt qua tất cả các variants và cập nhật variant có id_guid tương ứng
+    //         const updatedVariants = newVariants.map((variant) => {
+    //             if (variant.id_guid === idOrIndex) {
+    //                 return { ...variant, [field]: value }; // Cập nhật giá trị cho variant có id_guid
+    //             }
+    //             return variant; // Giữ nguyên các variant khác
+    //         });
+    //         setVariants(updatedVariants); // Cập nhật lại mảng variants
+    //     } else if (typeof idOrIndex === 'number') {  // Nếu idOrIndex là index
+    //         console.log("don");
+    //         newVariants[idOrIndex] = { ...newVariants[idOrIndex], [field]: value }; // Cập nhật giá trị tại vị trí index
+    //         setVariants(newVariants); // Cập nhật lại mảng variants
+    //     }
+    // };
+
+    const handleInputChange = (index: number, field: string, value: any) => {
+        const newVariants = [...variants];
+        newVariants[index] = { ...newVariants[index], [field]: value };
+        setVariants(newVariants);
     };
+
 
     const { data, isFetching } = useQuery({
         queryKey: ['productCreate'],
@@ -84,7 +103,7 @@ const ProductForm = () => {
 
         // Reset giá trị đã chọn
         const newCheckedItems = Array(variants.length).fill(false);
-        setCheckedItems(newCheckedItems);
+        // setCheckedItems(newCheckedItems);
 
         if (value === 0) {
             form.resetFields(['price_regular', 'price_sale', 'quantity']);
@@ -121,7 +140,6 @@ const ProductForm = () => {
         } else {
             setIsTableVisible(true);
         }
-
         handleSaveAttributes();
     };
 
@@ -257,16 +275,16 @@ const ProductForm = () => {
         },
     };
     const columns: any = [
-        {
-            title: "Checkox",
-            render: (text: any, record: any, index: number) => (
-                <Input
-                    type="checkbox"
-                    checked={!!checkedItems[index]}
-                    onChange={() => handleCheckboxChange(index)}
-                />
-            ),
-        },
+        // {
+        //     title: "Checkox",
+        //     render: (text: any, record: any, index: number) => (
+        //         <Input
+        //             type="checkbox"
+        //             checked={!!checkedItems[index]}
+        //             onChange={() => handleCheckboxChange(index)}
+        //         />
+        //     ),
+        // },
         {
             title: 'STT',
             render: (text: any, record: any, index: number) => <div>{index + 1}</div>,
@@ -306,118 +324,187 @@ const ProductForm = () => {
                     {
                         productShow?.galleries && (
                             <div className="flex">
-                                {
-                                    productShow?.variants?.map((e: any) => (
-                                        <>
-                                            <img src={e.image} alt="Uploaded" style={{ marginTop: 16, width: 30, height: '30px', marginBottom: '10px' }} />
-                                        </>
+                                {/* {
+                                    variants[index]?.map((e: any) => (
+                                        <> */}
+                                            <img src={variants[index]?.image} alt="Uploaded" style={{ marginTop: 16, width: 30, height: '30px', marginBottom: '10px' }} />
+                                        {/* </>
                                     ))
-                                }
+                                } */}
                             </div>
                         )
                     }
                 </>
             )
         },
-        // {
-        //     title: 'Price Regular',
-        //     dataIndex: 'price_regular',
-        //     render: (text: any, record: any, index: number) => {
-        //         // Loại bỏ image khỏi record
-        //         const { image, ...otherAttributes } = record;
-        //         const matchingVariant = variants.find((variant: any) => {
-        //             return Object.keys(otherAttributes).every((key) => variant.attributes[key] === otherAttributes[key]);
-        //         });
-        //         return (
-        //             <Input
-        //                 value={matchingVariant?.price_regular || ''}  // Chỉ hiển thị giá trị price_regular
-        //                 onChange={(e) => handleInputChange(index, 'price_regular', e.target.value)}
-        //             />
-        //         );
-        //     }
-        // },
         {
             title: 'Price Regular',
             dataIndex: 'price_regular',
-            render: (text: any, record: any, index: number) => {
-                const { image, ...otherAttributes } = record;
-
-                // Tìm variant khớp với các thuộc tính
-                const matchingVariant = variants.find((variant: any) => {
-                    return Object.keys(otherAttributes).every(
-                        (key) => variant.attributes[key] === otherAttributes[key]
-                    );
-                });
-
-                return (
-                    <Input
-                        value={matchingVariant?.price_regular || ''}
-                        onChange={(e) => handleInputChange(matchingVariant?.id_guid, 'price_regular', e.target.value)}
-                    />
-                );
-            }
+            render: (text: any, record: any, index: number) => (
+                <Input
+                    value={variants[index]?.price_regular || ''}
+                    onChange={(e) => handleInputChange(index, 'price_regular', e.target.value)} />
+            )
         },
         {
             title: 'Price Sale',
             dataIndex: 'price_sale',
-            render: (text: any, record: any, index: number) => {
-                const { image, ...otherAttributes } = record;
-                const matchingVariant = variants.find((variant: any) => {
-                    return Object.keys(otherAttributes).every((key) => variant.attributes[key] === otherAttributes[key]);
-                });
-                console.log("matchingVariant for Price Sale", matchingVariant);
-                return (
-                    <Input
-                        defaultValue={matchingVariant?.price_sale || ''} 
-                        onChange={(e) => handleInputChange(index, 'price_sale', e.target.value)} 
-                    />
-                );
-            }
+            render: (text: any, record: any, index: number) => (
+                <Input
+                    value={variants[index]?.price_sale || ''}
+                    onChange={(e) => handleInputChange(index, 'price_sale', e.target.value)} />
+            )
         },
         {
             title: 'Số lượng',
             dataIndex: 'quantity',
-            render: (text: any, record: any, index: number) => {
-                // Tách image ra khỏi record, chỉ lấy các thuộc tính còn lại
-                const { image, ...otherAttributes } = record;
-
-                // Tìm variant trong mảng variants với thuộc tính matching
-                const matchingVariant = variants.find((variant: any) => {
-                    return Object.keys(otherAttributes).every((key) => variant.attributes[key] === otherAttributes[key]);
-                });
-
-                console.log("matchingVariant for Quantity", matchingVariant);
-
-                return (
-                    <Input
-                        defaultValue={matchingVariant?.quantity || ''}  // Lấy giá trị quantity từ matchingVariant
-                        onChange={(e) => handleInputChange(index, 'quantity', e.target.value)}  // Hàm để xử lý thay đổi
-                    />
-                );
-            }
+            render: (text: any, record: any, index: number) => (
+                <Input
+                    value={variants[index]?.quantity || ''}
+                    onChange={(e) => handleInputChange(index, 'quantity', e.target.value)} />
+            )
         },
         {
             title: 'SKU',
             dataIndex: 'sku',
-            render: (text: any, record: any, index: number) => {
-                // Tách image ra khỏi record, chỉ lấy các thuộc tính còn lại
-                const { image, ...otherAttributes } = record;
+            render: (text: any, record: any, index: number) => (
+                <Input
+                    value={variants[index]?.sku || ''}
+                    onChange={(e) => handleInputChange(index, 'sku', e.target.value)} />
+            )
+        },
+        // {
+        //     title: 'Price Regular',
+        //     dataIndex: 'price_regular',
+        //     render: (text: any, record: any, index: number) => {
+        //         console.log("variants", variants);
 
-                // Tìm variant trong mảng variants với thuộc tính matching
-                const matchingVariant = variants.find((variant: any) => {
-                    return Object.keys(otherAttributes).every((key) => variant.attributes[key] === otherAttributes[key]);
-                });
+        //         // Trường hợp có id (tức là đang cập nhật)
+        //         const { image, ...otherAttributes } = record;
+        //         const matchingVariant = variants.find((variant: any) => {
+        //             return variant?.attributes && Object.keys(otherAttributes).every(
+        //                 (key) => variant?.attributes[key] === otherAttributes[key]
+        //             );
+        //         });
 
-                console.log("matchingVariant for SKU", matchingVariant);
+        //         // Sử dụng id_guid nếu có, nếu không có thì dùng index
+        //         const idToUpdate = matchingVariant?.id_guid ? matchingVariant?.id_guid : index;
 
-                return (
-                    <Input
-                        defaultValue={matchingVariant?.sku || ''}  // Lấy giá trị sku từ matchingVariant
-                        onChange={(e) => handleInputChange(index, 'sku', e.target.value)}  // Hàm để xử lý thay đổi
-                    />
-                );
-            }
-        }
+        //         if (id) {
+        //             return (
+        //                 <Input
+        //                     value={matchingVariant?.price_regular}
+        //                     onChange={(e) => handleInputChange(idToUpdate, 'price_regular', e.target.value)}
+        //                 />
+        //             );
+        //         } else {
+        //             return (
+        //                 <Input
+        //                     value={variants[index]?.price_regular || ''}
+        //                     onChange={(e) => handleInputChange(idToUpdate, 'price_regular', e.target.value)}
+        //                 />
+        //             )
+        //         }
+
+        //     }
+        // },
+
+        // {
+        //     title: 'Price Sale',
+        //     dataIndex: 'price_sale',
+        //     render: (text: any, record: any, index: number) => {
+        //         // Kiểm tra nếu đây là trường hợp thêm mới (dựa vào id_guid)
+        //         if (!id) {  // Kiểm tra nếu không có id_guid là trường hợp thêm mới
+        //             return (
+        //                 <Input
+        //                     value={variants[index]?.price_sale || ''}
+        //                     onChange={(e) => handleInputChange(index, 'price_sale', e.target.value)} // Dùng index cho thêm mới
+        //                 />
+        //             );
+        //         }
+
+        //         // Trường hợp cập nhật
+        //         const { image, ...otherAttributes } = record;
+        //         const matchingVariant = variants.find((variant: any) => {
+        //             return variant?.attributes && Object.keys(otherAttributes).every(
+        //                 (key) => variant?.attributes[key] === otherAttributes[key]
+        //             );
+        //         });
+
+        //         return (
+        //             <Input
+        //                 value={matchingVariant?.price_sale || ''}
+        //                 onChange={(e) => handleInputChanges(matchingVariant?.id_guid, 'price_sale', e.target.value)} // Dùng id_guid cho cập nhật
+        //             />
+        //         );
+        //     }
+        // },
+
+        // {
+        //     title: 'Số lượng',
+        //     dataIndex: 'quantity',
+        //     render: (text: any, record: any, index: number) => {
+        //         // Kiểm tra nếu đây là trường hợp thêm mới (dựa vào id_guid)
+        //         if (!id) {  // Nếu không có id_guid, là trường hợp thêm mới
+        //             return (
+        //                 <Input
+        //                     value={variants[index]?.quantity || ''}
+        //                     onChange={(e) => handleInputChange(index, 'quantity', e.target.value)} // Dùng index cho thêm mới
+        //                 />
+        //             );
+        //         }
+
+        //         // Trường hợp cập nhật
+        //         const { image, ...otherAttributes } = record;
+        //         const matchingVariant = variants.find((variant: any) => {
+        //             return variant?.attributes && Object.keys(otherAttributes).every(
+        //                 (key) => variant?.attributes[key] === otherAttributes[key]
+        //             );
+        //         });
+
+
+        //         return (
+        //             <Input
+        //                 value={matchingVariant?.quantity || ''}
+        //                 onChange={(e) => handleInputChanges(matchingVariant?.id_guid, 'quantity', e.target.value)} // Dùng id_guid cho cập nhật
+        //             />
+        //         );
+        //     }
+        // },
+
+        // {
+        //     title: 'SKU',
+        //     dataIndex: 'sku',
+        //     render: (text: any, record: any, index: number) => {
+        //         // Kiểm tra nếu đây là trường hợp thêm mới (dựa vào id_guid)
+        //         if (!id) {  // Nếu không có id_guid, là trường hợp thêm mới
+        //             return (
+        //                 <Input
+        //                     value={variants[index]?.sku || ''}
+        //                     onChange={(e) => handleInputChange(index, 'sku', e.target.value)} // Dùng index cho thêm mới
+        //                 />
+        //             );
+        //         }
+
+        //         // Trường hợp cập nhật
+        //         const { image, ...otherAttributes } = record;
+        //         const matchingVariant = variants.find((variant: any) => {
+        //             return variant?.attributes && Object.keys(otherAttributes).every(
+        //                 (key) => variant?.attributes[key] === otherAttributes[key]
+        //             );
+        //         });
+
+        //         console.log("matchingVariant for SKU", matchingVariant);
+
+        //         return (
+        //             <Input
+        //                 value={matchingVariant?.sku || ''}
+        //                 onChange={(e) => handleInputChanges(matchingVariant?.id_guid, 'sku', e.target.value)} // Dùng id_guid cho cập nhật
+        //             />
+        //         );
+        //     }
+        // }
+
 
     ];
 
@@ -583,27 +670,27 @@ const ProductForm = () => {
             toast.error('Có lỗi xảy ra');
         }
     };
-    const handleCheckboxChange = (index: number) => {
-        setCheckedItems(prev => {
-            const newCheckedItems = [...prev];
-            newCheckedItems[index] = !newCheckedItems[index];
-            if (!newCheckedItems[index]) {
-                setVariants(prev => {
-                    const newVariants = [...prev];
-                    newVariants[index] = {
-                        id_guid: '',
-                        price_regular: '',
-                        price_sale: '',
-                        quantity: '',
-                        sku: '',
-                        image: '',
-                    };
-                    return newVariants;
-                });
-            }
-            return newCheckedItems;
-        });
-    };
+    // const handleCheckboxChange = (index: number) => {
+    //     setCheckedItems(prev => {
+    //         const newCheckedItems = [...prev];
+    //         newCheckedItems[index] = !newCheckedItems[index];
+    //         if (!newCheckedItems[index]) {
+    //             setVariants(prev => {
+    //                 const newVariants = [...prev];
+    //                 newVariants[index] = {
+    //                     id_guid: '',
+    //                     price_regular: '',
+    //                     price_sale: '',
+    //                     quantity: '',
+    //                     sku: '',
+    //                     image: '',
+    //                 };
+    //                 return newVariants;
+    //             });
+    //         }
+    //         return newCheckedItems;
+    //     });
+    // };
     const createProductMutation = useMutation({
         mutationFn: productStore,
         onMutate: () => {
@@ -692,13 +779,13 @@ const ProductForm = () => {
                 });
             }
         } else {
-            const filteredVariants = productVariantData.filter((_, index) => checkedItems[index]);
+            // const filteredVariants = productVariantData.filter((_, index) => checkedItems[index]);
             const productPayload = {
                 ...values,
                 img_thumbnail: urlImage,
                 gallery: imageGallery,
                 attribute_item_id: attributeData,
-                product_variant: filteredVariants,
+                product_variant: productVariantData,
             };
             if (id) {
                 updateProductMutation.mutate(productPayload);
