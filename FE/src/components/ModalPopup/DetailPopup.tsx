@@ -38,7 +38,7 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
   const [dataAttribute, setDataAttribute] = useState<any>(
     transformAttributes(attributes)
   );
-  console.log("dataAttribute", dataAttribute)
+  console.log("dataAttribute", dataAttribute);
   const resultDataAttribute = Object.entries(
     productSeeMore?.unique_attributes ?? {}
   ).map(([key, value]) => ({
@@ -48,7 +48,6 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
       name,
     })),
   }));
-
 
   const priceProduct = productSeeMore?.variants?.map((e: any) => e?.price_sale);
   const minPrice =
@@ -68,7 +67,10 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
         const attributeItemId = attribute.pivot.attribute_item_id;
 
         // Kiểm tra nếu dataAttribute có giá trị và nó trùng với attribute_item_id của pivot
-        return dataAttribute[attributeName] && dataAttribute[attributeName] === attributeItemId.toString();
+        return (
+          dataAttribute[attributeName] &&
+          dataAttribute[attributeName] === attributeItemId.toString()
+        );
       });
     });
 
@@ -90,7 +92,7 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
     }));
     // findMatchingVariant();
   };
-  console.log("productSeeMore?.variants", productSeeMore?.variants)
+  console.log("productSeeMore?.variants", productSeeMore?.variants);
 
   const result = productSeeMore?.variants
     ?.filter(
@@ -124,7 +126,7 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
           return (
             x[key] &&
             x[key].toString() ===
-            dataAttribute?.product_variant[key]?.toString()
+              dataAttribute?.product_variant[key]?.toString()
           );
         }
         return true;
@@ -157,7 +159,7 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
     setSelectedVariantId(null);
     onClose();
   };
-  console.log("productSeeMore.quantity", productSeeMore.quantity)
+  console.log("productSeeMore.quantity", productSeeMore.quantity);
   // const handleCheckout = () => {
   //   if (productSeeMore.quantity <= 0) {
   //     toast.error("Sản phẩm này đã hết hàng")
@@ -183,10 +185,14 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
     if (open && productSeeMore?.variants?.length > 0) {
       const firstVariant = productSeeMore.variants[0];
       setSelectedVariantId(firstVariant.id);
-      const initialAttributes = firstVariant.attributes.reduce((acc: any, attr: any) => {
-        acc[attr.name.toLowerCase()] = attr.pivot.attribute_item_id.toString();
-        return acc;
-      }, {});
+      const initialAttributes = firstVariant.attributes.reduce(
+        (acc: any, attr: any) => {
+          acc[attr.name.toLowerCase()] =
+            attr.pivot.attribute_item_id.toString();
+          return acc;
+        },
+        {}
+      );
       setDataAttribute(initialAttributes);
     }
   }, [open, productSeeMore]);
@@ -196,7 +202,8 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
         return Object.keys(dataAttribute).every((attrKey) => {
           const attribute = variant.attributes.find(
             (attr: any) =>
-              attr.name.toLowerCase() === attrKey && attr.pivot.value === dataAttribute[attrKey]
+              attr.name.toLowerCase() === attrKey &&
+              attr.pivot.value === dataAttribute[attrKey]
           );
           return attribute !== undefined;
         });
@@ -278,16 +285,26 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
 
                     // Kiểm tra nếu item bị active (trạng thái đã được chọn hoặc chưa chọn nhưng là lựa chọn đầu tiên)
                     const isActive =
-                      (dataAttribute[e.attribute.toLowerCase()] === item.id) ||
-                      (index === 0 && !dataAttribute[e.attribute.toLowerCase()]);
+                      dataAttribute[e.attribute.toLowerCase()] === item.id ||
+                      (index === 0 &&
+                        !dataAttribute[e.attribute.toLowerCase()]);
 
                     return (
                       <div
                         key={item.id}
                         className={`relative flex-1 max-w-[75px] h-8 sm:h-8 rounded-full border-2 cursor-pointer p-2
-        ${isActive ? "border-black" : isDisabled ? "border-gray-200 opacity-50 cursor-not-allowed"
-                            : "border-2"}`}
-                        style={isActive ? { backgroundColor: item.name.toLowerCase() } : {}}
+        ${
+          isActive
+            ? "border-black"
+            : isDisabled
+              ? "border-gray-200 opacity-50 cursor-not-allowed"
+              : "border-2"
+        }`}
+                        style={
+                          isActive
+                            ? { backgroundColor: item.name.toLowerCase() }
+                            : {}
+                        }
                         onClick={() => {
                           if (isDisabled) return; // Nếu bị disable thì không thực hiện gì
                           getAttribute(e.attribute.toLowerCase(), item.id);
@@ -299,13 +316,13 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
                             style={{ backgroundColor: item.name.toLowerCase() }}
                           ></div>
                         ) : (
-                          <p className="flex items-center justify-center h-full text-sm">{item.name}</p>
+                          <p className="flex items-center justify-center h-full text-sm">
+                            {item.name}
+                          </p>
                         )}
                       </div>
                     );
                   })}
-
-
                 </div>
               </div>
             );
@@ -315,7 +332,7 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
             <div className="hd-quantity relative block min-w-[120px] w-[120px] h-10 hd-all-btn">
               <button
                 type="button"
-                onClick={() => setQty(prev => (prev > 1 ? prev - 1 : 1))}
+                onClick={() => setQty((prev) => (prev > 1 ? prev - 1 : 1))}
                 className="hd-btn-item left-0 text-left pl-[15px] p-0 top-0 text-sm cursor-pointer shadow-none transform-none touch-manipulation"
               >
                 <MinusOutlined />
@@ -325,7 +342,7 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
               </span>
               <button
                 type="button"
-                onClick={() => setQty(prev => prev + 1)}
+                onClick={() => setQty((prev) => prev + 1)}
                 className="hd-btn-item right-0 text-right pr-[15px] p-0 top-0 text-sm cursor-pointer shadow-none transform-none touch-manipulation"
               >
                 <svg
