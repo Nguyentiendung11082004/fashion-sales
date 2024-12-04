@@ -163,16 +163,28 @@ const HistoryOrder = () => {
   const [InForCommentId, setInForCommentId] = useState<string | null>(null);
 
   const [listIdProduct, setListIdProduct] = useState<any[]>([]);
+  const [listInForProducts, setListInForProducts] = useState<any[]>([]);
 
   const [isShowFormCmtOpen, setShowFormCmtOpen] = useState(false);
-
   const showFormCmt = (order: any) => {
+    console.log("data order nè : ", order);
     setShowFormCmtOpen(true);
     setSelectedOrder(order);
+
     const listIdProducts = order?.order_details?.map(
       (detail: any) => detail.product_id
     );
+
+    const listInForProducts = order?.order_details?.map((detail: any) => {
+      return {
+        product_id: detail.product_id,
+        product_img: detail.product_img,
+        product_name: detail.product_name,
+      };
+    });
+
     setListIdProduct(listIdProducts || []);
+    setListInForProducts(listInForProducts || []);
   };
 
   const closeFormCmt = () => {
@@ -190,6 +202,14 @@ const HistoryOrder = () => {
   const handleCloseFormReason = () => {
     setVisible(false);
   };
+
+  const handleGetReturnRequest = (id: number) => {
+    console.log(" kiểm tra id xem yêu cầu : ", id);
+    navigate(`return_requests`, { state: { id } });
+  };
+
+  console.log("data lịch sử đơn hàng: ", data);
+
   return (
     <>
       <main
@@ -272,7 +292,9 @@ const HistoryOrder = () => {
               </h2>
 
               {data?.map((order: any) => {
-                const isExpanded = expandedOrders.includes(order.id); // Kiểm tra xem order có trong danh sách mở
+                console.log("data id đang tìm: ", order);
+                const isExpanded = expandedOrders.includes(order.id);
+                console.log("isExpanded:", isExpanded);
                 const isDelivered =
                   order.order_status.toLowerCase() === "giao hàng thành công";
                 const isCancelOk =
@@ -285,6 +307,11 @@ const HistoryOrder = () => {
                   order.order_status.trim().toLowerCase() === "đang vận chuyển";
                 const complete =
                   order.order_status.trim().toLowerCase() === "hoàn thành";
+                const requestReturn =
+                  order.order_status.trim().toLowerCase() ===
+                  "yêu cầu hoàn trả hàng";
+                const completedReturn =
+                  order.order_status.trim().toLowerCase() === "hoàn trả hàng";
 
                 const handleCancelClick = (id: number, status: string) => {
                   if (!isCancelOk) {
@@ -310,6 +337,8 @@ const HistoryOrder = () => {
                     // Xóa lý do sau khi hủy
                   }
                 };
+
+                const disableCmt: any[] = [];
 
                 return (
                   <div
@@ -552,7 +581,7 @@ const HistoryOrder = () => {
                     <div className="hd-head-form-order flex sm:flex-row justify-between lg:justify-between sm:justify-between sm:items-center p-4 sm:p-8">
                       <div className="mt-3 sm:mt-0">
                         <div className="flex items-center space-x-2">
-                          {(isDelivered || shipOk) && (
+                          {(isDelivered || requestReturn || shipOk) && (
                             <>
                               <button
                                 className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB]  font-medium ${
@@ -566,22 +595,21 @@ const HistoryOrder = () => {
                                 Đã Nhận Hàng
                               </button>
 
-                              <button
-                                className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB]  font-medium ${
-                                  shipOk
-                                    ? "bg-gray-200 text-gray-400 border cursor-pointer border-gray-300"
-                                    : "text-white"
-                                }`}
-                                disabled={shipOk}
-                                onClick={() => handleOpenFormReason(order)}
-                              >
-                                Yêu cầu trả hàng
-                              </button>
-                              <ReasonReturn
-                                open={visiable}
-                                onClose={handleCloseFormReason}
-                                dataOrderRequest={dataOrderRequest}
-                              />
+                              {requestReturn && (
+                                <button
+                                  className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB]  font-medium ${
+                                    shipOk
+                                      ? "bg-gray-200 text-gray-400 border cursor-pointer border-gray-300"
+                                      : "text-white"
+                                  }`}
+                                  disabled={shipOk}
+                                  onClick={() =>
+                                    handleGetReturnRequest(order?.id)
+                                  }
+                                >
+                                  Xem yêu cầu hoàn trả
+                                </button>
+                              )}
                             </>
                           )}
 
@@ -602,10 +630,11 @@ const HistoryOrder = () => {
                                 centered
                               >
                                 <CommentProduct
+                                  selectedOrder={selectedOrder}
                                   listIdProduct={listIdProduct}
                                   InForCommentId={InForCommentId}
                                   isShowFormCmtOpen={isShowFormCmtOpen}
-                                  dataProductIdQuery={data}
+                                  listInForProducts={listInForProducts}
                                   setShowFormCmtOpen={setShowFormCmtOpen}
                                 />
                               </Modal>
@@ -628,7 +657,7 @@ const HistoryOrder = () => {
                             </button>
                           )}
 
-                          {(canCel || complete) && (
+                          {(canCel || complete || completedReturn) && (
                             // Nút "Mua Lại" khi đơn hàng đã hủy hoặc hoàn thành
                             <button
                               className="nc-Button relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB] text-white font-medium"
@@ -636,6 +665,26 @@ const HistoryOrder = () => {
                             >
                               Mua Lại
                             </button>
+                          )}
+                          {complete && (
+                            <>
+                              <button
+                                className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB]  font-medium ${
+                                  shipOk
+                                    ? "bg-gray-200 text-gray-400 border cursor-pointer border-gray-300"
+                                    : "text-white"
+                                }`}
+                                disabled={shipOk}
+                                onClick={() => handleOpenFormReason(order)}
+                              >
+                                Yêu cầu trả hàng
+                              </button>
+                              <ReasonReturn
+                                open={visiable}
+                                onClose={handleCloseFormReason}
+                                dataOrderRequest={dataOrderRequest}
+                              />
+                            </>
                           )}
                         </div>
 

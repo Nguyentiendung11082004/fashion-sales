@@ -136,7 +136,6 @@ const ProductDetail = () => {
     }
     setOpenComments(updatedOpenComments);
   };
-
   // Hàm render bình luận
   const renderComments = (
     comments: any,
@@ -240,7 +239,6 @@ const ProductDetail = () => {
                       editIdComment={editIdComment}
                       InForCommentId={InForCommentId}
                       isShowFormCmtOpen={isShowFormCmtOpen}
-                      dataProductIdQuery={data}
                       setShowFormCmtOpen={setShowFormCmtOpen}
                     />
                   </Modal>

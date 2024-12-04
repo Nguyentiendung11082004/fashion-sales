@@ -12,18 +12,10 @@ const ReturnRequest = () => {
   const items = location.state?.items;
   const reasonReturn = location.state?.reasonFromState;
   const dataOrder = location.state?.dataOrder;
-
-  console.log("kiểm tra items: ", items);
-  console.log("kiểm tra dataOrder: ", dataOrder);
-  console.log("kiểm tra reasonReturn: ", reasonReturn);
-
   const filteredProduct = dataOrder.order_details?.filter((product: any) =>
     items.some((item: any) => item.order_detail_id === product.id)
   );
   const navigate = useNavigate();
-
-  console.log("sp đã lọc: ", filteredProduct);
-
   const updatedProducts = filteredProduct.map((product: any) => {
     const item = items.find((i: any) => i.order_detail_id === product.id);
     if (item) {
@@ -76,14 +68,11 @@ const ReturnRequest = () => {
   const [refund, setRefund] = useState<number>(0);
 
   useEffect(() => {
-    // Calculate total refund
     const totalRefund = updatedProducts.reduce((acc: number, product: any) => {
       return acc + product.price * product.quantity;
     }, 0);
-    setRefund(totalRefund); // Set the calculated refund amount
-  }, [updatedProducts]); // Recalculate when updatedProducts changes
-
-  console.log("sp đã cập nhật số lượng: ", updatedProducts);
+    setRefund(totalRefund);
+  }, [updatedProducts]);
 
   return (
     <>
@@ -178,7 +167,6 @@ const ReturnRequest = () => {
                   Số tiền hoàn lại: {refund.toLocaleString("vi-VN")} VNĐ
                 </span>
                 <br />
-                <span className="text-base pb-4 ml-4">Hoàn tiền vào: ???</span>
               </div>
 
               <div className="fixed bottom-0 left-[134px] right-[134px] flex justify-between items-center p-6 border border-gray-200 rounded-lg shadow-md bg-white hover:shadow-lg transition-shadow duration-300">

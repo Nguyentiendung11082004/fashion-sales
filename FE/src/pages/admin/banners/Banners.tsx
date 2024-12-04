@@ -3,10 +3,11 @@
 import Loading from "@/common/Loading/Loading";
 import { IBanner } from "@/common/types/banners";
 import { IUser } from "@/common/types/users";
+import instance from "@/configs/axios";
 import { bannersDestroy, bannersIndex } from "@/services/api/admin/banners";
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Button, Image, Modal, Pagination } from "antd";
+import { Button, Image, Input, Modal, Pagination } from "antd";
 import Table, { ColumnType } from "antd/es/table";
 import dayjs from "dayjs";
 import { useState, useEffect } from "react";
@@ -81,12 +82,12 @@ const Banner = () => {
       width: 50,
     },
     {
-      title: "Title",
+      title: "Tiêu đề",
       dataIndex: "title",
       width: 200,
     },
     {
-      title: "Img",
+      title: "Ảnh",
       dataIndex: "image",
       render: (image: any) => (
         <Image src={image} style={{ height: "50", margin: "0 auto" }} />
@@ -159,12 +160,31 @@ const Banner = () => {
       }))
     : [];
 
+
+
   return (
     <div className="p-6 min-h-screen">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2">
-          Banner
-        </h1>
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 md:gap-8">
+          <h1 className="text-3xl font-bold text-gray-800 border-b-4 border-gray-300 pb-2">
+            Banner
+          </h1>
+          {/* <form className="flex items-center gap-2">
+            <Input
+              // value={query}
+              // onChange={(e) => setQuery(e.target.value)}
+              placeholder="Tìm kiếm"
+              className="w-full md:w-64 px-4 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
+            />
+            <Button
+              // onClick={handleSearch}
+              className="bg-indigo-500 hover:bg-indigo-600 text-white font-medium py-2 px-4 rounded-lg shadow"
+            >
+              Tìm kiếm
+            </Button>
+          </form> */}
+        </div>
+
         <Link to={`create`}>
           <Button
             className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 flex items-center"

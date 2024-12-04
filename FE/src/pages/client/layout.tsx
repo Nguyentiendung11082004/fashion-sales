@@ -4,7 +4,11 @@ import Footer from "../../components/website/Footer";
 
 const LayoutWebsite = () => {
   const location = useLocation();
-  const hideFooterRoutes = ["/requestOrder", "/return/request_order"];
+  const hideFooterRoutes = [
+    "/requestOrder",
+    "/return/request_order",
+    "/history-order/return_requests",
+  ];
   const shouldHideFooter = hideFooterRoutes.includes(location.pathname);
 
   return (

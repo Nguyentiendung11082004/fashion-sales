@@ -8,4 +8,5 @@ export interface Icomments {
   rating: number;
   image?: string;
   status: number;
+  order_id: string;
 }
