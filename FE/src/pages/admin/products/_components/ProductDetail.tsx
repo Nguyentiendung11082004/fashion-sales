@@ -179,7 +179,7 @@ const ProductDetailAdmin = () => {
               )}
             </p>
             <p className="bg-gray-100 text-base flex p-4 rounded-lg mt-3">
-               <p className="font-medium mr-1">Lượt xem:</p>  <span>100</span>
+               <p className="font-medium mr-1">Lượt xem: {productShow.views}</p> 
               </p>
 
             

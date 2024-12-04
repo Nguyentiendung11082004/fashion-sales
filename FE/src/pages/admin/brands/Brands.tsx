@@ -1,9 +1,10 @@
 import Loading from "@/common/Loading/Loading";
 import { Ibrands } from "@/common/types/brands";
+import instance from "@/configs/axios";
 import { deleteBrand, getBrands } from "@/services/api/admin/brands.api";
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Button, Modal, Pagination } from "antd";
+import { Button, Input, Modal, Pagination } from "antd";
 import Table, { ColumnType } from "antd/es/table";
 import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -19,11 +20,27 @@ const Brands = () => {
   const [visiable, setVisiable] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const [query, setQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]); 
 
   const { data, isFetching, isError } = useQuery({
     queryKey: ["brands"],
     queryFn: getBrands,
   });
+
+  const handleSearch = async () => {
+    if (!query.trim()) {
+      setSearchResults(data?.data?.brands || []);
+      return;
+    }
+    try {
+      const response = await instance.post("/brand/search", { query });
+      setSearchResults(response.data.data);
+    } catch (error) {
+      toast.error("Không tìm thấy thương hiệu nào!");
+      setSearchResults([]);
+    }
+  };
 
   const { mutate } = useMutation({
     mutationFn: deleteBrand,
@@ -58,7 +75,7 @@ const Brands = () => {
 
   useEffect(() => {
     const savedPage = localStorage.getItem("currentPage");
-  
+
     if (location.state?.currentPage) {
       setCurrentPage(location.state.currentPage);
     } else if (savedPage) {
@@ -129,11 +146,10 @@ const Brands = () => {
     },
   ];
 
-  const dataSource =
-    data?.data?.brands?.map((item: Ibrands) => ({
-      key: item?.id,
-      ...item,
-    })) || [];
+  const dataSource = (searchResults.length ? searchResults : data?.data?.brands || []).map((item: any) => ({
+    key: item?.id,
+    ...item,
+  }));
 
   useEffect(() => {
     if (isError && !hasError) {
@@ -148,6 +164,18 @@ const Brands = () => {
         <h1 className="text-3xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2">
           Brands
         </h1>
+        <div className="flex items-center">
+          <Input className="w-80" placeholder="Tìm kiếm thương hiệu" value={query}
+            onChange={(e) => {
+              const value = e.target.value;
+              setQuery(value);
+    
+              if (!value.trim()) {
+                setSearchResults(data?.data?.brands || []);
+              }
+            }}/>
+          <Button className="ml-1" onClick={handleSearch}>Tìm kiếm</Button>
+        </div>
         <div>
           <Link to={`create`}>
             <Button

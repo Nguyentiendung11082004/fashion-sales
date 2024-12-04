@@ -58,7 +58,6 @@ const Header = (props: Props) => {
   } else if (cartItems && typeof cartItems === "object") {
     qty += cartItems.quantity;
   }
-  
 
   if (isLoading) return <Loading />;
   return (
@@ -176,16 +175,20 @@ const Header = (props: Props) => {
                     Giới thiệu
                   </Link>
                 </li>
-                <li>
-                  <Link
-                    to="/order_lookup"
-                    className={`font-medium text-hover uppercase ${
-                      location.pathname === "/order_lookup" ? "text-[#00BADB]" : ""
-                    }`}
-                  >
-                    Tra cứu đơn hàng
-                  </Link>
-                </li>
+                {!token && (
+                  <li>
+                    <Link
+                      to="/order_lookup"
+                      className={`font-medium text-hover uppercase ${
+                        location.pathname === "/order_lookup"
+                          ? "text-[#00BADB]"
+                          : ""
+                      }`}
+                    >
+                      Tra cứu đơn hàng
+                    </Link>
+                  </li>
+                )}
               </ul>
             </div>
             <div className="lg:col-span-2 col-span-4 flex items-center justify-end order-3 z">

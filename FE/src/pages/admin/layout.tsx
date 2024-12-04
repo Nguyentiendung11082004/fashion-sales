@@ -264,27 +264,162 @@ const LayoutAdmin: React.FC = () => {
   };
   const location = useLocation();
   // Map đường dẫn thành key
-  const pathToKeyMap: Record<string, string> = {
-    "/admin": "1",
-    "/admin/products": "2",
-    "/admin/orders": "12",
-    "/admin/categories": "3",
-    "/admin/banners": "20",
-    "/admin/attributes": "5",
-    "/admin/attribute-values": "6",
-    "/admin/clients": "8",
-    "/admin/employees": "9",
-    "/admin/posts": "15",
-    "/admin/vouchers": "30",
-    "/admin/comments": "10",
-    "/admin/chatbox": "11",
-    "/admin/tags": "13",
-    "/admin/brands": "14",
+  const pathToKeyMap = (pathname: string): string => {
+    // "/admin": "1",
+    // "/admin/products": "2",
+    // "/admin/products/create": "2",
+    // "/admin/products/:id": "2",
+    // "/admin/products/edit/:id": "2",
+    // "/admin/orders": "12",
+    // "/admin/categories": "3",
+    // "/admin/banners": "20",
+    // "/admin/attributes": "5",
+    // "/admin/attribute-values": "6",
+    // "/admin/clients": "8",
+    // "/admin/employees": "9",
+    // "/admin/posts": "15",
+    // "/admin/vouchers": "30",
+    // "/admin/comments": "10",
+    // "/admin/chatbox": "11",
+    // "/admin/tags": "13",
+    // "/admin/brands": "14",
+    if (pathname === "/admin") {
+      return "1";
+    }
+    if (pathname === "/admin/products" || pathname.startsWith("/admin/products/")) {
+      return "2";
+    }
+    if (pathname === "/admin/products/create") {
+      return "2";
+    }
+    if (pathname.startsWith("/admin/products/edit/")) {
+      return "2";
+    }
+
+    if (pathname === "/admin/orders" || pathname.startsWith("/admin/orders/")) {
+      return "12";
+    }
+    if (pathname === "/admin/orders/create") {
+      return "12";
+    }
+    if (pathname.startsWith("/admin/orders/edit/")) {
+      return "12";
+    }
+
+    if (pathname === "/admin/categories" || pathname.startsWith("/admin/categories/")) {
+      return "3";
+    }
+    if (pathname === "/admin/categories/create") {
+      return "3";
+    }
+    if (pathname.startsWith("/admin/categories/edit/")) {
+      return "3";
+    }
+
+    if (pathname === "/admin/banners" || pathname.startsWith("/admin/banners/")) {
+      return "20";
+    }
+    if (pathname === "/admin/banners/create") {
+      return "20";
+    }
+    if (pathname.startsWith("/admin/banners/edit/")) {
+      return "20";
+    }
+
+    if (pathname === "/admin/attributes" || pathname.startsWith("/admin/attributes/")) {
+      return "5";
+    }
+    if (pathname === "/admin/attributes/create") {
+      return "5";
+    }
+    if (pathname.startsWith("/admin/attributes/edit/")) {
+      return "5";
+    }
+
+    if (pathname === "/admin/attribute-values" || pathname.startsWith("/admin/attribute-values/")) {
+      return "6";
+    }
+    if (pathname === "/admin/attribute-values/create") {
+      return "6";
+    }
+    if (pathname.startsWith("/admin/attribute-values/edit/")) {
+      return "6";
+    }
+
+    if (pathname === "/admin/clients" || pathname.startsWith("/admin/clients/")) {
+      return "8";
+    }
+    if (pathname === "/admin/clients/create") {
+      return "8";
+    }
+    if (pathname.startsWith("/admin/clients/edit/")) {
+      return "8";
+    }
+
+    if (pathname === "/admin/employees" || pathname.startsWith("/admin/employees/")) {
+      return "9";
+    }
+    if (pathname === "/admin/employees/create") {
+      return "9";
+    }
+    if (pathname.startsWith("/admin/employees/edit/")) {
+      return "9";
+    }
+
+    if (pathname === "/admin/posts" || pathname.startsWith("/admin/posts/")) {
+      return "15";
+    }
+    if (pathname === "/admin/posts/create") {
+      return "15";
+    }
+    if (pathname.startsWith("/admin/posts/edit/")) {
+      return "15";
+    }
+
+    if (pathname === "/admin/vouchers" || pathname.startsWith("/admin/vouchers/")) {
+      return "30";
+    }
+    if (pathname === "/admin/vouchers/create") {
+      return "30";
+    }
+    if (pathname.startsWith("/admin/vouchers/edit/")) {
+      return "30";
+    }
+
+    if (pathname === "/admin/comments" || pathname.startsWith("/admin/comments/")) {
+      return "10";
+    }
+    if (pathname === "/admin/comments/create") {
+      return "10";
+    }
+    if (pathname.startsWith("/admin/comments/edit/")) {
+      return "10";
+    }
+
+    if (pathname === "/admin/tags" || pathname.startsWith("/admin/tags/")) {
+      return "13";
+    }
+    if (pathname === "/admin/tags/create") {
+      return "13";
+    }
+    if (pathname.startsWith("/admin/tags/edit/")) {
+      return "13";
+    }
+
+    if (pathname === "/admin/brands" || pathname.startsWith("/admin/brands/")) {
+      return "14";
+    }
+    if (pathname === "/admin/brands/create") {
+      return "14";
+    }
+    if (pathname.startsWith("/admin/brands/edit/")) {
+      return "14";
+    }
+    return "1"; // Mặc định nếu không khớp`
   };
 
   // Tính toán selectedKeys ngay lập tức
-  const currentKey = pathToKeyMap[location.pathname] || "1";
-  
+  const currentKey = pathToKeyMap(location.pathname);
 
   return (
     <Layout>
