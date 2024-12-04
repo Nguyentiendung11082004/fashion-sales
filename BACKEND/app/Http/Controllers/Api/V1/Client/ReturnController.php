@@ -246,54 +246,56 @@ class ReturnController extends Controller
         try {
 
             $returnRequests = ReturnRequest::query()
-                ->with(["order.orderDetails", 'items']) // Load quan hệ liên quan
-                ->findOrFail($id); // Lấy dữ liệu theo ID, nếu không có thì trả lỗi 404
-
-            // Chuyển đổi dữ liệu
-            $result = [
-                'id' => $returnRequests->id,
-                'order_id' => $returnRequests->order_id,
-                'user_id' => $returnRequests->user_id,
-                'reason' => $returnRequests->reason,
-                'status' => $returnRequests->status,
-                'created_at' => $returnRequests->created_at->format('Y-m-d H:i:s'),
-                'updated_at' => $returnRequests->updated_at->format('Y-m-d H:i:s'),
-                'items' => $returnRequests->items->map(function ($item) use ($returnRequests) {
-                    return [
-                        'id' => $item->id,
-                        'request_id' => $item->return_request_id,
-                        'order_detail_id' => $item->order_detail_id,
-                        'image' => $item->image,
-                        'quantity' => $item->quantity,
-                        'status' => $item->status,
-                        'order' => [
-                            'id' => $returnRequests->order->id,
-                            'total' => $returnRequests->order->total,
-                            'total_quantity' => $returnRequests->order->total_quantity,
-                            'order_status' => $returnRequests->order->order_status,
-                            'order_code' => $returnRequests->order->order_code,
-                            'payment_status' => $returnRequests->order->payment_status,
-                            'order_details' => $returnRequests->order->orderDetails->map(function ($detail) {
-                                return [
-                                    "id" => $detail->id,
-                                    "product_id" => $detail->product_id,
-                                    "product_variant_id" => $detail->product_variant_id,
-                                    "order_id" => $detail->order_id,
-                                    "product_name" => $detail->product_name,
-                                    "product_img" => $detail->product_img,
-                                    "attributes" => $detail->attributes,
-                                    "quantity" => $detail->quantity,
-                                    "price" => $detail->price,
-                                    "total_price" => $detail->total_price,
-                                    "discount" => $detail->discount,
-                                    "created_at" => $detail->created_at->format('Y-m-d H:i:s'),
-                                    "updated_at" => $detail->updated_at->format('Y-m-d H:i:s'),
-                                ];
-                            })
-                        ],
-                    ];
-                }),
-            ];
+            ->with(['order', 'order.orderDetails', 'items']) // Load quan hệ liên quan
+            ->findOrFail($id);
+        
+        // Chuyển đổi dữ liệu
+        $result = [
+            'id' => $returnRequests->id,
+            'order_id' => $returnRequests->order_id,
+            'user_id' => $returnRequests->user_id,
+            'reason' => $returnRequests->reason,
+            'status' => $returnRequests->status,
+            'created_at' => $returnRequests->created_at->format('Y-m-d H:i:s'),
+            'updated_at' => $returnRequests->updated_at->format('Y-m-d H:i:s'),
+            'items' => $returnRequests->items->map(function ($item) use ($returnRequests) {
+                // Lấy thông tin chi tiết đơn hàng tương ứng với order_detail_id của item
+                $orderDetail = $returnRequests->order->orderDetails->firstWhere('id', $item->order_detail_id);
+        
+                return [
+                    'id' => $item->id,
+                    'request_id' => $item->return_request_id,
+                    'order_detail_id' => $item->order_detail_id,
+                    'image' => $item->image,
+                    'quantity' => $item->quantity,
+                    'status' => $item->status,
+                    'order' => [
+                        'id' => $returnRequests->order->id,
+                        'total' => $returnRequests->order->total,
+                        'total_quantity' => $returnRequests->order->total_quantity,
+                        'order_status' => $returnRequests->order->order_status,
+                        'order_code' => $returnRequests->order->order_code,
+                        'payment_status' => $returnRequests->order->payment_status,
+                        'order_detail' => $orderDetail ? [
+                            "id" => $orderDetail->id,
+                            "product_id" => $orderDetail->product_id,
+                            "product_variant_id" => $orderDetail->product_variant_id,
+                            "order_id" => $orderDetail->order_id,
+                            "product_name" => $orderDetail->product_name,
+                            "product_img" => $orderDetail->product_img,
+                            "attributes" => $orderDetail->attributes,
+                            "quantity" => $orderDetail->quantity,
+                            "price" => $orderDetail->price,
+                            "total_price" => $orderDetail->total_price,
+                            "discount" => $orderDetail->discount,
+                            "created_at" => $orderDetail->created_at->format('Y-m-d H:i:s'),
+                            "updated_at" => $orderDetail->updated_at->format('Y-m-d H:i:s'),
+                        ] : null, // Nếu không tìm thấy chi tiết đơn hàng, trả về null
+                    ],
+                ];
+            }),
+        ];
+        
 
             return response()->json([
                 'message' => 'Lấy dữ liệu thành công',
