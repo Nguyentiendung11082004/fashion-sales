@@ -10,15 +10,14 @@ import { toast } from "react-toastify";
 
 const GetReturnRequestOrderId = () => {
   const location = useLocation();
-  const order_id = location?.state.order_id;
-  console.log("keiemr tra order_id ", order_id);
+  const request_id = location?.state.id;
   const { token } = useAuth();
 
   const { data: dataReturnRequest } = useQuery({
-    queryKey: ["return-requests"],
+    queryKey: ["return-item"],
     queryFn: async () => {
       try {
-        return await instance.get(`user/return-item/${order_id}`, {
+        return await instance.get(`user/return-item/${request_id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -29,24 +28,12 @@ const GetReturnRequestOrderId = () => {
     },
   });
 
-  console.log("kiểm tra dataReturnRequest: ", dataReturnRequest);
-  const returnRequest = dataReturnRequest?.data?.data?.find(
-    (item: any) => Number(item.order_id) === Number(order_id)
-  );
-
-  console.log("returnRequest", returnRequest);
-
-  const dataSource = returnRequest?.items
-    ? returnRequest.items.map((item: any, index: number) => ({
-        key: item.id,
-        productName: item.name,
-        image: item.image,
-        quantity: item.quantity,
-        status: returnRequest.status,
+  const dataSource = dataReturnRequest?.data?.data?.items
+    ? dataReturnRequest?.data?.data?.items.map((item: any, index: number) => ({
+        key: item?.id,
+        ...item,
       }))
     : [];
-
-  console.log("data trả hàng: ", dataSource);
 
   const column: any = [
     {
@@ -71,7 +58,6 @@ const GetReturnRequestOrderId = () => {
     // },
   ];
 
-  console.log("token nè : ", token);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { mutate } = useMutation({
@@ -109,6 +95,7 @@ const GetReturnRequestOrderId = () => {
       cancel_items: cancelItems,
     });
   };
+  console.log("data trả hàng dataSource theo id : ", dataSource);
 
   return (
     <>
@@ -138,9 +125,9 @@ const GetReturnRequestOrderId = () => {
                 </div>
               </div>
 
-              <div className="text-gray-600 text-center lg:text-left mt-4 lg:mt-0">
+              {/* <div className="text-gray-600 text-center lg:text-left mt-4 lg:mt-0">
                 <p className="text-sm lg:text-base">{returnRequest?.reason}</p>
-              </div>
+              </div> */}
             </div>
 
             <div className="space-y-4 mb-[100px]">
@@ -164,12 +151,12 @@ const GetReturnRequestOrderId = () => {
                     VNĐ
                   </p>
                 </div>
-                <button
+                {/* <button
                   className="bg-blue-600 text-white hover:bg-blue-700 rounded-lg shadow-md px-6 py-2"
                   onClick={() => cancelReturnRequest(returnRequest?.id)}
                 >
                   Hủy yêu cầu
-                </button>
+                </button> */}
               </div>
             </div>
           </section>

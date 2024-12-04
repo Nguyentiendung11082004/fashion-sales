@@ -604,7 +604,9 @@ const HistoryOrder = () => {
                                   }`}
                                   disabled={shipOk}
                                   onClick={() =>
-                                    handleGetReturnRequest(order?.id)
+                                    handleGetReturnRequest(
+                                      order?.return_requests[0]?.id
+                                    )
                                   }
                                 >
                                   Xem yêu cầu hoàn trả
