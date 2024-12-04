@@ -451,11 +451,21 @@ class OrderController extends Controller
                 return response()->json(['message' => 'Không có quyền truy cập'], 403);
             }
             // Thông tin chi tiết đơn hàng
-            $order->load('orderDetails');
+            $order->load(['orderDetails', 'returnRequests']);
+
+            // Lọc các return_requests có status không phải "canceled"
+            $orderArray = $order->toArray();
+            $orderArray['return_requests'] = collect($orderArray['return_requests'])->filter(function ($request) {
+                return $request['status'] !== 'canceled';
+            })->values()->toArray();
+            
+            // Kiểm tra kết quả
+            // dd($orderArray);
+            
 
             // Trả về dữ liệu đơn hàng cùng với chi tiết dưới dạng JSON
             return response()->json([
-                'order' => $order,
+                'order' => $orderArray,
             ], 200);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Đã xảy ra lỗi khi lấy thông tin đơn hàng', 'error' => $e->getMessage()], 500);
