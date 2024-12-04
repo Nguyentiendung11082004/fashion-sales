@@ -97,12 +97,17 @@ const Dashboard = () => {
   }
   const [tongDonHang, setTongDonHang] = useState<any>([]);
   const [tongDoanhThu, setTongDoanhThu] = useState<any>([]);
+  const [tongUser,setTongUser] = useState<any>([]);
   const handleDonHang = (data: any) => {
     setTongDonHang(data)
   }
   const handleDoanhThu = (data:any) => {
     setTongDoanhThu(FormatMoney(data))
   }
+  const handleUser = (data:any) => {
+    setTongUser(data)
+  }
+  console.log("tongUser",tongUser)
   const _props = {
     filter,
     setFilter
@@ -190,7 +195,7 @@ const Dashboard = () => {
           <div className=" flex-wrap bg-white w-1/4 p-3 mr-4 rounded shadow-sm hover:transform hover:-translate-y-1 transition-all ease duration-400">
             <div className="flex justify-between">
               <h3 className="text-xs text-gray-400 font-bold">Tổng số đơn hàng</h3>
-              <span className="order text-red-500 font-medium">- 3.57 %</span>
+              {/* <span className="order text-red-500 font-medium">- 3.57 %</span> */}
             </div>
             <p className="text-xl font-semibold text-gray-600 mt-4">{tongDonHang?.total_quantity_in_order}</p>
             <div className="flex justify-between items-center">
@@ -207,10 +212,10 @@ const Dashboard = () => {
           </div>
           <div className="card-item flex-wrap bg-white w-1/4 p-3 mr-4 rounded shadow-sm hover:transform hover:-translate-y-1 transition-all ease duration-400">
             <div className="flex justify-between">
-              <h3 className="text-xs text-gray-400 font-medium">CUSTOMERS</h3>
-              <span className="text-green-500 font-medium">+29.08 %</span>
+              <h3 className="text-xs text-gray-400 font-medium">Tổng số người dùng</h3>
+              {/* <span className="text-green-500 font-medium">+29.08 %</span> */}
             </div>
-            <p className="text-xl font-semibold text-gray-600 mt-4">183.35M</p>
+            <p className="text-xl font-semibold text-gray-600 mt-4">{tongUser}</p>
             <div className="flex justify-between items-center">
               <a
                 href="#"
@@ -223,7 +228,7 @@ const Dashboard = () => {
               </button>
             </div>
           </div>
-          <div className="card-item flex-wrap bg-white w-1/4 p-3 rounded shadow-sm hover:transform hover:-translate-y-1 transition-all ease duration-400">
+          {/* <div className="card-item flex-wrap bg-white w-1/4 p-3 rounded shadow-sm hover:transform hover:-translate-y-1 transition-all ease duration-400">
             <div className="flex justify-between">
               <h3 className="text-xs text-gray-400 font-medium">MY BALANCE</h3>
               <span className="text-green-500 font-medium">+0.00 %</span>
@@ -240,7 +245,7 @@ const Dashboard = () => {
                 <FontAwesomeIcon icon={faBagShopping} />
               </button>
             </div>
-          </div>
+          </div> */}
         </div>
 
         <div className="page-dashboard__chart flex mt-5">
@@ -252,7 +257,7 @@ const Dashboard = () => {
             <Chart dataDonHang={handleDonHang} />
           </div> */}
           <div className="chart-right bg-white w-[100%] shadow">
-            <DonutChartWithStats dataDoanhThu={handleDoanhThu} />
+            <DonutChartWithStats dataDoanhThu={handleDoanhThu} dataUser={handleUser} />
           </div>
         </div>
 

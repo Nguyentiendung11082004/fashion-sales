@@ -203,30 +203,25 @@ const Checkout = () => {
     }
   }, [dataCheckout]);
   const getShipp = async () => {
-    // if (!(payloadDiaChi?.ward && payloadDiaChi?.district) || !(idXa && idQuanHuyen)) {
-    //   console.log("1")
-    //   return; // Dừng lại nếu không có đủ thông tin
-    // }
-    // setIsLoading(true);
     try {
-      setTimeout(async () => {
-        // Tiến hành các bước tính toán phí vận chuyển
-        let weight = dataCheckout?.order_items?.map((e: any) => Number(e.product.weight));
-        let totalWeight = weight?.reduce((sum: any, currentWeight: any) => sum + currentWeight, 0);
-        let toWardCode = payloadDiaChi?.ward?.id || idXa;
-        let toDistrictId = payloadDiaChi?.district?.id || idQuanHuyen;
-        let res = await instance.post(`/calculateshippingfee`, {
-          to_ward_code: String(toWardCode),
-          to_district_id: Number(toDistrictId),
-          weight: totalWeight
-        });
-        setShipPing(res?.data?.fee?.total); // Cập nhật phí vận chuyển
-        setOrder((prev) => ({ ...prev, shipping_fee: res?.data?.fee?.total }))
-      }, 0);
+      let weight = dataCheckout?.order_items?.map((e: any) => Number(e.product.weight));
+      let totalWeight = weight?.reduce((sum: any, currentWeight: any) => sum + currentWeight, 0);
+      let toWardCode = payloadDiaChi?.ward?.id || idXa;
+      let toDistrictId = payloadDiaChi?.district?.id || idQuanHuyen;
+      let res = await instance.post(`/calculateshippingfee`, {
+        to_ward_code: String(toWardCode),
+        to_district_id: Number(toDistrictId),
+        weight: totalWeight
+      });
+      setShipPing(res?.data?.fee?.total || 21000);
+      setOrder((prev) => ({ ...prev, shipping_fee: res?.data?.fee?.total || 21000 }));
+
     } catch (error) {
-      console.error("Error calculating shipping fee", error); // In lỗi nếu có
+      console.error("Lỗi khi tính toán phí vận chuyển", error);
+
     }
   };
+
   useEffect(() => {
     if (dataCheckout && dataCheckout.user) {
       setOrder((prevOrder) => ({
@@ -280,6 +275,7 @@ const Checkout = () => {
   const handleBuyNow = async () => {
     try {
       if (_payload || payloadDiaChi) {
+        console.log("2")
         setIsLoading(true);
         const response = await fetch('http://127.0.0.1:8000/api/v1/checkout', {
           method: 'POST',
@@ -816,7 +812,7 @@ const Checkout = () => {
                     }
                     <div className="flex justify-between py-2.5 mt-2">
                       <span>Phí ship</span>
-                      <span className="font-semibold text-slate-900">{FormatMoney(Number(shiping)) || 0}</span>
+                      <span className="font-semibold text-slate-900">{FormatMoney(Number(shiping)) ? FormatMoney(Number(shiping)) : 21000}</span>
                     </div>
 
                     <div className="flex justify-between font-semibold text-slate-900 text-base pt-4">
