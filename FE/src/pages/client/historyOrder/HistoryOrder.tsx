@@ -210,22 +210,17 @@ const HistoryOrder = () => {
 
   console.log("data lịch sử đơn hàng: ", data);
   //  data comment
-  // const
-  //   const { data: dataComment } = useQuery({
-  //     queryKey: ["comment"],
-  //     queryFn: async () => {
-  //       try {
-  //         return await instance.get("/comment", {
-  //           headers: {
-  //             Authorization: { token },
-  //           },
-  //         });
-  //       } catch (error) {
-  //         throw new Error("Lỗi!!!");
-  //       }
-  //     },
-  //   });
-  //   console.log("data comment: ", dataComment);
+  const { data: dataComment } = useQuery({
+    queryKey: ["comment"],
+    queryFn: async () => {
+      try {
+        return await instance.get("/comment");
+      } catch (error) {
+        throw new Error("Lỗi!!!");
+      }
+    },
+  });
+    console.log("data comment: ", dataComment);
 
   return (
     <>

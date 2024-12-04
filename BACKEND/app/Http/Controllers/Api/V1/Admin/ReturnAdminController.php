@@ -157,9 +157,7 @@ class ReturnAdminController extends Controller
 
     public function updateReturnItemStatus(Request $request, $returnItemId)
     {
-
         try {
-
             DB::transaction(function () use ($request, $returnItemId) {
                 $user = auth()->user();
                 // Validate input
@@ -170,6 +168,27 @@ class ReturnAdminController extends Controller
 
                 // Tìm return_item cần xử lý
                 $returnItem = ReturnItem::findOrFail($returnItemId);
+
+                // Kiểm tra tính hợp lệ của việc chuyển trạng thái
+                if ($returnItem->status === 'pending' && !in_array($validated['status'], ['canceled', 'approved', 'rejected'])) {
+                    throw new \Exception('Trạng thái không hợp lệ để chuyển đổi từ pending.');
+                }
+
+                if (in_array($returnItem->status, ['approved', 'rejected', 'canceled']) && $validated['status'] === 'pending') {
+                    throw new \Exception('Không thể quay lại trạng thái "pending" từ trạng thái hiện tại.');
+                }
+
+                if ($returnItem->status === 'canceled' && in_array($validated['status'], ['approved', 'rejected'])) {
+                    throw new \Exception('Không thể chuyển trạng thái từ "canceled" sang "approved" hoặc "rejected".');
+                }
+
+                if (($returnItem->status === 'approved' || $returnItem->status === 'rejected') && $validated['status'] === 'canceled') {
+                    throw new \Exception('Không thể chuyển trạng thái từ "approved" hoặc "rejected" sang "canceled".');
+                }
+
+                if (in_array($returnItem->status, ['approved', 'rejected']) && $validated['status'] !== $returnItem->status) {
+                    throw new \Exception('Trạng thái "approved" và "rejected" không thể chuyển đổi qua lại.');
+                }
 
                 // Lưu lịch sử vào return_log
                 $logComment = "Updated status to {$validated['status']}";
@@ -185,40 +204,29 @@ class ReturnAdminController extends Controller
                     'comment' => $logComment,
                 ]);
 
-                // Nếu trạng thái là "rejected", xử lý lý do và reset số lượng nếu cần
-                if ($validated['status'] === 'rejected') {
-                    if ($returnItem->status === 'approved') {
-                        // Nếu trạng thái trước đó là "approved", reset số lượng trong kho
-                        $orderDetail = OrderDetail::findOrFail($returnItem->order_detail_id);
-                        $product = Product::findOrFail($orderDetail->product_id);
+                // Cập nhật trạng thái cho return_item
+                $returnItem->update([
+                    'status' => $validated['status'],
+                ]);
 
-                        // Trừ số lượng sản phẩm trong kho
-                        $product->update([
-                            'quantity' => $product->quantity - $returnItem->quantity,
+                // Kiểm tra xem sản phẩm có phải là biến thể hay không
+                if ($validated['status'] === 'approved') {
+                    $orderDetail = OrderDetail::findOrFail($returnItem->order_detail_id);
+                    $product = Product::findOrFail($orderDetail->product_id);
+
+                    // Kiểm tra sản phẩm có biến thể không
+                    if ($orderDetail->product_variant_id) {
+                        // Nếu là biến thể sản phẩm, cộng số lượng vào bảng product_variants
+                        $productVariant = ProductVariant::findOrFail($orderDetail->product_variant_id);
+                        $productVariant->update([
+                            'quantity' => $productVariant->quantity + $returnItem->quantity,
                         ]);
-                    }
-
-                    // Lưu lý do vào return_item khi trạng thái là "rejected"
-                    $returnItem->update([
-                        'status' => 'rejected',
-                        'reason' => $validated['reason'], // Lưu lý do từ chối vào return_item
-                    ]);
-                } else {
-                    // Nếu trạng thái là "approved", cộng số lượng vào kho
-                    if ($validated['status'] === 'approved') {
-                        $orderDetail = OrderDetail::findOrFail($returnItem->order_detail_id);
-                        $product = Product::findOrFail($orderDetail->product_id);
-
-                        // Cộng số lượng vào kho
+                    } else {
+                        // Nếu là sản phẩm đơn, cộng số lượng vào bảng products
                         $product->update([
                             'quantity' => $product->quantity + $returnItem->quantity,
                         ]);
                     }
-
-                    // Cập nhật trạng thái cho return_item
-                    $returnItem->update([
-                        'status' => $validated['status'],
-                    ]);
                 }
 
                 // Tìm return_request liên quan
@@ -234,7 +242,6 @@ class ReturnAdminController extends Controller
                         $returnRequest->update([
                             'status' => 'rejected',
                         ]);
-
 
                         $this->updateOrder($returnRequest->id);
                     } else {
@@ -256,6 +263,7 @@ class ReturnAdminController extends Controller
             ], 500);
         }
     }
+
 
 
 
