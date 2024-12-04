@@ -204,7 +204,6 @@ const HistoryOrder = () => {
     setVisible(false);
   };
 
-<<<<<<< HEAD
   const handleGetReturnRequest = (id: number) => {
     console.log(" kiểm tra id xem yêu cầu : ", id);
     navigate(`return_requests`, { state: { id } });
@@ -212,7 +211,6 @@ const HistoryOrder = () => {
 
   console.log("data lịch sử đơn hàng: ", data);
 
-=======
   const [currentPage, setCurrentPage] = useState(1); // Trang hiện tại
   const productsPerPage = 6; // Mỗi trang có 12 sản phẩm
   const totalProducts = data?.length || 0; // Tổng số sản phẩm
@@ -226,7 +224,6 @@ const HistoryOrder = () => {
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber);
   };
->>>>>>> b7b3619c384584c1003b6e891c471c80e927064a
   return (
     <>
       <main
