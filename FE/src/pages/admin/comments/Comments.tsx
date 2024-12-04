@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Loading from "@/common/Loading/Loading";
 import { Icomments } from "@/common/types/comments";
+import instance from "@/configs/axios";
 import { deleteComment, getComments } from "@/services/api/admin/comments.api";
 import { DeleteOutlined } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Button, Modal, Pagination, Table } from "antd";
+import { Button, Input, Modal, Pagination, Table } from "antd";
 import { ColumnType } from "antd/es/table";
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
@@ -16,12 +17,29 @@ const CommentPage = () => {
   const [hasError, setHasError] = useState(false);
   const [currentTagId, setCurrentTagId] = useState<number | null>(null);
   const [visiable, setVisiable] = useState(false);
+  const [query, setQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]); 
 
   const { data, isFetching, isError } = useQuery({
     queryKey: ["comments"],
     queryFn: getComments,
   });
   console.log("comments  nè:", data);
+
+  const handleSearch = async () => {
+    if (!query.trim()) {
+      setSearchResults(data || []);
+      return;
+    }
+    try {
+      const response = await instance.post("/comment/search", { query });
+      setSearchResults(response.data);
+      alert('ok');
+    } catch (error) {
+      toast.error("Không tìm thấy thương hiệu nào!");
+      setSearchResults([]);
+    }
+  };
 
   const { mutate } = useMutation({
     mutationFn: deleteComment,
@@ -102,11 +120,15 @@ const CommentPage = () => {
     },
   ];
 
-  const dataSource =
-    data?.map((item: Icomments) => ({
-      key: item?.id,
-      ...item,
-    })) || [];
+  // const dataSource =
+  //   data?.map((item: Icomments) => ({
+  //     key: item?.id,
+  //     ...item,
+  //   })) || [];
+  const dataSource = (searchResults.length ? searchResults : data || []).map((item: any) => ({
+    key: item?.id,
+    ...item,
+  }));
 
   useEffect(() => {
     if (isError && !hasError) {
@@ -121,6 +143,18 @@ const CommentPage = () => {
         <h1 className="text-3xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2">
           Quản lí bình luận
         </h1>
+        <div className="flex items-center">
+          <Input className="w-80" placeholder="Tìm kiếm bình luận" value={query}
+            onChange={(e) => {
+              const value = e.target.value;
+              setQuery(value);
+    
+              if (!value.trim()) {
+                setSearchResults(data || []);
+              }
+            }}/>
+          <Button className="ml-1" onClick={handleSearch}>Tìm kiếm</Button>
+        </div>
       </div>
       <div>
         {isFetching ? (
