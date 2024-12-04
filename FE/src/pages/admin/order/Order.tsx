@@ -6,16 +6,37 @@ import { IVouchers } from "@/common/types/vouchers";
 import instance from "@/configs/axios";
 import { EyeOutlined } from "@ant-design/icons";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Button, Pagination, Select } from "antd";
+import type { DatePickerProps, GetProps } from 'antd';
+import { Button, DatePicker, Pagination, Select } from "antd";
 import Table, { ColumnType } from "antd/es/table";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
-
+const { RangePicker } = DatePicker;
+type RangePickerProps = GetProps<typeof DatePicker.RangePicker>;
 const OrderPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(5);
   const [hasError, setHasError] = useState(false);
+  const [filter, setFilter] = useState<any>({
+    statuses: [],
+    filter_end_date: null,
+    filter_start_date: null,
+    filter_type: "ranger",
+    filter_value: new Date().toISOString().split('T')[0],
+  });
+  const [dataFilter, setDataFilter] = useState<any>([])
+  const handleSearch = async () => {
+    let res = await instance.get(`/order-status`, filter)
+    setDataFilter(res?.data.data)
+  }
+  console.log("dataFilter", dataFilter)
+  useEffect(() => {
+    handleSearch()
+  }, [filter])
+  const filterRange = (value: DatePickerProps['value'] | RangePickerProps['value']) => {
+    console.log('filterRange: ', value);
+  };
   const { data, isLoading, isError, error, isFetching } = useQuery({
     queryKey: ["order-status"],
     queryFn: async () => {
@@ -116,11 +137,19 @@ const OrderPage = () => {
     }
   };
 
-  const dataSource = dataOrder
-    ? dataOrder?.map((item: IOrder) => ({
+
+  const dataSource =
+    dataOrder
+      ? dataOrder?.map((item: IOrder) => ({
         key: item?.id,
         ...item,
       }))
+      : [];
+  const dataSourceSearch = dataFilter
+    ? dataFilter?.map((item: IOrder) => ({
+      key: item?.id,
+      ...item,
+    }))
     : [];
 
   const columns: ColumnType<IOrder>[] = [
@@ -293,9 +322,19 @@ const OrderPage = () => {
           <Loading />
         ) : (
           <>
+            <RangePicker className="mt-4"
+              onChange={(value, dateString) => {
+                setFilter((prev: any) => ({
+                  ...prev,
+                  filter_type: "range",
+                  filter_start_date: dateString[0],
+                  filter_end_date: dateString[1],
+                }))
+              }}
+            />
             <Table
               className="custom-table"
-              dataSource={dataSource.slice(
+              dataSource={(dataFilter ? dataFilter :  dataSource).slice(
                 (currentPage - 1) * pageSize,
                 currentPage * pageSize
               )}
@@ -307,7 +346,7 @@ const OrderPage = () => {
               className="mt-4"
               align="end"
               current={currentPage}
-              total={dataSource.length}
+              total={(dataFilter ? dataFilter :  dataSource).length}
               pageSize={pageSize}
               onChange={(page) => {
                 setCurrentPage(page);

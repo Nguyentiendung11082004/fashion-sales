@@ -13,6 +13,8 @@ use App\Models\ReturnRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+use function PHPSTORM_META\map;
+
 class ReturnAdminController extends Controller
 {
 
@@ -37,28 +39,43 @@ class ReturnAdminController extends Controller
                         'status' => $returnRequest->status,
                         'created_at' => $returnRequest->created_at->format('Y-m-d H:i:s'),
                         'updated_at' => $returnRequest->updated_at->format('Y-m-d H:i:s'),
-                        'order' => [
-                            'id' => $returnRequest->order->id,
-                            'total' => $returnRequest->order->total,
-                            'total_quantity' => $returnRequest->order->total_quantity,
-                            'order_status' => $returnRequest->order->order_status,
-                           
-                        ],
-                        'items' => $returnRequest->items->map(function ($item) {
+
+                        'items' => $returnRequest->items->map(function ($item) use ($returnRequest) {
                             return [
                                 'id' => $item->id,
+                                'request_id' => $item->return_request_id,
                                 'order_detail_id' => $item->order_detail_id,
+                                'image' => $item->image,
                                 'quantity' => $item->quantity,
                                 'status' => $item->status,
-                                'product' => [
-                                    'id' => $item->orderDetail->product->id,
-                                    'name' => $item->orderDetail->product->name,
-                                    'price' => $item->orderDetail->product->price_sale,
-                                    'sku' => $item->orderDetail->product->sku,
-                                    'img_thumbnail'=>$item->orderDetail->product->img_thumbnail,
-                                    'attributes'=>$item->orderDetail->attributes
+
+                                'order' => [
+                                    'id' => $returnRequest->order->id,
+                                    'total' => $returnRequest->order->total,
+                                    'total_quantity' => $returnRequest->order->total_quantity,
+                                    'order_status' => $returnRequest->order->order_status,
+                                    'order_code' => $returnRequest->order->order_code,
+                                    'payment_status' => $returnRequest->order->payment_status,
+
+                                    'order_detail' =>
+                                    [
+                                        "id" => $item->orderDetail->id,
+                                        "product_id" => $item->orderDetail->product_id,
+                                        "product_variant_id" => $item->orderDetail->product_variant_id,
+                                        "order_id" => $item->orderDetail->order_id,
+                                        "product_name" => $item->orderDetail->product_name,
+                                        "product_img" => $item->orderDetail->product_img,
+                                        "attributes" => $item->orderDetail->attributes,
+                                        "quantity" => $item->orderDetail->quantity,
+                                        "price" => $item->orderDetail->price,
+                                        "total_price" => $item->orderDetail->total_price,
+                                        "discount" => $item->orderDetail->discount,
+                                        "created_at" => $item->orderDetail->created_at,
+                                        "updated_at" => $item->orderDetail->updated_at,
+                                    ]
 
                                 ],
+
                             ];
                         }),
                     ];
@@ -75,11 +92,72 @@ class ReturnAdminController extends Controller
         }
     }
 
+    public  function showReturnItem($id)
+    {
+        try {
+            // Lấy danh sách return_request cùng các item, đơn hàng và sản phẩm liên quan
+            $showReturnItem = ReturnRequest::with([
+                'items.orderDetail.product', // Thêm chi tiết sản phẩm từ order_detail
+                'order'                      // Thông tin đơn hàng
+            ])
+                ->findOrFail($id);
+            $formattedData = [
+                'id' => $showReturnItem->id,
+                'order_id' => $showReturnItem->order_id,
+                'user_id' => $showReturnItem->user_id,
+                'reason' => $showReturnItem->reason,
+                'status' => $showReturnItem->status,
+                'created_at' => $showReturnItem->created_at->format('Y-m-d H:i:s'),
+                'updated_at' => $showReturnItem->updated_at->format('Y-m-d H:i:s'),
+                'items' => $showReturnItem->items->map(function ($item) use ($showReturnItem) {
+                    return [
+                        'id' => $item->id,
+                        'request_id' => $item->return_request_id,
+                        'order_detail_id' => $item->order_detail_id,
+                        'image' => $item->image,
+                        'quantity' => $item->quantity,
+                        'status' => $item->status,
+                        'order' => [
+                            'id' => $showReturnItem->order->id,
+                            'total' => $showReturnItem->order->total,
+                            'total_quantity' => $showReturnItem->order->total_quantity,
+                            'order_status' => $showReturnItem->order->order_status,
+                            'order_code' => $showReturnItem->order->order_code,
+                            'payment_status' => $showReturnItem->order->payment_status,
+                            'order_detail' => [
+                                "id" => $item->orderDetail->id,
+                                "product_id" => $item->orderDetail->product_id,
+                                "product_variant_id" => $item->orderDetail->product_variant_id,
+                                "order_id" => $item->orderDetail->order_id,
+                                "product_name" => $item->orderDetail->product_name,
+                                "product_img" => $item->orderDetail->product_img,
+                                "attributes" => $item->orderDetail->attributes,
+                                "quantity" => $item->orderDetail->quantity,
+                                "price" => $item->orderDetail->price,
+                                "total_price" => $item->orderDetail->total_price,
+                                "discount" => $item->orderDetail->discount,
+                                "created_at" => $item->orderDetail->created_at->format('Y-m-d H:i:s'),
+                                "updated_at" => $item->orderDetail->updated_at->format('Y-m-d H:i:s'),
+                            ]
+                        ],
+                    ];
+                }),
+            ];
+
+            return response()->json([
+                'message' => 'Lấy dữ liệu thành công',
+                'data' => $formattedData,
+            ], 200);
+        } catch (\Exception $ex) {
+            return response()->json([
+                "message" => $ex->getMessage()
+            ]);
+        }
+    }
+
     public function updateReturnItemStatus(Request $request, $returnItemId)
     {
-
         try {
-
             DB::transaction(function () use ($request, $returnItemId) {
                 $user = auth()->user();
                 // Validate input
@@ -90,6 +168,27 @@ class ReturnAdminController extends Controller
 
                 // Tìm return_item cần xử lý
                 $returnItem = ReturnItem::findOrFail($returnItemId);
+
+                // Kiểm tra tính hợp lệ của việc chuyển trạng thái
+                if ($returnItem->status === 'pending' && !in_array($validated['status'], ['canceled', 'approved', 'rejected'])) {
+                    throw new \Exception('Trạng thái không hợp lệ để chuyển đổi từ pending.');
+                }
+
+                if (in_array($returnItem->status, ['approved', 'rejected', 'canceled']) && $validated['status'] === 'pending') {
+                    throw new \Exception('Không thể quay lại trạng thái "pending" từ trạng thái hiện tại.');
+                }
+
+                if ($returnItem->status === 'canceled' && in_array($validated['status'], ['approved', 'rejected'])) {
+                    throw new \Exception('Không thể chuyển trạng thái từ "canceled" sang "approved" hoặc "rejected".');
+                }
+
+                if (($returnItem->status === 'approved' || $returnItem->status === 'rejected') && $validated['status'] === 'canceled') {
+                    throw new \Exception('Không thể chuyển trạng thái từ "approved" hoặc "rejected" sang "canceled".');
+                }
+
+                if (in_array($returnItem->status, ['approved', 'rejected']) && $validated['status'] !== $returnItem->status) {
+                    throw new \Exception('Trạng thái "approved" và "rejected" không thể chuyển đổi qua lại.');
+                }
 
                 // Lưu lịch sử vào return_log
                 $logComment = "Updated status to {$validated['status']}";
@@ -105,40 +204,29 @@ class ReturnAdminController extends Controller
                     'comment' => $logComment,
                 ]);
 
-                // Nếu trạng thái là "rejected", xử lý lý do và reset số lượng nếu cần
-                if ($validated['status'] === 'rejected') {
-                    if ($returnItem->status === 'approved') {
-                        // Nếu trạng thái trước đó là "approved", reset số lượng trong kho
-                        $orderDetail = OrderDetail::findOrFail($returnItem->order_detail_id);
-                        $product = Product::findOrFail($orderDetail->product_id);
+                // Cập nhật trạng thái cho return_item
+                $returnItem->update([
+                    'status' => $validated['status'],
+                ]);
 
-                        // Trừ số lượng sản phẩm trong kho
-                        $product->update([
-                            'quantity' => $product->quantity - $returnItem->quantity,
+                // Kiểm tra xem sản phẩm có phải là biến thể hay không
+                if ($validated['status'] === 'approved') {
+                    $orderDetail = OrderDetail::findOrFail($returnItem->order_detail_id);
+                    $product = Product::findOrFail($orderDetail->product_id);
+
+                    // Kiểm tra sản phẩm có biến thể không
+                    if ($orderDetail->product_variant_id) {
+                        // Nếu là biến thể sản phẩm, cộng số lượng vào bảng product_variants
+                        $productVariant = ProductVariant::findOrFail($orderDetail->product_variant_id);
+                        $productVariant->update([
+                            'quantity' => $productVariant->quantity + $returnItem->quantity,
                         ]);
-                    }
-
-                    // Lưu lý do vào return_item khi trạng thái là "rejected"
-                    $returnItem->update([
-                        'status' => 'rejected',
-                        'reason' => $validated['reason'], // Lưu lý do từ chối vào return_item
-                    ]);
-                } else {
-                    // Nếu trạng thái là "approved", cộng số lượng vào kho
-                    if ($validated['status'] === 'approved') {
-                        $orderDetail = OrderDetail::findOrFail($returnItem->order_detail_id);
-                        $product = Product::findOrFail($orderDetail->product_id);
-
-                        // Cộng số lượng vào kho
+                    } else {
+                        // Nếu là sản phẩm đơn, cộng số lượng vào bảng products
                         $product->update([
                             'quantity' => $product->quantity + $returnItem->quantity,
                         ]);
                     }
-
-                    // Cập nhật trạng thái cho return_item
-                    $returnItem->update([
-                        'status' => $validated['status'],
-                    ]);
                 }
 
                 // Tìm return_request liên quan
@@ -154,7 +242,6 @@ class ReturnAdminController extends Controller
                         $returnRequest->update([
                             'status' => 'rejected',
                         ]);
-
 
                         $this->updateOrder($returnRequest->id);
                     } else {
@@ -176,6 +263,8 @@ class ReturnAdminController extends Controller
             ], 500);
         }
     }
+
+
 
 
     public function updateOrder($returnRequestId)

@@ -34,21 +34,7 @@ const Checkout = () => {
   const [idQuanHuyen, setIdQuanHuyen] = useState<number | null>(0)
   const [idXa, setIdXa] = useState<number | null>(0);
   const [payloadDiaChi, setPayLoadDiaChi] = useState<any>(null);
-  const mutationVoucher = useMutation({
-    mutationFn: async () => {
-      const res = await instance.post(`/checkout`, {
-        cart_item_ids: cartIds,
-        voucher_code: voucher,
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        }
-      });
-      setTotalDiscount(res?.data?.total_discount)
-      setSubTotal(res?.data?.sub_total)
-      return res.data;
-    },
-  });
+
   const handleChangeMethod = (e: any) => {
     const newPaymentMethod = e.target.value;
     setPaymentMethod(newPaymentMethod);
@@ -79,6 +65,24 @@ const Checkout = () => {
     product_variant_id: _payload?.product_variant_id || null,
     quantity: _payload?.quantity || null,
 
+  });
+  const mutationVoucher = useMutation({
+    mutationFn: async () => {
+      const res = await instance.post(`/checkout`, {
+        cart_item_ids: cartIds,
+        voucher_code: voucher,
+        product_id: order.product_id,
+        product_variant_id: order.product_variant_id,
+        quantity: order.quantity
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        }
+      });
+      setTotalDiscount(res?.data?.total_discount)
+      setSubTotal(res?.data?.sub_total)
+      return res.data;
+    },
   });
   const orderMutation = useMutation({
     mutationFn: async () => {
@@ -217,8 +221,8 @@ const Checkout = () => {
           weight: totalWeight
         });
         setShipPing(res?.data?.fee?.total); // Cập nhật phí vận chuyển
-        setOrder((prev)=> ({...prev,shipping_fee:res?.data?.fee?.total}))
-      }, 200);
+        setOrder((prev) => ({ ...prev, shipping_fee: res?.data?.fee?.total }))
+      }, 0);
     } catch (error) {
       console.error("Error calculating shipping fee", error); // In lỗi nếu có
     }
