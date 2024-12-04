@@ -22,6 +22,7 @@ return new class extends Migration
             $table->integer('rating')->nullable();
             $table->string('image')->nullable();
             $table->boolean('status')->default(true);
+            $table->foreignId('order_id')->nullable()->constrained('orders')->onDelete('cascade');
             $table->timestamps();
         });
     }

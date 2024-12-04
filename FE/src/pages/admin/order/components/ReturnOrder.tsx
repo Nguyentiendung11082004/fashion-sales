@@ -71,7 +71,7 @@ const ReturnOrder = () => {
       fixed: "right",
       render: (record: any) => {
         return (
-          <Link to={`/admin/return-items/status/${record?.order_id}`}>
+          <Link to={`/admin/return-item/${record?.id}`}>
             <Button
               className={` ${
                 dataSource?.status === "pending"

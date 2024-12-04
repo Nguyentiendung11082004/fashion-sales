@@ -13,11 +13,12 @@ const GetReturnRequestOrderId = () => {
   const order_id = location?.state.order_id;
   console.log("keiemr tra order_id ", order_id);
   const { token } = useAuth();
+
   const { data: dataReturnRequest } = useQuery({
     queryKey: ["return-requests"],
     queryFn: async () => {
       try {
-        return await instance.get(`user/return-requests`, {
+        return await instance.get(`user/return-item/${order_id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -27,6 +28,8 @@ const GetReturnRequestOrderId = () => {
       }
     },
   });
+
+  console.log("kiểm tra dataReturnRequest: ", dataReturnRequest);
   const returnRequest = dataReturnRequest?.data?.data?.find(
     (item: any) => Number(item.order_id) === Number(order_id)
   );

@@ -11,6 +11,8 @@ import { toast } from "react-toastify";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 const ReturnOrderId = () => {
+  const { id } = useParams();
+
   const queryClient = useQueryClient();
   const initialPage = queryClient.getQueryData(["currentPage"]) || 1;
   const [currentPage, setCurrentPage] = useState(Number(initialPage));
@@ -21,31 +23,27 @@ const ReturnOrderId = () => {
     queryKey: ["return-requests"],
     queryFn: async () => {
       try {
-        return await instance.get(`/return-requests`);
+        return await instance.get(`/return-item/${id}`);
       } catch (error) {
         throw Error("Có lỗi khi lấy dữ liệu");
       }
     },
   });
-  console.log("dataa orrder id: ", data);
-  const { id } = useParams();
-  const returnRequest = data?.data?.data?.find(
-    (item: any) => Number(item.id) === Number(id)
-  );
-
+  const dataReturnId = data?.data?.data;
   const status = {
     pending: "Đang đợi xử lí",
     approved: "Chấp nhận",
     rejected: "Từ chối",
   };
-
-  const dataSource = Array.isArray(returnRequest?.items)
-    ? returnRequest?.items.map((value: any) => ({
+  const dataSource = Array.isArray(dataReturnId?.items)
+    ? dataReturnId?.items?.map((value: any) => ({
         key: value.id,
         ...value,
       }))
     : [];
-  console.log("returnRequest8888 hoàn hàng theo id: ", returnRequest);
+
+  console.log("kiểm tra dataSource :", dataSource);
+  console.log("kiểm tra dataReturnId :", dataReturnId);
 
   const { token } = useAuth();
   const handleUpdateStatus = async (itemId: number, status: string) => {
@@ -80,27 +78,49 @@ const ReturnOrderId = () => {
         <div>{index + 1 + pageSize * (currentPage - 1)}</div>
       ),
     },
-
     {
       title: "Tên sản phẩm",
       render: (record: any) => (
-        <div>
-          <div>{record?.product?.name}</div>
-        </div>
+        <div>{record?.order?.order_detail?.product_name}</div>
       ),
     },
+
     {
       title: "Ảnh sản phẩm",
       render: (record: any) => (
         <div>
-          <div>{record?.product?.image}</div>
+          {record?.order?.order_detail?.product_img ? (
+            <div className="">
+              <img
+                className="flex m-auto"
+                src={record.order.order_detail.product_img}
+                alt={record.order.order_detail.product_name}
+                style={{ width: "100px", height: "auto" }}
+              />
+            </div>
+          ) : (
+            "Không có ảnh"
+          )}
         </div>
       ),
     },
+
     {
       title: "Số lượng",
       dataIndex: "quantity",
     },
+
+    {
+      title: "Giá sản phẩm",
+      render: (record: any) => (
+        <div>
+          {record?.order?.order_detail?.price &&
+            Number(record?.order?.order_detail?.price).toLocaleString("vi-VN")}
+          VNĐ
+        </div>
+      ),
+    },
+
     {
       title: "Xử lí",
       render: (record: any) => (
@@ -121,13 +141,33 @@ const ReturnOrderId = () => {
     },
   ];
 
+  
+  const totalAmount = dataReturnId?.items?.reduce((acc: number, item: any) => {
+    if (item.status === "pending" || item.status === "approved") {
+      const priceItems =
+        Number(item?.quantity) *
+        Number(item?.order?.order_detail?.price);
+
+      return acc + priceItems;
+    }
+    return acc;
+  }, 0);
+
+  console.log("Tổng số tiền:", totalAmount);
+
   return (
     <div className="p-6 min-h-screen">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2">
           Yêu cầu hoàn trả
         </h1>
+        <h1 className="text-xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2">
+          Tiền hoàn trả:
+          <span> {Number(totalAmount).toLocaleString("vi-VN")}</span>
+          <span> VNĐ</span>
+        </h1>
       </div>
+
       <div className="">
         <Table
           className="custom-table"

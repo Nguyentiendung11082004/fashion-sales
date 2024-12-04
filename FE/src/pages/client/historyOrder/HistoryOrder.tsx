@@ -203,9 +203,29 @@ const HistoryOrder = () => {
     setVisible(false);
   };
 
-  const handleGetReturnRequest = (order_id: number) => {
-    navigate(`return_requests`, { state: { order_id } });
+  const handleGetReturnRequest = (id: number) => {
+    console.log(" kiểm tra id xem yêu cầu : ", id);
+    navigate(`return_requests`, { state: { id } });
   };
+
+  console.log("data lịch sử đơn hàng: ", data);
+  //  data comment
+  // const
+  //   const { data: dataComment } = useQuery({
+  //     queryKey: ["comment"],
+  //     queryFn: async () => {
+  //       try {
+  //         return await instance.get("/comment", {
+  //           headers: {
+  //             Authorization: { token },
+  //           },
+  //         });
+  //       } catch (error) {
+  //         throw new Error("Lỗi!!!");
+  //       }
+  //     },
+  //   });
+  //   console.log("data comment: ", dataComment);
 
   return (
     <>
@@ -289,7 +309,9 @@ const HistoryOrder = () => {
               </h2>
 
               {data?.map((order: any) => {
-                const isExpanded = expandedOrders.includes(order.id); // Kiểm tra xem order có trong danh sách mở
+                console.log("data id đang tìm: ", order);
+                const isExpanded = expandedOrders.includes(order.id);
+                console.log("isExpanded:", isExpanded);
                 const isDelivered =
                   order.order_status.toLowerCase() === "giao hàng thành công";
                 const isCancelOk =
@@ -332,6 +354,8 @@ const HistoryOrder = () => {
                     // Xóa lý do sau khi hủy
                   }
                 };
+
+                const disableCmt: any[] = [];
 
                 return (
                   <div
@@ -623,6 +647,7 @@ const HistoryOrder = () => {
                                 centered
                               >
                                 <CommentProduct
+                                  selectedOrder={selectedOrder}
                                   listIdProduct={listIdProduct}
                                   InForCommentId={InForCommentId}
                                   isShowFormCmtOpen={isShowFormCmtOpen}

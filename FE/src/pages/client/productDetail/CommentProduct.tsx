@@ -26,6 +26,7 @@ const CommentProduct = ({
   setInForCommentId,
   setEditIdComment,
   setShowFormCmtOpen,
+  selectedOrder,
 }: any) => {
   const queryClient = useQueryClient();
   const { token } = useAuth();
@@ -95,11 +96,17 @@ const CommentProduct = ({
 
   const postCommentProduct = useMutation({
     mutationFn: async (data: Icomments) => {
-      const res = await instance.post("/comment", data, {
+      // Thêm selectedOrder.id vào payload
+      const payload = {
+        ...data,
+        orderId: selectedOrder.id,
+      };
+      const res = await instance.post("/comment", payload, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
+
       return res.data;
     },
     onSuccess: () => {
@@ -121,13 +128,49 @@ const CommentProduct = ({
     },
   });
 
+  // const postCommentProduct = useMutation({
+  //   mutationFn: async (data: Icomments) => {
+  //     const res = await instance.post("/comment", data, {
+  //       headers: {
+  //         Authorization: `Bearer ${token}`,
+  //       },
+  //     });
+  //     return res.data;
+  //   },
+  //   onSuccess: () => {
+  //     queryClient.invalidateQueries({ queryKey: ["product"] });
+  //     toast.success("Bình luận thành công");
+  //     setFormsData(
+  //       listIdProduct.reduce((acc: any, id: any) => {
+  //         acc[id] = { rating: 5, content: "", image: "" };
+  //         return acc;
+  //       }, {})
+  //     );
+  //     form.resetFields();
+  //     setShowFormCmtOpen(false);
+  //     setInForCommentId(null);
+  //     setEditIdComment(null);
+  //   },
+  //   onError: (error: any) => {
+  //     toast.error(error.response?.data?.message);
+  //   },
+  // });
+
   const updateComment = useMutation({
     mutationFn: async ({ data, editIdComment }: UpdateCommentPayload) => {
-      const response = await instance.put(`/comment/${editIdComment}`, data, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const payload = {
+        ...data,
+        orderId: selectedOrder.id,
+      };
+      const response = await instance.put(
+        `/comment/${editIdComment}`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       return response.data;
     },
     onSuccess: () => {
@@ -184,6 +227,7 @@ const CommentProduct = ({
               content,
               image,
               product_id: id,
+              order_id: selectedOrder.id,
             };
             if (editIdComment && InForCommentId) {
               updateComment.mutate({
@@ -191,6 +235,7 @@ const CommentProduct = ({
                 editIdComment,
               });
             } else {
+              console.log("payload nè : ", payload);
               postCommentProduct.mutate(payload as Icomments);
             }
           });
@@ -217,7 +262,7 @@ const CommentProduct = ({
                       className="w-20 h-20 object-cover rounded-lg"
                     />
                     <h3 className="text-md font-semibold">
-                      Sản phẩm:  <span>{product.product_name}</span>
+                      Sản phẩm: <span>{product.product_name}</span>
                     </h3>
                   </div>
                 </Link>

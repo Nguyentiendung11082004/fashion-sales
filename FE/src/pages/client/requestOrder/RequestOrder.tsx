@@ -35,7 +35,8 @@ const RequestOrder = () => {
     setSelectedItems(
       new Array(dataOrder?.order_details?.length).fill(isChecked)
     );
-    setQuantities(new Array(dataOrder?.order_details?.length).fill(1));
+    // setQuantities(new Array(dataOrder?.order_details?.length).fill(1));
+    setQuantities(quantities);
   };
 
   const handleDecrease = (index: number) => {

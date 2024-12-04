@@ -34,6 +34,7 @@ const OrderPage = () => {
   useEffect(() => {
     handleSearch()
   }, [filter])
+  
   const filterRange = (value: DatePickerProps['value'] | RangePickerProps['value']) => {
     console.log('filterRange: ', value);
   };

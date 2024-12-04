@@ -173,7 +173,7 @@ const Router = () => {
           <Route path="comments" element={<CommentPage />} />
           <Route path="orders" element={<OrderPage />} />
           <Route path="returnRequests" element={<ReturnOrder />} />
-          <Route path="return-items/status/:id" element={<ReturnOrderId />} />
+          <Route path="return-item/:id" element={<ReturnOrderId />} />
 
           <Route path="fastDelivery" element={<FastDelivery />} />
           <Route path="orders/:id" element={<OrderDetail />} />
