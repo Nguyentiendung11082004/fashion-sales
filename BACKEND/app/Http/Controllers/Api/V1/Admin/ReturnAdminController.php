@@ -13,6 +13,8 @@ use App\Models\ReturnRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+use function PHPSTORM_META\map;
+
 class ReturnAdminController extends Controller
 {
 
@@ -37,28 +39,43 @@ class ReturnAdminController extends Controller
                         'status' => $returnRequest->status,
                         'created_at' => $returnRequest->created_at->format('Y-m-d H:i:s'),
                         'updated_at' => $returnRequest->updated_at->format('Y-m-d H:i:s'),
-                        'order' => [
-                            'id' => $returnRequest->order->id,
-                            'total' => $returnRequest->order->total,
-                            'total_quantity' => $returnRequest->order->total_quantity,
-                            'order_status' => $returnRequest->order->order_status,
-                           
-                        ],
-                        'items' => $returnRequest->items->map(function ($item) {
+
+                        'items' => $returnRequest->items->map(function ($item) use ($returnRequest) {
                             return [
                                 'id' => $item->id,
+                                'request_id'=>$item->return_request_id,
                                 'order_detail_id' => $item->order_detail_id,
+                                'image'=>$item->image,
                                 'quantity' => $item->quantity,
                                 'status' => $item->status,
-                                'product' => [
-                                    'id' => $item->orderDetail->product->id,
-                                    'name' => $item->orderDetail->product->name,
-                                    'price' => $item->orderDetail->product->price_sale,
-                                    'sku' => $item->orderDetail->product->sku,
-                                    'img_thumbnail'=>$item->orderDetail->product->img_thumbnail,
-                                    'attributes'=>$item->orderDetail->attributes
+                                
+                                'order' => [
+                                    'id' => $returnRequest->order->id,
+                                    'total' => $returnRequest->order->total,
+                                    'total_quantity' => $returnRequest->order->total_quantity,
+                                    'order_status' => $returnRequest->order->order_status,
+                                    'order_code'=>$returnRequest->order->order_code,    
+                                    'payment_status'=>$returnRequest->order->payment_status,    
+
+                                    'order_detail'=> 
+                                     [
+                                        "id" => $item->orderDetail->id,
+                                        "product_id" => $item->orderDetail->product_id,
+                                        "product_variant_id" => $item->orderDetail->product_variant_id,
+                                        "order_id" => $item->orderDetail->order_id,
+                                        "product_name" => $item->orderDetail->product_name,
+                                        "product_img" => $item->orderDetail->product_img,
+                                        "attributes" => $item->orderDetail->attributes,
+                                        "quantity" => $item->orderDetail->quantity,
+                                        "price" => $item->orderDetail->price,
+                                        "total_price" => $item->orderDetail->total_price,
+                                        "discount" => $item->orderDetail->discount,
+                                        "created_at" => $item->orderDetail->created_at,
+                                        "updated_at" => $item->orderDetail->updated_at,
+                                    ]
 
                                 ],
+
                             ];
                         }),
                     ];
@@ -111,7 +128,7 @@ class ReturnAdminController extends Controller
                         // Nếu trạng thái trước đó là "approved", reset số lượng trong kho
                         $orderDetail = OrderDetail::findOrFail($returnItem->order_detail_id);
                         $product = Product::findOrFail($orderDetail->product_id);
-
+                        
                         // Trừ số lượng sản phẩm trong kho
                         $product->update([
                             'quantity' => $product->quantity - $returnItem->quantity,

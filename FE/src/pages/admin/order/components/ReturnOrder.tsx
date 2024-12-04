@@ -24,7 +24,9 @@ const ReturnOrder = () => {
       }
     },
   });
+
   console.log("data hoàn hàng admin : ", data);
+
   const dataSource = Array.isArray(data?.data?.data)
     ? data?.data?.data?.map((value: any) => ({
         key: value.id,
@@ -49,7 +51,7 @@ const ReturnOrder = () => {
       render: (record: any) => (
         <div>
           {record?.items?.map((item: any, index: any) => (
-            <div key={index}>{item.product.name}</div>
+            <div key={index}>{item?.order?.order_detail?.product_name}</div>
           ))}
         </div>
       ),
