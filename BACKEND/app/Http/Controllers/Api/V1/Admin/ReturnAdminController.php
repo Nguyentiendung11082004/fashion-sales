@@ -26,6 +26,8 @@ class ReturnAdminController extends Controller
             ])
                 ->orderBy('created_at', 'desc')
                 ->get()
+                // dd($returnRequests->toArray());
+
                 ->map(function ($returnRequest) {
                     return [
                         'id' => $returnRequest->id,
@@ -37,8 +39,10 @@ class ReturnAdminController extends Controller
                         'updated_at' => $returnRequest->updated_at->format('Y-m-d H:i:s'),
                         'order' => [
                             'id' => $returnRequest->order->id,
-                            'total_price' => $returnRequest->order->total_price,
-                            'status' => $returnRequest->order->status,
+                            'total' => $returnRequest->order->total,
+                            'total_quantity' => $returnRequest->order->total_quantity,
+                            'order_status' => $returnRequest->order->order_status,
+                           
                         ],
                         'items' => $returnRequest->items->map(function ($item) {
                             return [
@@ -49,8 +53,11 @@ class ReturnAdminController extends Controller
                                 'product' => [
                                     'id' => $item->orderDetail->product->id,
                                     'name' => $item->orderDetail->product->name,
-                                    'price' => $item->orderDetail->product->price,
+                                    'price' => $item->orderDetail->product->price_sale,
                                     'sku' => $item->orderDetail->product->sku,
+                                    'img_thumbnail'=>$item->orderDetail->product->img_thumbnail,
+                                    'attributes'=>$item->orderDetail->attributes
+
                                 ],
                             ];
                         }),
@@ -156,7 +163,6 @@ class ReturnAdminController extends Controller
                             'status' => 'completed', // hoặc trạng thái phù hợp
                         ]);
                         $this->updateOrder($returnRequest->id);
-
                     }
                 }
             });
@@ -216,7 +222,7 @@ class ReturnAdminController extends Controller
                     ]);
 
                     return [
-                        'status'=>true,
+                        'status' => true,
                         'message' => 'Đơn hàng đã đổi sang trạng thái là hoàn trả hàng',
                     ];
                 }
@@ -230,7 +236,7 @@ class ReturnAdminController extends Controller
                     ]);
 
                     return [
-                        'status'=>true,
+                        'status' => true,
                         'message' => 'Đơn hàng đã đổi sang trạng thái hoàn thành',
                     ];
                 }
@@ -262,7 +268,7 @@ class ReturnAdminController extends Controller
                 ]);
 
                 return [
-                    'status'=>true,
+                    'status' => true,
                     'message' => 'Đơn hàng đã đổi sang trạng thái là hoàn trả hàng',
                 ];
             });

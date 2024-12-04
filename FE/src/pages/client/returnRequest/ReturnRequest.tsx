@@ -167,7 +167,6 @@ const ReturnRequest = () => {
                   Số tiền hoàn lại: {refund.toLocaleString("vi-VN")} VNĐ
                 </span>
                 <br />
-                <span className="text-base pb-4 ml-4">Hoàn tiền vào: ???</span>
               </div>
 
               <div className="fixed bottom-0 left-[134px] right-[134px] flex justify-between items-center p-6 border border-gray-200 rounded-lg shadow-md bg-white hover:shadow-lg transition-shadow duration-300">

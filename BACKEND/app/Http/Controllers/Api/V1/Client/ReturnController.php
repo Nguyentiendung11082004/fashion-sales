@@ -10,6 +10,7 @@ use App\Models\ReturnRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Models\Order;
 
 class ReturnController extends Controller
 {
@@ -20,7 +21,7 @@ class ReturnController extends Controller
             // Lấy thông tin người dùng hiện tại
             $user = auth()->user();
             // Lấy danh sách return_requests của người dùng hiện tại
-            $returnRequests = ReturnRequest::with(['items'])
+            $returnRequests = ReturnRequest::with(["order.orderDetails", 'items'])
                 ->where('user_id', $user->id)
                 ->get();
 
@@ -75,6 +76,9 @@ class ReturnController extends Controller
                         // 'status' => 'pending',
                     ]);
                 }
+                Order::query()->findOrFail($validated["order_id"])->update([
+                    "order_status"=>"Yêu cầu hoàn trả hàng" 
+                 ]);
 
                 return [
                     'message' => 'Return request created successfully.',

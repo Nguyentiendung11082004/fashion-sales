@@ -12,6 +12,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button, Form, message, Rate, Upload, UploadProps } from "antd";
 import TextArea from "antd/es/input/TextArea";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 interface UpdateCommentPayload {
   data: Icomments;
@@ -19,13 +20,12 @@ interface UpdateCommentPayload {
 }
 const CommentProduct = ({
   listIdProduct,
-  setListIdProduct,
+  listInForProducts,
   editIdComment,
   InForCommentId,
   setInForCommentId,
   setEditIdComment,
   setShowFormCmtOpen,
-  isShowFormCmtOpen,
 }: any) => {
   const queryClient = useQueryClient();
   const { token } = useAuth();
@@ -35,9 +35,6 @@ const CommentProduct = ({
       return acc;
     }, {})
   );
-
-
-  
 
   const [urlImage, setUrlImage] = useState<string | null>(null);
   const [errors, setErrors] = useState<any>("");
@@ -204,76 +201,96 @@ const CommentProduct = ({
           {editIdComment ? "Sửa đánh giá" : "Đánh giá sản phẩm"}
         </h1>
 
-        {listIdProduct?.map((id: number) => (
-          <div key={id}>
-            <h2 className="font-medium text-lg mb-2">Sản phẩm ID: {id}</h2>
-            <label className="mb-2 block lg:text-sm text-[10px] font-medium text-gray-700">
-              Chất lượng sản phẩm:
-            </label>
-            <Form.Item className="mb-4">
-              <Rate
-                value={formsData[id]?.rating}
-                onChange={(value) => handleStateUpdate(id, "rating", value)}
-                count={5}
-              />
-            </Form.Item>
-            <label className="mb-2 block lg:text-sm text-[10px] font-medium text-gray-700">
-              Nhận xét:
-            </label>
-            <Form.Item className="mb-4">
-              <TextArea
-                value={formsData[id]?.content}
-                onChange={(e) =>
-                  handleStateUpdate(id, "content", e.target.value)
-                }
-                rows={3}
-              />
-            </Form.Item>
+        {listIdProduct?.map((id: number) => {
+          const product = listInForProducts?.find(
+            (product: any) => product.product_id === id
+          );
 
-            <label className="block lg:text-sm text-[10px] font-medium text-gray-700 mr-4">
-              Tải hình ảnh lên:
-            </label>
-            <Form.Item name="image" className="flex items-start">
-              <div>
-                <Upload
-                  {...propImgComment}
-                  showUploadList={false}
-                  onChange={(info) => {
-                    if (info.file.status === "done") {
-                      handleStateUpdate(id, "image", info.file.response.url);
-                    }
-                  }}
-                  onRemove={() => handleStateUpdate(id, "image", null)}
-                >
-                  <Button className="mt-2" icon={<UploadOutlined />}>
-                    {formsData[id]?.image ? "Tải ảnh khác" : "Tải lên ảnh"}
-                  </Button>
-                </Upload>
-                {formsData[id] && formsData[id].image && (
-                  <div className="mb-8 mt-4 group">
-                    <div className="relative w-[100px] h-[100px]">
-                      <img
-                        src={formsData[id].image}
-                        alt="Uploaded"
-                        className="absolute inset-0 w-full h-full object-cover rounded-lg transition-opacity duration-200 group-hover:opacity-50"
-                      />
-                      <button
-                        onClick={() => handleStateUpdate(id, "image", null)}
-                        className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 hover:text-brown-500 transition-opacity duration-200"
-                        title="Xóa ảnh"
-                      >
-                        <DeleteOutlined style={{ fontSize: "20px" }} />
-                      </button>
-                    </div>
+          return (
+            <div key={id}>
+              {product && (
+                <Link to={`/products/${product.product_id}`}>
+                  <div className="flex items-center space-x-4 mb-4">
+                    <img
+                      src={product.product_img}
+                      alt={product.product_name}
+                      className="w-20 h-20 object-cover rounded-lg"
+                    />
+                    <h3 className="text-md font-semibold">
+                      Sản phẩm:  <span>{product.product_name}</span>
+                    </h3>
                   </div>
-                )}
-              </div>
-            </Form.Item>
+                </Link>
+              )}
 
-            {errors && <div className="text-red-600">{errors.image}</div>}
-            <hr className="my-4" />
-          </div>
-        ))}
+              <label className="mb-2 block lg:text-sm text-[10px] font-medium text-gray-700">
+                Chất lượng sản phẩm:
+              </label>
+              <Form.Item className="mb-4">
+                <Rate
+                  value={formsData[id]?.rating}
+                  onChange={(value) => handleStateUpdate(id, "rating", value)}
+                  count={5}
+                />
+              </Form.Item>
+              <label className="mb-2 block lg:text-sm text-[10px] font-medium text-gray-700">
+                Nhận xét:
+              </label>
+              <Form.Item className="mb-4">
+                <TextArea
+                  value={formsData[id]?.content}
+                  onChange={(e) =>
+                    handleStateUpdate(id, "content", e.target.value)
+                  }
+                  rows={3}
+                />
+              </Form.Item>
+
+              <label className="block lg:text-sm text-[10px] font-medium text-gray-700 mr-4">
+                Tải hình ảnh lên:
+              </label>
+              <Form.Item name="image" className="flex items-start">
+                <div>
+                  <Upload
+                    {...propImgComment}
+                    showUploadList={false}
+                    onChange={(info) => {
+                      if (info.file.status === "done") {
+                        handleStateUpdate(id, "image", info.file.response.url);
+                      }
+                    }}
+                    onRemove={() => handleStateUpdate(id, "image", null)}
+                  >
+                    <Button className="mt-2" icon={<UploadOutlined />}>
+                      {formsData[id]?.image ? "Tải ảnh khác" : "Tải lên ảnh"}
+                    </Button>
+                  </Upload>
+                  {formsData[id] && formsData[id].image && (
+                    <div className="mb-8 mt-4 group">
+                      <div className="relative w-[100px] h-[100px]">
+                        <img
+                          src={formsData[id].image}
+                          alt="Uploaded"
+                          className="absolute inset-0 w-full h-full object-cover rounded-lg transition-opacity duration-200 group-hover:opacity-50"
+                        />
+                        <button
+                          onClick={() => handleStateUpdate(id, "image", null)}
+                          className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 hover:text-brown-500 transition-opacity duration-200"
+                          title="Xóa ảnh"
+                        >
+                          <DeleteOutlined style={{ fontSize: "20px" }} />
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </Form.Item>
+
+              {errors && <div className="text-red-600">{errors.image}</div>}
+              <hr className="my-4" />
+            </div>
+          );
+        })}
 
         <div className="flex justify-center items-center">
           <Button type="primary" htmlType="submit">

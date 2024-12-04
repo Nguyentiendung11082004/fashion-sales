@@ -46,7 +46,6 @@ const EmployeePage = () => {
     navigate(`edit/${id}`, { state: { currentPage } });
   };
 
-  console.log("số trang : ", currentPage);
   useEffect(() => {
     const totalItems = data?.data?.length || 0;
     const maxPage = Math.ceil(totalItems / pageSize);
@@ -158,13 +157,6 @@ const EmployeePage = () => {
     },
   ];
 
-  const dataSource = Array.isArray(data?.data)
-    ? data.data.map((employee: IUser) => ({
-        key: employee.id,
-        ...employee,
-      }))
-    : [];
-
   //  tìm kiếm theo tên  ;
   const [query, setQuery] = useState<string>("");
   const [dataSearch, setDataSearch] = useState<IUser[]>([]);
@@ -179,12 +171,21 @@ const EmployeePage = () => {
     }
   };
 
+  const dataSource =
+    dataSearch?.length > 0
+      ? dataSearch
+      : Array.isArray(data?.data)
+        ? data.data.map((employee: IUser) => ({
+            key: employee.id,
+            ...employee,
+          }))
+        : [];
+
+  console.log("dataSource: ", dataSource);
+
   return (
     <div className="p-6 min-h-screen">
       <div className="flex items-center justify-between mb-6">
-        {/* <h1 className="text-3xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2">
-          Nhân viên
-        </h1> */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 md:gap-8">
           <h1 className="text-3xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2">
             Nhân viên

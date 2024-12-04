@@ -144,13 +144,6 @@ const ClientPage = () => {
     },
   ];
 
-  const dataSource = Array.isArray(data?.data)
-    ? data.data.map((client: IUser) => ({
-        key: client.id,
-        ...client,
-      }))
-    : [];
-
   //  tìm kiếm theo tên  ;
   const [query, setQuery] = useState<string>("");
   const [dataSearch, setDataSearch] = useState<IUser[]>([]);
@@ -164,6 +157,16 @@ const ClientPage = () => {
       toast.error("Lỗi khi tìm kiếm");
     }
   };
+
+  const dataSource =
+    dataSearch?.length > 0
+      ? dataSearch
+      : Array.isArray(data?.data)
+        ? data.data.map((client: IUser) => ({
+            key: client.id,
+            ...client,
+          }))
+        : [];
 
   return (
     <div className="p-6 min-h-screen">

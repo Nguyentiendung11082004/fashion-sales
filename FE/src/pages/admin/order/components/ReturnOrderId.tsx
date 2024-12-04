@@ -32,6 +32,7 @@ const ReturnOrderId = () => {
   const returnRequest = data?.data?.data?.find(
     (item: any) => Number(item.id) === Number(id)
   );
+
   const status = {
     pending: "Đang đợi xử lí",
     approved: "Chấp nhận",
@@ -44,6 +45,7 @@ const ReturnOrderId = () => {
         ...value,
       }))
     : [];
+  console.log("returnRequest8888 hoàn hàng theo id: ", returnRequest);
 
   const { token } = useAuth();
   const handleUpdateStatus = async (itemId: number, status: string) => {

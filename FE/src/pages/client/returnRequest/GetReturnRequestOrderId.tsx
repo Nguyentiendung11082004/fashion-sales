@@ -33,13 +33,14 @@ const GetReturnRequestOrderId = () => {
 
   console.log("returnRequest", returnRequest);
 
-  const dataSource = returnRequest
-    ? [
-        {
-          key: returnRequest.id,
-          ...returnRequest,
-        },
-      ]
+  const dataSource = returnRequest?.items
+    ? returnRequest.items.map((item: any, index: number) => ({
+        key: item.id,
+        productName: item.name,
+        image: item.image,
+        quantity: item.quantity,
+        status: returnRequest.status,
+      }))
     : [];
 
   console.log("data trả hàng: ", dataSource);
@@ -49,55 +50,50 @@ const GetReturnRequestOrderId = () => {
       title: "Stt",
       render: (_: any, __: any, index: number) => <div>{index + 1}</div>,
     },
-
     {
       title: "Tên sản phẩm",
-      //   render: (record: any) => (
-      // <div>
-      //   {record?.map((item: any, index: any) => (
-      //     <div key={index}>{item.name}</div>
-      //   ))}
-      // </div>
-      //   ),
+      render: (record: any) => <div>{record.productName}</div>,
     },
-
     {
       title: "Ảnh sản phẩm",
-      dataIndex: "image",
+      render: (record: any) => <img src={record.image} alt="Product" />,
     },
-
     {
       title: "Số lượng",
-      dataIndex: "reason",
+      render: (record: any) => <div>{record.quantity}</div>,
     },
-    {
-      title: "Trạng thái",
-      dataIndex: "status",
-    },
+    // {
+    //   title: "Trạng thái",
+    //   render: (record: any) => <div>{record.status}</div>, // Render status
+    // },
   ];
+
+  console.log("token nè : ", token);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-
   const { mutate } = useMutation({
     mutationFn: async (data: {
       return_request_id: number;
       cancel_items: number[];
     }) => {
       const { return_request_id, cancel_items } = data;
-      await instance.post(`return-requests/cancel`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        data: {
+      await instance.post(
+        "return-requests/cancel",
+        {
           return_request_id,
           cancel_items,
         },
-      });
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["history_order"] });
       toast.success("Hủy yêu cầu hoàn hàng thành công");
-      navigate(`/history-order`);
+      navigate("/history-order");
     },
     onError: () => {
       toast.error("Hủy thất bại");
@@ -148,55 +144,7 @@ const GetReturnRequestOrderId = () => {
               <h2 className="ml-4 text-lg lg:text-xl font-semibold text-gray-800">
                 Sản phẩm đã chọn:
               </h2>
-              {/* {returnRequest?.items?.map((value: any) => (
-                <div
-                  key={value.id}
-                  className="flex justify-between items-center p-6 border border-gray-200 rounded-lg shadow-md bg-white hover:shadow-lg transition-shadow duration-300"
-                >
-                  <div className="flex items-center space-x-6">
-                    <Link
-                      to={`/products/${value?.id}`}
-                      className="flex-shrink-0"
-                    >
-                      <img
-                        src={value.image || "https://via.placeholder.com/100"}
-                        alt={value.product_name}
-                        className="w-[100px] h-[100px] object-cover rounded-lg border border-gray-300"
-                      />
-                    </Link>
 
-                    <div className="text-sm font-medium text-gray-800">
-                      <Link
-                        to={`/products/${value?.product_id}`}
-                        className="text-lg font-semibold text-gray-900 hover:underline"
-                      >
-                        {value.product_name}
-                      </Link>
-                      <div className="mt-2 space-y-1 text-gray-600">
-                        <span>Phân loại: </span>
-                        {value?.attributes &&
-                          Object.entries(value?.attributes).map(
-                            ([key, val]: any) => (
-                              <span key={key} className="capitalize mr-2">
-                                {key} {val}
-                              </span>
-                            )
-                          )}
-                      </div>
-                      <span className="block mt-2 text-base">
-                        Số lượng: <span>{value?.quantity}</span>
-                      </span>
-                      <span className="block mt-2 text-base">
-                        Giá: {Number(value.price).toLocaleString("vi-VN")} VNĐ
-                      </span>
-                      <span className="block mt-2 text-base">
-                        Trạng thái:
-                        <span>{}</span>
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ))} */}
               <Table
                 className="custom-table"
                 dataSource={dataSource}
@@ -205,21 +153,12 @@ const GetReturnRequestOrderId = () => {
                 pagination={false}
               />
 
-              <div className="mt-2">
-                <h2 className=" ml-4 pb-4 text-lg lg:text-xl font-semibold text-gray-800">
-                  Thông tin hoàn tiền
-                </h2>
-                <span className="text-base mb-4 ml-4">
-                  Số tiền hoàn lại: VNĐ
-                </span>
-                <br />
-                {/* <span className="text-base pb-4 ml-4">Hoàn tiền vào: ???</span> */}
-              </div>
-
               <div className="fixed bottom-0 left-[134px] right-[134px] flex justify-between items-center p-6 border border-gray-200 rounded-lg shadow-md bg-white hover:shadow-lg transition-shadow duration-300">
                 <div className="flex items-center space-x-2">
                   <p className="ml-4 text-sm font-medium text-gray-800">
-                    {/* Số tiền hoàn lại: {refund.toLocaleString("vi-VN")} VNĐ */}
+                    Số tiền hoàn lại: 100.000
+                    {/* {refund.toLocaleString("vi-VN")} */}
+                    VNĐ
                   </p>
                 </div>
                 <button
