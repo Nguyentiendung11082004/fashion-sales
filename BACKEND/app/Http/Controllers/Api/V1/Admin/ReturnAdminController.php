@@ -43,22 +43,22 @@ class ReturnAdminController extends Controller
                         'items' => $returnRequest->items->map(function ($item) use ($returnRequest) {
                             return [
                                 'id' => $item->id,
-                                'request_id'=>$item->return_request_id,
+                                'request_id' => $item->return_request_id,
                                 'order_detail_id' => $item->order_detail_id,
-                                'image'=>$item->image,
+                                'image' => $item->image,
                                 'quantity' => $item->quantity,
                                 'status' => $item->status,
-                                
+
                                 'order' => [
                                     'id' => $returnRequest->order->id,
                                     'total' => $returnRequest->order->total,
                                     'total_quantity' => $returnRequest->order->total_quantity,
                                     'order_status' => $returnRequest->order->order_status,
-                                    'order_code'=>$returnRequest->order->order_code,    
-                                    'payment_status'=>$returnRequest->order->payment_status,    
+                                    'order_code' => $returnRequest->order->order_code,
+                                    'payment_status' => $returnRequest->order->payment_status,
 
-                                    'order_detail'=> 
-                                     [
+                                    'order_detail' =>
+                                    [
                                         "id" => $item->orderDetail->id,
                                         "product_id" => $item->orderDetail->product_id,
                                         "product_variant_id" => $item->orderDetail->product_variant_id,
@@ -89,6 +89,69 @@ class ReturnAdminController extends Controller
             return response()->json([
                 'message' => $ex->getMessage(),
             ], 500);
+        }
+    }
+
+    public  function showReturnItem($id)
+    {
+        try {
+            // Lấy danh sách return_request cùng các item, đơn hàng và sản phẩm liên quan
+            $showReturnItem = ReturnRequest::with([
+                'items.orderDetail.product', // Thêm chi tiết sản phẩm từ order_detail
+                'order'                      // Thông tin đơn hàng
+            ])
+                ->findOrFail($id);
+            $formattedData = [
+                'id' => $showReturnItem->id,
+                'order_id' => $showReturnItem->order_id,
+                'user_id' => $showReturnItem->user_id,
+                'reason' => $showReturnItem->reason,
+                'status' => $showReturnItem->status,
+                'created_at' => $showReturnItem->created_at->format('Y-m-d H:i:s'),
+                'updated_at' => $showReturnItem->updated_at->format('Y-m-d H:i:s'),
+                'items' => $showReturnItem->items->map(function ($item) use ($showReturnItem) {
+                    return [
+                        'id' => $item->id,
+                        'request_id' => $item->return_request_id,
+                        'order_detail_id' => $item->order_detail_id,
+                        'image' => $item->image,
+                        'quantity' => $item->quantity,
+                        'status' => $item->status,
+                        'order' => [
+                            'id' => $showReturnItem->order->id,
+                            'total' => $showReturnItem->order->total,
+                            'total_quantity' => $showReturnItem->order->total_quantity,
+                            'order_status' => $showReturnItem->order->order_status,
+                            'order_code' => $showReturnItem->order->order_code,
+                            'payment_status' => $showReturnItem->order->payment_status,
+                            'order_detail' => [
+                                "id" => $item->orderDetail->id,
+                                "product_id" => $item->orderDetail->product_id,
+                                "product_variant_id" => $item->orderDetail->product_variant_id,
+                                "order_id" => $item->orderDetail->order_id,
+                                "product_name" => $item->orderDetail->product_name,
+                                "product_img" => $item->orderDetail->product_img,
+                                "attributes" => $item->orderDetail->attributes,
+                                "quantity" => $item->orderDetail->quantity,
+                                "price" => $item->orderDetail->price,
+                                "total_price" => $item->orderDetail->total_price,
+                                "discount" => $item->orderDetail->discount,
+                                "created_at" => $item->orderDetail->created_at->format('Y-m-d H:i:s'),
+                                "updated_at" => $item->orderDetail->updated_at->format('Y-m-d H:i:s'),
+                            ]
+                        ],
+                    ];
+                }),
+            ];
+
+            return response()->json([
+                'message' => 'Lấy dữ liệu thành công',
+                'data' => $formattedData,
+            ], 200);
+        } catch (\Exception $ex) {
+            return response()->json([
+                "message" => $ex->getMessage()
+            ]);
         }
     }
 
@@ -128,7 +191,7 @@ class ReturnAdminController extends Controller
                         // Nếu trạng thái trước đó là "approved", reset số lượng trong kho
                         $orderDetail = OrderDetail::findOrFail($returnItem->order_detail_id);
                         $product = Product::findOrFail($orderDetail->product_id);
-                        
+
                         // Trừ số lượng sản phẩm trong kho
                         $product->update([
                             'quantity' => $product->quantity - $returnItem->quantity,
@@ -193,6 +256,7 @@ class ReturnAdminController extends Controller
             ], 500);
         }
     }
+
 
 
     public function updateOrder($returnRequestId)
