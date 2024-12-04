@@ -24,7 +24,8 @@ class ReturnRequest extends Model
     }
 
     public function items()
-{
-    return $this->hasMany(ReturnItem::class, 'return_request_id');
-}
+    {
+        return $this->hasMany(ReturnItem::class, 'return_request_id');
+    }
+    
 }
