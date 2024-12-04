@@ -15,7 +15,8 @@ class Comments extends Model
         "rating",
         'image',
         "status",
-         "parent_id"
+         "parent_id",
+         'order_id',
     ];
 
     public function product(){

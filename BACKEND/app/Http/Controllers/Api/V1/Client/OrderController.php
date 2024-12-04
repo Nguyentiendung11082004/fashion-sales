@@ -40,12 +40,17 @@ class OrderController extends Controller
                 // Get all orders for the authenticated user, including order details
                 $orders = Order::query()
                     ->where('user_id', $user_id)
-                    ->with(
+                    ->with([
                         'orderDetails',
-                        'paymentMethod'
-                    )
+                        'paymentMethod',
+                        'returnRequests' => function ($query) {
+                            $query->where('status', '!=', 'canceled')->latest('id'); // Điều kiện loại bỏ "canceled" và sắp xếp theo id mới nhất
+                        }
+                    ])
                     ->latest('id')
                     ->get();
+
+
 
                 return response()->json($orders, 200);
             } else {
@@ -451,7 +456,13 @@ class OrderController extends Controller
                 return response()->json(['message' => 'Không có quyền truy cập'], 403);
             }
             // Thông tin chi tiết đơn hàng
-            $order->load('orderDetails');
+            $order->load(['orderDetails']);
+
+           
+
+            // Kiểm tra kết quả
+            // dd($orderArray);
+
 
             // Trả về dữ liệu đơn hàng cùng với chi tiết dưới dạng JSON
             return response()->json([
