@@ -8,7 +8,7 @@
 <body>
     <h1>Chào bạn!</h1>
     <p>Mã OTP để xác minh đơn hàng của bạn là: <strong>{{ $otp }}</strong></p>
-    <p>Mã OTP này sẽ hết hạn sau 10 phút.</p>
+    <p>Mã OTP này sẽ hết hạn sau 3 phút.</p>
     <p>Trân trọng,<br>Đội ngũ hỗ trợ của chúng tôi.</p>
 </body>
 </html>

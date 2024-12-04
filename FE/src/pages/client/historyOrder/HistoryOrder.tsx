@@ -123,7 +123,8 @@ const HistoryOrder = () => {
       );
       return response.data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      // setSelectedItems(data.items);
       navigate("/cart");
       notifyOrdersChanged();
     },
@@ -152,7 +153,7 @@ const HistoryOrder = () => {
       key: "label",
     },
     {
-      title: "Thông tin",
+      title: "Nội dung",
       dataIndex: "value",
       key: "value",
     },
@@ -210,6 +211,19 @@ const HistoryOrder = () => {
 
   console.log("data lịch sử đơn hàng: ", data);
 
+  const [currentPage, setCurrentPage] = useState(1); // Trang hiện tại
+  const productsPerPage = 6; // Mỗi trang có 12 sản phẩm
+  const totalProducts = data?.length || 0; // Tổng số sản phẩm
+  // Tính toán các sản phẩm hiển thị trên trang hiện tại
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = data?.slice(indexOfFirstProduct, indexOfLastProduct);
+  // Tính số trang
+  const totalPages = Math.ceil(totalProducts / productsPerPage);
+  // Hàm để chuyển trang
+  const handlePageChange = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+  };
   return (
     <>
       <main
@@ -388,104 +402,142 @@ const HistoryOrder = () => {
                                 {selectedOrder.order_status}
                               </p>
                             </div>
-                            <p>
-                              <strong>Thời gian đặt hàng:</strong>
-                              {selectedOrder.created_at}
+                            <p className="flex items-center">
+                              <p className="mr-1">Thời gian đặt hàng: </p>
+                              <p className="text-gray-500">{selectedOrder.created_at}</p>
                             </p>
-                            <p>
-                              <strong>Trạng thái đơn hàng:</strong>
-                              {selectedOrder.order_status}
-                            </p>
-                            <p>
-                              <strong>Địa chỉ nhận hàng:</strong>
-                              <br />
-                              Tên: {selectedOrder.ship_user_name}
-                              <br />
-                              Số điện thoại:
-                              {selectedOrder.ship_user_phonenumber}
-                              <br />
-                              Địa chỉ: {selectedOrder.ship_user_address}
-                            </p>
-                            <div>
-                              <strong>Sản phẩm:</strong>
-                              {selectedOrder.order_details.map((item: any) => (
-                                <div
-                                  key={item.id}
-                                  className="flex items-center space-x-4 border-b pb-2 mb-2"
-                                >
-                                  <img
-                                    src={item.product_img}
-                                    alt={item.product_name}
-                                    className="w-16 h-16 object-cover"
-                                  />
-                                  <div>
-                                    <p className="font-semibold">
-                                      {item.product_name}
-                                    </p>
-                                    <p>
-                                      {item.attributes &&
-                                        Object.entries(item.attributes).length >
-                                          0 && (
-                                          <>
-                                            Phân loại hàng:
-                                            {Object.entries(
-                                              item.attributes
-                                            ).map(([key, value]) => (
-                                              <li key={key}>
-                                                {Array.isArray(value)
-                                                  ? value.join(", ") // Nếu là mảng
-                                                  : typeof value === "object" &&
-                                                      value !== null
-                                                    ? Object.values(value).join(
-                                                        ", "
-                                                      ) // Nếu là object
-                                                    : String(value)}
-                                                {/* Nếu là giá trị đơn lẻ */}
-                                              </li>
-                                            ))}
-                                          </>
-                                        )}
-                                    </p>
-                                    <p>Số lượng: {item.quantity}</p>
-                                    <p>
-                                      Giá:
-                                      {/* {FormatMoney(item.price)} */}
-                                      {new Intl.NumberFormat("vi-VN").format(
-                                        item.price
-                                      )}
-                                      ₫
-                                    </p>
+                            {/* <div className="flex items-center space-x-5 my-5"> */}
+                              {/* <div>
+                                <p className="font-medium text-base mb-2">
+                                  Địa chỉ nhận hàng:{" "}
+                                </p>
+                              
+                                Tên: {selectedOrder.ship_user_name}
+                                <br />
+                                Số điện thoại:{" "}
+                                {selectedOrder.ship_user_phonenumber}
+                                <br />
+                                Địa chỉ: {selectedOrder.ship_user_address}
+                              </div> */}
+                              <div className="py-5">
+                                <p className="font-medium text-base mb-2">
+                                  Sản phẩm:
+                                </p>
+                                {selectedOrder.order_details.map(
+                                  (item: any) => (
+                                    <div
+                                    className="flex bg-gray-100 p-2 rounded-xl"
+                                    key={item.id}
+                                  >
+                                    <div className="relative sm:w-20 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
+                                      <img
+                                        alt={item.product_name}
+                                        loading="lazy"
+                                        decoding="async"
+                                        data-nimg="fill"
+                                        className="block absolute align-middle inset-0 h-full w-full object-cover object-center"
+                                        sizes="100px"
+                                        src={item.product_img}
+                                      />
+                                    </div>
+                                    <div className="ml-4 flex flex-1 flex-col">
+                                      <div>
+                                        <div className="flex ">
+                                          <div className="mr-12">
+                                            <h3 className="text-lg font-medium line-clamp-1">
+                                              {item.product_name}
+                                            </h3>
+                                            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                                              {item.attributes &&
+                                                Object.entries(item.attributes)
+                                                  .length > 0 && (
+                                                  <>
+                                                    Phân loại hàng:
+                                                    {Object.entries(
+                                                      item.attributes
+                                                    ).map(([key, value]) => (
+                                                      <li key={key}>
+                                                        {Array.isArray(value)
+                                                          ? value.join(", ") // Nếu là mảng
+                                                          : typeof value ===
+                                                                "object" &&
+                                                              value !== null
+                                                            ? Object.values(
+                                                                value
+                                                              ).join(", ") // Nếu là object
+                                                            : String(value)}
+                                                        {/* Nếu là giá trị đơn lẻ */}
+                                                      </li>
+                                                    ))}
+                                                  </>
+                                                )}
+                                            </p>
+                                          </div>
+                                          <div className="mt-[1.7px] ">
+                                            <div className="flex items-center font-medium">
+                                              {/* <del className="mr-1">{detail.price}đ</del> */}
+                                              <span className="text-lg">
+                                                {/* {FormatMoney(detail.price)}₫ */}
+                                                {new Intl.NumberFormat(
+                                                  "vi-VN"
+                                                ).format(item.price)}
+                                                ₫
+                                              </span>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      <div className="flex flex-1 items-end justify-between text-sm">
+                                        <p className="text-gray-500 dark:text-slate-400 flex items-center">
+                                          <span className="inline-block">x</span>
+                                          <span className="ml-2">
+                                            {item.quantity}
+                                          </span>
+                                        </p>
+                                      </div>
+                                    </div>
                                   </div>
-                                </div>
-                              ))}
-                            </div>
+                                  )
+                                )}
+                              </div>
+                            {/* </div> */}
 
                             {/* Dùng Table hiển thị thông tin */}
                             <Table
                               dataSource={[
                                 {
                                   key: "1",
-                                  label: "Phí vận chuyển",
+                                  label: "Thông tin",
                                   value: `
-                                 
-                                  ₫`,
+                                    ${selectedOrder.ship_user_name} - ${selectedOrder.ship_user_phonenumber}
+                                `,
                                 },
                                 {
                                   key: "2",
-                                  label: "Khuyến mãi",
-                                  value:
-                                    // `-${FormatMoney(selectedOrder.voucher_discount)}₫`
-                                    `${new Intl.NumberFormat("vi-VN").format(selectedOrder.voucher_discount)}₫`,
+                                  label: "Địa chỉ nhận hàng",
+                                  value: `
+                                    ${selectedOrder.ship_user_address}
+                                `,
                                 },
                                 {
                                   key: "3",
-                                  label: "Thành tiền",
-                                  value:
-                                    // `${FormatMoney(selectedOrder.total)}₫`
-                                    `${new Intl.NumberFormat("vi-VN").format(selectedOrder.total)}₫`,
+                                  label: "Phí vận chuyển",
+                                  value: `
+                                    ${new Intl.NumberFormat("vi-VN").format(selectedOrder.shipping_fee)}
+                                  ₫`,
                                 },
                                 {
                                   key: "4",
+                                  label: "Khuyến mãi",
+                                  value: `${new Intl.NumberFormat("vi-VN").format(selectedOrder.voucher_discount)}₫`,
+                                },
+                                {
+                                  key: "5",
+                                  label: "Thành tiền",
+                                  value: `${new Intl.NumberFormat("vi-VN").format(selectedOrder.total)}₫`,
+                                },
+                                {
+                                  key: "6",
                                   label: "Phương thức thanh toán",
                                   value: `${selectedOrder.payment_method.name} - ${selectedOrder.payment_method.description}`,
                                 },
@@ -499,83 +551,161 @@ const HistoryOrder = () => {
                       </div>
                     </button>
                     {/*end hd-head-form-order*/}
-                    {isExpanded && (
-                      <div className="hd-body-form-order border-b border-t border-slate-200 p-2 sm:p-8 divide-y divide-y-slate-20">
-                        {order.order_details.map((detail: any) => (
-                          <div
-                            className="flex py-4 sm:py-7 last:pb-0 first:pt-0"
-                            key={detail.id}
-                          >
-                            <div className="relative h-[88px] w-16 sm:w-20 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
-                              <img
-                                alt={detail.product_name}
-                                loading="lazy"
-                                decoding="async"
-                                data-nimg="fill"
-                                className="block absolute align-middle inset-0 h-full w-full object-cover object-center"
-                                sizes="100px"
-                                src={detail.product_img}
-                              />
-                            </div>
-                            <div className="ml-4 flex flex-1 flex-col">
-                              <div>
-                                <div className="flex justify-between">
-                                  <div>
-                                    <h3 className="text-lg font-medium line-clamp-1">
-                                      {detail.product_name}
-                                    </h3>
-                                    <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                                      {detail.attributes &&
-                                        Object.entries(detail.attributes)
-                                          .length > 0 && (
-                                          <>
-                                            Phân loại hàng:
-                                            {Object.entries(
-                                              detail.attributes
-                                            ).map(([key, value]) => (
-                                              <li key={key}>
-                                                {Array.isArray(value)
-                                                  ? value.join(", ") // Nếu là mảng
-                                                  : typeof value === "object" &&
-                                                      value !== null
-                                                    ? Object.values(value).join(
-                                                        ", "
-                                                      ) // Nếu là object
-                                                    : String(value)}
-                                                {/* Nếu là giá trị đơn lẻ */}
-                                              </li>
-                                            ))}
-                                          </>
-                                        )}
-                                    </p>
-                                  </div>
-                                  <div className="mt-[1.7px]">
-                                    <div className="flex items-center text-sm font-medium">
-                                      {/* <del className="mr-1">{detail.price}đ</del> */}
-                                      <span className="text-base">
-                                        {/* {FormatMoney(detail.price)}₫ */}
-                                        {new Intl.NumberFormat("vi-VN").format(
-                                          detail.price
-                                        )}
-                                        ₫
-                                      </span>
-                                    </div>
+                    <div className="hd-body-form-order border-b border-t border-slate-200 p-2 sm:p-8 divide-y divide-y-slate-20">
+                      {/* Luôn hiển thị ít nhất 1 sản phẩm */}
+                      {order.order_details.length > 0 && (
+                        <div
+                          className="flex py-4 sm:py-7 last:pb-0 first:pt-0"
+                          key={order.order_details[0].id}
+                        >
+                          <div className="relative sm:w-20 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
+                            <img
+                              alt={order.order_details[0].product_name}
+                              loading="lazy"
+                              decoding="async"
+                              data-nimg="fill"
+                              className="block absolute align-middle inset-0 h-full w-full object-cover object-center"
+                              sizes="100px"
+                              src={order.order_details[0].product_img}
+                            />
+                          </div>
+                          <div className="ml-4 flex flex-1 flex-col">
+                            <div>
+                              <div className="flex justify-between">
+                                <div>
+                                  <h3 className="text-lg font-medium line-clamp-1">
+                                    {order.order_details[0].product_name}
+                                  </h3>
+                                  <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                                    {order.order_details[0].attributes &&
+                                      Object.entries(
+                                        order.order_details[0].attributes
+                                      ).length > 0 && (
+                                        <>
+                                          Phân loại hàng:
+                                          {Object.entries(
+                                            order.order_details[0].attributes
+                                          ).map(([key, value]) => (
+                                            <li key={key}>
+                                              {Array.isArray(value)
+                                                ? value.join(", ") // Nếu là mảng
+                                                : typeof value === "object" &&
+                                                    value !== null
+                                                  ? Object.values(value).join(
+                                                      ", "
+                                                    ) // Nếu là object
+                                                  : String(value)}
+                                              {/* Nếu là giá trị đơn lẻ */}
+                                            </li>
+                                          ))}
+                                        </>
+                                      )}
+                                  </p>
+                                </div>
+                                <div className="mt-[1.7px]">
+                                  <div className="flex items-center text-sm font-medium">
+                                    {/* <del className="mr-1">{detail.price}đ</del> */}
+                                    <span className="text-base">
+                                      {/* {FormatMoney(detail.price)}₫ */}
+                                      {new Intl.NumberFormat("vi-VN").format(
+                                        order.order_details[0].price
+                                      )}
+                                      ₫
+                                    </span>
                                   </div>
                                 </div>
                               </div>
-                              <div className="flex flex-1 items-end justify-between text-sm">
-                                <p className="text-gray-500 dark:text-slate-400 flex items-center">
-                                  <span className="inline-block">x</span>
-                                  <span className="ml-2">
-                                    {detail.quantity}
-                                  </span>
-                                </p>
-                              </div>
+                            </div>
+                            <div className="flex flex-1 items-end justify-between text-sm">
+                              <p className="text-gray-500 dark:text-slate-400 flex items-center">
+                                <span className="inline-block">x</span>
+                                <span className="ml-2">
+                                  {order.order_details[0].quantity}
+                                </span>
+                              </p>
                             </div>
                           </div>
-                        ))}
-                      </div>
-                    )}
+                        </div>
+                      )}
+                      {isExpanded && order.order_details.length > 1 && (
+                        <div>
+                          {order.order_details.slice(1).map((detail: any) => (
+                            <div
+                              className="flex py-4 sm:py-7 last:pb-0 first:pt-0"
+                              key={detail.id}
+                            >
+                              <div className="relative sm:w-20 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
+                                <img
+                                  alt={detail.product_name}
+                                  loading="lazy"
+                                  decoding="async"
+                                  data-nimg="fill"
+                                  className="block absolute align-middle inset-0 h-full w-full object-cover object-center"
+                                  sizes="100px"
+                                  src={detail.product_img}
+                                />
+                              </div>
+                              <div className="ml-4 flex flex-1 flex-col">
+                                <div>
+                                  <div className="flex justify-between">
+                                    <div>
+                                      <h3 className="text-lg font-medium line-clamp-1">
+                                        {detail.product_name}
+                                      </h3>
+                                      <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                                        {detail.attributes &&
+                                          Object.entries(detail.attributes)
+                                            .length > 0 && (
+                                            <>
+                                              Phân loại hàng:
+                                              {Object.entries(
+                                                detail.attributes
+                                              ).map(([key, value]) => (
+                                                <li key={key}>
+                                                  {Array.isArray(value)
+                                                    ? value.join(", ") // Nếu là mảng
+                                                    : typeof value ===
+                                                          "object" &&
+                                                        value !== null
+                                                      ? Object.values(
+                                                          value
+                                                        ).join(", ") // Nếu là object
+                                                      : String(value)}
+                                                  {/* Nếu là giá trị đơn lẻ */}
+                                                </li>
+                                              ))}
+                                            </>
+                                          )}
+                                      </p>
+                                    </div>
+                                    <div className="mt-[1.7px]">
+                                      <div className="flex items-center text-sm font-medium">
+                                        {/* <del className="mr-1">{detail.price}đ</del> */}
+                                        <span className="text-base">
+                                          {/* {FormatMoney(detail.price)}₫ */}
+                                          {new Intl.NumberFormat(
+                                            "vi-VN"
+                                          ).format(detail.price)}
+                                          ₫
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="flex flex-1 items-end justify-between text-sm">
+                                  <p className="text-gray-500 dark:text-slate-400 flex items-center">
+                                    <span className="inline-block">x</span>
+                                    <span className="ml-2">
+                                      {detail.quantity}
+                                    </span>
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
 
                     {/*end hd-body-form-order*/}
                     <div className="hd-head-form-order flex sm:flex-row justify-between lg:justify-between sm:justify-between sm:items-center p-4 sm:p-8">
@@ -720,6 +850,42 @@ const HistoryOrder = () => {
                   </div>
                 );
               })}
+
+              {/* phân trang  */}
+              {totalProducts > productsPerPage && (
+                <div className="pagination flex justify-center mt-6">
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="px-4 py-2 mx-1 bg-gray-100 rounded"
+                  >
+                    Quay lại
+                  </button>
+                  {Array.from(
+                    { length: totalPages },
+                    (_, index) => index + 1
+                  ).map((pageNumber) => (
+                    <button
+                      key={pageNumber}
+                      onClick={() => handlePageChange(pageNumber)}
+                      className={`px-4 py-2 mx-1 ${
+                        currentPage === pageNumber
+                          ? "text-black"
+                          : "text-gray-300"
+                      } rounded`}
+                    >
+                      {pageNumber}
+                    </button>
+                  ))}
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="px-4 py-2 mx-1 bg-gray-100 rounded"
+                  >
+                    Chuyển tiếp
+                  </button>
+                </div>
+              )}
             </div>
           </div>
           {/*end hd-account-content*/}

@@ -1,4 +1,5 @@
 import Loading from "@/common/Loading/Loading";
+import OrderLookup from "@/components/website/OrderLookup";
 import FastDelivery from "@/pages/admin/fastDelivery/FastDelivery";
 import ReturnOrder from "@/pages/admin/order/components/ReturnOrder";
 import ReturnOrderId from "@/pages/admin/order/components/ReturnOrderId";
@@ -114,9 +115,9 @@ const Router = () => {
           <Route path="about" element={<About />} />
           <Route path="" element={<Permission />}>
             <Route path="cart" element={<Cart />} />
+            <Route path="account" element={<Account />} />
+            <Route path="wishlist" element={<Wishlist />} />
           </Route>
-          <Route path="account" element={<Account />} />
-          <Route path="wishlist" element={<Wishlist />} />
           <Route path="checkout" element={<Checkout />} />
           <Route path="contact" element={<Contact />} />
           <Route path="thank" element={<Thanks />} />
@@ -128,6 +129,7 @@ const Router = () => {
             element={<GetReturnRequestOrderId />}
           />
           <Route path="/order" element={<Order />} />
+          <Route path="/order_lookup" element={<OrderLookup />} />
         </Route>
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />

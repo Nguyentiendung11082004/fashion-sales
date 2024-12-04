@@ -9,6 +9,8 @@ import { FormatMoney } from "@/common/utils/utils";
 import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
+import { useWishlist } from "@/common/context/Wishlist/WishlistContext";
+import HeartRedPopup from "../icons/detail/HeartRedPopup";
 import { toast } from "react-toastify";
 type Props = {
   open: boolean;
@@ -19,6 +21,7 @@ type Props = {
 const MySwal = withReactContent(Swal);
 const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
   const navigate = useNavigate();
+  const { handleAddToWishlist, isInWishlist } = useWishlist();
   console.log("productSeeMore", productSeeMore);
   const attributes = productSeeMore?.variants;
 
@@ -371,20 +374,24 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
               </Button>
             </div>
             <div className="mt-2">
-              <button>
-                <HeartBlack />
+              <button onClick={() => handleAddToWishlist(productSeeMore)}>
+                {isInWishlist(productSeeMore.id) ? (
+                  <HeartRedPopup />
+                ) : (
+                  <HeartBlack />
+                )}
               </button>
             </div>
           </div>
-          <div className="flex mt-2">
-            <p className="mr-1 font-medium">Xem chi tiết</p>
+          <Link to={`/products/${productSeeMore?.id}`} className="flex mt-2">
+            <p className="mr-1 font-medium text-black">Xem chi tiết</p>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
               stroke-width="1.5"
               stroke="currentColor"
-              className="size-6"
+              className="size-6 text-black"
             >
               <path
                 stroke-linecap="round"
@@ -392,7 +399,7 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
                 d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3"
               />
             </svg>
-          </div>
+          </Link>
         </div>
       </div>
     </AntModal>

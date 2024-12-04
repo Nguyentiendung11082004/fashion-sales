@@ -97,10 +97,24 @@ class ProductShopController extends Controller
                     // Lọc theo danh mục
                     return $query->whereIn('brand_id', $brands);
                 })
+                // ->when($search, function ($query, $search) {
+                //     return $query->where('name', 'like', "%{$search}%");
+                // })
                 ->when($search, function ($query, $search) {
-                    // Nếu có từ khóa tìm kiếm, lọc sản phẩm có tên chứa từ khóa
-                    return $query->where('name', 'like', "%{$search}%");
+                    $keywords = explode(' ', $search);
+
+                    return $query->where(function ($q) use ($keywords) {
+                        foreach ($keywords as $keyword) {
+                            $q->where(function ($subQuery) use ($keyword) {
+                                $subQuery->where('name', 'like', "% {$keyword} %")
+                                         ->orWhere('name', 'like', "{$keyword} %")
+                                         ->orWhere('name', 'like', "% {$keyword}")
+                                         ->orWhere('name', '=', "{$keyword}");
+                            });
+                        }
+                    });
                 })
+
                 ->when($colors, function ($query, $colors) {
                     // Lọc theo màu sắc
                     return $query->whereHas('variants.attributes', function ($subQuery) use ($colors) {

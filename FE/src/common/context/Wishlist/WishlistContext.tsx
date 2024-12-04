@@ -31,7 +31,7 @@ export const WishlistProvider = ({ children }: { children: React.ReactNode }) =>
         });
         return response.data;
       },
-      enabled: isActive, // Chỉ kích hoạt khi cần
+      enabled: isActive, 
     }
   );
 

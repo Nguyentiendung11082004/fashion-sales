@@ -27,7 +27,7 @@ const OrderPage = () => {
   });
   const [dataFilter, setDataFilter] = useState<any>([])
   const handleSearch = async () => {
-    let res = await instance.get(`/order-status`, filter)
+    let res = await instance.post(`/order-status`, filter)
     setDataFilter(res?.data.data)
   }
   console.log("dataFilter", dataFilter)
@@ -260,6 +260,14 @@ const OrderPage = () => {
       },
     },
   ];
+  const trangThai = [
+    {
+      name: 'Giao hàng thành công', id: 'Giao hàng thành công'
+    },
+    {
+      name: 'Đang chờ xác nhận', id: 'Đang chờ xác nhận'
+    }
+  ]
 
   useEffect(() => {
     if (isError && !hasError) {
@@ -333,9 +341,23 @@ const OrderPage = () => {
                 }))
               }}
             />
+            <Select
+              size='large'
+              mode='multiple'
+              options={
+                trangThai?.map((item: any) => ({
+                  value: item?.id,
+                  label: item?.name
+                })) || []
+              }
+              onChange={(e) => setFilter((prev:any)=> ({...prev, statuses: e}))}
+              placeholder="Chọn tag"
+              placement="bottomLeft"
+              className='w-full'
+            />
             <Table
               className="custom-table"
-              dataSource={(dataFilter ? dataFilter :  dataSource).slice(
+              dataSource={(dataFilter ? dataFilter : dataSource).slice(
                 (currentPage - 1) * pageSize,
                 currentPage * pageSize
               )}
@@ -347,7 +369,7 @@ const OrderPage = () => {
               className="mt-4"
               align="end"
               current={currentPage}
-              total={(dataFilter ? dataFilter :  dataSource).length}
+              total={(dataFilter ? dataFilter : dataSource).length}
               pageSize={pageSize}
               onChange={(page) => {
                 setCurrentPage(page);

@@ -1,11 +1,12 @@
 import { Icategories } from "@/common/types/categories";
 import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom"; // Đảm bảo bạn đã cài đặt react-router-dom
+import { Link, useNavigate } from "react-router-dom"; // Đảm bảo bạn đã cài đặt react-router-dom
 
 const CategoryCarousel = () => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [category, setCategory] = useState<Icategories[]>([]);
+  const navigate = useNavigate();
 
   const scrollLeft = () => {
     if (scrollContainerRef.current) {
@@ -28,14 +29,20 @@ const CategoryCarousel = () => {
 
   useEffect(() => {
     axios
-      .get("http://127.0.0.1:8000/api/v1/category")
+      .get("http://127.0.0.1:8000/api/v1/product-home")
       .then((response) => {
-        setCategory(response.data);
+        setCategory(response.data.categories);
       })
       .catch((error) => {
         console.error("Có lỗi xảy ra khi lấy danh mục", error);
       });
   }, []);
+
+  const handleCategoryClick = () => {
+    setSelectedCategories([categoryId]);
+    applyFilters([categoryId]);
+    navigate("/products");
+  };
 
   return (
     <section className="container relative overflow-hidden">
@@ -60,7 +67,13 @@ const CategoryCarousel = () => {
       >
         {category.map((cat) => (
           <div key={cat.id} className="min-w-[250px] h-[500px] overflow-hidden">
-            <Link to="" className="relative">
+            <Link
+              to={{
+                pathname: "/products",
+              }}
+              state={{ selectedCategoryId: cat.id }}
+              className="relative"
+            >
               <img
                 src={cat.img_thumbnail}
                 alt={cat.name}

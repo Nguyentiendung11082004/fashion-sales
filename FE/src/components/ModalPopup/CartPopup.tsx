@@ -3,6 +3,7 @@
 /* eslint-disable prefer-const */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useCart } from "@/common/context/Cart/CartContext";
+import { useWishlist } from "@/common/context/Wishlist/WishlistContext";
 import HeartBlack from "@/components/icons/detail/HeartBlack";
 import {
   findProductVariant,
@@ -12,11 +13,13 @@ import { CloseOutlined, MinusOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
 import { Modal as AntModal, Button } from "antd";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
+import HeartRedPopup from "../icons/detail/HeartRedPopup";
 
 const CartPopup = forwardRef((props: any, ref) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { idProduct, setIdProduct }: any = props;
   const [product, setProduct] = useState<any>();
+  const { handleAddToWishlist, isInWishlist } = useWishlist();
 
   const [selectedAttributes, setSelectedAttributes] = useState<{ product_variant: Record<string, string | number>;
   }>({
