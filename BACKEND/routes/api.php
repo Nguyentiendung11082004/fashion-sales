@@ -51,10 +51,49 @@ use App\Http\Controllers\API\V1\Service\PaymentController;
 */
 
 Route::prefix("v1/")->group(function () {
-    //     Route::middleware(['auth:sanctum', 'role:4'])->group(function () {
+    //Login Admin
+    Route::post('admin/login', [AuthAdminController::class, 'login']);
+
+    // Route::middleware(['role:4'])->group(function () {
+    //     // Route::resource('vouchers', VoucherController::class);
+    //     Route::resource("products", ProductController::class);
+    //     Route::resource("comments", CommentsController::class);
+    //     Route::resource("brand", BrandController::class);
+    //     Route::resource("tags", TagController::class);
+    //     Route::resource('employees', EmployeeController::class);
+    //     Route::resource('clients', ClientController::class);
+    //     Route::apiResource('attribute', AttributeController::class);
+    //     Route::apiResource('attributeItem', AttributeItemController::class);
+    //     Route::apiResource('category', CategoryController::class);
+
+    //     Route::get('check-banner-validity', [BannerController::class, 'checkBannerValidity']);
+    //     Route::get('check-banner-validity/{id}', [BannerController::class, 'checkBannerValidity']);
+    //     Route::get('/posts-by-category', [PostController::class, 'getPostsGroupedByCategory']);
+    //     Route::apiResource('posts', PostController::class);
+    //     Route::apiResource('order-status', AdminOrderController::class);
+
+    //     //Tìm kiếm
+    //     Route::post('/client/search', [ClientController::class, 'search']);
+    //     Route::post('/employee/search', [EmployeeController::class, 'search']);
+    //     Route::post('/voucher/search', [VoucherController::class, 'search']);
+    //     Route::post('/product/search', [ProductController::class, 'search']);
+    //     Route::post('/category/search', [CategoryController::class, 'search']);
+    //     Route::post('/order/search', [OrderController::class, 'search']);
+    //     Route::post('/post/search', [PostController::class, 'search']);
+    //     Route::post('/attribute/search', [AttributeController::class, 'search']);
+    //     Route::post('/banner/search', [BannerController::class, 'search']);
+    //     Route::post('/brand/search', [BrandController::class, 'search']);
+    //     Route::post('/comment/search', [CommentsController::class, 'search']);
+    //     Route::post('/tag/search', [TagController::class, 'search']);
+    // });
+
+    // Route::middleware(['role:2,3,4'])->group(function () {
     //     Route::resource('vouchers', VoucherController::class);
     // });
 
+
+
+    Route::apiResource('banners', BannerController::class);
     Route::resource("products", ProductController::class);
     Route::resource("comments", CommentsController::class);
     Route::resource("brand", BrandController::class);
@@ -69,12 +108,11 @@ Route::prefix("v1/")->group(function () {
     Route::get('check-banner-validity', [BannerController::class, 'checkBannerValidity']);
     Route::get('check-banner-validity/{id}', [BannerController::class, 'checkBannerValidity']);
     Route::get('/posts-by-category', [PostController::class, 'getPostsGroupedByCategory']);
+
     Route::get('product-home', [HomeProductController::class, "getHomeProducts"]);
     Route::get('product-detail/{product_id}', [ProductDetailController::class, "productdetail"]);
     Route::post('product-shop', [ProductShopController::class, "getAllProduct"]);
     Route::get('find-variant/{product_id}', [ProductDetailController::class, "findvariant"]);
-    Route::post('login', [AuthController::class, 'login']);
-    Route::post('register', [AuthController::class, 'register']);
     Route::resource('order', OrderController::class);
     Route::resource('checkout', CheckoutController::class);
     Route::apiResource('posts', PostController::class);
@@ -95,6 +133,8 @@ Route::prefix("v1/")->group(function () {
     Route::post('/tag/search', [TagController::class, 'search']);
 
 
+    Route::post('login', [AuthController::class, 'login']);
+    Route::post('register', [AuthController::class, 'register']);
 
     //Login with Google
     Route::middleware(['web'])->group(function () {
@@ -102,8 +142,7 @@ Route::prefix("v1/")->group(function () {
         Route::get('login/google/callback', [SocialiteController::class, 'handleGoogleCallback']);
     });
 
-    //Login Admin
-    Route::post('admin/login', [AuthAdminController::class, 'login']);
+
     //Gửi mail
     Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
         ->middleware(['signed'])->name('verification.verify');
@@ -136,7 +175,7 @@ Route::prefix("v1/")->group(function () {
     Route::post('ghn_update_order', [OrderGHNController::class, 'ghnUpdateOrder']);
 
 
-    //test 
+    //test
     // Route::get('updatehh/{requestid}', [ReturnAdminController::class, 'updateOrder']);
     // Route::get('search',[AdminOrderController::class,'searchOrders']);
 

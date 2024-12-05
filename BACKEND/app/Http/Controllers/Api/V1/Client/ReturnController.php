@@ -15,25 +15,25 @@ class ReturnController extends Controller
 {
 
     public function getUserReturnRequests()
-    {
-        try {
-            // Lấy thông tin người dùng hiện tại
-            $user = auth()->user();
-            // Lấy danh sách return_requests của người dùng hiện tại
-            $returnRequests = ReturnRequest::with(['items'])
-                ->where('user_id', $user->id)
-                ->get();
+{
+    try {
+        // Lấy thông tin người dùng hiện tại
+        $user = auth()->user();
+        // Lấy danh sách return_requests của người dùng hiện tại cùng với các items và sản phẩm liên quan
+        $returnRequests = ReturnRequest::with(['items.product']) // Giả sử mỗi item có quan hệ 'product'
+            ->where('user_id', $user->id)
+            ->get();
 
-            return response()->json([
-                'message' => 'User return requests retrieved successfully.',
-                'data' => $returnRequests,
-            ]);
-        } catch (\Exception $ex) {
-            return response()->json([
-                'message' => 'Error retrieving return requests: ' . $ex->getMessage(),
-            ], 500);
-        }
+        return response()->json([
+            'message' => 'User return requests retrieved successfully.',
+            'data' => $returnRequests,
+        ]);
+    } catch (\Exception $ex) {
+        return response()->json([
+            'message' => 'Error retrieving return requests: ' . $ex->getMessage(),
+        ], 500);
     }
+}
 
     //
     public function createReturnRequest(Request $request)

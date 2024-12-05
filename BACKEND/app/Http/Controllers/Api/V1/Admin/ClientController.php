@@ -29,28 +29,6 @@ class ClientController extends Controller
         ]);
     }
 
-    public function search(Request $request)
-    {
-        $query = $request->input('query'); // Lấy từ khóa tìm kiếm từ body request
-
-        if (!$query) {
-            return response()->json([
-                'message' => 'Vui lòng nhập từ khóa tìm kiếm.',
-                'data' => []
-            ], 400);
-        }
-
-        // Tìm kiếm trong cột `name` và `email`
-        $results = User::where('name', 'LIKE', "%{$query}%")
-            ->orWhere('email', 'LIKE', "%{$query}%")
-            ->get();
-
-        return response()->json([
-            'message' => 'Kết quả tìm kiếm.',
-            'data' => $results,
-        ]);
-    }
-
     /**
      * Store a newly created resource in storage.
      */
@@ -176,5 +154,33 @@ class ClientController extends Controller
             'success' => true,
             'message' => 'Client deleted successfully',
         ], 200);
+    }
+
+
+    public function search(Request $request)
+    {
+        $query = $request->input('query');
+        if (empty($query)) {
+            $results = User::where('role_id', 1)->get();
+            return response()->json(['message' => 'Hiển thị tất cả người dùng.', 'data' => $results]);
+        }
+
+
+        $results = User::where('role_id', 1)
+            ->where('name', 'LIKE', "%{$query}%")
+            ->orWhere('email', 'LIKE', "%{$query}%")
+            ->get();
+
+        if ($results->isEmpty()) {
+            return response()->json([
+                'message' => 'Không tìm thấy người dùng.',
+                'data' => []
+            ], 404);
+        }
+
+        return response()->json([
+            'message' => 'Kết quả tìm kiếm.',
+            'data' => $results,
+        ]);
     }
 }

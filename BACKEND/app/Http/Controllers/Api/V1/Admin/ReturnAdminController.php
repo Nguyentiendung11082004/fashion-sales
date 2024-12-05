@@ -31,6 +31,7 @@ class ReturnAdminController extends Controller
                         'id' => $returnRequest->id,
                         'order_id' => $returnRequest->order_id,
                         'user_id' => $returnRequest->user_id,
+                        'user_name' => $returnRequest->user->name,
                         'reason' => $returnRequest->reason,
                         'status' => $returnRequest->status,
                         'created_at' => $returnRequest->created_at->format('Y-m-d H:i:s'),

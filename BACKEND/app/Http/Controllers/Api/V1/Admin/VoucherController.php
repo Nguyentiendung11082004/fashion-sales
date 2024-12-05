@@ -94,7 +94,7 @@ class VoucherController extends Controller
                         }
 
                         // Kiểm tra `_voucher_applies_to_total`
-if ($metaKey === '_voucher_applies_to_total') {
+                        if ($metaKey === '_voucher_applies_to_total') {
                             if (!is_bool($metaValue)) {
                                 return response()->json([
                                     'status' => 400,
@@ -336,7 +336,7 @@ if ($metaKey === '_voucher_applies_to_total') {
                             VoucherMeta::where('voucher_id', $voucher->id)
                                 ->where('meta_key', '_voucher_applies_to_total')
                                 ->delete();
-continue; // Bỏ qua lưu vào database khi metaValue là false
+                            continue; // Bỏ qua lưu vào database khi metaValue là false
                         }
                         //Kết thúc bổ sung sẽ xóa bản ghi nếu từ true sang false
 
@@ -391,7 +391,7 @@ continue; // Bỏ qua lưu vào database khi metaValue là false
                     throw new \Exception('The selected categories cannot be included in both Applicable Product and Excluded Product');
                 }
                 if (!empty(array_intersect($categoryIds, $excludeCategoryIds))) {
-throw new \Exception('The selected categories cannot be included in both Applicable Categories and Excluded Categories');
+                    throw new \Exception('The selected categories cannot be included in both Applicable Categories and Excluded Categories');
                 }
 
                 if (!empty($metaData)) {
@@ -454,17 +454,25 @@ throw new \Exception('The selected categories cannot be included in both Applica
     {
         $query = $request->input('query'); // Lấy từ khóa tìm kiếm từ body request
 
-        if (!$query) {
+        if (empty($query)) {
+            $results = Voucher::all();
             return response()->json([
-                'message' => 'Vui lòng nhập từ khóa tìm kiếm.',
-                'data' => []
-            ], 400);
+                'message' => 'Tất cả voucher.',
+                'data' => $results
+            ]);
         }
 
         // Tìm kiếm trong cột `name` và `email`
         $results = Voucher::where('title', 'LIKE', "%{$query}%")
             ->orWhere('code', 'LIKE', "%{$query}%")
             ->get();
+
+        if ($results->isEmpty()) {
+            return response()->json([
+                'message' => 'Không tìm thấy voucher.',
+                'data' => []
+            ], 404);
+        }
 
         return response()->json([
             'message' => 'Kết quả tìm kiếm.',

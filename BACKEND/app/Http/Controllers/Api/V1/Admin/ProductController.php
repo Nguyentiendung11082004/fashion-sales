@@ -505,26 +505,23 @@ class ProductController extends Controller
     }
     public function search(Request $request)
     {
-        $query = $request->input('query'); // Lấy từ khóa tìm kiếm từ body request
+        $query = $request->input('query');
 
-        if (!$query) {
-            // Nếu không nhập từ khóa, lấy tất cả sản phẩm
+        if (empty($query)) {
             $results = Product::all();
-
-            return response()->json([
-                'message' => 'Hiển thị tất cả sản phẩm.',
-                'data' => $results,
-            ]);
+            return response()->json(['message' => 'Hiển thị tất cả sản phẩm.', 'data' => $results]);
         }
 
-        // Tìm kiếm trong cột `name` hoặc các cột khác nếu cần
         $results = Product::where('name', 'LIKE', "%{$query}%")
-            ->orWhere('description', 'LIKE', "%{$query}%") // Thêm cột mô tả nếu có
+            ->orWhere('description', 'LIKE', "%{$query}%")
             ->get();
 
-        return response()->json([
-            'message' => 'Kết quả tìm kiếm.',
-            'data' => $results,
-        ]);
+        if ($results->isEmpty()) {
+            return response()->json(['message' => 'Không tìm thấy sản phẩm nào phù hợp.',
+            'data' => []
+        ],404);
+        }
+
+        return response()->json(['message' => 'Kết quả tìm kiếm.', 'data' => $results]);
     }
 }
