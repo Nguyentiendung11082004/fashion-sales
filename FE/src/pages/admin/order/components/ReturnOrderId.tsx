@@ -95,7 +95,7 @@ const ReturnOrderId = () => {
                 className="flex m-auto"
                 src={record.order.order_detail.product_img}
                 alt={record.order.order_detail.product_name}
-                style={{ width: "100px", height: "auto" }}
+                style={{ width: "130px", height: "150px" }}
               />
             </div>
           ) : (

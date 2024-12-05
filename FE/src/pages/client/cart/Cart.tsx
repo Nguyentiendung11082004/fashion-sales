@@ -292,9 +292,7 @@ const Cart = () => {
           </div>
         </div>
 
-        {isFetching ? (
-          <Loading />
-        ) : (
+        {<Loading /> && (
           <section className="hd-page-body text-[14px] lg:mt-[60px] mt-[30px] block m-0 p-0 border-0 isolate *:box-border">
             <div className="hd-container block">
               <form className="hd-form-cart overflow-hidden relative">
