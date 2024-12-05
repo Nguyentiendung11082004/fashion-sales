@@ -13,7 +13,8 @@ class ReturnItem extends Model
         "order_detail_id",
         "quantity",
         "image",
-        "status"
+        "status",
+        "refund_amount"
     ];
     public function returnRequest(){
         return $this->belongsTo(ReturnRequest::class);
