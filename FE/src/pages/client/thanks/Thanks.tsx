@@ -18,10 +18,10 @@ const Thanks = () => {
         <div>
           <div className="flex flex-col items-center space-y-2">
             <ThanksIcon />
-            <h1 className="text-4xl font-bold text-center">Thank You !</h1>
+            <h1 className="text-4xl font-bold text-center">Cảm ơn !</h1>
             <p className="text-center">
-              Thank you for your interest! Check your email for a link to the
-              guide.
+              Cảm ơn bạn đã quan tâm! Kiểm tra email của bạn để biết liên kết
+              đến hướng dẫn.
             </p>
             {token ? (
               <Link

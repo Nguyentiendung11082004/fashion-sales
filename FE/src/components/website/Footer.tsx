@@ -28,14 +28,14 @@ const Footer = (props: Props) => {
           </div>
           <div className="flex mb-5">
             <EmailFooter />
-            <p>contact@company.com</p>
+            <p>mixmatchfashionbrand@gmail.com</p>
           </div>
           <div className="flex mb-5">
             <div className="mr-2">
 
               <PhoneFooter />
             </div>
-            <p>+001 2233 456</p>
+            <p>+84 879 202 919</p>
           </div>
           <ul className="flex">
             <li className="mr-6">
