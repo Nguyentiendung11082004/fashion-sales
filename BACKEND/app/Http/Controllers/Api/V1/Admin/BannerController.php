@@ -67,7 +67,7 @@ class BannerController extends Controller
             }
 
             $params['status'] = Carbon::parse($params['end_date'])->greaterThanOrEqualTo(Carbon::now());
-        //  dd($params['status']);
+            //  dd($params['status']);
             if ($request->has('image')) {
                 $params['image'] = $request->input('image');
             }
@@ -180,7 +180,7 @@ class BannerController extends Controller
             ->where('end_date', '<', $currentDate)
             ->update(['status' => false]);
     }
-        private function isValidDates($start_date, $end_date)
+    private function isValidDates($start_date, $end_date)
     {
         $start = Carbon::parse($start_date);
         $end = Carbon::parse($end_date);
@@ -213,19 +213,24 @@ class BannerController extends Controller
 
     public function search(Request $request)
     {
-        $query = $request->input('query'); // Lấy từ khóa tìm kiếm từ body request
+        $query = $request->input('query');
 
-        if (!$query) {
-            return response()->json([
-                'message' => 'Vui lòng nhập từ khóa tìm kiếm.',
-                'data' => []
-            ], 400);
+        if (empty($query)) {
+            $results = Banner::all();
+            return response()->json(['message' => 'Hiển thị tất cả banner.', 'data' => $results]);
         }
 
         // Tìm kiếm trong cột `name` hoặc các cột khác nếu cần
         $results = Banner::where('title', 'LIKE', "%{$query}%")
             ->orWhere('id', 'LIKE', "%{$query}%") // Thêm cột mô tả nếu có
             ->get();
+
+        if ($results->isEmpty()) {
+            return response()->json([
+                'message' => 'Không tìm thấy banner.',
+                'data' => []
+            ], 404);
+        }
 
         return response()->json([
             'message' => 'Kết quả tìm kiếm.',

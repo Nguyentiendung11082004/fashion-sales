@@ -33,30 +33,50 @@ class AuthController extends Controller
             $user = User::where('email', request('email'))->first();
             // dd($user);
 
+            // if (
+            //     !$user || !Hash::check(request('password'), $user->password) ||
+            //     $user->role_id != 1
+            // ) {
+            //     throw ValidationException::withMessages([
+            //         'infor' => ['The provided credentials are incorrect.'],
+            //     ]);
+            // }
+
+            // // Kiểm tra xem email đã được xác thực chưa
+            // if (!$user->hasVerifiedEmail()) {
+            //     // Gửi lại email xác thực
+            //     event(new Registered($user));
+            //     return response()->json([
+            //         'message' => 'Vui lòng xác thực tài khoản của bạn.
+            //          Email xác thực tài khoản đã được gửi đến địa chỉ email của bạn!!'
+            //     ], 403); // Forbidden
+            // }
+
+            //Case 2: Có đăng nhập cả Admin và Client
             if (
-                !$user || !Hash::check(request('password'), $user->password) ||
-                $user->role_id != 1
+                !$user || !Hash::check(request('password'), $user->password)
             ) {
                 throw ValidationException::withMessages([
                     'infor' => ['The provided credentials are incorrect.'],
                 ]);
             }
-
-            // Kiểm tra xem email đã được xác thực chưa
-            if (!$user->hasVerifiedEmail()) {
-                // Gửi lại email xác thực
-                event(new Registered($user));
-                return response()->json([
-                    'message' => 'Vui lòng xác thực tài khoản của bạn.
-                     Email xác thực tài khoản đã được gửi đến địa chỉ email của bạn!!'
-                ], 403); // Forbidden
+            if ($user->role_id === 1) {
+                // Kiểm tra xem email đã được xác thực chưa
+                if (!$user->hasVerifiedEmail()) {
+                    // Gửi lại email xác thực
+                    event(new Registered($user));
+                    return response()->json([
+                        'message' => 'Vui lòng xác thực tài khoản của bạn.  Email xác thực tài khoản đã được gửi đến địa chỉ email của bạn!!'
+                    ], 403); // Forbidden
+                }
             }
 
             $token = $user->createToken($user->id)->plainTextToken;
 
             return response()->json([
+                'message' => 'Đăng nhập thành công',
                 'token' => $token,
-                'message' => 'Đăng nhập thành công'
+                'data' => $user
             ]);
         } catch (\Throwable $th) {
             if ($th instanceof ValidationException) {
@@ -313,7 +333,7 @@ class AuthController extends Controller
     {
 
         try {
-        
+
             $request->user()->tokens()->delete();
 
             return response()->json([

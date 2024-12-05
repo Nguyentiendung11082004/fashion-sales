@@ -14,13 +14,13 @@ class CommentsController extends Controller
     /**
      * Display a listing of the resource.
      */
-  
- public function index()
+
+    public function index()
     {
         $comments = Comments::with(['user:id,name,avatar', 'childrenRecursive.user:id,name,avatar'])
-                            ->whereNull('parent_id')
-                            ->latest('created_at')
-                            ->get();
+            ->whereNull('parent_id')
+            ->latest('created_at')
+            ->get();
         return response()->json($comments, Response::HTTP_OK);
     }
 
@@ -70,7 +70,6 @@ class CommentsController extends Controller
                 'status' => true,
                 'message' => "Xóa bình luận thành công."
             ], 200);
-
         } catch (\Exception $ex) {
             Log::error('API/V1/Admin/CommentsController@destroy: ', [$ex->getMessage()]);
 
@@ -85,23 +84,30 @@ class CommentsController extends Controller
     {
         $query = $request->input('query'); // Lấy từ khóa tìm kiếm từ body request
 
-        if (!$query) {
+        if (empty($query)) {
+            $results = Comments::all();
             return response()->json([
-                'message' => 'Vui lòng nhập từ khóa tìm kiếm.',
-                'data' => []
-            ], 400);
+                'message' => 'Tất cả comment:',
+                'data' => $results
+            ]);
         }
 
         // Tìm kiếm trong cột `name` hoặc các cột khác nếu cần
         $results = Comments::where('content', 'LIKE', "%{$query}%")
             ->orWhere('user_id', 'LIKE', "%{$query}%")
-            ->orWhere('product_id', 'LIKE', "%{$query}%")// Thêm cột mô tả nếu có
+            ->orWhere('product_id', 'LIKE', "%{$query}%") // Thêm cột mô tả nếu có
             ->get();
+
+        if ($results->isEmpty()) {
+            return response()->json([
+                'message' => 'Không tìm thấy bình luận.',
+                'data' => []
+            ], 404);
+        }
 
         return response()->json([
             'message' => 'Kết quả tìm kiếm.',
             'data' => $results,
         ]);
     }
-
 }
