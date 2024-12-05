@@ -131,9 +131,10 @@ class OrderController extends Controller
                 return response()->json(['message' => 'Trạng thái không hợp lệ.'], Response::HTTP_BAD_REQUEST);
             }
 
-            if ($currentStatus === 'Đã hủy' || $currentStatus === 'Hoàn thành' || $currentStatus === 'Hoàn trả hàng') {
+            if ($currentStatus === 'Đã hủy' || $currentStatus === 'Hoàn thành' || $currentStatus === 'Hoàn trả hàng' || $currentStatus === 'Yêu cầu hoàn trả hàng') {
                 return response()->json(['message' => "Không thể thay đổi trạng thái \"$currentStatus\"."], Response::HTTP_BAD_REQUEST);
             }
+            
             
             if ($currentStatus === 'Đang chờ xác nhận' && !in_array($newStatus, ['Đã xác nhận', 'Đã hủy'])) {
                 return response()->json(['message' => 'Trạng thái tiếp theo chỉ có thể là "Đã xác nhận" hoặc "Đã hủy".'], Response::HTTP_BAD_REQUEST);
