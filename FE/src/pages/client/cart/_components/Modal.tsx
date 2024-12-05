@@ -98,6 +98,7 @@ const ModalCart = ({
       );
     },
   });
+  console.log("cartAttribute",cartAttribute)
 
   const formattedAttributes = cartAttribute ? cartAttribute.cart_item?.product?.variants
     ?.filter((item: any) =>
@@ -115,6 +116,7 @@ const ModalCart = ({
     })
     : [];
 
+    
   const dataAttribute = cartAttribute?.getuniqueattributes;
 
   const checkDisable = (attribute: string, value: any) => {
