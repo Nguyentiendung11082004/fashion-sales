@@ -1,9 +1,11 @@
-import Smile from '@/components/icons/thanks/Smile';
-import ThanksIcon from '@/components/icons/thanks/ThanksIcon';
-import React, { useEffect } from 'react'
-import { Link } from 'react-router-dom';
+import { useAuth } from "@/common/context/Auth/AuthContext";
+import Smile from "@/components/icons/thanks/Smile";
+import ThanksIcon from "@/components/icons/thanks/ThanksIcon";
+import React, { useEffect } from "react";
+import { Link } from "react-router-dom";
 
 const Thanks = () => {
+  const { token } = useAuth();
   // const location = useLocation();
   // location.state?._payload = null;
   useEffect(() => {
@@ -21,15 +23,28 @@ const Thanks = () => {
               Thank you for your interest! Check your email for a link to the
               guide.
             </p>
-            <Link to="/history-order" className="inline-flex items-center rounded border border-indigo-600 bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700 focus:outline-none focus:ring">
-              <Smile />
-              <span className="text-sm font-medium"> Xem đơn hàng </span>
-            </Link>
+            {token ? (
+              <Link
+                to="/history-order"
+                className="inline-flex items-center rounded border border-indigo-600 bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700 focus:outline-none focus:ring"
+              >
+                <Smile />
+                <span className="text-sm font-medium"> Xem đơn hàng </span>
+              </Link>
+            ) : (
+              <Link
+                to="/order_lookup"
+                className="inline-flex items-center rounded border border-indigo-600 bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700 focus:outline-none focus:ring"
+              >
+                <Smile />
+                <span className="text-sm font-medium"> Tra cứu đơn hàng </span>
+              </Link>
+            )}
           </div>
         </div>
       </div>
     </div>
   );
-}
+};
 
-export default Thanks
+export default Thanks;

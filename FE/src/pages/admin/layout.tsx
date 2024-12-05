@@ -415,6 +415,19 @@ const LayoutAdmin: React.FC = () => {
     if (pathname.startsWith("/admin/brands/edit/")) {
       return "14";
     }
+
+    if (pathname === "/admin/returnRequests" || pathname.startsWith("/admin/returnRequests/")) {
+      return "16";
+    }
+
+    if (pathname === "/admin/return-item" || pathname.startsWith("/admin/return-item/")) {
+      return "16";
+    }
+
+    if (pathname === "/admin/fastDelivery" || pathname.startsWith("/admin/fastDelivery/")) {
+      return "17";
+    }
+
     return "1"; // Mặc định nếu không khớp`
   };
 
