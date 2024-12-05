@@ -95,51 +95,120 @@ class ReturnController extends Controller
     public function createReturnRequest(Request $request)
     {
         try {
-            $respone = DB::transaction(function () use ($request) {
-                // Validate dữ liệu từ client
-                $validated = $request->validate([
-                    'order_id' => 'required|exists:orders,id',
-                    'items' => 'required|array',
-                    'items.*.order_detail_id' => 'required|exists:order_details,id',
-                    'items.*.quantity' => 'required|integer|min:1',
-                    'reason' => 'required|string',
-                ]);
+            // $respone = DB::transaction(function () use ($request) {
+            //     // Validate dữ liệu từ client
+            //     $validated = $request->validate([
+            //         'order_id' => 'required|exists:orders,id',
+            //         'items' => 'required|array',
+            //         'items.*.order_detail_id' => 'required|exists:order_details,id',
+            //         'items.*.quantity' => 'required|integer|min:1',
+            //         'reason' => 'required|string',
+            //     ]);
 
-                // Tạo yêu cầu hoàn trả
-                $returnRequest = ReturnRequest::create([
-                    'order_id' => $validated['order_id'],
-                    'user_id' => auth()->id(),
-                    'reason' => $validated['reason'],
-                    // 'status' => 'pending',
-                ]);
+            //     // Tạo yêu cầu hoàn trả
+            //     $returnRequest = ReturnRequest::create([
+            //         'order_id' => $validated['order_id'],
+            //         'user_id' => auth()->id(),
+            //         'reason' => $validated['reason'],
+            //         // 'status' => 'pending',
+            //     ]);
 
-                // Duyệt qua từng sản phẩm
-                foreach ($validated['items'] as $item) {
-                    // Lấy thông tin chi tiết sản phẩm từ bảng order_details
-                    $orderDetail = OrderDetail::findOrFail($item['order_detail_id']);
+            //     // Duyệt qua từng sản phẩm
+            //     foreach ($validated['items'] as $item) {
+            //         // Lấy thông tin chi tiết sản phẩm từ bảng order_details
+            //         $orderDetail = OrderDetail::findOrFail($item['order_detail_id']);
 
-                    // Kiểm tra số lượng yêu cầu hoàn trả không vượt quá số lượng đã mua
-                    if ($item['quantity'] > $orderDetail->quantity) {
-                        throw new \Exception("Quantity to return for order_detail_id {$item['order_detail_id']} exceeds purchased quantity.");
-                    }
+            //         // Kiểm tra số lượng yêu cầu hoàn trả không vượt quá số lượng đã mua
+            //         if ($item['quantity'] > $orderDetail->quantity) {
+            //             throw new \Exception("Quantity to return for order_detail_id {$item['order_detail_id']} exceeds purchased quantity.");
+            //         }
 
-                    // Tạo danh sách các item yêu cầu hoàn trả
-                    ReturnItem::create([
-                        'return_request_id' => $returnRequest->id,
-                        'order_detail_id' => $item['order_detail_id'],
-                        'quantity' => $item['quantity'],
-                        // 'status' => 'pending',
+            //         // Tạo danh sách các item yêu cầu hoàn trả
+            //         ReturnItem::create([
+            //             'return_request_id' => $returnRequest->id,
+            //             'order_detail_id' => $item['order_detail_id'],
+            //             'quantity' => $item['quantity'],
+            //             // 'status' => 'pending',
+            //         ]);
+            //     }
+            //     Order::query()->findOrFail($validated["order_id"])->update([
+            //         "order_status" => "Yêu cầu hoàn trả hàng"
+            //     ]);
+
+            //     return [
+            //         'message' => 'Return request created successfully.',
+            //         'return_request' => $returnRequest,
+            //     ];
+            // });
+
+
+            try {
+                $response = DB::transaction(function () use ($request) {
+                    // Validate dữ liệu từ client
+                    $validated = $request->validate([
+                        'order_id' => 'required|exists:orders,id',
+                        'items' => 'required|array',
+                        'items.*.order_detail_id' => 'required|exists:order_details,id',
+                        'items.*.quantity' => 'required|integer|min:1',
+                        'reason' => 'required|string',
                     ]);
-                }
-                Order::query()->findOrFail($validated["order_id"])->update([
-                    "order_status" => "Yêu cầu hoàn trả hàng"
-                ]);
-
-                return [
-                    'message' => 'Return request created successfully.',
-                    'return_request' => $returnRequest,
-                ];
-            });
+            
+                    // Tạo yêu cầu hoàn trả
+                    $returnRequest = ReturnRequest::create([
+                        'order_id' => $validated['order_id'],
+                        'user_id' => auth()->id(),
+                        'reason' => $validated['reason'],
+                        'total_refund_amount' => 0, // Sẽ được tính sau
+                    ]);
+            
+                    $totalRefundAmount = 0;
+            
+                    // Duyệt qua từng sản phẩm
+                    foreach ($validated['items'] as $item) {
+                        // Lấy thông tin chi tiết sản phẩm từ bảng order_details
+                        $orderDetail = OrderDetail::findOrFail($item['order_detail_id']);
+            
+                        // Kiểm tra số lượng yêu cầu hoàn trả không vượt quá số lượng đã mua
+                        if ($item['quantity'] > $orderDetail->quantity) {
+                            throw new \Exception("Quantity to return for order_detail_id {$item['order_detail_id']} exceeds purchased quantity.");
+                        }
+            
+                        // Tính toán số tiền hoàn trả cho sản phẩm này
+                        $refundForItem = $orderDetail->price * $item['quantity'];
+                        $totalRefundAmount += $refundForItem;
+            
+                        // Tạo danh sách các item yêu cầu hoàn trả
+                        ReturnItem::create([
+                            'return_request_id' => $returnRequest->id,
+                            'order_detail_id' => $item['order_detail_id'],
+                            'quantity' => $item['quantity'],
+                            'refund_amount' => $refundForItem,
+                        ]);
+                    }
+            
+                    // Cập nhật số tiền hoàn lại tổng cộng trong yêu cầu hoàn trả
+                    $returnRequest->update([
+                        'refund_amount' => $totalRefundAmount,
+                    ]);
+            
+                    // Cập nhật trạng thái đơn hàng
+                    Order::query()->findOrFail($validated['order_id'])->update([
+                        'order_status' => 'Yêu cầu hoàn trả hàng',
+                    ]);
+            
+                    return [
+                        'message' => 'Return request created successfully.',
+                        'return_request' => $returnRequest,
+                    ];
+                });
+            
+                return response()->json($response, 201);
+            } catch (\Exception $ex) {
+                return response()->json([
+                    'message' => $ex->getMessage(),
+                ], 400);
+            }
+            
             return response()->json($respone, 201);
         } catch (\Exception $ex) {
             return response()->json([

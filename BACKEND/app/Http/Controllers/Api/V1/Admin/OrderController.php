@@ -16,14 +16,10 @@ class OrderController extends Controller
      * Display a listing of the resource.
      */
 
-    public function index(Request $request)
+    public function index()
     {
         try {
-            // dd($request->all());
-            if (!empty($request->all())) {
-
-                return $this->searchOrders($request);
-            }
+            
             Order::where('order_status', 'Giao hàng thành công')
                 ->whereDate('updated_at', '<', now()->subDays(3))
                 ->update(['order_status' => 'Hoàn thành']);
@@ -198,7 +194,7 @@ class OrderController extends Controller
         //
     }
 
-    public function searchOrders($request)
+    public function searchOrders(Request $request)
     {
         // Danh sách trạng thái hợp lệ
         $validStatuses = [

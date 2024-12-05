@@ -18,6 +18,8 @@ return new class extends Migration
             $table->foreignIdFor(Order::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(User::class)->constrained()->cascadeOnDelete();
             $table->text('reason')->comment("lí do");
+            $table->decimal('total_refund_amount', 10, 2)->default(0);
+
             $table->enum('status',['pending','canceled' ,'completed', 'rejected'])->default('pending');
 
             $table->timestamps();
