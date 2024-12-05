@@ -287,26 +287,26 @@ class ReturnAdminController extends Controller
                     // Nếu tất cả các item được chấp nhận
                     $returnRequest->update(['status' => 'completed']);
 
-                    foreach ($returnItems as $returnItem) {
-                        $orderDetail = OrderDetail::findOrFail($returnItem->order_detail_id);
+                    // foreach ($returnItems as $returnItem) {
+                    //     $orderDetail = OrderDetail::findOrFail($returnItem->order_detail_id);
 
-                        // Cập nhật số lượng và tổng giá trong order_detail
-                        $newQuantity = $orderDetail->quantity - $returnItem->quantity;
-                        $newTotalPrice = $newQuantity * $orderDetail->price;
+                    //     // Cập nhật số lượng và tổng giá trong order_detail
+                    //     // $newQuantity = $orderDetail->quantity - $returnItem->quantity;
+                    //     // $newTotalPrice = $newQuantity * $orderDetail->price;
 
-                        $orderDetail->update([
-                            'quantity' => $newQuantity,
-                            'total_price' => $newTotalPrice,
-                        ]);
-                    }
+                    //     // $orderDetail->update([
+                    //     //     'quantity' => $newQuantity,
+                    //     //     'total_price' => $newTotalPrice,
+                    //     // ]);
+                    // }
 
                     // Cập nhật tổng số lượng và tổng giá của order
-                    $totalQuantity = $order->orderDetails->sum('quantity');
-                    $totalPrice = $order->orderDetails->sum('total_price');
+                    // $totalQuantity = $order->orderDetails->sum('quantity');
+                    // $totalPrice = $order->orderDetails->sum('total_price');
 
                     $order->update([
-                        'total_quantity' => $totalQuantity,
-                        'total' => $totalPrice,
+                        // 'total_quantity' => $totalQuantity,
+                        // 'total' => $totalPrice,
                         'order_status' => Order::STATUS_RETURNED, // Đặt trạng thái là 'Hoàn trả hàng'
                     ]);
 
@@ -333,26 +333,26 @@ class ReturnAdminController extends Controller
                 // Nếu có một số item được chấp nhận, một số bị từ chối
                 $returnRequest->update(['status' => 'completed']);
 
-                foreach ($returnItems->where('status', 'approved') as $returnItem) {
-                    $orderDetail = OrderDetail::findOrFail($returnItem->order_detail_id);
+                // foreach ($returnItems->where('status', 'approved') as $returnItem) {
+                //     $orderDetail = OrderDetail::findOrFail($returnItem->order_detail_id);
 
-                    // Cập nhật số lượng và tổng giá trong order_detail
-                    $newQuantity = $orderDetail->quantity - $returnItem->quantity;
-                    $newTotalPrice = $newQuantity * $orderDetail->price;
+                //     // Cập nhật số lượng và tổng giá trong order_detail
+                //     $newQuantity = $orderDetail->quantity - $returnItem->quantity;
+                //     $newTotalPrice = $newQuantity * $orderDetail->price;
 
-                    $orderDetail->update([
-                        'quantity' => $newQuantity,
-                        'total_price' => $newTotalPrice,
-                    ]);
-                }
+                //     $orderDetail->update([
+                //         'quantity' => $newQuantity,
+                //         'total_price' => $newTotalPrice,
+                //     ]);
+                // }
 
                 // Cập nhật tổng số lượng và tổng giá của order
-                $totalQuantity = $order->orderDetails->sum('quantity');
-                $totalPrice = $order->orderDetails->sum('total_price');
+                // $totalQuantity = $order->orderDetails->sum('quantity');
+                // $totalPrice = $order->orderDetails->sum('total_price');
 
                 $order->update([
-                    'total_quantity' => $totalQuantity,
-                    'total' => $totalPrice,
+                    // 'total_quantity' => $totalQuantity,
+                    // 'total' => $totalPrice,
                     'order_status' => Order::STATUS_RETURNED, // Đặt trạng thái là 'Hoàn trả hàng'
                 ]);
 
