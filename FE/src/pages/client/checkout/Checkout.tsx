@@ -214,6 +214,8 @@ const Checkout = () => {
         to_ward_code: String(toWardCode),
         to_district_id: Number(toDistrictId),
         weight: totalWeight
+      }, {
+        timeout: 5000,
       });
       setShipPing(res?.data?.fee?.total || 21000);
       setOrder((prev) => ({ ...prev, shipping_fee: res?.data?.fee?.total || 21000 }));
