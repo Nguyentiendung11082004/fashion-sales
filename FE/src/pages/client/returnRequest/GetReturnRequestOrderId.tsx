@@ -10,15 +10,14 @@ import { toast } from "react-toastify";
 
 const GetReturnRequestOrderId = () => {
   const location = useLocation();
-  const order_id = location?.state.order_id;
-  console.log("keiemr tra order_id ", order_id);
+  const request_id = location?.state.id;
   const { token } = useAuth();
 
   const { data: dataReturnRequest } = useQuery({
-    queryKey: ["return-requests"],
+    queryKey: ["return-item"],
     queryFn: async () => {
       try {
-        return await instance.get(`user/return-item/${order_id}`, {
+        return await instance.get(`user/return-item/${request_id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -29,49 +28,82 @@ const GetReturnRequestOrderId = () => {
     },
   });
 
-  console.log("kiểm tra dataReturnRequest: ", dataReturnRequest);
-  const returnRequest = dataReturnRequest?.data?.data?.find(
-    (item: any) => Number(item.order_id) === Number(order_id)
-  );
-
-  console.log("returnRequest", returnRequest);
-
-  const dataSource = returnRequest?.items
-    ? returnRequest.items.map((item: any, index: number) => ({
-        key: item.id,
-        productName: item.name,
-        image: item.image,
-        quantity: item.quantity,
-        status: returnRequest.status,
+  const dataSource = dataReturnRequest?.data?.data?.items
+    ? dataReturnRequest?.data?.data?.items.map((item: any, index: number) => ({
+        key: item?.id,
+        ...item,
       }))
     : [];
 
-  console.log("data trả hàng: ", dataSource);
+  console.log("data trả hàng dataReturnRequest theo id  : ", dataReturnRequest);
 
-  const column: any = [
+  const columns: any = [
     {
-      title: "Stt",
+      title: "STT",
       render: (_: any, __: any, index: number) => <div>{index + 1}</div>,
     },
     {
       title: "Tên sản phẩm",
-      render: (record: any) => <div>{record.productName}</div>,
+      render: (record: any) => (
+        <div>{record?.order?.order_detail?.product_name}</div>
+      ),
     },
     {
       title: "Ảnh sản phẩm",
-      render: (record: any) => <img src={record.image} alt="Product" />,
+      render: (record: any) => (
+        <img
+          className="w-[100px] h-[100px] m-auto object-fit"
+          src={record?.order?.order_detail?.product_img}
+          alt="Ảnh sản phẩm"
+        />
+      ),
+    },
+    {
+      title: "Phân loại sản phẩm",
+      render: (record: any) => {
+        const attributes = record?.order?.order_detail?.attributes;
+        return attributes && typeof attributes === "object" ? (
+          Object.entries(attributes).map(([key, value]: [string, any]) => (
+            <div key={key}>
+              <strong>{key}:</strong> {value}
+            </div>
+          ))
+        ) : (
+          <div>Không có phân loại</div>
+        );
+      },
     },
     {
       title: "Số lượng",
-      render: (record: any) => <div>{record.quantity}</div>,
+      render: (record: any) => <div>{record?.quantity || 0}</div>,
     },
-    // {
-    //   title: "Trạng thái",
-    //   render: (record: any) => <div>{record.status}</div>, // Render status
-    // },
-  ];
+    {
+      title: "Trạng thái hoàn hàng",
+      render: (record: any) => {
+        const getStatus = (status: string) => {
+          switch (status) {
+            case "approved":
+              return "Chấp nhận";
+            case "canceled":
+              return "Từ chối";
+            case "pending":
+              return "Đang chờ xử lý";
+            default:
+              return "Không xác định";
+          }
+        };
 
-  console.log("token nè : ", token);
+        return <div>{getStatus(record?.status)}</div>;
+      },
+    },
+  ];
+  // Tính tổng số tiền
+  const totalAmount = dataSource.reduce(
+    (sum: number, record: any) =>
+      sum + Number(record?.order?.order_detail?.total_price || 0),
+    0
+  );
+
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { mutate } = useMutation({
@@ -110,6 +142,8 @@ const GetReturnRequestOrderId = () => {
     });
   };
 
+  console.log("huệ : ", dataSource?.data?.data?.status);
+
   return (
     <>
       <div className="mb-20px">
@@ -139,7 +173,9 @@ const GetReturnRequestOrderId = () => {
               </div>
 
               <div className="text-gray-600 text-center lg:text-left mt-4 lg:mt-0">
-                <p className="text-sm lg:text-base">{returnRequest?.reason}</p>
+                <p className="text-sm lg:text-base">
+                  {dataReturnRequest?.data?.data?.reason}
+                </p>
               </div>
             </div>
 
@@ -151,7 +187,7 @@ const GetReturnRequestOrderId = () => {
               <Table
                 className="custom-table"
                 dataSource={dataSource}
-                columns={column}
+                columns={columns}
                 scroll={{ x: "max-content" }}
                 pagination={false}
               />
@@ -159,17 +195,22 @@ const GetReturnRequestOrderId = () => {
               <div className="fixed bottom-0 left-[134px] right-[134px] flex justify-between items-center p-6 border border-gray-200 rounded-lg shadow-md bg-white hover:shadow-lg transition-shadow duration-300">
                 <div className="flex items-center space-x-2">
                   <p className="ml-4 text-sm font-medium text-gray-800">
-                    Số tiền hoàn lại: 100.000
-                    {/* {refund.toLocaleString("vi-VN")} */}
-                    VNĐ
+                    <span> Số tiền hoàn lại: </span>
+                    {totalAmount.toLocaleString("vi-VN")}
+                    <span> VNĐ</span>
                   </p>
                 </div>
-                <button
-                  className="bg-blue-600 text-white hover:bg-blue-700 rounded-lg shadow-md px-6 py-2"
-                  onClick={() => cancelReturnRequest(returnRequest?.id)}
-                >
-                  Hủy yêu cầu
-                </button>
+
+                {dataReturnRequest?.data?.data?.status === "pending" && (
+                  <button
+                    className="bg-blue-600 text-white hover:bg-blue-700 rounded-lg shadow-md px-6 py-2"
+                    onClick={() =>
+                      cancelReturnRequest(dataReturnRequest?.data?.data?.id)
+                    }
+                  >
+                    Hủy yêu cầu
+                  </button>
+                )}
               </div>
             </div>
           </section>

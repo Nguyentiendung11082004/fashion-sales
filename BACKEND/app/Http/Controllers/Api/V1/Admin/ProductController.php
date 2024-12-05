@@ -157,9 +157,9 @@ class ProductController extends Controller
     public function show(string $id)
     {
         try {
-            // dd($id);
+           
             $product = Product::query()->latest('id')->findOrFail($id)->load(["brand", "category", "attributes", "variants.attributes", "galleries", "tags"]);
-            // dd($product);
+           
             foreach ($product->attributes as  $item) {
                 $item->pivot->attribute_item_ids = json_decode($item->pivot->attribute_item_ids);
             }
@@ -176,7 +176,7 @@ class ProductController extends Controller
                 "brand" => $brand,
 
             ], Response::HTTP_OK);
-            // dd($product->toArray());
+           
         } catch (\Exception $ex) {
             Log::error('API/V1/Admin/ProductController@show: ', [$ex->getMessage()]);
 

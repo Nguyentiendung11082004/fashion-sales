@@ -19,6 +19,8 @@ return new class extends Migration
             $table->foreignIdFor(OrderDetail::class)->constrained()->cascadeOnDelete();
             $table->integer('quantity');
             $table->text('image')->nullable();
+            $table->decimal('refund_amount', 10, 2)->default(0);
+
             $table->enum('status', ['pending', 'canceled', 'approved', 'rejected'])->default('pending');
 
 

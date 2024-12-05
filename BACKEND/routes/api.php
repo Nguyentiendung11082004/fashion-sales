@@ -88,7 +88,7 @@ Route::prefix("v1/")->group(function () {
     Route::post('/voucher/search', [VoucherController::class, 'search']);
     Route::post('/product/search', [ProductController::class, 'search']);
     Route::post('/category/search', [CategoryController::class, 'search']);
-    Route::post('/order/search', [OrderController::class, 'search']);
+    Route::post('/order/search', [AdminOrderController::class, 'searchOrders']);
     Route::post('/post/search', [PostController::class, 'search']);
     Route::post('/attribute/search', [AttributeController::class, 'search']);
     Route::post('/banner/search', [BannerController::class, 'search']);

@@ -41,7 +41,6 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
   const [dataAttribute, setDataAttribute] = useState<any>(
     transformAttributes(attributes)
   );
-  console.log("dataAttribute", dataAttribute);
   const resultDataAttribute = Object.entries(
     productSeeMore?.unique_attributes ?? {}
   ).map(([key, value]) => ({
@@ -114,6 +113,7 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
       );
       return attributeObj;
     });
+  console.log("result", result)
   // useEffect(() => {
   //   if (result && result.length > 0) {
   //     setDataAttribute({ product_variant: result[0] });
@@ -123,25 +123,24 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
     let res = false;
     // Access dataAttribute (the state) instead of setDataAttribute (the setter function)
     let matchingItems = result?.filter((x: any) => {
-      // Check if product_variant exists in dataAttribute
       return Object.keys(dataAttribute?.product_variant || {}).every((key) => {
         if (key !== attribute) {
           return (
             x[key] &&
             x[key].toString() ===
-              dataAttribute?.product_variant[key]?.toString()
+            dataAttribute?.product_variant[key]?.toString()
           );
         }
+
         return true;
       });
     });
 
+
     let isAttributeValid = matchingItems?.some(
       (x: any) => x[attribute] && x[attribute].toString() === value.toString()
     );
-
     res = !isAttributeValid;
-
     return res;
   };
   const [qty, setQty] = useState(1);
@@ -150,7 +149,6 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
     product_variant_id: selectedVariantId,
     quantity: qty,
   };
-
   const styles = {
     disable: {
       opacity: 0.2,
@@ -162,28 +160,43 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
     setSelectedVariantId(null);
     onClose();
   };
-  console.log("productSeeMore.quantity", productSeeMore.quantity);
-  // const handleCheckout = () => {
-  //   if (productSeeMore.quantity <= 0) {
-  //     toast.error("Sản phẩm này đã hết hàng")
-  //     return;
-  //   } else if (_payload.product_id || _payload.product_variant_id) {
-  //     navigate("/checkout", { state: { _payload: _payload } });
-  //   }
-  // };
   const handleCheckout = () => {
-    if (!_payload.product_variant_id) {
-      if (productSeeMore.quantity <= 0) {
-        toast.error("Sản phẩm này đã hết hàng");
-        return;
+    // Kiểm tra nếu có product_variant_id và kiểm tra số lượng
+    if (_payload.product_variant_id) {
+      const selectedVariant = productSeeMore?.variants.find(
+        (variant:any) => variant.id === _payload.product_variant_id
+      );
+  
+      if (selectedVariant) {
+        // Kiểm tra nếu số lượng giỏ hàng lớn hơn số lượng còn lại của sản phẩm
+        if (_payload.quantity > selectedVariant.quantity) {
+          toast.error("Số lượng yêu cầu vượt quá số lượng còn lại trong kho");
+          return;  // Dừng lại, không cho phép chuyển trang
+        }
       } else {
-        navigate("/checkout", { state: { _payload: _payload } });
+        // Nếu không tìm thấy biến thể sản phẩm
+        toast.error("Sản phẩm không hợp lệ");
+        return;
       }
-    } else if (_payload.product_id || _payload.product_variant_id) {
-      navigate("/checkout", { state: { _payload: _payload } });
+    } else if (_payload.product_id) {
+      // Nếu không có product_variant_id, kiểm tra sản phẩm theo product_id
+      const selectedProduct = productSeeMore?.variants.find(
+        (variant:any) => variant.product_id === _payload.product_id
+      );
+  
+      if (selectedProduct) {
+        // Kiểm tra nếu số lượng giỏ hàng lớn hơn số lượng còn lại của sản phẩm
+        if (_payload.quantity > selectedProduct.quantity) {
+          toast.error("Sản phẩm này đã hết hàng");
+          return;  // Dừng lại, không cho phép chuyển trang
+        }
+      }
     }
+  
+    // Nếu mọi điều kiện kiểm tra đều ổn, cho phép chuyển trang
+    navigate("/checkout", { state: { _payload: _payload } });
   };
-
+  
   useEffect(() => {
     if (open && productSeeMore?.variants?.length > 0) {
       const firstVariant = productSeeMore.variants[0];
@@ -296,13 +309,12 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
                       <div
                         key={item.id}
                         className={`relative flex-1 max-w-[75px] h-8 sm:h-8 rounded-full border-2 cursor-pointer p-2
-        ${
-          isActive
-            ? "border-black"
-            : isDisabled
-              ? "border-gray-200 opacity-50 cursor-not-allowed"
-              : "border-2"
-        }`}
+        ${isActive
+                            ? "border-black"
+                            : isDisabled
+                              ? "border-gray-200 opacity-50 cursor-not-allowed"
+                              : "border-2"
+                          }`}
                         style={
                           isActive
                             ? { backgroundColor: item.name.toLowerCase() }

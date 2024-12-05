@@ -16,14 +16,10 @@ class OrderController extends Controller
      * Display a listing of the resource.
      */
 
-    public function index(Request $request)
+    public function index()
     {
         try {
-            // dd($request->all());
-            if (!empty($request->all())) {
-
-                return $this->searchOrders($request);
-            }
+            
             Order::where('order_status', 'Giao hàng thành công')
                 ->whereDate('updated_at', '<', now()->subDays(3))
                 ->update(['order_status' => 'Hoàn thành']);
@@ -135,9 +131,10 @@ class OrderController extends Controller
                 return response()->json(['message' => 'Trạng thái không hợp lệ.'], Response::HTTP_BAD_REQUEST);
             }
 
-            if ($currentStatus === 'Đã hủy' || $currentStatus === 'Hoàn thành' || $currentStatus === 'Hoàn trả hàng') {
+            if ($currentStatus === 'Đã hủy' || $currentStatus === 'Hoàn thành' || $currentStatus === 'Hoàn trả hàng' || $currentStatus === 'Yêu cầu hoàn trả hàng') {
                 return response()->json(['message' => "Không thể thay đổi trạng thái \"$currentStatus\"."], Response::HTTP_BAD_REQUEST);
             }
+            
             
             if ($currentStatus === 'Đang chờ xác nhận' && !in_array($newStatus, ['Đã xác nhận', 'Đã hủy'])) {
                 return response()->json(['message' => 'Trạng thái tiếp theo chỉ có thể là "Đã xác nhận" hoặc "Đã hủy".'], Response::HTTP_BAD_REQUEST);
@@ -198,7 +195,7 @@ class OrderController extends Controller
         //
     }
 
-    public function searchOrders($request)
+    public function searchOrders(Request $request)
     {
         // Danh sách trạng thái hợp lệ
         $validStatuses = [

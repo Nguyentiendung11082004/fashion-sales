@@ -205,22 +205,18 @@ const HistoryOrder = () => {
   };
 
   const handleGetReturnRequest = (id: number) => {
-    console.log(" kiểm tra id xem yêu cầu : ", id);
     navigate(`return_requests`, { state: { id } });
   };
 
   console.log("data lịch sử đơn hàng: ", data);
 
-  const [currentPage, setCurrentPage] = useState(1); // Trang hiện tại
-  const productsPerPage = 6; // Mỗi trang có 12 sản phẩm
-  const totalProducts = data?.length || 0; // Tổng số sản phẩm
-  // Tính toán các sản phẩm hiển thị trên trang hiện tại
+  const [currentPage, setCurrentPage] = useState(1);
+  const productsPerPage = 6;
+  const totalProducts = data?.length || 0;
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
   const currentProducts = data?.slice(indexOfFirstProduct, indexOfLastProduct);
-  // Tính số trang
   const totalPages = Math.ceil(totalProducts / productsPerPage);
-  // Hàm để chuyển trang
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber);
   };
@@ -404,10 +400,12 @@ const HistoryOrder = () => {
                             </div>
                             <p className="flex items-center">
                               <p className="mr-1">Thời gian đặt hàng: </p>
-                              <p className="text-gray-500">{selectedOrder.created_at}</p>
+                              <p className="text-gray-500">
+                                {selectedOrder.created_at}
+                              </p>
                             </p>
                             {/* <div className="flex items-center space-x-5 my-5"> */}
-                              {/* <div>
+                            {/* <div>
                                 <p className="font-medium text-base mb-2">
                                   Địa chỉ nhận hàng:{" "}
                                 </p>
@@ -419,87 +417,85 @@ const HistoryOrder = () => {
                                 <br />
                                 Địa chỉ: {selectedOrder.ship_user_address}
                               </div> */}
-                              <div className="py-5">
-                                <p className="font-medium text-base mb-2">
-                                  Sản phẩm:
-                                </p>
-                                {selectedOrder.order_details.map(
-                                  (item: any) => (
-                                    <div
-                                    className="flex bg-gray-100 p-2 rounded-xl"
-                                    key={item.id}
-                                  >
-                                    <div className="relative sm:w-20 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
-                                      <img
-                                        alt={item.product_name}
-                                        loading="lazy"
-                                        decoding="async"
-                                        data-nimg="fill"
-                                        className="block absolute align-middle inset-0 h-full w-full object-cover object-center"
-                                        sizes="100px"
-                                        src={item.product_img}
-                                      />
-                                    </div>
-                                    <div className="ml-4 flex flex-1 flex-col">
-                                      <div>
-                                        <div className="flex ">
-                                          <div className="mr-12">
-                                            <h3 className="text-lg font-medium line-clamp-1">
-                                              {item.product_name}
-                                            </h3>
-                                            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                                              {item.attributes &&
-                                                Object.entries(item.attributes)
-                                                  .length > 0 && (
-                                                  <>
-                                                    Phân loại hàng:
-                                                    {Object.entries(
-                                                      item.attributes
-                                                    ).map(([key, value]) => (
-                                                      <li key={key}>
-                                                        {Array.isArray(value)
-                                                          ? value.join(", ") // Nếu là mảng
-                                                          : typeof value ===
-                                                                "object" &&
-                                                              value !== null
-                                                            ? Object.values(
-                                                                value
-                                                              ).join(", ") // Nếu là object
-                                                            : String(value)}
-                                                        {/* Nếu là giá trị đơn lẻ */}
-                                                      </li>
-                                                    ))}
-                                                  </>
-                                                )}
-                                            </p>
-                                          </div>
-                                          <div className="mt-[1.7px] ">
-                                            <div className="flex items-center font-medium">
-                                              {/* <del className="mr-1">{detail.price}đ</del> */}
-                                              <span className="text-lg">
-                                                {/* {FormatMoney(detail.price)}₫ */}
-                                                {new Intl.NumberFormat(
-                                                  "vi-VN"
-                                                ).format(item.price)}
-                                                ₫
-                                              </span>
-                                            </div>
+                            <div className="py-5">
+                              <p className="font-medium text-base mb-2">
+                                Sản phẩm:
+                              </p>
+                              {selectedOrder.order_details.map((item: any) => (
+                                <div
+                                  className="flex bg-gray-100 p-2 rounded-xl"
+                                  key={item.id}
+                                >
+                                  <div className="relative sm:w-20 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
+                                    <img
+                                      alt={item.product_name}
+                                      loading="lazy"
+                                      decoding="async"
+                                      data-nimg="fill"
+                                      className="block absolute align-middle inset-0 h-full w-full object-cover object-center"
+                                      sizes="100px"
+                                      src={item.product_img}
+                                    />
+                                  </div>
+                                  <div className="ml-4 flex flex-1 flex-col">
+                                    <div>
+                                      <div className="flex ">
+                                        <div className="mr-12">
+                                          <h3 className="text-lg font-medium line-clamp-1">
+                                            {item.product_name}
+                                          </h3>
+                                          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                                            {item.attributes &&
+                                              Object.entries(item.attributes)
+                                                .length > 0 && (
+                                                <>
+                                                  Phân loại hàng:
+                                                  {Object.entries(
+                                                    item.attributes
+                                                  ).map(([key, value]) => (
+                                                    <li key={key}>
+                                                      {Array.isArray(value)
+                                                        ? value.join(", ") // Nếu là mảng
+                                                        : typeof value ===
+                                                              "object" &&
+                                                            value !== null
+                                                          ? Object.values(
+                                                              value
+                                                            ).join(", ") // Nếu là object
+                                                          : String(value)}
+                                                      {/* Nếu là giá trị đơn lẻ */}
+                                                    </li>
+                                                  ))}
+                                                </>
+                                              )}
+                                          </p>
+                                        </div>
+                                        <div className="mt-[1.7px] ">
+                                          <div className="flex items-center font-medium">
+                                            {/* <del className="mr-1">{detail.price}đ</del> */}
+                                            <span className="text-lg">
+                                              {/* {FormatMoney(detail.price)}₫ */}
+                                              {new Intl.NumberFormat(
+                                                "vi-VN"
+                                              ).format(item.price)}
+                                              ₫
+                                            </span>
                                           </div>
                                         </div>
                                       </div>
-                                      <div className="flex flex-1 items-end justify-between text-sm">
-                                        <p className="text-gray-500 dark:text-slate-400 flex items-center">
-                                          <span className="inline-block">x</span>
-                                          <span className="ml-2">
-                                            {item.quantity}
-                                          </span>
-                                        </p>
-                                      </div>
+                                    </div>
+                                    <div className="flex flex-1 items-end justify-between text-sm">
+                                      <p className="text-gray-500 dark:text-slate-400 flex items-center">
+                                        <span className="inline-block">x</span>
+                                        <span className="ml-2">
+                                          {item.quantity}
+                                        </span>
+                                      </p>
                                     </div>
                                   </div>
-                                  )
-                                )}
-                              </div>
+                                </div>
+                              ))}
+                            </div>
                             {/* </div> */}
 
                             {/* Dùng Table hiển thị thông tin */}
@@ -734,7 +730,9 @@ const HistoryOrder = () => {
                                   }`}
                                   disabled={shipOk}
                                   onClick={() =>
-                                    handleGetReturnRequest(order?.id)
+                                    handleGetReturnRequest(
+                                      order?.return_requests[0]?.id
+                                    )
                                   }
                                 >
                                   Xem yêu cầu hoàn trả
@@ -815,6 +813,24 @@ const HistoryOrder = () => {
                                 dataOrderRequest={dataOrderRequest}
                               />
                             </>
+                          )}
+
+                          {completedReturn && (
+                            <button
+                              className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB]  font-medium ${
+                                shipOk
+                                  ? "bg-gray-200 text-gray-400 border cursor-pointer border-gray-300"
+                                  : "text-white"
+                              }`}
+                              disabled={shipOk}
+                              onClick={() =>
+                                handleGetReturnRequest(
+                                  order?.return_requests[0]?.id
+                                )
+                              }
+                            >
+                              Xem phản hồi hoàn trả hàng
+                            </button>
                           )}
                         </div>
 
