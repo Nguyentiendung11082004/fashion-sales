@@ -75,6 +75,7 @@ class OrderController extends Controller
                 $order = $this->createOrder($data, $user);
                 $totalQuantity = 0;
                 $totalPrice = 0.00;
+                $message = [];
 
                 if ($isImmediatePurchase) {
                     list($quantity, $price) = $this->addImmediatePurchase($data, $order);
@@ -232,8 +233,7 @@ class OrderController extends Controller
     protected function addCartItemsToOrder($data, $user, $order)
     {
         $cartItemIds = $data['cart_item_ids'];
-        $quantities = $data['quantityOfCart'];
-
+        // $quantities = $data['quantityOfCart'];
         $cart = Cart::query()
             ->where('user_id', $user['id'])
             ->with('cartitems.product', 'cartitems.productvariant.attributes')
@@ -249,13 +249,38 @@ class OrderController extends Controller
                 $product = $cartItem->product;
                 $variant = $cartItem->productvariant;
                 $validCartItemFound = true;
-                // Lấy số lượng từ request hoặc số lượng trong giỏ hàng
-                $quantity = isset($quantities[$cartItem->id]) ? $quantities[$cartItem->id] : $cartItem->quantity;
-                $productPrice = $variant ? ($variant->price_sale > 0 ? $variant->price_sale : $variant->price_regular) : ($product->price_sale > 0 ? $product->price_sale : $product->price_regular);
+                $quantity = $cartItem->quantity;
+
+                // Kiểm tra số lượng tồn kho của biến thể (nếu có)
+                if ($variant) {
+                    $availableQuantity = $variant->quantity;
+                    $productPrice = $variant->price_sale > 0 ? $variant->price_sale : $variant->price_regular;
+                } else { // Kiểm tra số lượng tồn kho của sản phẩm nếu không có biến thể
+                    $availableQuantity = $product->quantity;
+                    $productPrice = $product->price_sale > 0 ? $product->price_sale : $product->price_regular;
+                }
+
+                // Nếu số lượng yêu cầu mua lớn hơn số lượng tồn kho, điều chỉnh số lượng và thông báo
+                if ($quantity > $availableQuantity) {
+                    $quantity = $availableQuantity; // Giảm số lượng về tối đa có thể mua
+                    $message[$cartItem->product->id] = "Số lượng sản phẩm này trong kho không đủ. Bạn chỉ có thể mua tối đa $availableQuantity sản phẩm.";
+                    // Bạn có thể lưu thông báo này vào session hoặc trả về cho người dùng để hiển thị
+                }
+
+                // Nếu không còn sản phẩm trong kho
+                if ($availableQuantity == 0) {
+                    $message[$cartItem->product->id] = "Sản phẩm này đã hết hàng.";
+                    continue; // Bỏ qua sản phẩm này
+                }
+
+                // Tạo chi tiết đơn hàng
                 $attributes = $variant ? $variant->attributes->pluck('pivot.value', 'name')->toArray() : null;
                 $this->createOrderDetail($order, $product, $variant->id ?? null, $productPrice, $quantity, $attributes);
+
                 $totalQuantity += $quantity;
                 $totalPrice += $productPrice * $quantity;
+
+                // Giảm số lượng tồn kho
                 if ($variant) {
                     $variant->decrement('quantity', $quantity);
                 } else {
@@ -263,14 +288,17 @@ class OrderController extends Controller
                 }
             }
         }
-        // If no valid cart items were found in cartItemIds
+
+        // Nếu không tìm thấy sản phẩm hợp lệ trong giỏ hàng
         if (!$validCartItemFound) { // Rollback nếu có lỗi
             return response()->json([
                 'message' => 'Không có sản phẩm nào trong giỏ hàng phù hợp với yêu cầu của bạn.',
             ], 400);
         }
+
         // Xóa các sản phẩm đã mua trong giỏ hàng
         CartItem::whereIn('id', $cartItemIds)->delete();
+
         return [$totalQuantity, $totalPrice];
     }
 
@@ -630,88 +658,120 @@ class OrderController extends Controller
     {
         // Validate dữ liệu đầu vào
         $request->validate([
-            'email' => 'required|email',
+            'type' => 'required|in:phoneNumber,email',
+            'contact' => ['required', function ($attribute, $value, $fail) use ($request) {
+                if ($request->type === 'phoneNumber') {
+                    // Validate số điện thoại Việt Nam
+                    if (!preg_match('/^(0|\+84)[3|5|7|8|9][0-9]{8}$/', $value)) {
+                        $fail('Số điện thoại không hợp lệ.');
+                    }
+                } elseif ($request->type === 'email') {
+                    // Validate email
+                    if (!filter_var($value, FILTER_VALIDATE_EMAIL)) {
+                        $fail('Email không hợp lệ.');
+                    }
+                }
+            }],
             'order_code' => 'required|string',
         ]);
 
-        // Tìm đơn hàng với order_code và email
-        $order = Order::where('order_code', $request->order_code)
-            ->where('user_email', $request->email)
-            ->first();
+        // Nếu type là email, tìm đơn hàng với order_code và email
+        if ($request->type == "email") {
+            $order = Order::where('order_code', $request->order_code)
+                ->where('user_email', $request->contact)
+                ->first();
+        }
 
+        // Nếu type là phoneNumber, tìm đơn hàng với số điện thoại
+        if ($request->type == "phoneNumber") {
+            $order = Order::query()->with('orderDetails')->where('order_code', $request->order_code)
+                ->where('ship_user_phonenumber', $request->contact)->latest('id')
+                ->first();
+        }
         // Nếu không tìm thấy đơn hàng
         if (!$order) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Không tìm thấy đơn hàng với mã đơn hàng và email này.',
+                'message' => 'Không tìm thấy đơn hàng, thông tin bạn cung cấp không đúng!',
             ], 400);
         }
-        // Kiểm tra xem người dùng đã yêu cầu OTP trước đó chưa
-        $existingOtp = DB::table('order_otp_verifications')
-            ->where('order_code', $request->order_code)
-            ->where('email', $request->email)
-            ->orderBy('expires_at', 'desc')
-            ->first();
 
-        // Nếu đã có OTP trước đó và OTP chưa hết hạn
-        if ($existingOtp && Carbon::parse($existingOtp->expires_at)->isFuture()) {
+        // Nếu type là email, kiểm tra OTP
+        if ($request->type == "email") {
+            // Kiểm tra xem người dùng đã yêu cầu OTP trước đó chưa
+            $existingOtp = DB::table('order_otp_verifications')
+                ->where('contact', $request->contact)
+                ->orderBy('expires_at', 'desc')
+                ->first();
+
+            // Nếu đã có OTP trước đó và OTP chưa hết hạn
+            if ($existingOtp && Carbon::parse($existingOtp->expires_at)->isFuture()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Bạn đã yêu cầu mã OTP trước đó. Vui lòng đợi cho đến khi mã OTP cũ hết hiệu lực.',
+                ], 400);
+            }
+
+            // Tạo mã OTP ngẫu nhiên
+            $otpCode = rand(100000, 999999);
+            $otpExpiresAt = Carbon::now()->addMinutes(3); // Mã OTP hết hạn sau 3 phút
+
+            // Lưu mã OTP và thời gian hết hạn vào bảng order_otp_verifications
+            DB::table('order_otp_verifications')->insert([
+                'order_code' => $request->order_code ?? '',
+                'contact' => $request->contact,
+                'otp' => $otpCode,
+                'expires_at' => $otpExpiresAt,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ]);
+
+            // Đẩy việc gửi email OTP vào queue
+            SendOtpEmail::dispatch($request->contact, $otpCode);
+
             return response()->json([
-                'status' => 'error',
-                'message' => 'Bạn đã yêu cầu mã OTP trước đó. Vui lòng đợi cho đến khi mã OTP cũ hết hiệu lực.',
-            ], 400);
+                'status' => 'success',
+                'message' => 'Mã OTP đã được gửi đến email của bạn.',
+            ], 200);
         }
-        // Tạo mã OTP ngẫu nhiên
-        $otp = rand(100000, 999999);
-        $expiresAt = Carbon::now()->addMinutes(3); // Mã OTP hết hạn sau 3 phút
 
-        // Lưu mã OTP và thời gian hết hạn vào bảng order_otp_verifications
-        DB::table('order_otp_verifications')->insert([
-            'order_code' => $request->order_code,
-            'email' => $request->email,
-            'otp' => $otp,
-            'expires_at' => $expiresAt,
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
-
-        // Đẩy việc gửi email OTP vào queue
-        SendOtpEmail::dispatch($request->email, $otp);
-
+        // Trả về thông tin đơn hàng nếu không cần xác minh OTP
         return response()->json([
             'status' => 'success',
-            'message' => 'Mã OTP đã được gửi đến email của bạn.',
+            'order' => $order,
         ], 200);
     }
     public function verifyOtp(Request $request)
     {
         // Validate dữ liệu đầu vào
         $request->validate([
-            'email' => 'required|email',
+            'contact' => 'required|email',
             'order_code' => 'required|string',
             'otp' => 'required|string',
         ]);
 
         // Kiểm tra mã OTP trong bảng order_otp_verifications
-        $otpRecord = DB::table('order_otp_verifications')
+        $otpVerification = DB::table('order_otp_verifications')
             ->where('order_code', $request->order_code)
-            ->where('email', $request->email)
+            ->where('contact', $request->contact)
             ->where('otp', $request->otp)
             ->first();
 
         // Nếu không tìm thấy OTP hoặc OTP đã hết hạn
-        if (!$otpRecord || Carbon::now()->gt(Carbon::parse($otpRecord->expires_at))) {
+        if (!$otpVerification || Carbon::now()->gt(Carbon::parse($otpVerification->expires_at))) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Mã OTP không hợp lệ hoặc đã hết hạn.',
             ], 400);
         }
 
+        // Tìm đơn hàng sau khi xác minh OTP thành công
         $order = Order::query()
             ->with('orderDetails')
-            ->where("order_code", "=", $otpRecord->order_code)
+            ->where("order_code", "=", $otpVerification->order_code)
             ->first();
-        // Xác minh OTP thành công
 
+        // Xác minh OTP thành công
         return response()->json([
             'status' => 'success',
             'order' => $order,
