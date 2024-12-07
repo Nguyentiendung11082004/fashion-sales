@@ -458,7 +458,7 @@ class OrderController extends Controller
             // Thông tin chi tiết đơn hàng
             $order->load(['orderDetails']);
 
-           
+
 
             // Kiểm tra kết quả
             // dd($orderArray);

@@ -325,16 +325,16 @@ const HistoryOrder = () => {
                     "đang chờ xác nhận" ||
                   order.order_status.trim().toLowerCase() === "đã xác nhận";
                 const canCel =
-                  order.order_status.trim().toLowerCase() === "đã hủy";
+                  order.order_status.trim().toLowerCase() === "đã hủy"; //
                 const shipOk =
                   order.order_status.trim().toLowerCase() === "đang vận chuyển";
                 const complete =
-                  order.order_status.trim().toLowerCase() === "hoàn thành";
+                  order.order_status.trim().toLowerCase() === "hoàn thành"; //
                 const requestReturn =
                   order.order_status.trim().toLowerCase() ===
                   "yêu cầu hoàn trả hàng";
                 const completedReturn =
-                  order.order_status.trim().toLowerCase() === "hoàn trả hàng";
+                  order.order_status.trim().toLowerCase() === "hoàn trả hàng"; //
 
                 const handleCancelClick = (id: number, status: string) => {
                   if (!isCancelOk) {
@@ -417,19 +417,6 @@ const HistoryOrder = () => {
                                 {selectedOrder.created_at}
                               </p>
                             </p>
-                            {/* <div className="flex items-center space-x-5 my-5"> */}
-                            {/* <div>
-                                <p className="font-medium text-base mb-2">
-                                  Địa chỉ nhận hàng:{" "}
-                                </p>
-                              
-                                Tên: {selectedOrder.ship_user_name}
-                                <br />
-                                Số điện thoại:{" "}
-                                {selectedOrder.ship_user_phonenumber}
-                                <br />
-                                Địa chỉ: {selectedOrder.ship_user_address}
-                              </div> */}
                             <div className="py-5">
                               <p className="font-medium text-base mb-2">
                                 Sản phẩm:
@@ -797,7 +784,7 @@ const HistoryOrder = () => {
                           )}
 
                           {(canCel || complete || completedReturn) && (
-                            // Nút "Mua Lại" khi đơn hàng đã hủy hoặc hoàn thành
+                            // Nút "Mua Lại" khi đơn hàng đã hủy/ hoàn thành/hoàn trả hàng
                             <button
                               className="nc-Button relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB] text-white font-medium"
                               onClick={() => mutateReorder(order.id)}
