@@ -82,16 +82,16 @@ class ReturnController extends Controller
                     ];
                 });
 
-            return response()->json([
-                'message' => 'User return requests retrieved successfully.',
-                'data' => $returnRequests,
-            ]);
-        } catch (\Exception $ex) {
-            return response()->json([
-                'message' => 'Error retrieving return requests: ' . $ex->getMessage(),
-            ], 500);
-        }
+        return response()->json([
+            'message' => 'User return requests retrieved successfully.',
+            'data' => $returnRequests,
+        ]);
+    } catch (\Exception $ex) {
+        return response()->json([
+            'message' => 'Error retrieving return requests: ' . $ex->getMessage(),
+        ], 500);
     }
+}
 
     //
     public function createReturnRequest(Request $request)

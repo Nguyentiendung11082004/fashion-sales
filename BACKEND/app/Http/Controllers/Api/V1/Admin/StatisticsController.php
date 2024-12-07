@@ -135,17 +135,57 @@ class StatisticsController extends Controller
         try {
 
             // Khởi tạo truy vấn cơ bản
+            // $query = OrderDetail::select(
+            //     'order_details.product_id',
+            //     'order_details.product_variant_id',
+            //     'products.name as product_name',
+            //     'products.sku as product_sku',
+            //     'product_variants.sku as variant_sku',
+            //     DB::raw('SUM(order_details.total_price) as revenue'),
+            //     DB::raw('SUM(order_details.quantity) as total_quantity')
+            // )
+            //     ->leftJoin('products', 'order_details.product_id', '=', 'products.id')
+            //     ->leftJoin('product_variants', 'order_details.product_variant_id', '=', 'product_variants.id')
+            //     ->groupBy(
+            //         'order_details.product_id',
+            //         'order_details.product_variant_id',
+            //         'products.name',
+            //         'products.sku',
+            //         'product_variants.sku'
+            //     );
+
+            // // Áp dụng bộ lọc ngày tháng nếu có
+            // $this->applyDateFilter($query, $request, 'order_details.created_at');
+
+            // // Lấy dữ liệu tổng hợp từ truy vấn
+            // $revenueData = $query->get();
+
+            // // Tính tổng doanh thu
+            // $totalRevenue = $revenueData->sum('revenue');
+
             $query = OrderDetail::select(
                 'order_details.product_id',
                 'order_details.product_variant_id',
                 'products.name as product_name',
                 'products.sku as product_sku',
                 'product_variants.sku as variant_sku',
-                DB::raw('SUM(order_details.total_price) as revenue'),
-                DB::raw('SUM(order_details.quantity) as total_quantity')
+                DB::raw('SUM(order_details.total_price - IFNULL(return_items.total_refund, 0)) as revenue'), // Tính doanh thu sau hoàn trả
+                DB::raw('SUM(order_details.quantity - IFNULL(return_items.total_return_quantity, 0)) as total_quantity') // Tính số lượng thực tế
             )
                 ->leftJoin('products', 'order_details.product_id', '=', 'products.id')
                 ->leftJoin('product_variants', 'order_details.product_variant_id', '=', 'product_variants.id')
+                ->leftJoin(
+                    DB::raw('(SELECT 
+                                  order_detail_id, 
+                                  SUM(quantity) as total_return_quantity, 
+                                  SUM(refund_amount) as total_refund 
+                              FROM return_items 
+                              WHERE status = "approved" 
+                              GROUP BY order_detail_id) as return_items'),
+                    'order_details.id',
+                    '=',
+                    'return_items.order_detail_id'
+                )
                 ->groupBy(
                     'order_details.product_id',
                     'order_details.product_variant_id',
@@ -162,6 +202,7 @@ class StatisticsController extends Controller
 
             // Tính tổng doanh thu
             $totalRevenue = $revenueData->sum('revenue');
+
 
             // Lấy thông tin thuộc tính sản phẩm
             $variantAttributes = DB::table('product_variant_has_attributes')
@@ -230,9 +271,26 @@ class StatisticsController extends Controller
 
             // Lọc số lượng sản phẩm trong các đơn hàng dựa trên bộ lọc thời gian
             $orderIds = $orderIdsQuery->pluck('id'); // Tách riêng query để lấy ID
-            $totalQuantityInOrder = OrderDetail::whereIn('order_id', $orderIds)->sum('quantity');
+            // $totalQuantityInOrder = OrderDetail::whereIn('order_id', $orderIds)->sum('quantity');
+
+            // Tính tổng số lượng thực tế trong các đơn hàng
+            $totalQuantityInOrder = OrderDetail::whereIn('order_id', $orderIds)
+                ->leftJoin(
+                    DB::raw('(SELECT 
+                  order_detail_id, 
+                  SUM(quantity) as total_return_quantity 
+              FROM return_items 
+              WHERE status = "approved" 
+              GROUP BY order_detail_id) as return_items'),
+                    'order_details.id',
+                    '=',
+                    'return_items.order_detail_id'
+                )
+                ->selectRaw('SUM(order_details.quantity - IFNULL(return_items.total_return_quantity, 0)) as total_quantity')
+                ->value('total_quantity');
 
             // Tạo kết quả trả về
+            // dd($orderCountsByStatus->toArray());
             $result = [
                 'order_counts_by_status' => $orderCountsByStatus,
                 'total_quantity_in_order' => $totalQuantityInOrder,

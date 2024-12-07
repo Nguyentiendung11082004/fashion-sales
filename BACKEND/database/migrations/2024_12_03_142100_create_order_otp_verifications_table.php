@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('order_otp_verifications', function (Blueprint $table) {
             $table->id();
             $table->string('order_code'); 
-            $table->string('email');    
+            $table->string('contact');    
             $table->string('otp');    
             $table->timestamp('expires_at');
             $table->timestamps();
