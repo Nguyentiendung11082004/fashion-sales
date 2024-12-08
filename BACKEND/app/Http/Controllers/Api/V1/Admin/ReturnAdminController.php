@@ -37,6 +37,7 @@ class ReturnAdminController extends Controller
                         'user_name' => $returnRequest->user->name,
                         'reason' => $returnRequest->reason,
                         'status' => $returnRequest->status,
+                        'total_refund_amount' => $returnRequest->total_refund_amount,
                         'created_at' => $returnRequest->created_at->format('Y-m-d H:i:s'),
                         'updated_at' => $returnRequest->updated_at->format('Y-m-d H:i:s'),
 
@@ -48,7 +49,7 @@ class ReturnAdminController extends Controller
                                 'image' => $item->image,
                                 'quantity' => $item->quantity,
                                 'status' => $item->status,
-
+                                'refund_amount' => $item->refund_amount,
                                 'order' => [
                                     'id' => $returnRequest->order->id,
                                     'total' => $returnRequest->order->total,
@@ -107,6 +108,7 @@ class ReturnAdminController extends Controller
                 'user_id' => $showReturnItem->user_id,
                 'reason' => $showReturnItem->reason,
                 'status' => $showReturnItem->status,
+                'total_refund_amount' => $showReturnItem->total_refund_amount,
                 'created_at' => $showReturnItem->created_at->format('Y-m-d H:i:s'),
                 'updated_at' => $showReturnItem->updated_at->format('Y-m-d H:i:s'),
                 'items' => $showReturnItem->items->map(function ($item) use ($showReturnItem) {
@@ -117,6 +119,7 @@ class ReturnAdminController extends Controller
                         'image' => $item->image,
                         'quantity' => $item->quantity,
                         'status' => $item->status,
+                        'refund_amount' => $item->refund_amount,
                         'order' => [
                             'id' => $showReturnItem->order->id,
                             'total' => $showReturnItem->order->total,

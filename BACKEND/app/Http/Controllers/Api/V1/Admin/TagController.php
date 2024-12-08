@@ -152,17 +152,26 @@ class TagController extends Controller
     {
         $query = $request->input('query'); // Lấy từ khóa tìm kiếm từ body request
 
-        if (!$query) {
+        if (empty($query)) {
+            $results = Tag::all();
             return response()->json([
-                'message' => 'Vui lòng nhập từ khóa tìm kiếm.',
-                'data' => []
-            ], 400);
+                'message' => 'Tất cả Tag:',
+                'data' => $results
+            ]);
         }
 
         // Tìm kiếm trong cột `name` hoặc các cột khác nếu cần
         $results = Tag::where('name', 'LIKE', "%{$query}%")
             ->orWhere('id', 'LIKE', "%{$query}%") // Thêm cột mô tả nếu có
             ->get();
+
+            if ($results->isEmpty()) {
+                return response()->json([
+                    'message' => 'Không tìm thấy Tag.',
+                    'data' => []
+                ], 404);
+            }
+
 
         return response()->json([
             'message' => 'Kết quả tìm kiếm.',

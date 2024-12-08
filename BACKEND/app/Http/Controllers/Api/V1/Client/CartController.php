@@ -96,8 +96,8 @@ class CartController extends Controller
                         return response()->json(['message' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
                     }
                     // Kiểm tra trạng thái đơn hàng
-                    if (!in_array($order->order_status, [Order::STATUS_CANCELED, Order::STATUS_COMPLETED])) {
-                        return response()->json(['message' => 'Chỉ có thể thêm sản phẩm từ các đơn hàng đã hoàn thành hoặc đã hủy.'], Response::HTTP_BAD_REQUEST);
+                    if (!in_array($order->order_status, [Order::STATUS_CANCELED, Order::STATUS_COMPLETED,Order::STATUS_RETURNED])) {
+                        return response()->json(['message' => 'Chỉ có thể thêm sản phẩm từ các đơn hàng đã hoàn thành hoặc đã hủy,hoàn trả hàng.'], Response::HTTP_BAD_REQUEST);
                     }
                     $productIds = $order->orderDetails->pluck('product_id')->toArray();
                     $variantIds = $order->orderDetails->pluck('product_variant_id')->filter()->toArray();
