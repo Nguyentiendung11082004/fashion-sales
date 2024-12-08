@@ -657,10 +657,10 @@ const ProductDetail = () => {
                                 }}
                                 onClick={() => {
                                   if (!isDisabled) {
-                                    handleAttributeSelect(
-                                      key.attribute,
-                                      item.id
-                                    );
+                                    // handleAttributeSelect(
+                                    //   key.attribute,
+                                    //   item.id
+                                    // );
                                     setSelectedAttributes((prev) => ({
                                       ...prev,
                                       product_variant: {

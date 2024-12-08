@@ -6,8 +6,6 @@ import { useAuth } from '@/common/context/Auth/AuthContext';
 import Loading from '@/common/Loading/Loading';
 import AddressAction from './AddressAction';
 import { toast } from 'react-toastify';
-
-
 type Props = {
   open: boolean,
   onClose: () => void,
@@ -15,7 +13,6 @@ type Props = {
   dataCheckout: any,
   onHandleOk: (dataIdAddress: any) => void;
 }
-
 const ModalAddress = ({ open, onClose, title, dataCheckout, onHandleOk }: Props) => {
   const { token } = useAuth();
   const [addressAction, setAddressAction] = useState(false);
@@ -38,8 +35,10 @@ const ModalAddress = ({ open, onClose, title, dataCheckout, onHandleOk }: Props)
       return response.data;
     },
     onSuccess: (updatedAddress) => {
-      queryClient.invalidateQueries({
-        queryKey: ['address'],
+      queryClient.setQueryData(['address'], (oldData: any) => {
+        return oldData.map((addr: any) =>
+          addr.id === updatedAddress.id ? { ...addr, ...updatedAddress } : addr
+        );
       });
       onHandleOk(updatedAddress);
       onClose();
