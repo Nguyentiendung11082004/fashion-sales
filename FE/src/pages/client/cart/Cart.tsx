@@ -27,9 +27,10 @@ const Cart = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const closeModal = () => {
-    setIdCart("");
+    // setIdCart("");
     setVisible(false);
   };
+  console.log("updatedAttributes", updatedAttributes)
   const { token } = useAuth();
   const { data, isLoading, isFetching } = useQuery({
     queryKey: ["cart"],
@@ -156,12 +157,22 @@ const Cart = () => {
       [idCart]: variants,
     }));
   };
-  const handleUpdateAttributes = (idCart: any, attributes: any) => {
-    setUpdatedAttributes({
-      ...updatedAttributes,
-      [idCart]: attributes,
+  const handleUpdateAttributes = (newIdCart: any, attributes: any) => {
+    // Cập nhật attributes cho sản phẩm mới
+    setUpdatedAttributes((prevAttributes: any) => ({
+      ...prevAttributes,
+      [newIdCart]: attributes,
+    }));
+    // Cập nhật lại idCart để giữ tất cả các item đang check, bao gồm cả item vừa cập nhật
+    setIdCart((prevIdCart: any) => {
+      const currentIdCart = Array.isArray(prevIdCart) ? prevIdCart : [];
+      const allCheckedIds = [...currentIdCart, newIdCart]; // Thêm item mới nếu chưa có
+      return Array.from(new Set(allCheckedIds)); // Loại bỏ trùng lặp
     });
   };
+  
+  console.log("idCart", idCart);
+  
   const carts = data?.cart?.cartitems;
   carts?.map((cartItem: any) => {
     const {
@@ -226,7 +237,6 @@ const Cart = () => {
 
     setIsAllChecked(updatedIdCarts.length === carts.length);
   };
-  console.log("idCart", idCart);
   const handleCheckout = () => {
     if (!idCart || idCart.length === 0) {
       MySwal.fire({
@@ -261,7 +271,6 @@ const Cart = () => {
       if (storedCheckedItems) {
         const parsedCheckedItems = JSON.parse(storedCheckedItems);
         setCheckedItems(parsedCheckedItems);
-
         // Tính toán lại isAllChecked
         const isAllCheckedNow = carts.every(
           (item: any) => parsedCheckedItems[item.id]
@@ -363,50 +372,50 @@ const Cart = () => {
                                   </Link>
                                   {/*end hd-price-item*/}
                                   {updatedAttributes.dataAttributes &&
-                                  Object.entries(
-                                    updatedAttributes.dataAttributes
-                                  ).length > 0
+                                    Object.entries(
+                                      updatedAttributes.dataAttributes
+                                    ).length > 0
                                     ? Object.entries(
-                                        updatedAttributes.dataAttributes
-                                      ).map(
-                                        ([attributeName, attributeValue]) => {
-                                          const attributeItem =
-                                            updatedAttributes.find(
-                                              (item: any) =>
-                                                item.name === attributeName
-                                            );
-                                          return (
-                                            <div
-                                              className="hd-infor-text-meta text-[13px] text-[#878787]"
-                                              key={attributeName}
-                                            >
-                                              <p>
-                                                {attributeName}:{" "}
-                                                <strong>
-                                                  {attributeItem
-                                                    ? attributeItem.pivot.value
-                                                    : attributeValue}
-                                                </strong>
-                                              </p>
-                                            </div>
+                                      updatedAttributes.dataAttributes
+                                    ).map(
+                                      ([attributeName, attributeValue]) => {
+                                        const attributeItem =
+                                          updatedAttributes.find(
+                                            (item: any) =>
+                                              item.name === attributeName
                                           );
-                                        }
-                                      )
-                                    : e?.productvariant?.attributes?.map(
-                                        (item: any) => (
+                                        return (
                                           <div
                                             className="hd-infor-text-meta text-[13px] text-[#878787]"
-                                            key={item.id}
+                                            key={attributeName}
                                           >
                                             <p>
-                                              {item?.name}:{" "}
+                                              {attributeName}:{" "}
                                               <strong>
-                                                {item?.pivot?.value}
+                                                {attributeItem
+                                                  ? attributeItem.pivot.value
+                                                  : attributeValue}
                                               </strong>
                                             </p>
                                           </div>
-                                        )
-                                      )}
+                                        );
+                                      }
+                                    )
+                                    : e?.productvariant?.attributes?.map(
+                                      (item: any) => (
+                                        <div
+                                          className="hd-infor-text-meta text-[13px] text-[#878787]"
+                                          key={item.id}
+                                        >
+                                          <p>
+                                            {item?.name}:{" "}
+                                            <strong>
+                                              {item?.pivot?.value}
+                                            </strong>
+                                          </p>
+                                        </div>
+                                      )
+                                    )}
 
                                   <div className="hd-infor-text-tools mt-[10px]">
                                     {e.productvariant && (
@@ -479,13 +488,13 @@ const Cart = () => {
                                   <del className="text-[#696969]">
                                     {FormatMoney(
                                       e?.productvariant?.price_regular ||
-                                        e?.product?.price_regular
+                                      e?.product?.price_regular
                                     )}
                                   </del>
                                   <ins className="ms-[6px] no-underline text-[#ec0101]">
                                     {FormatMoney(
                                       e?.productvariant?.price_sale ||
-                                        e?.product?.price_sale
+                                      e?.product?.price_sale
                                     )}
                                   </ins>
                                 </div>
