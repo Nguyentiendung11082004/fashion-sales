@@ -67,7 +67,6 @@ const FormVoucher = () => {
   });
 
   const location = useLocation();
-  console.log("locaion: ",location)
 
   const currentPage = location.state?.currentPage || 1;
   console.log("currentPage 123  : ", currentPage);
@@ -97,6 +96,9 @@ const FormVoucher = () => {
     },
   });
 
+  console.log("kiểm tra voucherDetail?.meta_data: ", voucherDetail?.meta_data);
+
+  
   useEffect(() => {
     if (voucherDetail) {
       let metaDataValues = {};
@@ -150,6 +152,60 @@ const FormVoucher = () => {
       form.setFieldsValue(initialValues);
     }
   }, [voucherDetail, form]);
+
+  // useEffect(() => {
+  //   if (voucherDetail) {
+  //     let metaDataValues = {};
+  //     const appliesToTotalMeta = voucherDetail?.meta_data?.find(
+  //       (meta: any) => meta?.meta_key === "_voucher_applies_to_total"
+  //     );
+
+  //     const initialVoucherAppliesToTotal = appliesToTotalMeta
+  //       ? "true"
+  //       : "false";
+  //     setVoucher_applies_to_total(initialVoucherAppliesToTotal);
+
+  //     if (initialVoucherAppliesToTotal === "false") {
+  //       metaDataValues = voucherDetail?.meta_data?.reduce(
+  //         (acc: any, meta: any) => {
+  //           if (
+  //             meta?.meta_key !== "_voucher_applies_to_total" &&
+  //             meta?.meta_key &&
+  //             meta?.meta_value !== undefined
+  //           ) {
+  //             if (
+  //               meta?.meta_key === "_voucher_category_ids" ||
+  //               meta?.meta_key === "_voucher_exclude_category_ids" ||
+  //               meta?.meta_key === "_voucher_exclude_product_ids" ||
+  //               meta?.meta_key === "_voucher_product_ids"
+  //             ) {
+  //               acc[meta.meta_key] = JSON.parse(meta.meta_value);
+  //             } else {
+  //               acc[meta.meta_key] = meta.meta_value;
+  //             }
+  //           }
+  //           if (meta?.meta_key === "_voucher_max_discount_amount") {
+  //             acc[meta.meta_key] = meta.meta_value;
+  //           }
+  //           return acc;
+  //         },
+  //         {}
+  //       );
+  //     }
+
+  //     const initialValues = {
+  //       ...voucherDetail?.voucher,
+  //       _voucher_applies_to_total: initialVoucherAppliesToTotal,
+  //       start_date: dayjs(voucherDetail?.voucher?.start_date),
+  //       end_date: dayjs(voucherDetail?.voucher?.end_date),
+  //       discount_value: parseFloat(voucherDetail?.voucher?.discount_value),
+  //       min_order_value: parseFloat(voucherDetail?.voucher?.min_order_value),
+  //       ...(initialVoucherAppliesToTotal === "false" ? metaDataValues : {}),
+  //     };
+
+  //     form.setFieldsValue(initialValues);
+  //   }
+  // }, [voucherDetail, form]);
 
   const onFinish = (value: any) => {
     console.log("value submit: ", value);
