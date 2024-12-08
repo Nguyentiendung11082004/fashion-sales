@@ -68,7 +68,7 @@ class StoreOrderRequest extends FormRequest
             'quantity' => 'required_without:cart_item_ids|integer|min:1',
             'cart_item_ids' => 'required_without:product_id|array',
             'cart_item_ids.*' => 'integer|exists:cart_items,id',
-            'quantityOfCart.*' => 'required_without:product_id|integer|min:1',
+            // 'quantityOfCart.*' => 'required_without:product_id|integer|min:1',
             'voucher_code' => 'nullable|string|exists:vouchers,code',
         ];
     }
