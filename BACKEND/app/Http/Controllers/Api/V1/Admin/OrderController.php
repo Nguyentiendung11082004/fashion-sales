@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1\Admin;
 
+use App\Events\OrderStatusUpdated;
 use App\Http\Controllers\Api\V1\Service\OrderGHNController;
 use App\Models\Order;
 use Illuminate\Http\Response;
@@ -104,6 +105,7 @@ class OrderController extends Controller
             // dd($test->createOrder($id));
 
             $order = Order::findOrFail($id);
+            // broadcast(new OrderStatusUpdated($order))->toOthers();
 
             $currentStatus = $order->order_status;
             $newStatus = $request->input('order_status');

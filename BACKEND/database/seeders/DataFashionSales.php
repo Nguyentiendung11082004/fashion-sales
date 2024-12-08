@@ -72,30 +72,30 @@ class DataFashionSales extends Seeder
 
         // ]);
         User::query()->insert([
-            [
-                "role_id" => 1,
-                'name' => 'khách hàng 1',
-                'email' => fake()->email(),
-                'password' => Hash::make("12345"),
-                "phone_number" => "0987654321",
-                'address' => "hà nội",
-            ],
-            [
-                "role_id" => 2,
-                'name' => 'membership',
-                'email' => fake()->email(),
-                'password' => Hash::make("12345"),
-                "phone_number" => "0987654321",
-                'address' => "hà nội",
-            ],
-            [
-                "role_id" => 3,
-                'name' => 'shipper',
-                'email' => fake()->email(),
-                'password' => Hash::make("12345"),
-                "phone_number" => "0987654321",
-                'address' => "hà nội",
-            ],
+            // [
+            //     "role_id" => 1,
+            //     'name' => 'khách hàng 1',
+            //     'email' => fake()->email(),
+            //     'password' => Hash::make("12345"),
+            //     "phone_number" => "0987654321",
+            //     'address' => "hà nội",
+            // ],
+            // [
+            //     "role_id" => 2,
+            //     'name' => 'membership',
+            //     'email' => fake()->email(),
+            //     'password' => Hash::make("12345"),
+            //     "phone_number" => "0987654321",
+            //     'address' => "hà nội",
+            // ],
+            // [
+            //     "role_id" => 3,
+            //     'name' => 'shipper',
+            //     'email' => fake()->email(),
+            //     'password' => Hash::make("12345"),
+            //     "phone_number" => "0987654321",
+            //     'address' => "hà nội",
+            // ],
             [
                 "role_id" => 4,
                 'name' => 'khách hàng 1',
