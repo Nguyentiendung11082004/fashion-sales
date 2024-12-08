@@ -3,6 +3,7 @@ import OrderLookup from "@/components/website/OrderLookup";
 import FastDelivery from "@/pages/admin/fastDelivery/FastDelivery";
 import ReturnOrder from "@/pages/admin/order/components/ReturnOrder";
 import ReturnOrderId from "@/pages/admin/order/components/ReturnOrderId";
+import CheckAdmin from "@/pages/client/auth/permission/CheckAdmin";
 import RequestOrder from "@/pages/client/requestOrder/RequestOrder";
 import GetReturnRequestOrderId from "@/pages/client/returnRequest/GetReturnRequestOrderId";
 import ReturnRequest from "@/pages/client/returnRequest/ReturnRequest";
@@ -139,7 +140,7 @@ const Router = () => {
           element={<PasswordResetHandler />}
         />
         <Route path="password/reset" element={<ResetPassword />} />
-        <Route path="" element={<Permission />}>
+        <Route path="" element={<CheckAdmin />}>
           <Route path="/admin" element={<LayoutAdmin />}>
             <Route index element={<Dashboard />} />
             <Route path="products" element={<ProductPageManager />} />

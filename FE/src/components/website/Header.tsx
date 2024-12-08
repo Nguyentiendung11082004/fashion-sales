@@ -117,9 +117,8 @@ const Header = (props: Props) => {
                 <li>
                   <Link
                     to="/"
-                    className={`font-medium text-hover uppercase ${
-                      location.pathname === "/" ? "text-[#00BADB]" : ""
-                    }`}
+                    className={`font-medium text-hover uppercase ${location.pathname === "/" ? "text-[#00BADB]" : ""
+                      }`}
                   >
                     Trang Chủ
                   </Link>
@@ -127,11 +126,10 @@ const Header = (props: Props) => {
                 <li className="relative">
                   <Link
                     to="/products"
-                    className={`font-medium text-hover uppercase ${
-                      location.pathname === "/products" && !location.state?.sale
-                        ? "text-[#00BADB]"
-                        : ""
-                    }`}
+                    className={`font-medium text-hover uppercase ${location.pathname === "/products" && !location.state?.sale
+                      ? "text-[#00BADB]"
+                      : ""
+                      }`}
                   >
                     <p className="uppercase">Sản Phẩm</p>
                     <span className="absolute text-xs rounded-full px-2 py-[2px] text-white bg-primary top-[-16px] left-16">
@@ -145,11 +143,10 @@ const Header = (props: Props) => {
                       pathname: "/products",
                     }}
                     state={{ sale: true }}
-                    className={`font-medium text-hover uppercase ${
-                      location.pathname === "/products" && location.state?.sale
-                        ? "text-[#00BADB]"
-                        : ""
-                    }`}
+                    className={`font-medium text-hover uppercase ${location.pathname === "/products" && location.state?.sale
+                      ? "text-[#00BADB]"
+                      : ""
+                      }`}
                   >
                     Sale
                   </Link>
@@ -158,9 +155,8 @@ const Header = (props: Props) => {
                 <li>
                   <Link
                     to="/contact"
-                    className={`font-medium text-hover uppercase ${
-                      location.pathname === "/contact" ? "text-[#00BADB]" : ""
-                    }`}
+                    className={`font-medium text-hover uppercase ${location.pathname === "/contact" ? "text-[#00BADB]" : ""
+                      }`}
                   >
                     Liên Hệ
                   </Link>
@@ -168,9 +164,8 @@ const Header = (props: Props) => {
                 <li>
                   <Link
                     to="/about"
-                    className={`font-medium text-hover uppercase ${
-                      location.pathname === "/about" ? "text-[#00BADB]" : ""
-                    }`}
+                    className={`font-medium text-hover uppercase ${location.pathname === "/about" ? "text-[#00BADB]" : ""
+                      }`}
                   >
                     Giới thiệu
                   </Link>
@@ -179,11 +174,10 @@ const Header = (props: Props) => {
                   <li>
                     <Link
                       to="/order_lookup"
-                      className={`font-medium text-hover uppercase ${
-                        location.pathname === "/order_lookup"
-                          ? "text-[#00BADB]"
-                          : ""
-                      }`}
+                      className={`font-medium text-hover uppercase ${location.pathname === "/order_lookup"
+                        ? "text-[#00BADB]"
+                        : ""
+                        }`}
                     >
                       Tra cứu đơn hàng
                     </Link>
@@ -207,12 +201,26 @@ const Header = (props: Props) => {
                   </Link>
                   <div className="absolute left-[-50px] hidden group-hover:flex flex-col items-start mt-0 space-y-2 p-4 bg-white shadow-lg rounded-lg transition-all duration-300 z-20">
                     {user ? (
-                      <Button
-                        onClick={() => logoutUser()}
-                        className="py-2 w-[150px] text-center text-white bg-red-500 rounded-md hover:bg-red-600 transition duration-200 ease-in-out"
-                      >
-                        Đăng Xuất
-                      </Button>
+                      <>
+                        <Button
+                          onClick={() => logoutUser()}
+                          className="py-2 w-[150px] text-center text-white bg-red-500 rounded-md hover:bg-red-600 transition duration-200 ease-in-out"
+                        >
+                          Đăng Xuất
+                        </Button>
+                        {
+                          user?.InforUser?.role_id === 4 ? <Link
+                            to={`/admin`}
+                          >
+                            <Button
+                              className="py-2 w-[150px] text-center text-white bg-blue-500 rounded-md hover:bg-blue-600 transition duration-200 ease-in-out"
+                            >
+                              Chuyển sang admin
+                            </Button>
+                          </Link> : ''
+                        }
+
+                      </>
                     ) : (
                       <div className="flex flex-col space-y-2">
                         <Link

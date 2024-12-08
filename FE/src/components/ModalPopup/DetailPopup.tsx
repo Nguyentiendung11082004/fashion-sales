@@ -155,12 +155,14 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
     setSelectedVariantId(null);
     onClose();
   };
+  console.log("_payload", _payload)
+  console.log("productSeeMore", productSeeMore)
+  
   const handleCheckout = () => {
     if (_payload.product_variant_id) {
       const selectedVariant = productSeeMore?.variants.find(
         (variant: any) => variant.id === _payload.product_variant_id
       );
-
       if (selectedVariant) {
         if (_payload.quantity > selectedVariant.quantity) {
           toast.error("Số lượng yêu cầu vượt quá số lượng còn lại trong kho");
@@ -171,12 +173,12 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
         return;
       }
     } else if (_payload.product_id) {
-      const selectedProduct = productSeeMore?.variants.find(
-        (variant: any) => variant.product_id === _payload.product_id
-      );
-
-      if (selectedProduct) {
-        if (_payload.quantity > selectedProduct.quantity) {
+      // const selectedProduct = productSeeMore?.find(
+      //   (variant: any) => variant.product_id === _payload.product_id
+      // );
+      // console.log("selectedProduct", selectedProduct)
+      if (productSeeMore) {
+        if (_payload.quantity > productSeeMore.quantity) {
           toast.error("Sản phẩm này đã hết hàng");
           return;
         }

@@ -147,6 +147,7 @@ const OrderPage = () => {
         ...item,
       }))
       : [];
+  console.log("dataSource", dataSource)
   const dataSourceSearch = dataFilter
     ? dataFilter?.map((item: IOrder) => ({
       key: item?.id,
@@ -379,7 +380,7 @@ const OrderPage = () => {
 
             <Table
               className="custom-table"
-              dataSource={(dataSourceSearch.length > 0 ? dataSourceSearch : dataSource).slice(
+              dataSource={(dataSource ? dataSource : dataSourceSearch).slice(
                 (currentPage - 1) * pageSize,
                 currentPage * pageSize
               )}
@@ -391,7 +392,7 @@ const OrderPage = () => {
               className="mt-4"
               align="end"
               current={currentPage}
-              total={(dataFilter ? dataFilter : dataSource).length}
+              total={(dataSource ? dataSource : dataSourceSearch).length}
               pageSize={pageSize}
               onChange={(page) => {
                 setCurrentPage(page);
