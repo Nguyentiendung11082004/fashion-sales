@@ -2,15 +2,16 @@
 import instance from "@/configs/axios";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ReactNode, createContext, useContext, useState } from "react";
-import Swal from "sweetalert2";
-import withReactContent from "sweetalert2-react-content";
+// import Swal from "sweetalert2";
+// import withReactContent from "sweetalert2-react-content";
 import { useAuth } from "../Auth/AuthContext";
-const MySwal = withReactContent(Swal);
+import { toast } from "react-toastify";
+// const MySwal = withReactContent(Swal);
 
 interface CartContextType {
   data: any;
   isLoading: boolean;
-  activateCart: () => void; 
+  activateCart: () => void;
   addToCart: (
     idProduct: number,
     idProductVariant: number,
@@ -31,14 +32,14 @@ export const useCart = () => {
 };
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
-  const [isActive, setIsActive] = useState(false); 
+  const [isActive, setIsActive] = useState(false);
   const { token } = useAuth();
   const queryClient = useQueryClient();
 
   const { data, isLoading } = useQuery({
     queryKey: ["cart"],
     queryFn: async () => {
-      if(token) {
+      if (token) {
         const res = await instance.get("/cart", {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -52,7 +53,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   const activateCart = () => {
     if (!isActive) {
-      setIsActive(true); 
+      setIsActive(true);
     }
   };
 
@@ -87,24 +88,26 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       queryClient.invalidateQueries({
         queryKey: ["cart"],
       });
-      MySwal.fire({
-        title: <strong>Chúc mừng!</strong>,
-        icon: "success",
-        text: "Thêm vào giỏ hàng thành công",
-        timer: 1500,
-        timerProgressBar: true,
-        showConfirmButton: false,
-      });
+      toast.success("Đã thêm sản phẩm vào giỏ hàng");
+      // MySwal.fire({
+      //   title: <strong>Chúc mừng!</strong>,
+      //   icon: "success",
+      //   text: "Thêm vào giỏ hàng thành công",
+      //   timer: 1000,
+      //   timerProgressBar: true,
+      //   showConfirmButton: false,
+      // });
     },
     onError: (message: any) => {
-      MySwal.fire({
-        title: <strong>Thất bại</strong>,
-        icon: "error",
-        text: `${message?.response?.data?.message}`,
-        timer: 2000,
-        timerProgressBar: true,
-        showConfirmButton: false,
-      });
+      toast.error(message?.response?.data?.message);
+      // MySwal.fire({
+      //   title: <strong>Thất bại</strong>,
+      //   icon: "error",
+      //   text: `${message?.response?.data?.message}`,
+      //   timer: 2000,
+      //   timerProgressBar: true,
+      //   showConfirmButton: false,
+      // });
     },
   });
 
@@ -156,7 +159,14 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <CartContext.Provider
-      value={{ data, isLoading, activateCart, addToCart, handleIncrease, handleDecrease }}
+      value={{
+        data,
+        isLoading,
+        activateCart,
+        addToCart,
+        handleIncrease,
+        handleDecrease,
+      }}
     >
       {children}
     </CartContext.Provider>

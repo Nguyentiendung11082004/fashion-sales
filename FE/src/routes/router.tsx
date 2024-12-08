@@ -111,7 +111,9 @@ const Router = () => {
         <Route path="/" element={<LayoutWebsite />}>
           <Route index element={<HomePage />} />
           <Route path="products" element={<Products />} />
-          <Route path="products/:id" element={<ProductDetail />} />
+          {/* <Route path="products/:id" element={<ProductDetail />} /> */}
+          <Route path="products/:slug.html" element={<ProductDetail />} />
+
           <Route path="about" element={<About />} />
           <Route path="" element={<Permission />}>
             <Route path="cart" element={<Cart />} />

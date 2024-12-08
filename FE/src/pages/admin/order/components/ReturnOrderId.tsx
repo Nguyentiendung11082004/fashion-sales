@@ -42,9 +42,6 @@ const ReturnOrderId = () => {
       }))
     : [];
 
-  console.log("kiểm tra dataSource :", dataSource);
-  console.log("kiểm tra dataReturnId :", dataReturnId);
-
   const { token } = useAuth();
   const handleUpdateStatus = async (itemId: number, status: string) => {
     try {
@@ -66,8 +63,8 @@ const ReturnOrderId = () => {
         toast.error(errorMessage || "Có lỗi xảy ra!");
       }
     } catch (error: any) {
-      console.log("error: ", error.message);
-      toast.error("Lỗi khi cập nhật trạng thái yêu cầu hoàn trả!");
+      const errorMessage = error.response?.data?.message;
+      toast.error(`Lỗi: ${errorMessage}`);
     }
   };
 
@@ -89,7 +86,7 @@ const ReturnOrderId = () => {
       title: "Ảnh sản phẩm",
       render: (record: any) => (
         <div>
-          {record?.order?.order_detail?.product_img ? (
+          {record?.order?.order_detail?.product_img && (
             <div className="">
               <img
                 className="flex m-auto"
@@ -98,8 +95,6 @@ const ReturnOrderId = () => {
                 style={{ width: "130px", height: "150px" }}
               />
             </div>
-          ) : (
-            "Không có ảnh"
           )}
         </div>
       ),
@@ -141,12 +136,10 @@ const ReturnOrderId = () => {
     },
   ];
 
-  
   const totalAmount = dataReturnId?.items?.reduce((acc: number, item: any) => {
     if (item.status === "pending" || item.status === "approved") {
       const priceItems =
-        Number(item?.quantity) *
-        Number(item?.order?.order_detail?.price);
+        Number(item?.quantity) * Number(item?.order?.order_detail?.price);
 
       return acc + priceItems;
     }

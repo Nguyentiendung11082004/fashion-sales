@@ -6,7 +6,7 @@ import { IVouchers } from "@/common/types/vouchers";
 import instance from "@/configs/axios";
 import { EyeOutlined } from "@ant-design/icons";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import type { DatePickerProps, GetProps } from 'antd';
+import type { DatePickerProps, GetProps } from "antd";
 import { Button, DatePicker, Pagination, Select } from "antd";
 import Table, { ColumnType } from "antd/es/table";
 import { useEffect, useState } from "react";
@@ -23,20 +23,22 @@ const OrderPage = () => {
     filter_end_date: null,
     filter_start_date: null,
     filter_type: "ranger",
-    filter_value: new Date().toISOString().split('T')[0],
+    filter_value: new Date().toISOString().split("T")[0],
   });
-  const [dataFilter, setDataFilter] = useState<any>([])
+  const [dataFilter, setDataFilter] = useState<any>([]);
   const handleSearch = async () => {
-    let res = await instance.post(`/order-status`, filter)
-    setDataFilter(res?.data.data)
-  }
-  console.log("dataFilter", dataFilter)
+    let res = await instance.post(`/order-status`, filter);
+    setDataFilter(res?.data.data);
+  };
+  console.log("dataFilter", dataFilter);
   useEffect(() => {
-    handleSearch()
-  }, [filter])
-  
-  const filterRange = (value: DatePickerProps['value'] | RangePickerProps['value']) => {
-    console.log('filterRange: ', value);
+    handleSearch();
+  }, [filter]);
+
+  const filterRange = (
+    value: DatePickerProps["value"] | RangePickerProps["value"]
+  ) => {
+    console.log("filterRange: ", value);
   };
   const { data, isLoading, isError, error, isFetching } = useQuery({
     queryKey: ["order-status"],
@@ -47,6 +49,7 @@ const OrderPage = () => {
         throw new Error(error.message);
       }
     },
+    
   });
 
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
@@ -110,9 +113,6 @@ const OrderPage = () => {
   };
   const handleUpdateStatus = async (orderId: number, status: string) => {
     try {
-      console.log("orderId: ", orderId);
-      console.log("status: ", status);
-
       const response = await instance.put(`/order-status/${orderId}`, {
         order_status: status,
       });
@@ -123,7 +123,6 @@ const OrderPage = () => {
         toast.success("Cập nhật trạng thái đơn hàng thành công!");
       } else {
         const errorMessage = response.data?.message;
-
         toast.error(errorMessage);
       }
     } catch (error: any) {
@@ -132,25 +131,21 @@ const OrderPage = () => {
 
         const errorMessage = error.response.data?.message;
         toast.error(errorMessage);
-      } else {
-        toast.error("Lỗi khi cập nhật trạng thái đơn hàng!");
       }
     }
   };
 
-
-  const dataSource =
-    dataOrder
-      ? dataOrder?.map((item: IOrder) => ({
+  const dataSource = dataOrder
+    ? dataOrder?.map((item: IOrder) => ({
         key: item?.id,
         ...item,
       }))
-      : [];
+    : [];
   const dataSourceSearch = dataFilter
     ? dataFilter?.map((item: IOrder) => ({
-      key: item?.id,
-      ...item,
-    }))
+        key: item?.id,
+        ...item,
+      }))
     : [];
 
   const columns: ColumnType<IOrder>[] = [
@@ -262,12 +257,14 @@ const OrderPage = () => {
   ];
   const trangThai = [
     {
-      name: 'Giao hàng thành công', id: 'Giao hàng thành công'
+      name: "Giao hàng thành công",
+      id: "Giao hàng thành công",
     },
     {
-      name: 'Đang chờ xác nhận', id: 'Đang chờ xác nhận'
-    }
-  ]
+      name: "Đang chờ xác nhận",
+      id: "Đang chờ xác nhận",
+    },
+  ];
 
   useEffect(() => {
     if (isError && !hasError) {
@@ -331,29 +328,32 @@ const OrderPage = () => {
           <Loading />
         ) : (
           <>
-            <RangePicker className="mt-4"
+            <RangePicker
+              className="mt-4"
               onChange={(value, dateString) => {
                 setFilter((prev: any) => ({
                   ...prev,
                   filter_type: "range",
                   filter_start_date: dateString[0],
                   filter_end_date: dateString[1],
-                }))
+                }));
               }}
             />
             <Select
-              size='large'
-              mode='multiple'
+              size="large"
+              mode="multiple"
               options={
                 trangThai?.map((item: any) => ({
                   value: item?.id,
-                  label: item?.name
+                  label: item?.name,
                 })) || []
               }
-              onChange={(e) => setFilter((prev:any)=> ({...prev, statuses: e}))}
+              onChange={(e) =>
+                setFilter((prev: any) => ({ ...prev, statuses: e }))
+              }
               placeholder="Chọn tag"
               placement="bottomLeft"
-              className='w-full'
+              className="w-full"
             />
             <Table
               className="custom-table"

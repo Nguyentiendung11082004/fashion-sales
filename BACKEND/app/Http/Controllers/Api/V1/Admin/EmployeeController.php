@@ -168,19 +168,25 @@ class EmployeeController extends Controller
 
     public function search(Request $request)
     {
-        $query = $request->input('query'); // Lấy từ khóa tìm kiếm từ body request
-
-        if (!$query) {
-            return response()->json([
-                'message' => 'Vui lòng nhập từ khóa tìm kiếm.',
-                'data' => []
-            ], 400);
+        $query = $request->input('query');
+        if (empty($query)) {
+            $results = User::whereIn('role_id', [2, 3])->get();
+            // $results = User::all();
+            return response()->json(['message' => 'Hiển thị tất cả nhân viên.', 'data' => $results]);
         }
 
         // Tìm kiếm trong cột `name` và `email`
-        $results = User::where('name', 'LIKE', "%{$query}%")
+        $results = User::whereIn('role_id', [2, 3])->where('name', 'LIKE', "%{$query}%")
             ->orWhere('email', 'LIKE', "%{$query}%")
+            ->orWhere('phone_number', 'LIKE', "%{$query}%")
             ->get();
+
+        if ($results->isEmpty()) {
+            return response()->json([
+                'message' => 'Không tìm thấy người dùng.',
+                'data' => []
+            ], 404);
+        }
 
         return response()->json([
             'message' => 'Kết quả tìm kiếm.',

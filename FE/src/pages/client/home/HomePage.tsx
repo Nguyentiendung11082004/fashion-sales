@@ -92,8 +92,8 @@ const HomePage = () => {
                 <div className="lg:mb-[25px] mb-[20px]">
                   <div className="cursor-pointer lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] sm:h-[345px] overflow-hidden">
                     <Link
-                      to={`/products/${product?.id}`}
-                      className="absolute inset-0"
+                      to={`/products/${product?.slug}.html`}
+                     className="absolute inset-0"
                     >
                       <img
                         className="group-hover:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover:opacity-0 object-cover"
@@ -127,7 +127,7 @@ const HomePage = () => {
                           onClick={() => handleOpenSeeMore(product)}
                         >
                           <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                            Xem thêm
+                            Mua ngay
                           </p>
                           <Eye />
                         </button>
@@ -499,7 +499,7 @@ const HomePage = () => {
                 <div className="lg:mb-[25px] mb-[20px]">
                   <div className="cursor-pointer lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] sm:h-[345px] overflow-hidden">
                     <Link
-                      to={`/products/${product?.id}`}
+                      to={`/products/${product?.slug}.html`}
                       className="absolute inset-0"
                     >
                       <img
@@ -534,7 +534,7 @@ const HomePage = () => {
                           onClick={() => handleOpenSeeMore(product)}
                         >
                           <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                            Xem thêm
+                            Mua ngay
                           </p>
                           <Eye />
                         </button>
