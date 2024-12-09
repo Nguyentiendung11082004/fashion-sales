@@ -17,33 +17,35 @@ import HeartRedPopup from "../icons/detail/HeartRedPopup";
 
 const CartPopup = forwardRef((props: any, ref) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { slugProduct, setSlugProduct }: any = props;
   const { idProduct, setIdProduct }: any = props;
   const [product, setProduct] = useState<any>();
   const { handleAddToWishlist, isInWishlist } = useWishlist();
 
-  const [selectedAttributes, setSelectedAttributes] = useState<{ product_variant: Record<string, string | number>;
+  const [selectedAttributes, setSelectedAttributes] = useState<{
+    product_variant: Record<string, string | number>;
   }>({
     product_variant: {},
   });
   const { data, isLoading } = useQuery({
-    queryKey: ["product", idProduct],
+    queryKey: ["product", slugProduct],
     queryFn: async () => {
-      if (!idProduct) {
+      if (!slugProduct) {
         return;
       }
       try {
-        return await productShow_client(`${idProduct}`);
+        return await productShow_client(`${slugProduct}`);
       } catch (error) {
         throw new Error("Không có sản phẩm nào phù hợp");
       }
     },
-    enabled: !!idProduct,
+    enabled: !!slugProduct,
   });
-
-
+  console.log("kiểm tra slug nè : ", slugProduct);
+  console.log("kiểm tra id nè : ", idProduct);
   const getUniqueAttributes = data?.getUniqueAttributes;
 
-  console.log("data", data)
+  console.log("data", data);
   useEffect(() => {
     if (data && data.product) {
       setProduct(data.product);
@@ -89,7 +91,7 @@ const CartPopup = forwardRef((props: any, ref) => {
           return (
             x[key] &&
             x[key].toString() ===
-            selectedAttributes?.product_variant[key].toString()
+              selectedAttributes?.product_variant[key].toString()
           );
         }
         return true;
@@ -109,7 +111,6 @@ const CartPopup = forwardRef((props: any, ref) => {
   useEffect(() => {
     setIsInitialLoad(true);
   }, [idProduct]);
-
   useEffect(() => {
     if (result && result.length > 0 && isInitialLoad) {
       setSelectedAttributes({ product_variant: result[0] });
@@ -175,6 +176,7 @@ const CartPopup = forwardRef((props: any, ref) => {
   };
   const handleClose = () => {
     setIsModalOpen(false);
+    setSlugProduct("");
     setIdProduct("");
   };
   useImperativeHandle(ref, () => ({
@@ -308,7 +310,7 @@ const CartPopup = forwardRef((props: any, ref) => {
     //           onClick={() => {
     //             handleClose();
     //             console.log("số lượng : ", quantity);
-    //             onHandleAddToCart(idProduct, product?.id, quantity);
+    //             onHandleAddToCart(slugProduct, product?.id, quantity);
     //           }}
     //           className="h-12 w-full mt-4 rounded-full bg-[#56cfe1] text-white text-lg font-medium hover:bg-[#4bc3d5]"
     //         >
@@ -319,130 +321,134 @@ const CartPopup = forwardRef((props: any, ref) => {
     //   </div>
     // </AntModal>
     <AntModal
-  open={isModalOpen}
-  onCancel={handleClose}
-  footer={false}
-  closable={false}
-  maskClosable={false}
-  className="rounded-xl"
-  width={400}
->
-  <div className="p-4">
-    <button
-      onClick={handleClose}
-      className="absolute -top-4 -right-4 text-white bg-gray-800 hover:bg-gray-700 px-3 py-2 rounded-full"
+      open={isModalOpen}
+      onCancel={handleClose}
+      footer={false}
+      closable={false}
+      maskClosable={false}
+      className="rounded-xl"
+      width={400}
     >
-      <CloseOutlined className="text-lg" />
-    </button>
-
-    {data?.product && (
-      <div>
-        {/* Tên sản phẩm */}
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">
-          {data?.product?.name}
-        </h2>
-
-        {/* Giá sản phẩm */}
-        <div className="text-2xl text-[#ff4d4f] font-semibold mb-6">
-          {Number(product?.price_sale).toLocaleString("vi-VN")} VNĐ
-        </div>
-
-        {/* Thuộc tính sản phẩm */}
-        {resultGetUniqueAttribute?.map((value: any) => (
-          <div className="my-6" key={value.attribute}>
-            <p className="font-medium text-gray-800">{value.attribute}</p>
-            <div className="flex mt-3 gap-3">
-              {value.attributeValue?.map((item: any) => {
-                const isDisabled = checkDisable(value.attribute, item.id);
-                const isSelected =
-                  selectedAttributes.product_variant[value.attribute] === item.id;
-
-                return (
-                  <div
-                    key={item.id}
-                    className={`cursor-pointer border rounded-lg p-2 text-center ${isSelected
-                      ? "border-black bg-gray-200"
-                      : isDisabled
-                        ? "border-gray-300 opacity-50 cursor-not-allowed"
-                        : "border-gray-300 hover:border-black"
-                      }`}
-                    onClick={() => {
-                      if (!isDisabled) {
-                        handleAttributeSelect(value.attribute, item.id);
-                        setSelectedAttributes((prev) => ({
-                          ...prev,
-                          product_variant: {
-                            ...prev.product_variant,
-                            [value.attribute]: item.id,
-                          },
-                        }));
-                      }
-                    }}
-                  >
-                    {value.attribute !== "color" ? (
-                      <span className="text-sm">{item.name}</span>
-                    ) : (
-                      <div
-                        style={{
-                          backgroundColor: item.name.toLowerCase(),
-                        }}
-                        className="w-6 h-6 rounded-full mx-auto"
-                      />
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        ))}
-
-        {/* Số lượng */}
-        <div className="flex items-center mt-6">
-          <div className="flex items-center border rounded-lg w-[120px] h-10">
-            <button
-              onClick={decreaseQuantity}
-              className="px-3 text-gray-700 hover:bg-gray-100"
-            >
-              <MinusOutlined />
-            </button>
-            <span className="flex-1 text-center">{quantity}</span>
-            <button
-              onClick={increaseQuantity}
-              className="px-3 text-gray-700 hover:bg-gray-100"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-                stroke="currentColor"
-                className="w-4 h-4"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-              </svg>
-            </button>
-          </div>
-          <button className="ml-4 text-gray-500 hover:text-gray-800">
-            <HeartBlack />
-          </button>
-        </div>
-
-        {/* Thêm vào giỏ hàng */}
-        <Button
-          onClick={() => {
-            handleClose();
-            console.log("Số lượng:", quantity);
-            onHandleAddToCart(idProduct, product?.id, quantity);
-          }}
-          className="h-12 w-full mt-6 rounded-lg bg-[#56cfe1] text-white text-lg font-semibold hover:bg-[#4bc3d5]"
+      <div className="p-4">
+        <button
+          onClick={handleClose}
+          className="absolute -top-4 -right-4 text-white bg-gray-800 hover:bg-gray-700 px-3 py-2 rounded-full"
         >
-          Thêm vào giỏ hàng
-        </Button>
-      </div>
-    )}
-  </div>
-</AntModal>
+          <CloseOutlined className="text-lg" />
+        </button>
 
+        {data?.product && (
+          <div>
+            {/* Tên sản phẩm */}
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              {data?.product?.name}
+            </h2>
+
+            {/* Giá sản phẩm */}
+            <div className="text-2xl text-[#ff4d4f] font-semibold mb-6">
+              {Number(product?.price_sale).toLocaleString("vi-VN")} VNĐ
+            </div>
+
+            {/* Thuộc tính sản phẩm */}
+            {resultGetUniqueAttribute?.map((value: any) => (
+              <div className="my-6" key={value.attribute}>
+                <p className="font-medium text-gray-800">{value.attribute}</p>
+                <div className="flex mt-3 gap-3">
+                  {value.attributeValue?.map((item: any) => {
+                    const isDisabled = checkDisable(value.attribute, item.id);
+                    const isSelected =
+                      selectedAttributes.product_variant[value.attribute] ===
+                      item.id;
+
+                    return (
+                      <div
+                        key={item.id}
+                        className={`cursor-pointer border rounded-lg p-2 text-center ${
+                          isSelected
+                            ? "border-black bg-gray-200"
+                            : isDisabled
+                              ? "border-gray-300 opacity-50 cursor-not-allowed"
+                              : "border-gray-300 hover:border-black"
+                        }`}
+                        onClick={() => {
+                          if (!isDisabled) {
+                            handleAttributeSelect(value.attribute, item.id);
+                            setSelectedAttributes((prev) => ({
+                              ...prev,
+                              product_variant: {
+                                ...prev.product_variant,
+                                [value.attribute]: item.id,
+                              },
+                            }));
+                          }
+                        }}
+                      >
+                        {value.attribute !== "color" ? (
+                          <span className="text-sm">{item.name}</span>
+                        ) : (
+                          <div
+                            style={{
+                              backgroundColor: item.name.toLowerCase(),
+                            }}
+                            className="w-6 h-6 rounded-full mx-auto"
+                          />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+
+            {/* Số lượng */}
+            <div className="flex items-center mt-6">
+              <div className="flex items-center border rounded-lg w-[120px] h-10">
+                <button
+                  onClick={decreaseQuantity}
+                  className="px-3 text-gray-700 hover:bg-gray-100"
+                >
+                  <MinusOutlined />
+                </button>
+                <span className="flex-1 text-center">{quantity}</span>
+                <button
+                  onClick={increaseQuantity}
+                  className="px-3 text-gray-700 hover:bg-gray-100"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2}
+                    stroke="currentColor"
+                    className="w-4 h-4"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 4.5v15m7.5-7.5h-15"
+                    />
+                  </svg>
+                </button>
+              </div>
+              {/* <button className="ml-4 text-gray-500 hover:text-gray-800">
+                <HeartBlack />
+              </button> */}
+            </div>
+
+            {/* Thêm vào giỏ hàng */}
+            <Button
+              onClick={() => {
+                handleClose();
+                onHandleAddToCart(idProduct, product?.id, quantity);
+              }}
+              className="h-12 w-full mt-6 rounded-lg bg-[#56cfe1] text-white text-lg font-semibold hover:bg-[#4bc3d5]"
+            >
+              Thêm vào giỏ hàng
+            </Button>
+          </div>
+        )}
+      </div>
+    </AntModal>
   );
 });
 

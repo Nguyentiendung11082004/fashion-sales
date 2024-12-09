@@ -12,20 +12,15 @@ import Less from "@/components/icons/detail/Less";
 import NoDatasIcon from "@/components/icons/products/NoDataIcon";
 import instance from "@/configs/axios";
 
+import { useCart } from "@/common/context/Cart/CartContext";
+import { useWishlist } from "@/common/context/Wishlist/WishlistContext";
+import HeartRed from "@/components/icons/detail/HeartRed";
+import CartPopup from "@/components/ModalPopup/CartPopup";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Spin } from "antd";
 import "rc-slider/assets/index.css";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import unorm from "unorm";
-import { useWishlist } from "@/common/context/Wishlist/WishlistContext";
-import HeartRed from "@/components/icons/detail/HeartRed";
-import { Button } from "antd";
-import { LoadingOutlined } from "@ant-design/icons";
-import { useAuth } from "@/common/context/Auth/AuthContext";
-import { useCart } from "@/common/context/Cart/CartContext";
-import CartPopup from "@/components/ModalPopup/CartPopup";
-import { useFilterContext } from "@/common/context/Filter/FilterProvider";
 
 const Products = () => {
   const location = useLocation();
@@ -52,6 +47,8 @@ const Products = () => {
   const [isSale, setIsSale] = useState<boolean>(saleFromLink);
   const [selectedSortName, setSelectedSortName] = useState("");
   const [temporarySortName, setTemporarySortName] = useState("");
+  const [slugProduct, setSlugProduct] = useState<string>("");
+
   const [selectedSort, setSelectedSort] = useState<{
     trend: boolean;
     sortDirection: string | null;
@@ -239,22 +236,26 @@ const Products = () => {
           (item: any) => item.product.name
         );
 
-        const filteredSuggestions = suggestionsData.filter((suggestion: string) => {
-          const removeDiacritics = (str: string) =>
-            unorm.nfkd(str).replace(/[\u0300-\u036f]/g, "");
-        
-          const normalizedSuggestion = removeDiacritics(suggestion).toLowerCase();
-          const normalizedValue = removeDiacritics(trimmedValue).toLowerCase();
-        
-          console.log("Suggestion:", suggestion); 
-          console.log("Normalized Suggestion:", normalizedSuggestion);
-          console.log("Normalized Value:", normalizedValue);
-        
-          return normalizedSuggestion.startsWith(normalizedValue);
-        });
-        
-        console.log("Filtered Suggestions:", filteredSuggestions);        
-        
+        const filteredSuggestions = suggestionsData.filter(
+          (suggestion: string) => {
+            const removeDiacritics = (str: string) =>
+              unorm.nfkd(str).replace(/[\u0300-\u036f]/g, "");
+
+            const normalizedSuggestion =
+              removeDiacritics(suggestion).toLowerCase();
+            const normalizedValue =
+              removeDiacritics(trimmedValue).toLowerCase();
+
+            console.log("Suggestion:", suggestion);
+            console.log("Normalized Suggestion:", normalizedSuggestion);
+            console.log("Normalized Value:", normalizedValue);
+
+            return normalizedSuggestion.startsWith(normalizedValue);
+          }
+        );
+
+        console.log("Filtered Suggestions:", filteredSuggestions);
+
         setSuggestions(filteredSuggestions);
       };
       fetchSuggestions();
@@ -1138,7 +1139,7 @@ const Products = () => {
                         <div className="lg:mb-[25px] mb-[20px]">
                           <div className="cursor-pointer lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] sm:h-[345px] overflow-hidden">
                             <Link
-                              to={`/products/${product?.id}`}
+                              to={`/products/${product?.slug}.html`}
                               className="absolute inset-0"
                             >
                               <img
@@ -1189,8 +1190,9 @@ const Products = () => {
                                 <button
                                   className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]"
                                   onClick={() => {
-                                    modalRef.current?.showModal();
-                                    setIdProduct(product.id);
+                                    modalRef.current?.showModal(),
+                                      setSlugProduct(product?.slug);
+                                    setIdProduct(product?.id);
                                   }}
                                 >
                                   <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
@@ -1499,9 +1501,11 @@ const Products = () => {
                       </div>
                       {/* </div> */}
                       <CartPopup
+                        slugProduct={slugProduct}
                         idProduct={idProduct}
-                        ref={modalRef}
                         setIdProduct={setIdProduct}
+                        ref={modalRef}
+                        setSlugProduct={setSlugProduct}
                       />
                     </>
                   );

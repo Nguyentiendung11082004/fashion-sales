@@ -26,6 +26,7 @@ const ReturnRequest = () => {
     }
     return product;
   });
+  console.log("updatedProducts 12345: ", updatedProducts);
   const { token } = useAuth();
   const { mutate } = useMutation({
     mutationFn: async (request: any) => {
@@ -172,7 +173,8 @@ const ReturnRequest = () => {
               <div className="fixed bottom-0 left-[134px] right-[134px] flex justify-between items-center p-6 border border-gray-200 rounded-lg shadow-md bg-white hover:shadow-lg transition-shadow duration-300">
                 <div className="flex items-center space-x-2">
                   <p className="ml-4 text-sm font-medium text-gray-800">
-                    Số tiền hoàn lại: {refund.toLocaleString("vi-VN")} VNĐ
+                    Số tiền hoàn lại:
+                    {refund.toLocaleString("vi-VN")} VNĐ
                   </p>
                 </div>
                 <button

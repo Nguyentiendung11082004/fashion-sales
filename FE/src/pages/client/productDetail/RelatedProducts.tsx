@@ -79,11 +79,11 @@ const RelatedProducts = () => {
                     src={relatedProduct.img_thumbnail}
                     alt={relatedProduct.name}
                   />
-                  <img
+                  {/* <img
                     className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover/image:opacity-100"
                     src={ProductNext}
                     alt={relatedProduct.name}
-                  />
+                  /> */}
                 </Link>
                 <div className="image-overlay"></div>
 
@@ -94,7 +94,7 @@ const RelatedProducts = () => {
                 </div>
                 <div className="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100">
                   <Link
-                    to={`/products/${relatedProduct.id}`}
+                    to={`/products/${product?.slug}.html`}
                     className="group/btn relative m-auto"
                   >
                     <button className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]">

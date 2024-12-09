@@ -27,7 +27,7 @@ const GetReturnRequestOrderId = () => {
       }
     },
   });
-
+  console.log("dataReturnRequest: ", dataReturnRequest);
   const dataSource = dataReturnRequest?.data?.data?.items
     ? dataReturnRequest?.data?.data?.items.map((item: any, index: number) => ({
         key: item?.id,
@@ -35,7 +35,10 @@ const GetReturnRequestOrderId = () => {
       }))
     : [];
 
-  console.log("data trả hàng dataReturnRequest theo id  : ", dataReturnRequest);
+  console.log(
+    "dataReturnRequest?.data?.data?.data?.total_refund_amount  : ",
+    dataReturnRequest?.data?.data?.total_refund_amount
+  );
 
   const columns: any = [
     {
@@ -196,8 +199,17 @@ const GetReturnRequestOrderId = () => {
                 <div className="flex items-center space-x-2">
                   <p className="ml-4 text-sm font-medium text-gray-800">
                     <span> Số tiền hoàn lại: </span>
-                    {totalAmount.toLocaleString("vi-VN")}
-                    <span> VNĐ</span>
+                    {dataReturnRequest?.data?.data?.total_refund_amount ? (
+                      <>
+                        {dataReturnRequest.data.data.total_refund_amount &&
+                          `${new Intl.NumberFormat("vi-VN").format(dataReturnRequest.data.data.total_refund_amount)} VNĐ`}
+                      </>
+                    ) : (
+                      <>
+                        {totalAmount.toLocaleString("vi-VN")}
+                        <span> VNĐ</span>
+                      </>
+                    )}
                   </p>
                 </div>
 

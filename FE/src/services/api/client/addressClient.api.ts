@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-catch */
 import { IAddresses } from "@/common/types/addressO";
 import instance from "@/configs/axios";
 

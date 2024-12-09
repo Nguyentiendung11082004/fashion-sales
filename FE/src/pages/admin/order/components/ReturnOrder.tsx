@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import Loading from "@/common/Loading/Loading";
 import instance from "@/configs/axios";
 import { EyeOutlined } from "@ant-design/icons";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -14,7 +15,7 @@ const ReturnOrder = () => {
   const [pageSize] = useState(5);
   const navigate = useNavigate();
 
-  const { data } = useQuery({
+  const { data, isLoading, isFetching } = useQuery({
     queryKey: ["return-requests"],
     queryFn: async () => {
       try {
@@ -94,18 +95,23 @@ const ReturnOrder = () => {
           Danh sách yêu cầu hoàn trả hàng
         </h1>
       </div>
-      <div className="">
-        <Table
-          className="custom-table"
-          dataSource={dataSource.slice(
-            (currentPage - 1) * pageSize,
-            currentPage * pageSize
-          )}
-          columns={column}
-          scroll={{ x: "max-content" }}
-          pagination={false}
-        />
-      </div>
+
+      {isFetching ? (
+        <Loading />
+      ) : (
+        <div className="">
+          <Table
+            className="custom-table"
+            dataSource={dataSource.slice(
+              (currentPage - 1) * pageSize,
+              currentPage * pageSize
+            )}
+            columns={column}
+            scroll={{ x: "max-content" }}
+            pagination={false}
+          />
+        </div>
+      )}
     </div>
   );
 };

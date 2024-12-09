@@ -6,7 +6,7 @@ import { IVouchers } from "@/common/types/vouchers";
 import instance from "@/configs/axios";
 import { EyeOutlined, SearchOutlined, SyncOutlined } from "@ant-design/icons";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import type { DatePickerProps, GetProps } from 'antd';
+import type { DatePickerProps, GetProps } from "antd";
 import { Button, DatePicker, Pagination, Select } from "antd";
 import Table, { ColumnType } from "antd/es/table";
 import { useEffect, useState } from "react";
@@ -25,9 +25,9 @@ const OrderPage = () => {
     filter_end_date: null,
     filter_start_date: null,
     filter_type: "ranger",
-    filter_value: new Date().toISOString().split('T')[0],
+    filter_value: new Date().toISOString().split("T")[0],
   });
-  const [dataFilter, setDataFilter] = useState<any>([])
+  const [dataFilter, setDataFilter] = useState<any>([]);
   const handleSearch = async () => {
     try {
       const res = await instance.post(`/order/search`, filter);
@@ -72,6 +72,7 @@ const OrderPage = () => {
         throw new Error(error.message);
       }
     },
+    
   });
   const dataOrder = data?.data?.data;
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
@@ -152,8 +153,6 @@ const OrderPage = () => {
 
         const errorMessage = error.response.data?.message;
         toast.error(errorMessage);
-      } else {
-        toast.error("Lỗi khi cập nhật trạng thái đơn hàng!");
       }
     }
   };
@@ -169,9 +168,9 @@ const OrderPage = () => {
       : [];
   const dataSourceSearch = dataFilter
     ? dataFilter?.map((item: IOrder) => ({
-      key: item?.id,
-      ...item,
-    }))
+        key: item?.id,
+        ...item,
+      }))
     : [];
 
   const columns: ColumnType<IOrder>[] = [
@@ -283,12 +282,14 @@ const OrderPage = () => {
   ];
   const trangThai = [
     {
-      name: 'Giao hàng thành công', id: 'Giao hàng thành công'
+      name: "Giao hàng thành công",
+      id: "Giao hàng thành công",
     },
     {
-      name: 'Đang chờ xác nhận', id: 'Đang chờ xác nhận'
-    }
-  ]
+      name: "Đang chờ xác nhận",
+      id: "Đang chờ xác nhận",
+    },
+  ];
 
   useEffect(() => {
     if (isError && !hasError) {
