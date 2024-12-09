@@ -18,7 +18,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button, Modal, Popconfirm } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useRef, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import Less from "../../../components/icons/detail/Less";
 import CommentProduct from "./CommentProduct";
@@ -45,13 +45,14 @@ const ProductDetail = () => {
     setShowFormCmtOpen(false);
   };
   const [listIdProduct, setListIdProduct] = useState<any[]>([]);
-
+  const navigate = useNavigate();
   const { data, isLoading } = useQuery({
     queryKey: ["product", slug],
     queryFn: async () => {
       try {
         return await productShow_client(`${slug}`);
       } catch (error) {
+        navigate("*");
         throw new Error("Không có sản phẩm nào phù hợp");
       }
     },
