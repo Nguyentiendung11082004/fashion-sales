@@ -75,10 +75,7 @@ class OrderController extends Controller
                 $order = $this->createOrder($data, $user);
                 $totalQuantity = 0;
                 $totalPrice = 0.00;
-                $errors = [
-                    'out_of_stock' => [],
-                    'insufficient_stock' => [],
-                ];
+                $errors = [];
                 if ($isImmediatePurchase) {
                     list($quantity, $price) = $this->addImmediatePurchase($data, $order);
                     $totalQuantity += $quantity;
@@ -133,25 +130,36 @@ class OrderController extends Controller
                     'total' => $totalPrice,
                 ]);
                 if (count($errors)) {
-                    DB::rollBack();
-                    $cart = Cart::query()
-                        ->where('user_id', $user['id'])
-                        ->with('cartitems.product', 'cartitems.productvariant.attributes')
-                        ->first();
-                    foreach ($cart->cartitems as $cartItem) {
-                        // Kiểm tra nếu sản phẩm hết hàng
-                        if (isset($errors['out_of_stock'][$cartItem->product->id])) {
-                            // Nếu sản phẩm hết hàng, xóa sản phẩm khỏi giỏ hàng
-                            $cartItem->delete();
+                    // Kiểm tra nếu có lỗi trong 'out_of_stock' hoặc 'insufficient_stock'
+                    $hasOutOfStockError = !empty($errors['out_of_stock']);
+                    $hasInsufficientStockError = !empty($errors['insufficient_stock']);
+                
+                    if ($hasOutOfStockError || $hasInsufficientStockError) {
+                        DB::rollBack(); // Rollback nếu có lỗi
+                
+                        // Lấy lại giỏ hàng
+                        $cart = Cart::query()
+                            ->where('user_id', $user['id'])
+                            ->with('cartitems.product', 'cartitems.productvariant.attributes')
+                            ->first();
+                
+                        foreach ($cart->cartitems as $cartItem) {
+                            // Kiểm tra nếu sản phẩm hết hàng
+                            if ($hasOutOfStockError && isset($errors['out_of_stock'][$cartItem->product->id])) {
+                                // Nếu sản phẩm hết hàng, xóa sản phẩm khỏi giỏ hàng
+                                $cartItem->delete();
+                            }
+                            // Kiểm tra nếu số lượng yêu cầu lớn hơn số lượng có sẵn
+                            if ($hasInsufficientStockError && isset($errors['insufficient_stock'][$cartItem->product->id])) {
+                                // Nếu không đủ số lượng, cập nhật lại số lượng trong giỏ hàng
+                                $availableQuantity = $cartItem->productvariant ? $cartItem->productvariant->quantity : $cartItem->product->quantity;
+                                $cartItem->update(['quantity' => $availableQuantity]); // Cập nhật lại số lượng
+                            }
                         }
-                        // Kiểm tra nếu số lượng yêu cầu lớn hơn số lượng có sẵn
-                        if (isset($errors['insufficient_stock'][$cartItem->product->id])) {
-                            // Nếu không đủ số lượng, cập nhật lại số lượng trong giỏ hàng
-                            $availableQuantity = $cartItem->productvariant ? $cartItem->productvariant->quantity : $cartItem->product->quantity;
-                            $cartItem->update(['quantity' => $availableQuantity]); // Cập nhật lại số lượng
-                        }
+                
+                        // Trả về các lỗi
+                        return response()->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
                     }
-                    return response()->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
                 }
                 if (!auth('sanctum')->check()) {
                     // Gửi notification cho người dùng với email nhận thông báo
@@ -250,6 +258,10 @@ class OrderController extends Controller
     protected function addCartItemsToOrder($data, $user, $order)
     {
         $cartItemIds = $data['cart_item_ids'];
+        $errors = [
+            'out_of_stock' => [], // Lỗi sản phẩm hết hàng
+            'insufficient_stock' => [], // Lỗi số lượng không đủ
+        ];
         // $quantities = $data['quantityOfCart'];
         $cart = Cart::query()
             ->where('user_id', $user['id'])
@@ -323,7 +335,6 @@ class OrderController extends Controller
 
         // Xóa các sản phẩm đã mua trong giỏ hàng
         CartItem::whereIn('id', $cartItemIds)->delete();
-
         return [$totalQuantity, $totalPrice, $errors];
     }
 
