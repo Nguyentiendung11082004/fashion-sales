@@ -12,7 +12,8 @@ class ReturnRequest extends Model
         "order_id",
         "user_id",
         'reason',
-        'status'
+        'status',
+        'total_refund_amount'
     ];
     public function order()
     {

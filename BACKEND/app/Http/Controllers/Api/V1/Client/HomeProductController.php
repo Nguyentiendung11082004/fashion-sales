@@ -18,11 +18,25 @@ class HomeProductController extends Controller
             // Lấy sản phẩm xu hướng (trend) và sản phẩm hiển thị trên trang chủ (is_show_home)
             $trendProducts = Product::query()->with([
                 "variants.attributes"
-            ])->where('trend', true)->get();
+            ])->where([
+                [
+                    'trend', true
+                ],
+                [
+                    'status',true
+                ]
+            ])->get();
 
             $homeShowProducts = Product::query()->with([
                 "variants.attributes"
-            ])->where('is_show_home', true)->get();
+            ])->where([
+                [
+                    'is_show_home', true
+                ],
+                [
+                   'status',true 
+                ]
+            ])->get();
 
             // Khởi tạo đối tượng để lấy các thuộc tính độc nhất
             $getUniqueAttributes = new GetUniqueAttribute();

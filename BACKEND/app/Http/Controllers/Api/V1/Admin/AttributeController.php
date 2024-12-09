@@ -156,17 +156,24 @@ class AttributeController extends Controller
     {
         $query = $request->input('query'); // Lấy từ khóa tìm kiếm từ body request
 
-        if (!$query) {
-            return response()->json([
-                'message' => 'Vui lòng nhập từ khóa tìm kiếm.',
-                'data' => []
-            ], 400);
+        // Kiểm tra xem có từ khóa tìm kiếm không
+        if (empty($query)) {
+            $results = Attribute::all(); // Nếu không có từ khóa, trả về tất cả sản phẩm
+            return response()->json(['message' => 'Hiển thị tất cả thuộc tính.', 'data' => $results]);
         }
 
         // Tìm kiếm trong cột `name` hoặc các cột khác nếu cần
         $results = Attribute::where('name', 'LIKE', "%{$query}%")
             // ->orWhere('description', 'LIKE', "%{$query}%") // Thêm cột mô tả nếu có
             ->get();
+
+          // Xử lý trường hợp không tìm thấy
+          if ($results->isEmpty()) {
+            return response()->json([
+                'message' => 'Không tìm thấy thuộc tính.',
+                'data' => []
+            ], 404);
+        }
 
         return response()->json([
             'message' => 'Kết quả tìm kiếm.',

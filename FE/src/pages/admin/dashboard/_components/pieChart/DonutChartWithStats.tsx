@@ -9,8 +9,9 @@ type RangePickerProps = GetProps<typeof DatePicker.RangePicker>;
 const { Option } = Select;
 type Props = {
   dataDoanhThu: (data: any) => void;
+  dataUser: (data: any) => void;
 }
-const DonutChartWithLegend = ({ dataDoanhThu }: Props) => {
+const DonutChartWithLegend = ({ dataDoanhThu, dataUser }: Props) => {
   const { filter, setFilter } = useContext(DashboardContext)
   const [data, setData] = useState<any>([])
   const getData = async () => {
@@ -18,6 +19,7 @@ const DonutChartWithLegend = ({ dataDoanhThu }: Props) => {
     if (res) {
       setData(res.data)
       dataDoanhThu(res?.data?.total_revenue)
+      dataUser(res?.data?.totalUsers)
     }
   }
   const value: any[] = data?.data?.map((item: any) => ({

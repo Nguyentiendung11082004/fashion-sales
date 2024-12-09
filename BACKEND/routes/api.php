@@ -51,10 +51,10 @@ use App\Http\Controllers\API\V1\Service\PaymentController;
 */
 
 Route::prefix("v1/")->group(function () {
-    //     Route::middleware(['auth:sanctum', 'role:4'])->group(function () {
-    //     Route::resource('vouchers', VoucherController::class);
-    // });
+    //Login Admin
+    Route::post('admin/login', [AuthAdminController::class, 'login']);
 
+    Route::apiResource('banners', BannerController::class);
     Route::resource("products", ProductController::class);
     Route::resource("comments", CommentsController::class);
     Route::resource("brand", BrandController::class);
@@ -69,12 +69,11 @@ Route::prefix("v1/")->group(function () {
     Route::get('check-banner-validity', [BannerController::class, 'checkBannerValidity']);
     Route::get('check-banner-validity/{id}', [BannerController::class, 'checkBannerValidity']);
     Route::get('/posts-by-category', [PostController::class, 'getPostsGroupedByCategory']);
+
     Route::get('product-home', [HomeProductController::class, "getHomeProducts"]);
     Route::get('product-detail/{product_id}', [ProductDetailController::class, "productdetail"]);
     Route::post('product-shop', [ProductShopController::class, "getAllProduct"]);
     Route::get('find-variant/{product_id}', [ProductDetailController::class, "findvariant"]);
-    Route::post('login', [AuthController::class, 'login']);
-    Route::post('register', [AuthController::class, 'register']);
     Route::resource('order', OrderController::class);
     Route::resource('checkout', CheckoutController::class);
     Route::apiResource('posts', PostController::class);
@@ -88,21 +87,25 @@ Route::prefix("v1/")->group(function () {
     Route::post('/voucher/search', [VoucherController::class, 'search']);
     Route::post('/product/search', [ProductController::class, 'search']);
     Route::post('/category/search', [CategoryController::class, 'search']);
-    Route::post('/order/search', [OrderController::class, 'search']);
+    Route::post('/order/search', [AdminOrderController::class, 'searchOrders']);
     Route::post('/post/search', [PostController::class, 'search']);
     Route::post('/attribute/search', [AttributeController::class, 'search']);
     Route::post('/banner/search', [BannerController::class, 'search']);
     Route::post('/brand/search', [BrandController::class, 'search']);
     Route::post('/comment/search', [CommentsController::class, 'search']);
     Route::post('/tag/search', [TagController::class, 'search']);
+
+
+    Route::post('login', [AuthController::class, 'login']);
+    Route::post('register', [AuthController::class, 'register']);
+
     //Login with Google
     Route::middleware(['web'])->group(function () {
         Route::get('login/google', [SocialiteController::class, 'redirectToGoogle']);
         Route::get('login/google/callback', [SocialiteController::class, 'handleGoogleCallback']);
     });
 
-    //Login Admin
-    Route::post('admin/login', [AuthAdminController::class, 'login']);
+
     //Gửi mail
     Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
         ->middleware(['signed'])->name('verification.verify');
@@ -135,13 +138,15 @@ Route::prefix("v1/")->group(function () {
     Route::post('ghn_update_order', [OrderGHNController::class, 'ghnUpdateOrder']);
 
 
-    //test 
+    //test
     // Route::get('updatehh/{requestid}', [ReturnAdminController::class, 'updateOrder']);
     // Route::get('search',[AdminOrderController::class,'searchOrders']);
 
     //Quản lí hoàn đơn Admin
     // Route::post('return-items/status/{returnItemId}', [ReturnAdminController::class, 'updateReturnItemStatus']);
     Route::get('return-requests', [ReturnAdminController::class, 'getReturnRequests']);
+    Route::get('return-item/{request_id}', [ReturnAdminController::class, 'showReturnItem']);
+
 
 
     //  xuất order pdf
@@ -181,7 +186,9 @@ Route::middleware('auth:sanctum')->prefix('v1/')->group(function () {
     // admin hoàn trả
     Route::post('return-items/status/{returnItemId}', [ReturnAdminController::class, 'updateReturnItemStatus']);
     //list hoàn trả hàng client
-    Route::get('user/return-requests', [ReturnController::class, 'getUserReturnRequests'])
+    Route::get('user/return-requests', [ReturnController::class, 'getUserReturnRequests']);
+    Route::get('user/return-item/{request_id}', [ReturnController::class, 'getUserReturnItem']);
+
         // Route::post('return-requests/action', [ReturnAdminController::class, 'handleReturnRequest']);
 
     ;

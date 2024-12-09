@@ -63,85 +63,7 @@ class ProductController extends Controller
         }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    // public function store(StoreProduct $request)
-    // {
-    //     try {
-
-    //         $respone = DB::transaction(function () use ($request) {
-
-    //             $dataProduct = $request->except(["attribute_id", "attribute_item_id", "product_variant"]);
-
-    //             $dataProduct["slug"] = Str::slug($request->input("name"));
-
-    //             $product = Product::query()->create($dataProduct);
-    //             foreach ($request->gallery as  $gallery) {
-
-    //                 ProductGallery::query()->create([
-    //                     "product_id" => $product->id,
-    //                     "image" => $gallery
-    //                 ]);
-    //             }
-    //             $product->tags()->attach($dataProduct['tags']);
-
-
-    //             if ($request->input('type') == 1) {
-    //                 // create product_has_attribute
-
-    //                 foreach ($request->input("attribute_item_id") as $attributeId => $attributeItemId) {
-    //                     $product->attributes()->attach($attributeId, ["attribute_item_ids" => json_encode($attributeItemId)]);
-    //                 }
-    //                 // thêm mới productvariant
-
-    //                 foreach ($request->input("product_variant") as $item) {
-    //                     //    dd($item);
-    //                     $productVariant = ProductVariant::query()->create([
-    //                         "product_id" => $product->id,
-    //                         "price_regular" => $item["price_regular"],
-    //                         "price_sale" => $item["price_sale"],
-    //                         "quantity" => $item["quantity"],
-    //                         "image" => $item['image'],
-    //                         "sku" => $item["sku"],
-    //                         "id_guid" => $item["id_guid"]??null
-
-    //                     ]);
-    //                     foreach ($item["attribute_item_id"] as  $value) {
-
-    //                         $attribute_id = null;
-
-    //                         foreach ($request->input('attribute_id') as  $attr_id) {
-
-    //                             if (in_array($value['id'], $request->input('attribute_item_id')[$attr_id])) {
-    //                                 $attribute_id = $attr_id;
-    //                                 break;
-    //                             }
-    //                         }
-    //                         if ($attribute_id !== null) {
-    //                             $productVariant->attributes()->attach(
-    //                                 $attribute_id,
-    //                                 ["attribute_item_id" => $value["id"], "value" => $value['value']]
-    //                             );
-    //                         }
-    //                     }
-    //                 }
-    //             }
-
-    //             return [
-    //                 "message" => "thêm mới thành công !",
-    //                 "data" => $product
-    //             ];
-    //         });
-    //         return response()->json($respone, Response::HTTP_CREATED);
-    //     } catch (\Exception $ex) {
-
-    //         // dd($ex->getMessage());
-    //         return response()->json([
-    //             'message' => $ex->getMessage()
-    //         ], Response::HTTP_INTERNAL_SERVER_ERROR);
-    //     }
-    // }
+    
     public function store(StoreProduct $request)
     {
         try {
@@ -235,9 +157,9 @@ class ProductController extends Controller
     public function show(string $id)
     {
         try {
-            // dd($id);
+           
             $product = Product::query()->latest('id')->findOrFail($id)->load(["brand", "category", "attributes", "variants.attributes", "galleries", "tags"]);
-            // dd($product);
+           
             foreach ($product->attributes as  $item) {
                 $item->pivot->attribute_item_ids = json_decode($item->pivot->attribute_item_ids);
             }
@@ -254,7 +176,7 @@ class ProductController extends Controller
                 "brand" => $brand,
 
             ], Response::HTTP_OK);
-            // dd($product->toArray());
+           
         } catch (\Exception $ex) {
             Log::error('API/V1/Admin/ProductController@show: ', [$ex->getMessage()]);
 
@@ -505,23 +427,23 @@ class ProductController extends Controller
     }
     public function search(Request $request)
     {
-        $query = $request->input('query'); // Lấy từ khóa tìm kiếm từ body request
+        $query = $request->input('query');
 
-        if (!$query) {
-            return response()->json([
-                'message' => 'Vui lòng nhập từ khóa tìm kiếm.',
-                'data' => []
-            ], 400);
+        if (empty($query)) {
+            $results = Product::all();
+            return response()->json(['message' => 'Hiển thị tất cả sản phẩm.', 'data' => $results]);
         }
 
-        // Tìm kiếm trong cột `name` hoặc các cột khác nếu cần
         $results = Product::where('name', 'LIKE', "%{$query}%")
-            ->orWhere('description', 'LIKE', "%{$query}%") // Thêm cột mô tả nếu có
+            ->orWhere('description', 'LIKE', "%{$query}%")
             ->get();
 
-        return response()->json([
-            'message' => 'Kết quả tìm kiếm.',
-            'data' => $results,
-        ]);
+        if ($results->isEmpty()) {
+            return response()->json(['message' => 'Không tìm thấy sản phẩm nào phù hợp.',
+            'data' => []
+        ],404);
+        }
+
+        return response()->json(['message' => 'Kết quả tìm kiếm.', 'data' => $results]);
     }
 }

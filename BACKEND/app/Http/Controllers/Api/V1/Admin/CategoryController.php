@@ -175,17 +175,27 @@ class CategoryController extends Controller
     {
         $query = $request->input('query'); // Lấy từ khóa tìm kiếm từ body request
 
-        if (!$query) {
+        // Nếu không có từ khóa tìm kiếm, trả về tất cả danh mục
+        if (empty($query)) {
+            $results = Category::all(); // Lấy tất cả danh mục
             return response()->json([
-                'message' => 'Vui lòng nhập từ khóa tìm kiếm.',
-                'data' => []
-            ], 400);
+                'message' => 'Hiển thị tất cả danh mục.',
+                'data' => $results,
+            ]);
         }
 
-        // Tìm kiếm trong cột `name` hoặc các cột khác nếu cần
+        // Tìm kiếm trong cột `name` và `description`
         $results = Category::where('name', 'LIKE', "%{$query}%")
-            ->orWhere('description', 'LIKE', "%{$query}%") // Thêm cột mô tả nếu có
+            ->orWhere('description', 'LIKE', "%{$query}%") // Tìm trong mô tả nếu cần
             ->get();
+
+        // Xử lý trường hợp không tìm thấy
+        if ($results->isEmpty()) {
+            return response()->json([
+                'message' => 'Không tìm thấy danh mục nào phù hợp.',
+                'data' => []
+            ], 404);
+        }
 
         return response()->json([
             'message' => 'Kết quả tìm kiếm.',

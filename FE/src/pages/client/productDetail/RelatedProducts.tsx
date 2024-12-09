@@ -36,8 +36,7 @@ const RelatedProducts = () => {
     );
   }
 
-  if (isLoading)
-    return <Loading />;
+  if (isLoading) return <Loading />;
   if (isError) return <p>{error.message}</p>;
 
   const indexOfLastProduct = currentPage * productsPerPage;
@@ -71,16 +70,23 @@ const RelatedProducts = () => {
           {currentProducts.map((relatedProduct: Iproduct) => (
             <div key={relatedProduct.id} className="lg:mb-[25px] mb-[20px]">
               <div className="lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] sm:h-[345px] overflow-hidden">
-                <img
-                  className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover/image:opacity-0"
-                  src={relatedProduct.img_thumbnail}
-                  alt={relatedProduct.name}
-                />
-                <img
-                  className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover/image:opacity-100"
-                  src={ProductNext}
-                  alt={relatedProduct.name}
-                />
+                <Link
+                  to={`/products/${relatedProduct?.id}`}
+                  className="absolute inset-0"
+                >
+                  <img
+                    className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover/image:opacity-0"
+                    src={relatedProduct.img_thumbnail}
+                    alt={relatedProduct.name}
+                  />
+                  {/* <img
+                    className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover/image:opacity-100"
+                    src={ProductNext}
+                    alt={relatedProduct.name}
+                  /> */}
+                </Link>
+                <div className="image-overlay"></div>
+
                 <div>
                   <Link to="" className="absolute left-5 top-5">
                     <HeartWhite />
@@ -88,7 +94,7 @@ const RelatedProducts = () => {
                 </div>
                 <div className="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100">
                   <Link
-                    to={`/products/${relatedProduct.id}`}
+                    to={`/products/${product?.slug}.html`}
                     className="group/btn relative m-auto"
                   >
                     <button className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]">

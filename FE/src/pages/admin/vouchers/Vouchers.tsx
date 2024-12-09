@@ -9,7 +9,7 @@ import {
   PlusOutlined,
 } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Button, Modal, Pagination, Table } from "antd";
+import { Button, Input, Modal, Pagination, Table } from "antd";
 import { ColumnType } from "antd/es/table";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -50,11 +50,6 @@ const Vouchers = () => {
       setCurrentPage(maxPage);
     }
   }, [data, currentPage, pageSize]);
-  const dataSource =
-    dataVoucher?.map((item: IVouchers) => ({
-      key: item?.id,
-      ...item,
-    })) || [];
 
   const { mutate } = useMutation({
     mutationFn: async (id: any) => {
@@ -157,15 +152,54 @@ const Vouchers = () => {
     }
   }, [isError, hasError]);
 
+  //  tìm kiếm theo tên  ;
+  const [query, setQuery] = useState<string>("");
+  const [dataSearch, setDataSearch] = useState<IVouchers[]>([]);
+
+  const handleSearch = async () => {
+    try {
+      const res = await instance.post(`/voucher/search`, { query });
+      setDataSearch(res?.data?.data || []);
+      setCurrentPage(1);
+    } catch (error) {
+      toast.error("Lỗi khi tìm kiếm");
+    }
+  };
+
+  const dataSource =
+    dataSearch?.length > 0
+      ? dataSearch
+      : dataVoucher?.map((item: IVouchers) => ({
+          key: item?.id,
+          ...item,
+        })) || [];
+
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>{error.message}</div>;
 
   return (
     <div className="p-6 min-h-screen">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2">
+        {/* <h1 className="text-3xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2">
           Danh sách voucher
-        </h1>
+        </h1> */}
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 md:gap-8">
+          <h1 className="text-3xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2">
+            Danh sách voucher
+          </h1>
+          <Input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Tìm kiếm"
+            className="w-full md:w-64 px-4 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
+          />
+          <Button
+            onClick={handleSearch}
+            className="bg-indigo-500 hover:bg-indigo-600 text-white font-medium py-2 px-4 rounded-lg shadow"
+          >
+            Tìm kiếm
+          </Button>
+        </div>
         <Link to={`create`}>
           <Button className="bg-blue-500 text-white rounded-lg h-10 px-4 flex items-center hover:bg-blue-600 transition duration-200">
             <PlusOutlined className="mr-2" />

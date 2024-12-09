@@ -28,7 +28,7 @@ const About = () => {
               </div>
             </div>
           </div>
-          <div className="hd-page-body-content container py-10 lg:py-28 space-y-16 lg:space-y-28">
+          <div className="hd-page-body-content container py-10 lg:py-20 space-y-16 lg:space-y-28">
             <div className="hd-SectionTop relative " data-nc-id="SectionHero">
               <div className="flex flex-col lg:flex-row space-y-14 lg:space-y-0 lg:space-x-10 items-center relative text-center lg:text-left">
                 <div className="w-screen max-w-full xl:max-w-lg space-y-5 lg:space-y-7">
@@ -57,7 +57,7 @@ const About = () => {
                     height={638}
                     decoding="async"
                     data-nimg={1}
-                    className="w-full"
+                    className="w-[5300px] relative -right-40"
                     srcSet="
           "
                     src={HeroRight}
@@ -67,7 +67,7 @@ const About = () => {
               </div>
             </div>
             {/*end hd-SectionTop*/}
-            <div className="hd-SectionPeople relative">
+            <div className="hd-SectionPeople relative -top-14">
               <div className="nc-Section-Heading relative flex flex-col sm:flex-row sm:items-end justify-between mb-0 lg:mb-14 text-neutral-900 text-center lg:text-left">
                 <div>
                   <h2 className="text-2xl md:text-3xl font-semibold">
@@ -104,8 +104,7 @@ const About = () => {
                       data-nimg="fill"
                       className="absolute inset-0 object-cover hidden lg:block"
                       sizes="300px"
-                      srcSet="
-            "
+                      src=""
                       style={{
                         position: "absolute",
                         height: "100%",
@@ -131,8 +130,7 @@ const About = () => {
                       data-nimg="fill"
                       className="absolute inset-0 object-cover hidden lg:block"
                       sizes="300px"
-                      srcSet="
-              "
+                      src="./src/assets/images/z6080913682718_0437356e59304fbfb80754b6b07df34c.jpg"
                       style={{
                         position: "absolute",
                         height: "100%",
@@ -186,6 +184,7 @@ const About = () => {
                       sizes="300px"
                       srcSet="
               "
+                      src="./src/assets/images/z6080902480848_00dba82ce951d41b5cbd2cdf379607a8.jpg"
                       style={{
                         position: "absolute",
                         height: "100%",
@@ -238,6 +237,7 @@ const About = () => {
                       sizes="300px"
                       srcSet="
               "
+                      src="./src/assets/images/z6080904489132_be65fadd49e6806784032537c238ad3f.jpg"
                       style={{
                         position: "absolute",
                         height: "100%",
@@ -265,6 +265,7 @@ const About = () => {
                       sizes="300px"
                       srcSet="
               "
+                      src="./src/assets/images/z6080907305180_9095ebc9d001ef6aae02f629b373af48.jpg"
                       style={{
                         position: "absolute",
                         height: "100%",

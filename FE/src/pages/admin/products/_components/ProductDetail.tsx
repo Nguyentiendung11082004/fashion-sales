@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { colorTranslations } from "@/common/colors/colorUtils";
 import Loading from "@/common/Loading/Loading";
 import { IProductVariant } from "@/common/types/products";
 import instance from "@/configs/axios";
@@ -24,6 +25,7 @@ const ProductDetailAdmin = () => {
   });
 
   console.log("productShow", productShow);
+
   if (isFetching) return <Loading />;
 
   return (
@@ -48,11 +50,10 @@ const ProductDetailAdmin = () => {
           {/* <!-- Product Info Section --> */}
           <div className="w-full md:w-1/2 md:pl-6 mt-4 md:mt-0">
             {/* <div className="flex items-center justify-between"> */}
-              <h1 className="text-2xl font-semibold text-gray-800">
-                {productShow.name}
-              </h1>
+            <h1 className="text-2xl font-semibold text-gray-800">
+              {productShow.name}
+            </h1>
 
-              
             {/* </div> */}
             <p className="text-2xl font-bold mt-3">
               {(productShow?.price_regular ||
@@ -179,10 +180,8 @@ const ProductDetailAdmin = () => {
               )}
             </p>
             <p className="bg-gray-100 text-base flex p-4 rounded-lg mt-3">
-               <p className="font-medium mr-1">Lượt xem:</p>  <span>100</span>
-              </p>
-
-            
+              <p className="font-medium mr-1">Lượt xem: {productShow.views}</p>
+            </p>
 
             <p className=" bg-gray-100 text-base flex p-4 rounded-lg mt-3">
               <p className=" font-semibold mr-1">Mã sản phẩm: </p>
@@ -206,9 +205,7 @@ const ProductDetailAdmin = () => {
             <div className="mt-4">
               <div className="bg-gray-100 p-4 rounded-lg">
                 <div className="flex items-center">
-                  <p className="text-base font-semibold ">
-                    Trạng thái:
-                  </p>
+                  <p className="text-base font-semibold ">Trạng thái:</p>
                   <span
                     className={`ml-1 ${productShow.status ? "text-green-600" : "text-red-600"}`}
                   >
@@ -216,9 +213,7 @@ const ProductDetailAdmin = () => {
                   </span>
                 </div>
                 <div className="flex items-center">
-                  <p className="text-base font-semibold">
-                    Xu hướng:
-                  </p>
+                  <p className="text-base font-semibold">Xu hướng:</p>
                   <span
                     className={`ml-1 ${productShow.trend ? "text-green-600" : "text-gray-600"}`}
                   >
@@ -258,7 +253,7 @@ const ProductDetailAdmin = () => {
         {/* <!-- Product Attributes Section --> */}
         <div className="mt-8">
           <div>
-          <h2 className="text-xl font-semibold text-gray-800">
+            <h2 className="text-xl font-semibold text-gray-800">
               Mô tả sản phẩm
             </h2>
             <div className="mt-4 max-w-full text-base">
@@ -270,35 +265,60 @@ const ProductDetailAdmin = () => {
               </p>
             </div>
           </div>
-        
+
           <div className="mt-4">
             <h2 className="text-xl font-semibold text-gray-800">
               Thuộc tính sản phẩm
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+              {/* Màu sắc */}
               <div className="bg-gray-100 p-4 rounded-lg">
-                <p className="text-base font-semibold text-gray-600">Màu sắc:</p>
-                <p className="text-base text-gray-800">
-                  {productShow.attributes.map((attr: any) => (
-                    <p key={attr.id} className="text-gray-800">
-                      <span className="font-medium text-gray-600">
-                        {attr.value}
+                <p className="text-base font-semibold text-black">
+                  Màu sắc:
+                </p>
+                <div className="text-base">
+                  {Array.from(
+                    new Set<string>(
+                      productShow.variants.flatMap((variant: any) =>
+                        variant.attributes
+                          .filter((attr: any) => attr.name === "color")
+                          .map((attr: any) => attr.pivot.value)
+                      )
+                    )
+                  ).map((uniqueColor: string, index: number) => (
+                    <p key={index}>
+                      <span className="font-medium text-gray-500">
+                        {colorTranslations[
+                            uniqueColor.charAt(0).toUpperCase() +
+                            uniqueColor.slice(1).toLowerCase()
+                          ] || ""}
                       </span>
                     </p>
                   ))}
-                </p>
+                </div>
               </div>
+              {/* Kích cỡ */}
               <div className="bg-gray-100 p-4 rounded-lg">
-                <p className="text-base font-semibold text-gray-600">Kích cỡ:</p>
-                <p className="text-base text-gray-800">
-                  {productShow.attributes.map((attr: any) => (
-                    <p key={attr.id} className="text-gray-800">
-                      <span className="font-medium text-gray-600">
-                        {attr.value}
+                <p className="text-base font-semibold text-black">
+                  Kích cỡ:
+                </p>
+                <div className="text-base">
+                  {Array.from(
+                    new Set<string>(
+                      productShow.variants.flatMap((variant: any) =>
+                        variant.attributes
+                          .filter((attr: any) => attr.name === "size")
+                          .map((attr: any) => attr.pivot.value)
+                      )
+                    )
+                  ).map((uniqueSize: string, index: number) => (
+                    <p key={index} >
+                      <span className="font-medium text-gray-500">
+                        {uniqueSize}
                       </span>
                     </p>
                   ))}
-                </p>
+                </div>
               </div>
             </div>
           </div>

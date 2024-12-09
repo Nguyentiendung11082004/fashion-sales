@@ -27,12 +27,13 @@ const Cart = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const closeModal = () => {
-    setIdCart("");
+    // setIdCart("");
     setVisible(false);
   };
+  console.log("updatedAttributes", updatedAttributes)
   const { token } = useAuth();
-  const { data, isLoading } = useQuery({
-    queryKey: ['cart'],
+  const { data, isLoading, isFetching } = useQuery({
+    queryKey: ["cart"],
     queryFn: async () => {
       const res = await instance.get("/cart", {
         headers: {
@@ -44,8 +45,6 @@ const Cart = () => {
     refetchOnWindowFocus: true,
     refetchOnMount: true,
   });
-
-
 
   const updateQuantity = useMutation({
     mutationFn: async ({
@@ -158,12 +157,22 @@ const Cart = () => {
       [idCart]: variants,
     }));
   };
-  const handleUpdateAttributes = (idCart: any, attributes: any) => {
-    setUpdatedAttributes({
-      ...updatedAttributes,
-      [idCart]: attributes,
+  const handleUpdateAttributes = (newIdCart: any, attributes: any) => {
+    // Cập nhật attributes cho sản phẩm mới
+    setUpdatedAttributes((prevAttributes: any) => ({
+      ...prevAttributes,
+      [newIdCart]: attributes,
+    }));
+    // Cập nhật lại idCart để giữ tất cả các item đang check, bao gồm cả item vừa cập nhật
+    setIdCart((prevIdCart: any) => {
+      const currentIdCart = Array.isArray(prevIdCart) ? prevIdCart : [];
+      const allCheckedIds = [...currentIdCart, newIdCart]; // Thêm item mới nếu chưa có
+      return Array.from(new Set(allCheckedIds)); // Loại bỏ trùng lặp
     });
   };
+  
+  console.log("idCart", idCart);
+  
   const carts = data?.cart?.cartitems;
   carts?.map((cartItem: any) => {
     const {
@@ -195,7 +204,9 @@ const Cart = () => {
   });
 
   const [isAllChecked, setIsAllChecked] = useState<boolean>(false);
-  const [checkedItems, setCheckedItems] = useState<{ [key: number]: boolean }>({});
+  const [checkedItems, setCheckedItems] = useState<{ [key: number]: boolean }>(
+    {}
+  );
   const handleCheckAll = () => {
     const newChecked = !isAllChecked;
     setIsAllChecked(newChecked);
@@ -226,7 +237,6 @@ const Cart = () => {
 
     setIsAllChecked(updatedIdCarts.length === carts.length);
   };
-  console.log("idCart", idCart)
   const handleCheckout = () => {
     if (!idCart || idCart.length === 0) {
       MySwal.fire({
@@ -257,13 +267,14 @@ const Cart = () => {
     // Khi dữ liệu giỏ hàng (carts) thay đổi, kiểm tra lại các checkbox
     if (carts && carts.length > 0) {
       // Cập nhật checkedItems từ localStorage nếu có
-      const storedCheckedItems = localStorage.getItem('checkedItems');
+      const storedCheckedItems = localStorage.getItem("checkedItems");
       if (storedCheckedItems) {
         const parsedCheckedItems = JSON.parse(storedCheckedItems);
         setCheckedItems(parsedCheckedItems);
-
         // Tính toán lại isAllChecked
-        const isAllCheckedNow = carts.every((item: any) => parsedCheckedItems[item.id]);
+        const isAllCheckedNow = carts.every(
+          (item: any) => parsedCheckedItems[item.id]
+        );
         setIsAllChecked(isAllCheckedNow);
       }
     } else {
@@ -289,7 +300,7 @@ const Cart = () => {
             </div>
           </div>
         </div>
-        {/*end hd-page-head*/}
+
         <section className="hd-page-body text-[14px] lg:mt-[60px] mt-[30px] block m-0 p-0 border-0 isolate *:box-border">
           <div className="hd-container block">
             <form className="hd-form-cart overflow-hidden relative">
@@ -424,13 +435,13 @@ const Cart = () => {
                                 </div>
                               </div>
 
-                                <ModalCart
-                                  open={visiable}
-                                  onClose={closeModal}
-                                  idCart={idCart}
-                                  onUpdateAttributes={handleUpdateAttributes}
-                                  attributes={updatedAttributes[idCart] || []}
-                                />
+                              <ModalCart
+                                open={visiable}
+                                onClose={closeModal}
+                                idCart={idCart}
+                                onUpdateAttributes={handleUpdateAttributes}
+                                attributes={updatedAttributes[idCart] || []}
+                              />
 
                               <div className="hd-qty-total block lg:hidden">
                                 <div className="flex items-center justify-between border-2 border-slate-200 rounded-full py-[10px] px-[10px]">
@@ -682,6 +693,8 @@ const Cart = () => {
             {/*end hd-form-cart*/}
           </div>
         </section>
+
+        {/*end hd-page-head*/}
         {/*end hd-page-body*/}
       </main>
     </>

@@ -190,11 +190,9 @@ class BrandController extends Controller
     {
         $query = $request->input('query'); // Lấy từ khóa tìm kiếm từ body request
 
-        if (!$query) {
-            return response()->json([
-                'message' => 'Vui lòng nhập từ khóa tìm kiếm.',
-                'data' => []
-            ], 400);
+        if (empty($query)) {
+            $results = Brand::all();
+            return response()->json(['message' => 'Hiển thị tất cả brand.', 'data' => $results]);
         }
 
         // Tìm kiếm trong cột `name` hoặc các cột khác nếu cần
@@ -202,6 +200,12 @@ class BrandController extends Controller
             ->orWhere('email', 'LIKE', "%{$query}%")
             ->orWhere('phone_number', 'LIKE', "%{$query}%") // Thêm cột mô tả nếu có
             ->get();
+
+            if ($results->isEmpty()) {
+                return response()->json(['message' => 'Không tìm thấy brand.',
+                'data' => []
+            ],404);
+            }
 
         return response()->json([
             'message' => 'Kết quả tìm kiếm.',

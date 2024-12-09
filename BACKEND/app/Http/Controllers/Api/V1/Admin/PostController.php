@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Api\V1\Admin;
 
 use App\Models\Post;
@@ -62,7 +63,6 @@ class PostController extends Controller
                 'message' => 'Thêm bài viết thành công!',
                 'data' => $post
             ], Response::HTTP_CREATED);
-
         } catch (QueryException $e) {
             return response()->json([
                 'message' => 'Thêm bài viết thất bại!',
@@ -125,40 +125,40 @@ class PostController extends Controller
     //     }
     // }
     public function update(UpdatePostRequest $request, $id)
-{
-    try {
-        $post = Post::findOrFail($id);
-        $data = $request->all();
-        if ($data['post_name'] !== $post->post_name) {
-            $data['slug'] = $this->generateUniqueSlug($data['post_name'], $id);
-        } else {
-            $data['slug'] = $post->slug;
-        }
-        $purifier = new HTMLPurifier();
-        $data['post_content'] = $purifier->purify($data['post_content']);
-        if ($request->has('img_thumbnail') && !empty($request->img_thumbnail)) {
-            $data['img_thumbnail'] = $request->img_thumbnail;
-        } else {
-            $data['img_thumbnail'] = $post->img_thumbnail;
-        }
+    {
+        try {
+            $post = Post::findOrFail($id);
+            $data = $request->all();
+            if ($data['post_name'] !== $post->post_name) {
+                $data['slug'] = $this->generateUniqueSlug($data['post_name'], $id);
+            } else {
+                $data['slug'] = $post->slug;
+            }
+            $purifier = new HTMLPurifier();
+            $data['post_content'] = $purifier->purify($data['post_content']);
+            if ($request->has('img_thumbnail') && !empty($request->img_thumbnail)) {
+                $data['img_thumbnail'] = $request->img_thumbnail;
+            } else {
+                $data['img_thumbnail'] = $post->img_thumbnail;
+            }
 
-        $post->update($data);
+            $post->update($data);
 
-        return response()->json([
-            'message' => 'Cập nhật bài viết thành công!',
-            'data' => $post
-        ], Response::HTTP_OK);
-    } catch (ModelNotFoundException $e) {
-        return response()->json([
-            'message' => 'Bài viết không tồn tại!',
-        ], 404);
-    } catch (QueryException $e) {
-        return response()->json([
-            'message' => 'Cập nhật bài viết thất bại!',
-            'error' => $e->getMessage()
-        ], 500);
+            return response()->json([
+                'message' => 'Cập nhật bài viết thành công!',
+                'data' => $post
+            ], Response::HTTP_OK);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'message' => 'Bài viết không tồn tại!',
+            ], 404);
+        } catch (QueryException $e) {
+            return response()->json([
+                'message' => 'Cập nhật bài viết thất bại!',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
-}
 
 
     /**
@@ -173,7 +173,6 @@ class PostController extends Controller
             return response()->json([
                 'message' => 'Xóa bài viết thành công!'
             ], Response::HTTP_OK);
-
         } catch (QueryException $e) {
             return response()->json([
                 'message' => 'Xóa bài viết thất bại!',
@@ -254,7 +253,6 @@ class PostController extends Controller
                 'message' => 'Danh sách bài viết theo danh mục và không có danh mục',
                 'data' => $data
             ], 200);
-
         } catch (\Exception $e) {
             return response()->json([
                 'status' => false,
@@ -266,18 +264,25 @@ class PostController extends Controller
     public function search(Request $request)
     {
         $query = $request->input('query'); // Lấy từ khóa tìm kiếm từ body request
-
-        if (!$query) {
+        if (empty($query)) {
+            $results = Post::all();
             return response()->json([
-                'message' => 'Vui lòng nhập từ khóa tìm kiếm.',
-                'data' => []
-            ], 400);
+                'message' => 'Hiển thị tất cả',
+                'data' => $results
+            ]);
         }
 
         // Tìm kiếm trong cột `name` hoặc các cột khác nếu cần
         $results = Post::where('post_name', 'LIKE', "%{$query}%")
             ->orWhere('post_content', 'LIKE', "%{$query}%") // Thêm cột mô tả nếu có
             ->get();
+        if ($results->isEmpty()) {
+            return response()->json([
+                'message' => 'Không tìm thấy post.',
+                'data' => []
+            ], 404);
+        }
+
 
         return response()->json([
             'message' => 'Kết quả tìm kiếm.',
@@ -285,4 +290,3 @@ class PostController extends Controller
         ]);
     }
 }
-

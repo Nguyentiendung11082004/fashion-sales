@@ -12,21 +12,18 @@ import Less from "@/components/icons/detail/Less";
 import NoDatasIcon from "@/components/icons/products/NoDataIcon";
 import instance from "@/configs/axios";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Spin } from "antd";
-import "rc-slider/assets/index.css";
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import unorm from "unorm";
+import { useCart } from "@/common/context/Cart/CartContext";
 import { useWishlist } from "@/common/context/Wishlist/WishlistContext";
 import HeartRed from "@/components/icons/detail/HeartRed";
-import { Button } from "antd";
-import { LoadingOutlined } from "@ant-design/icons";
-import { useAuth } from "@/common/context/Auth/AuthContext";
-import { useCart } from "@/common/context/Cart/CartContext";
 import CartPopup from "@/components/ModalPopup/CartPopup";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import "rc-slider/assets/index.css";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import unorm from "unorm";
 
 const Products = () => {
+  const location = useLocation();
   const [growboxDropdownOpen, setGrowboxDropdownOpen] = useState(false);
   const [toepfeDropdownOpen, setToepfeDropdownOpen] = useState(false);
   const growboxRef = useRef<HTMLDivElement>(null);
@@ -38,6 +35,7 @@ const Products = () => {
   const [allproducts, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [suggestions, setSuggestions] = useState<string[]>([]);
+  const selectedCategoryId = location.state?.selectedCategoryId || null;
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedBrand, setSelectedBrand] = useState<string[]>([]);
   const [appliedBrands, setAppliedBrands] = useState<string[]>([]);
@@ -45,7 +43,8 @@ const Products = () => {
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
-  const [isSale, setIsSale] = useState<boolean>(false);
+  const saleFromLink = location.state?.sale || false;
+  const [isSale, setIsSale] = useState<boolean>(saleFromLink);
   const [selectedSortName, setSelectedSortName] = useState("");
   const [temporarySortName, setTemporarySortName] = useState("");
   const [selectedSort, setSelectedSort] = useState<{
@@ -144,6 +143,20 @@ const Products = () => {
     setToepfeDropdownOpen(false);
   };
 
+  useEffect(() => {
+    if (saleFromLink) {
+      setIsSale(true);
+      applyFilters();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [saleFromLink]);
+
+  useEffect(() => {
+    if (selectedCategoryId) {
+      setSelectedCategories([selectedCategoryId.toString()]);
+    }
+  }, [selectedCategoryId]);
+
   const handleCheckboxChange = (name: string, value: any) => {
     console.log(`Checkbox changed: ${name} -> ${value}`);
     switch (name) {
@@ -185,7 +198,10 @@ const Products = () => {
         break;
       case "sale":
         setIsSale((prev) => {
-          const newSale = !prev; // Đảo giá trị của isSale
+          const newSale = !prev;
+          if (!newSale) {
+            navigate("/products");
+          }
           applyFilters();
           return newSale;
         });
@@ -212,20 +228,31 @@ const Products = () => {
     } else {
       const fetchSuggestions = async () => {
         const response = await instance.post("/product-shop", {
-          search: trimmedValue, // Gửi giá trị đã loại bỏ khoảng trắng đầu
+          search: trimmedValue, // Gửi mảng từ khóa lên server
         });
         const suggestionsData = response.data.products.map(
           (item: any) => item.product.name
         );
 
-        // Lọc gợi ý chỉ hiển thị những từ khóa bắt đầu bằng searchTerm (có phân biệt dấu)
         const filteredSuggestions = suggestionsData.filter(
           (suggestion: string) => {
-            const normalizedSuggestion = unorm.nfkd(suggestion.toLowerCase()); // Chuẩn hóa gợi ý
-            const normalizedValue = unorm.nfkd(trimmedValue.toLowerCase()); // Chuẩn hóa giá trị tìm kiếm
-            return normalizedSuggestion.startsWith(normalizedValue); // So sánh
+            const removeDiacritics = (str: string) =>
+              unorm.nfkd(str).replace(/[\u0300-\u036f]/g, "");
+
+            const normalizedSuggestion =
+              removeDiacritics(suggestion).toLowerCase();
+            const normalizedValue =
+              removeDiacritics(trimmedValue).toLowerCase();
+
+            console.log("Suggestion:", suggestion);
+            console.log("Normalized Suggestion:", normalizedSuggestion);
+            console.log("Normalized Value:", normalizedValue);
+
+            return normalizedSuggestion.startsWith(normalizedValue);
           }
         );
+
+        console.log("Filtered Suggestions:", filteredSuggestions);
 
         setSuggestions(filteredSuggestions);
       };
@@ -1110,7 +1137,7 @@ const Products = () => {
                         <div className="lg:mb-[25px] mb-[20px]">
                           <div className="cursor-pointer lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] sm:h-[345px] overflow-hidden">
                             <Link
-                              to={`/products/${product?.id}`}
+                              to={`/products/${product?.slug}.html`}
                               className="absolute inset-0"
                             >
                               <img
@@ -1281,12 +1308,28 @@ const Products = () => {
                                   const productPriceRegular =
                                     product?.price_regular;
 
-                                  // Điều kiện hiển thị
-                                  if (minPriceSale >= 0) {
+                                  const pricesSaleVar = variants.map(
+                                    (variant: any) => variant.price_sale
+                                  );
+                                  const pricesRegularVar = variants.map(
+                                    (variant: any) => variant.price_regular
+                                  );
+                                  const allSaleEqual = pricesSaleVar.every(
+                                    (price: any) => price === pricesSaleVar[0]
+                                  );
+                                  const allRegularEqual =
+                                    pricesRegularVar.every(
+                                      (price: any) =>
+                                        price === pricesRegularVar[0]
+                                    );
+
+                                  if (minPriceSale > 0) {
                                     // Nếu có giá sale
                                     if (
-                                      productPriceSale &&
-                                      productPriceSale < productPriceRegular
+                                      (productPriceSale &&
+                                        productPriceSale <
+                                          productPriceRegular) ||
+                                      productPriceSale === 0
                                     ) {
                                       return (
                                         <>
@@ -1317,27 +1360,48 @@ const Products = () => {
                                         </span>
                                       );
                                     } else {
-                                      return (
-                                        <span>
-                                          {new Intl.NumberFormat(
-                                            "vi-VN"
-                                          ).format(minPriceSale)}
-                                          ₫ -{" "}
-                                          {new Intl.NumberFormat(
-                                            "vi-VN"
-                                          ).format(maxPriceRegular)}
-                                          ₫
-                                        </span>
-                                      );
+                                      if (allSaleEqual && allRegularEqual) {
+                                        // Nếu tất cả giá sale và giá regular giống nhau
+                                        return (
+                                          <>
+                                            <del className="mr-1">
+                                              {new Intl.NumberFormat(
+                                                "vi-VN"
+                                              ).format(
+                                                pricesRegularVar[0]
+                                              )}{" "}
+                                              ₫
+                                            </del>
+                                            <span className="text-[red]">
+                                              {new Intl.NumberFormat(
+                                                "vi-VN"
+                                              ).format(pricesSaleVar[0])}{" "}
+                                              ₫
+                                            </span>
+                                          </>
+                                        );
+                                      } else {
+                                        return (
+                                          <span>
+                                            {new Intl.NumberFormat(
+                                              "vi-VN"
+                                            ).format(minPriceSale)}
+                                            ₫ -{" "}
+                                            {new Intl.NumberFormat(
+                                              "vi-VN"
+                                            ).format(maxPriceRegular)}
+                                            ₫
+                                          </span>
+                                        );
+                                      }
                                     }
                                   } else {
-                                    // Nếu không có giá sale, chỉ hiển thị khoảng giá regular
                                     return (
                                       <span>
                                         {new Intl.NumberFormat("vi-VN").format(
                                           minPriceRegular
                                         )}
-                                        ₫ -
+                                        ₫ -{" "}
                                         {new Intl.NumberFormat("vi-VN").format(
                                           maxPriceRegular
                                         )}

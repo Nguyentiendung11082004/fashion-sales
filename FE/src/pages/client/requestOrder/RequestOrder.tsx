@@ -11,9 +11,13 @@ const RequestOrder = () => {
   const [selectedItems, setSelectedItems] = useState<boolean[]>(
     new Array(dataOrder?.order_details?.length).fill(false)
   );
+  console.log("dataOrder?.order_details?: ", dataOrder?.order_details);
   const [selectAll, setSelectAll] = useState(false);
+  // const [quantities, setQuantities] = useState<number[]>(
+  //   new Array(dataOrder?.order_details?.length).fill(1)
+  // );
   const [quantities, setQuantities] = useState<number[]>(
-    new Array(dataOrder?.order_details?.length).fill(1)
+    dataOrder?.order_details?.map((item: any) => item.quantity) || []
   );
 
   const handleCheckboxChange = (index: number) => {
@@ -31,7 +35,8 @@ const RequestOrder = () => {
     setSelectedItems(
       new Array(dataOrder?.order_details?.length).fill(isChecked)
     );
-    setQuantities(new Array(dataOrder?.order_details?.length).fill(1));
+    // setQuantities(new Array(dataOrder?.order_details?.length).fill(1));
+    setQuantities(quantities);
   };
 
   const handleDecrease = (index: number) => {
@@ -65,7 +70,6 @@ const RequestOrder = () => {
         order_detail_id: item.id,
         quantity: quantities[index],
       }));
-
       navigate(`/return/request_order`, {
         state: { items, dataOrder, reasonFromState },
       });
