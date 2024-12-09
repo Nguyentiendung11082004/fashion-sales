@@ -186,8 +186,6 @@ const Router = () => {
             {/* <Route path="/comments" element={<CommentPage/>} /> */}
           </Route>
         </Route>
-
-
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Suspense>
