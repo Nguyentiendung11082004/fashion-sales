@@ -33,14 +33,13 @@ interface IinitialAttributes {
   [key: string]: string;
 }
 const ProductDetail = () => {
-  const { id } = useParams<{ id: string }>();
+  // const { id } = useParams<{ id: string }>();
   const { slug } = useParams<{ slug: string }>();
 
-  const productId = Number(id);
+  // const productId = Number(id);
   const [product, setProduct] = useState<any>();
   const [selectedImage, setSelectedImage] = useState<string>();
   const { handleAddToWishlist, isInWishlist } = useWishlist();
-
   // sửa bình luận
   const closeFormCmt = () => {
     setShowFormCmtOpen(false);
@@ -57,6 +56,8 @@ const ProductDetail = () => {
       }
     },
   });
+  const productId = data?.product?.id;
+  console.log("id cần tìm : ", productId);
 
   const getUniqueAttributes = data?.getUniqueAttributes;
   useEffect(() => {
@@ -414,6 +415,7 @@ const ProductDetail = () => {
   useEffect(() => {
     const fetchProductVariant = async () => {
       try {
+        console.log("kiểm tra idProduct: ", productId);
         const variant = await findProductVariant(productId, selectedAttributes);
         if (variant.findProductVariant) {
           setProduct((prevProduct: any) => ({
@@ -748,7 +750,7 @@ const ProductDetail = () => {
 
                 <Button
                   onClick={() => {
-                    onHandleAddToCart(id, product?.id, quantity);
+                    onHandleAddToCart(productId, product?.id, quantity);
                   }}
                   className={`h-11 w-full px-2 py-2 rounded-full ...`}
                   disabled={isLoading}

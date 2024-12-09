@@ -21,6 +21,7 @@ const HomePage = () => {
   const [trendProducts, setTrendProducts] = useState<any[]>([]);
   const [homeProducts, setHomeProducts] = useState<any[]>([]);
   const { handleAddToWishlist, isInWishlist } = useWishlist();
+  const [slugProduct, setSlugProduct] = useState();
   const [idProduct, setIdProduct] = useState();
   const [visibleProducts, setVisibleProducts] = useState(8);
   const [visProducts, setVisProducts] = useState(8);
@@ -66,7 +67,9 @@ const HomePage = () => {
   const closeModal = () => {
     setVisible(false);
   };
-  const navigate = useNavigate();
+  useEffect(() => {
+    console.log("idProduct updated:", idProduct);
+  }, [idProduct]);
 
   return (
     <>
@@ -93,7 +96,7 @@ const HomePage = () => {
                   <div className="cursor-pointer lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] sm:h-[345px] overflow-hidden">
                     <Link
                       to={`/products/${product?.slug}.html`}
-                     className="absolute inset-0"
+                      className="absolute inset-0"
                     >
                       <img
                         className="group-hover:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover:opacity-0 object-cover"
@@ -137,7 +140,8 @@ const HomePage = () => {
                           className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]"
                           onClick={() => {
                             modalRef.current?.showModal(),
-                              setIdProduct(product?.id);
+                              setSlugProduct(product?.slug);
+                            setIdProduct(product?.id);
                           }}
                         >
                           <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
@@ -429,9 +433,11 @@ const HomePage = () => {
               </div>
             ))}
             <CartPopup
+              slugProduct={slugProduct}
               idProduct={idProduct}
-              ref={modalRef}
               setIdProduct={setIdProduct}
+              ref={modalRef}
+              setSlugProduct={setSlugProduct}
             />
           </div>
           <DetailPopup
@@ -544,7 +550,8 @@ const HomePage = () => {
                           className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]"
                           onClick={() => {
                             modalRef.current?.showModal(),
-                              setIdProduct(product?.id);
+                              setSlugProduct(product?.slug);
+                            setIdProduct(product?.id);
                           }}
                         >
                           <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
