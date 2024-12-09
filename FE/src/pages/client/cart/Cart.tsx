@@ -158,21 +158,23 @@ const Cart = () => {
     }));
   };
   const handleUpdateAttributes = (newIdCart: any, attributes: any) => {
-    // Cập nhật attributes cho sản phẩm mới
     setUpdatedAttributes((prevAttributes: any) => ({
       ...prevAttributes,
       [newIdCart]: attributes,
     }));
-    // Cập nhật lại idCart để giữ tất cả các item đang check, bao gồm cả item vừa cập nhật
+
     setIdCart((prevIdCart: any) => {
       const currentIdCart = Array.isArray(prevIdCart) ? prevIdCart : [];
-      const allCheckedIds = [...currentIdCart, newIdCart]; // Thêm item mới nếu chưa có
-      return Array.from(new Set(allCheckedIds)); // Loại bỏ trùng lặp
+      const isChecked = checkedItems[newIdCart]; // Kiểm tra trạng thái checkbox
+      if (isChecked) {
+        const allCheckedIds = [...currentIdCart, newIdCart];
+        return Array.from(new Set(allCheckedIds)); // Loại bỏ trùng lặp
+      }
+      return currentIdCart; // Giữ nguyên nếu sản phẩm chưa được checkbox
     });
   };
-  
   console.log("idCart", idCart);
-  
+
   const carts = data?.cart?.cartitems;
   carts?.map((cartItem: any) => {
     const {
@@ -238,7 +240,8 @@ const Cart = () => {
     setIsAllChecked(updatedIdCarts.length === carts.length);
   };
   const handleCheckout = () => {
-    if (!idCart || idCart.length === 0) {
+    const validIdCart = idCart.filter((id: number) => checkedItems[id]);
+    if (validIdCart.length === 0) {
       MySwal.fire({
         title: <strong>Cảnh báo</strong>,
         icon: "error",
@@ -248,7 +251,7 @@ const Cart = () => {
         showConfirmButton: false,
       });
     } else {
-      navigate("/checkout", { state: { cartIds: idCart } });
+      navigate("/checkout", { state: { cartIds: validIdCart } });
     }
   };
   useEffect(() => {
