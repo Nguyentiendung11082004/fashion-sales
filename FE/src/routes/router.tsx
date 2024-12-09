@@ -3,6 +3,7 @@ import OrderLookup from "@/components/website/OrderLookup";
 import FastDelivery from "@/pages/admin/fastDelivery/FastDelivery";
 import ReturnOrder from "@/pages/admin/order/components/ReturnOrder";
 import ReturnOrderId from "@/pages/admin/order/components/ReturnOrderId";
+import CheckAdmin from "@/pages/client/auth/permission/CheckAdmin";
 import RequestOrder from "@/pages/client/requestOrder/RequestOrder";
 import GetReturnRequestOrderId from "@/pages/client/returnRequest/GetReturnRequestOrderId";
 import ReturnRequest from "@/pages/client/returnRequest/ReturnRequest";
@@ -111,7 +112,9 @@ const Router = () => {
         <Route path="/" element={<LayoutWebsite />}>
           <Route index element={<HomePage />} />
           <Route path="products" element={<Products />} />
-          <Route path="products/:id" element={<ProductDetail />} />
+          {/* <Route path="products/:id" element={<ProductDetail />} /> */}
+          <Route path="products/:slug.html" element={<ProductDetail />} />
+
           <Route path="about" element={<About />} />
           <Route path="" element={<Permission />}>
             <Route path="cart" element={<Cart />} />
@@ -139,48 +142,52 @@ const Router = () => {
           element={<PasswordResetHandler />}
         />
         <Route path="password/reset" element={<ResetPassword />} />
-        <Route path="/admin" element={<LayoutAdmin />}>
-          <Route index element={<Dashboard />} />
-          <Route path="products" element={<ProductPageManager />} />
-          <Route path="products/:id" element={<ProductDetailAdmin />} />
-          <Route path="products/create" element={<ProductForm />} />
-          <Route path="products/edit/:id" element={<ProductForm />} />
-          <Route path="categories" element={<CategoryPage />} />
-          <Route path="categories/create" element={<CategoryForm />} />
-          <Route path="categories/edit/:id" element={<CategoryForm />} />
-          <Route path="attributes" element={<AttributeItem />} />
-          <Route path="attribute-values" element={<AttributeItemValues />} />
-          <Route path="clients" element={<ClientPage />} />
-          <Route path="clients/create" element={<FormClient />} />
-          <Route path="employees" element={<EmployeePage />} />
-          <Route path="employees/create" element={<FormEmployee />} />
-          <Route path="employees/edit/:id" element={<FormEmployee />} />
-          <Route path="brands" element={<Brands />} />
-          <Route path="brands/create" element={<BrandForm />} />
-          <Route path="brands/edit/:id" element={<BrandForm />} />
-          <Route path="tags" element={<Tags />} />
-          <Route path="tags/create" element={<FormTag />} />
-          <Route path="tags/edit/:id" element={<FormTag />} />
-          <Route path="banners" element={<Banners />} />
-          <Route path="banners/create" element={<BannersForm />} />
-          <Route path="banners/edit/:id" element={<BannersForm />} />
-          <Route path="posts" element={<Posts />} />
-          <Route path="posts/create" element={<FormPost />} />
-          <Route path="posts/edit/:id" element={<FormPost />} />
-          <Route path="chatbox" element={<Chatbox />} />
-          <Route path="vouchers" element={<Vouchers />} />
-          <Route path="vouchers/:id" element={<VoucherDetail />} />
-          <Route path="vouchers/create" element={<FormVoucher />} />
-          <Route path="vouchers/edit/:id" element={<FormVoucher />} />
-          <Route path="comments" element={<CommentPage />} />
-          <Route path="orders" element={<OrderPage />} />
-          <Route path="returnRequests" element={<ReturnOrder />} />
-          <Route path="return-item/:id" element={<ReturnOrderId />} />
+        <Route path="" element={<CheckAdmin />}>
+          <Route path="/admin" element={<LayoutAdmin />}>
+            <Route index element={<Dashboard />} />
+            <Route path="products" element={<ProductPageManager />} />
+            <Route path="products/:id" element={<ProductDetailAdmin />} />
+            <Route path="products/create" element={<ProductForm />} />
+            <Route path="products/edit/:id" element={<ProductForm />} />
+            <Route path="categories" element={<CategoryPage />} />
+            <Route path="categories/create" element={<CategoryForm />} />
+            <Route path="categories/edit/:id" element={<CategoryForm />} />
+            <Route path="attributes" element={<AttributeItem />} />
+            <Route path="attribute-values" element={<AttributeItemValues />} />
+            <Route path="clients" element={<ClientPage />} />
+            <Route path="clients/create" element={<FormClient />} />
+            <Route path="employees" element={<EmployeePage />} />
+            <Route path="employees/create" element={<FormEmployee />} />
+            <Route path="employees/edit/:id" element={<FormEmployee />} />
+            <Route path="brands" element={<Brands />} />
+            <Route path="brands/create" element={<BrandForm />} />
+            <Route path="brands/edit/:id" element={<BrandForm />} />
+            <Route path="tags" element={<Tags />} />
+            <Route path="tags/create" element={<FormTag />} />
+            <Route path="tags/edit/:id" element={<FormTag />} />
+            <Route path="banners" element={<Banners />} />
+            <Route path="banners/create" element={<BannersForm />} />
+            <Route path="banners/edit/:id" element={<BannersForm />} />
+            <Route path="posts" element={<Posts />} />
+            <Route path="posts/create" element={<FormPost />} />
+            <Route path="posts/edit/:id" element={<FormPost />} />
+            <Route path="chatbox" element={<Chatbox />} />
+            <Route path="vouchers" element={<Vouchers />} />
+            <Route path="vouchers/:id" element={<VoucherDetail />} />
+            <Route path="vouchers/create" element={<FormVoucher />} />
+            <Route path="vouchers/edit/:id" element={<FormVoucher />} />
+            <Route path="comments" element={<CommentPage />} />
+            <Route path="orders" element={<OrderPage />} />
+            <Route path="returnRequests" element={<ReturnOrder />} />
+            <Route path="return-item/:id" element={<ReturnOrderId />} />
 
-          <Route path="fastDelivery" element={<FastDelivery />} />
-          <Route path="orders/:id" element={<OrderDetail />} />
-          {/* <Route path="/comments" element={<CommentPage/>} /> */}
+            <Route path="fastDelivery" element={<FastDelivery />} />
+            <Route path="orders/:id" element={<OrderDetail />} />
+            {/* <Route path="/comments" element={<CommentPage/>} /> */}
+          </Route>
         </Route>
+
+
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Suspense>

@@ -34,6 +34,8 @@ interface IinitialAttributes {
 }
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
+  const { slug } = useParams<{ slug: string }>();
+
   const productId = Number(id);
   const [product, setProduct] = useState<any>();
   const [selectedImage, setSelectedImage] = useState<string>();
@@ -46,10 +48,10 @@ const ProductDetail = () => {
   const [listIdProduct, setListIdProduct] = useState<any[]>([]);
 
   const { data, isLoading } = useQuery({
-    queryKey: ["product", id],
+    queryKey: ["product", slug],
     queryFn: async () => {
       try {
-        return await productShow_client(`${id}`);
+        return await productShow_client(`${slug}`);
       } catch (error) {
         throw new Error("Không có sản phẩm nào phù hợp");
       }
@@ -657,10 +659,10 @@ const ProductDetail = () => {
                                 }}
                                 onClick={() => {
                                   if (!isDisabled) {
-                                    handleAttributeSelect(
-                                      key.attribute,
-                                      item.id
-                                    );
+                                    // handleAttributeSelect(
+                                    //   key.attribute,
+                                    //   item.id
+                                    // );
                                     setSelectedAttributes((prev) => ({
                                       ...prev,
                                       product_variant: {
