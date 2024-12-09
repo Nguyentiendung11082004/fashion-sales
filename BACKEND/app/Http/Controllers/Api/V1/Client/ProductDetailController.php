@@ -17,7 +17,7 @@ class ProductDetailController extends Controller
     {
         $this->getUniqueAttributes = new GetUniqueAttribute();
     }
-    public function productdetail(string $id)
+    public function productdetail(string $slug)
     {
         try {
             $product = Product::query()->with([
@@ -32,7 +32,7 @@ class ProductDetailController extends Controller
                 "comments.user",
                 "comments.childrenRecursive.user",
                 "variants.attributes"
-            ])->findOrFail($id);
+            ])->where('slug',$slug)->first();
             $product->increment('views');
 
             $productRelated = Product::query()->with(["variants.attributes"])->where([
