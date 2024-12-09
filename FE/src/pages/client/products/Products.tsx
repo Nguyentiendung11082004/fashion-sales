@@ -47,6 +47,8 @@ const Products = () => {
   const [isSale, setIsSale] = useState<boolean>(saleFromLink);
   const [selectedSortName, setSelectedSortName] = useState("");
   const [temporarySortName, setTemporarySortName] = useState("");
+  const [slugProduct, setSlugProduct] = useState<string>("");
+
   const [selectedSort, setSelectedSort] = useState<{
     trend: boolean;
     sortDirection: string | null;
@@ -1188,8 +1190,9 @@ const Products = () => {
                                 <button
                                   className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]"
                                   onClick={() => {
-                                    modalRef.current?.showModal();
-                                    setIdProduct(product.id);
+                                    modalRef.current?.showModal(),
+                                      setSlugProduct(product?.slug);
+                                    setIdProduct(product?.id);
                                   }}
                                 >
                                   <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
@@ -1498,9 +1501,11 @@ const Products = () => {
                       </div>
                       {/* </div> */}
                       <CartPopup
+                        slugProduct={slugProduct}
                         idProduct={idProduct}
-                        ref={modalRef}
                         setIdProduct={setIdProduct}
+                        ref={modalRef}
+                        setSlugProduct={setSlugProduct}
                       />
                     </>
                   );

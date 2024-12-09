@@ -18,6 +18,7 @@ const OrderPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(5);
   const [hasError, setHasError] = useState(false);
+  const [rangeValue, setRangeValue] = useState<any>([]);
   const [filter, setFilter] = useState<any>({
     statuses: [],
     filter_end_date: null,
@@ -27,18 +28,19 @@ const OrderPage = () => {
   });
   const [dataFilter, setDataFilter] = useState<any>([]);
   const handleSearch = async () => {
-    let res = await instance.post(`/order-status`, filter);
-    setDataFilter(res?.data.data);
+    let res = await instance.post(`/order/search`, filter)
+    setDataFilter(res?.data.data)
+  }
+  // console.log("dataFilter", dataFilter)
+  // useEffect(() => {
+  //   handleSearch()
+  // }, [filter])
+  const handleCancelSearch = () => {
+    setDataFilter([]);
+    setFilter(null)
   };
-  console.log("dataFilter", dataFilter);
-  useEffect(() => {
-    handleSearch();
-  }, [filter]);
-
-  const filterRange = (
-    value: DatePickerProps["value"] | RangePickerProps["value"]
-  ) => {
-    console.log("filterRange: ", value);
+  const filterRange = (value: DatePickerProps['value'] | RangePickerProps['value']) => {
+    console.log('filterRange: ', value);
   };
   const { data, isLoading, isError, error, isFetching } = useQuery({
     queryKey: ["order-status"],
@@ -135,18 +137,23 @@ const OrderPage = () => {
     }
   };
 
-  const dataSource = dataOrder
-    ? dataOrder?.map((item: IOrder) => ({
+
+
+  const dataSource =
+    dataOrder
+      ? dataOrder?.map((item: IOrder) => ({
         key: item?.id,
         ...item,
       }))
-    : [];
+      : [];
+  console.log("dataSource", dataSource)
   const dataSourceSearch = dataFilter
     ? dataFilter?.map((item: IOrder) => ({
         key: item?.id,
         ...item,
       }))
     : [];
+  console.log("dataSourceSearch", dataSourceSearch)
 
   const columns: ColumnType<IOrder>[] = [
     {
@@ -328,36 +335,53 @@ const OrderPage = () => {
           <Loading />
         ) : (
           <>
-            <RangePicker
-              className="mt-4"
-              onChange={(value, dateString) => {
-                setFilter((prev: any) => ({
-                  ...prev,
-                  filter_type: "range",
-                  filter_start_date: dateString[0],
-                  filter_end_date: dateString[1],
-                }));
-              }}
-            />
-            <Select
-              size="large"
-              mode="multiple"
-              options={
-                trangThai?.map((item: any) => ({
-                  value: item?.id,
-                  label: item?.name,
-                })) || []
-              }
-              onChange={(e) =>
-                setFilter((prev: any) => ({ ...prev, statuses: e }))
-              }
-              placeholder="Chọn tag"
-              placement="bottomLeft"
-              className="w-full"
-            />
+            <div className="flex mb-2">
+              <RangePicker className="mt-4"
+                onChange={(value, dateString) => {
+                  // setRangeValue(value)
+                  setFilter((prev: any) => ({
+                    ...prev,
+                    filter_type: "range",
+                    filter_start_date: dateString[0],
+                    filter_end_date: dateString[1],
+                  }))
+                }}
+              // value={rangeValue}
+              />
+              <div className="flex items-center space-x-4 mt-4">
+                {/* <Select
+                size="large"
+                mode="multiple"
+                options={
+                  trangThai?.map((item: any) => ({
+                    value: item?.id,
+                    label: item?.name
+                  })) || []
+                }
+                onChange={(e) => setFilter((prev: any) => ({ ...prev, statuses: e }))}
+                // value={filter?.statuses}
+                placeholder="Chọn kiểu"
+                placement="bottomLeft"
+                className="w-full max-w-md mb-2"
+              /> */}
+                <Button
+                  onClick={handleSearch}
+                  className="bg-blue-600 mx-2 text-white px-6 py-2 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                >
+                  Tìm kiếm
+                </Button>
+                <Button
+                  onClick={handleCancelSearch}
+                  className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                >
+                  Xem tất cả đơn hàng
+                </Button>
+              </div>
+            </div>
+
             <Table
               className="custom-table"
-              dataSource={(dataFilter ? dataFilter : dataSource).slice(
+              dataSource={(dataSource ? dataSource : dataSourceSearch).slice(
                 (currentPage - 1) * pageSize,
                 currentPage * pageSize
               )}
@@ -369,7 +393,7 @@ const OrderPage = () => {
               className="mt-4"
               align="end"
               current={currentPage}
-              total={(dataFilter ? dataFilter : dataSource).length}
+              total={(dataSource ? dataSource : dataSourceSearch).length}
               pageSize={pageSize}
               onChange={(page) => {
                 setCurrentPage(page);

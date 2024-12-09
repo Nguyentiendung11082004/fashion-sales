@@ -206,10 +206,9 @@ const AddressAction = ({ title, open, onClose, idAddress, onAddressSave }: Props
                             <Form.Item name="address" className='text-2xl font-medium text-neutral-900' label="Địa chỉ cụ thể">
                                 <Input />
                             </Form.Item>
-                            <Form.Item name="label" className='text-2xl font-medium text-neutral-900' label="Tiêu d">
+                            <Form.Item name="label" className='text-2xl font-medium text-neutral-900' label="Tiêu đề">
                                 <Input />
                             </Form.Item>
-                           
                             <Button onClick={() => handleClose()} className='mt-2 mr-3' >Quay lại</Button>
                             <Button type='primary' htmlType='submit' className='mt-2 mr-auto' >Lưu lại</Button>
                         </Form>

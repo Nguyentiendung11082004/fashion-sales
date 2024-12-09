@@ -22,9 +22,17 @@ const MySwal = withReactContent(Swal);
 const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
   const navigate = useNavigate();
   const { handleAddToWishlist, isInWishlist } = useWishlist();
-  console.log("productSeeMore", productSeeMore);
   const attributes = productSeeMore?.variants;
-
+  const image = productSeeMore?.variants;
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const handleImage = (e: any) => {
+    const selectedProduct = image.find((item: any) =>
+      item.attributes.some((attr: any) => attr.pivot.attribute_item_id.toString() === e)
+    );
+    if (selectedProduct) {
+      setSelectedImage(selectedProduct.image);
+    }
+  };
   const transformAttributes = (variants: any) => {
     return (Array.isArray(variants) ? variants : []).reduce(
       (acc: any, variant: any) => {
@@ -84,7 +92,6 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
     }
   };
   useEffect(() => {
-    // Gọi hàm để kiểm tra và gán product_variant_id khi dataAttribute thay đổi
     getSelectedVariantId();
   }, [dataAttribute]);
   const getAttribute = (attribute: any, id: any) => {
@@ -92,10 +99,7 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
       ...prev,
       [attribute]: id,
     }));
-    // findMatchingVariant();
   };
-  console.log("productSeeMore?.variants", productSeeMore?.variants);
-
   const result = productSeeMore?.variants
     ?.filter(
       (variant: any) =>
@@ -113,15 +117,8 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
       );
       return attributeObj;
     });
-  console.log("result", result)
-  // useEffect(() => {
-  //   if (result && result.length > 0) {
-  //     setDataAttribute({ product_variant: result[0] });
-  //   }
-  // }, [result]);
   const checkDisable = (attribute: string, value: any) => {
     let res = false;
-    // Access dataAttribute (the state) instead of setDataAttribute (the setter function)
     let matchingItems = result?.filter((x: any) => {
       return Object.keys(dataAttribute?.product_variant || {}).every((key) => {
         if (key !== attribute) {
@@ -135,8 +132,6 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
         return true;
       });
     });
-
-
     let isAttributeValid = matchingItems?.some(
       (x: any) => x[attribute] && x[attribute].toString() === value.toString()
     );
@@ -160,43 +155,38 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
     setSelectedVariantId(null);
     onClose();
   };
+  console.log("_payload", _payload)
+  console.log("productSeeMore", productSeeMore)
+  
   const handleCheckout = () => {
-    // Kiểm tra nếu có product_variant_id và kiểm tra số lượng
     if (_payload.product_variant_id) {
       const selectedVariant = productSeeMore?.variants.find(
-        (variant:any) => variant.id === _payload.product_variant_id
+        (variant: any) => variant.id === _payload.product_variant_id
       );
-  
       if (selectedVariant) {
-        // Kiểm tra nếu số lượng giỏ hàng lớn hơn số lượng còn lại của sản phẩm
         if (_payload.quantity > selectedVariant.quantity) {
           toast.error("Số lượng yêu cầu vượt quá số lượng còn lại trong kho");
-          return;  // Dừng lại, không cho phép chuyển trang
+          return;
         }
       } else {
-        // Nếu không tìm thấy biến thể sản phẩm
         toast.error("Sản phẩm không hợp lệ");
         return;
       }
     } else if (_payload.product_id) {
-      // Nếu không có product_variant_id, kiểm tra sản phẩm theo product_id
-      const selectedProduct = productSeeMore?.variants.find(
-        (variant:any) => variant.product_id === _payload.product_id
-      );
-  
-      if (selectedProduct) {
-        // Kiểm tra nếu số lượng giỏ hàng lớn hơn số lượng còn lại của sản phẩm
-        if (_payload.quantity > selectedProduct.quantity) {
+      // const selectedProduct = productSeeMore?.find(
+      //   (variant: any) => variant.product_id === _payload.product_id
+      // );
+      // console.log("selectedProduct", selectedProduct)
+      if (productSeeMore) {
+        if (_payload.quantity > productSeeMore.quantity) {
           toast.error("Sản phẩm này đã hết hàng");
-          return;  // Dừng lại, không cho phép chuyển trang
+          return;
         }
       }
     }
-  
-    // Nếu mọi điều kiện kiểm tra đều ổn, cho phép chuyển trang
     navigate("/checkout", { state: { _payload: _payload } });
   };
-  
+
   useEffect(() => {
     if (open && productSeeMore?.variants?.length > 0) {
       const firstVariant = productSeeMore.variants[0];
@@ -250,7 +240,7 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
         {/* Khung chứa ảnh */}
         <div className="w-1/2 h-[450px] relative">
           <img
-            src={`${productSeeMore.img_thumbnail}`}
+            src={`${selectedImage ? selectedImage : productSeeMore.img_thumbnail}`}
             alt=""
             className="h-full w-full object-cover"
           />
@@ -291,7 +281,7 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
           <p className="mt-4 hd-all-text grey  mb-3">
             {productSeeMore?.description}
           </p>
-          {resultDataAttribute?.map((e) => {
+          {resultDataAttribute?.map((e, index) => {
             return (
               <div className="my-4" key={e?.attribute}>
                 <p className="font-medium">{e?.attribute}</p>
@@ -309,7 +299,7 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
                       <div
                         key={item.id}
                         className={`relative flex-1 max-w-[75px] h-8 sm:h-8 rounded-full border-2 cursor-pointer p-2
-        ${isActive
+                          ${isActive
                             ? "border-black"
                             : isDisabled
                               ? "border-gray-200 opacity-50 cursor-not-allowed"
@@ -321,8 +311,9 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
                             : {}
                         }
                         onClick={() => {
-                          if (isDisabled) return; // Nếu bị disable thì không thực hiện gì
+                          if (isDisabled) return;
                           getAttribute(e.attribute.toLowerCase(), item.id);
+                          handleImage(item.id)
                         }}
                       >
                         {e.attribute.toLowerCase() === "color" ? (

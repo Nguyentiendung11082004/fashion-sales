@@ -22,6 +22,7 @@ import type { DatePickerProps, GetProps } from 'antd';
 type RangePickerProps = GetProps<typeof DatePicker.RangePicker>;
 import dayjs from 'dayjs';
 import { FormatMoney } from "@/common/utils/utils";
+import { useUser } from "@/common/context/User/UserContext";
 export const DashboardContext = createContext<any | undefined>(undefined);
 
 const Dashboard = () => {
@@ -31,6 +32,8 @@ const Dashboard = () => {
     filter_type: "day",
     filter_value: new Date().toISOString().split('T')[0],
   })
+  const { user } = useUser();
+  console.log("user", user)
   const [inputRange, setInputRange] = useState(false);
   const onChange: DatePickerProps['onChange'] = (date, dateString) => {
     let formattedDate = '';
@@ -97,17 +100,16 @@ const Dashboard = () => {
   }
   const [tongDonHang, setTongDonHang] = useState<any>([]);
   const [tongDoanhThu, setTongDoanhThu] = useState<any>([]);
-  const [tongUser,setTongUser] = useState<any>([]);
+  const [tongUser, setTongUser] = useState<any>([]);
   const handleDonHang = (data: any) => {
     setTongDonHang(data)
   }
-  const handleDoanhThu = (data:any) => {
+  const handleDoanhThu = (data: any) => {
     setTongDoanhThu(FormatMoney(data))
   }
-  const handleUser = (data:any) => {
+  const handleUser = (data: any) => {
     setTongUser(data)
   }
-  console.log("tongUser",tongUser)
   const _props = {
     filter,
     setFilter
@@ -117,7 +119,7 @@ const Dashboard = () => {
       <div className="page-dashboard bg-[#f3f3f9] py-0 px-5 font-[Poppins]">
         <div className="page-dashboard__header flex justify-between items-center py-5">
           <div className="page-dashboard__header__left">
-            <p className="text-[14px] font-medium">Good Morning, Anna!</p>
+            <p className="text-[14px] font-medium">Good Morning, {user?.InforUser?.name}</p>
           </div>
           <div >
             <Select

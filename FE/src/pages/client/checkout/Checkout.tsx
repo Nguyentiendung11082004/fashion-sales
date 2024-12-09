@@ -12,6 +12,7 @@ import { createContext, useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import ModalAddress from "./_components/Address";
+import User from "@/components/icons/checkout/User";
 export const ContextCheckout = createContext({});
 const Checkout = () => {
   const { Option } = Select;
@@ -87,6 +88,7 @@ const Checkout = () => {
   const [error, setError] = useState<any>()
   const orderMutation = useMutation({
     mutationFn: async () => {
+      console.log("order", order)
       const res = await instance.post(`/order`, order, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -112,11 +114,11 @@ const Checkout = () => {
       localStorage.removeItem('checkedItems');
     },
     onError: (error: any) => {
-      console.log("error?.response?.data?.errors", error?.response?.data?.errors)
       setError(error?.response?.data?.errors)
       toast.error(error?.response?.data?.errors);
     }
   });
+
   const handleOrder = () => {
     orderMutation.mutate();
   };
@@ -160,6 +162,8 @@ const Checkout = () => {
     setOrder((prev: any) => ({
       ...prev,
       tinh: e.label,
+      huyen: '',
+      xa: '',
     })),
       setIdTinh(Number(e.value));
     setShipPing('')
@@ -169,6 +173,7 @@ const Checkout = () => {
   const handleChangeQuanHuyen = (e: any) => {
     setOrder((prev: any) => ({
       ...prev,
+      xa: '',
       huyen: e.label,
     })),
       setShipPing('')
@@ -191,8 +196,8 @@ const Checkout = () => {
   }
 
   const handleSaveDiaChi = (dataIdAddress: any) => {
-    setVisible(false)
     setPayLoadDiaChi(dataIdAddress)
+    setVisible(false)
   }
 
   let dataDiaChi = dataCheckout?.user?.addresses?.filter((e: any) => e.is_default === true);
@@ -204,24 +209,7 @@ const Checkout = () => {
       }
     }
   }, [dataCheckout]);
-  const getShipp = async () => {
-    try {
-      let weight = dataCheckout?.order_items?.map((e: any) => Number(e.product.weight));
-      let totalWeight = weight?.reduce((sum: any, currentWeight: any) => sum + currentWeight, 0);
-      let toWardCode = payloadDiaChi?.ward?.id || idXa;
-      let toDistrictId = payloadDiaChi?.district?.id || idQuanHuyen;
-      let res = await instance.post(`/calculateshippingfee`, {
-        to_ward_code: String(toWardCode),
-        to_district_id: Number(toDistrictId),
-        weight: totalWeight
-      });
-      setShipPing(res?.data?.fee?.total || 21000);
-      setOrder((prev) => ({ ...prev, shipping_fee: res?.data?.fee?.total || 21000 }));
 
-    } catch (error) {
-      console.error("Lỗi khi tính toán phí vận chuyển", error);
-    }
-  };
 
   useEffect(() => {
     if (dataCheckout && dataCheckout.user) {
@@ -230,10 +218,10 @@ const Checkout = () => {
         ship_user_email: dataCheckout.user.email || '',
         ship_user_name: dataCheckout.user.name || '',
         ship_user_phonenumber: dataCheckout.user.phone_number || '',
-        ship_user_address: dataDiaChi[0]?.address || '',
-        tinh: dataDiaChi[0]?.city?.name || '',
-        huyen: dataDiaChi[0]?.district?.name || '',
-        xa: dataDiaChi[0]?.ward?.name || '',
+        // ship_user_address: dataDiaChi[0]?.address || '',
+        // tinh: dataDiaChi[0]?.city?.name || '',
+        // huyen: dataDiaChi[0]?.district?.name || '',
+        // xa: dataDiaChi[0]?.ward?.name || '',
         quantityOfCart: quantityOfCart,
       }));
     }
@@ -245,6 +233,7 @@ const Checkout = () => {
   })
   const handleBuyCart = async () => {
     let payload = { cart_item_ids: cartIds };
+    console.log("cartIds", cartIds)
     if (cartIds.length > 0) {
       try {
         setIsLoading(true);
@@ -302,6 +291,19 @@ const Checkout = () => {
       setIsLoading(false);
     }
   }
+  let weight = dataCheckout?.order_items?.map((e: any) => Number(e.product.weight));
+  let totalWeight = weight?.reduce((sum: any, currentWeight: any) => sum + currentWeight, 0);
+  let toWardCode = payloadDiaChi?.ward?.id || idXa;
+  let toDistrictId = payloadDiaChi?.district?.id || idQuanHuyen;
+  const getShipp = async () => {
+    let res = await instance.post(`/calculateshippingfee`, {
+      to_ward_code: String(toWardCode),
+      to_district_id: Number(toDistrictId),
+      weight: totalWeight
+    });
+    setShipPing(res?.data?.fee?.total || 21000);
+    setOrder((prev) => ({ ...prev, shipping_fee: res?.data?.fee?.total || 21000 }));
+  };
   useEffect(() => {
     handleBuyNow()
   }, [_payload, payloadDiaChi])
@@ -309,13 +311,13 @@ const Checkout = () => {
     handleBuyCart()
   }, [payloadDiaChi]);
   useEffect(() => {
-    if (payloadDiaChi && payloadDiaChi.district && payloadDiaChi.ward) {
+    // if (payloadDiaChi && payloadDiaChi.district && payloadDiaChi.ward) {
+    //   getShipp();
+    // }
+    if (idQuanHuyen && idXa) {
       getShipp();
     }
-    else if (idQuanHuyen && idXa) {
-      getShipp();
-    }
-  }, [_payload, payloadDiaChi, idXa, idQuanHuyen]);
+  }, [idXa, idQuanHuyen]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -346,113 +348,121 @@ const Checkout = () => {
               <div className="flex flex-col lg:flex-row">
                 <div className="flex-1">
                   <div className="space-y-8">
-                    <div id="hd-ContactInfo" className="scroll-mt-24">
-                      <div className="border border-slate-200 rounded-xl overflow-hidden z-0">
-                        {
-                          token && <div className="flex flex-col sm:flex-row items-start p-6">
-                            <span className="hidden sm:block mt-4 ">
-                              <Map />
+                    {
+                      token &&
+                      <div className="scroll-mt-24">
+                        <div className="border border-slate-200 rounded-xl shadow-md overflow-hidden z-0">
+                          <div className="flex flex-col sm:flex-row items-start p-6 bg-white dark:bg-neutral-900">
+                            <span className="hidden sm:block mt-4">
+                              <User />
                             </span>
-                            <div className="sm:ml-4">
-                              <h3 className="text-black flex">
-                                <span className="uppercase tracking-tight">
-                                  Địa chỉ nhận hàng
-                                </span>
+                            <div className="sm:ml-4 flex-1">
+                              <h3 className="text-black text-lg font-semibold flex items-center space-x-2">
+                                <span className="uppercase tracking-tight text-base">{'Thông tin người dùng'}</span>
                                 <Completed />
                               </h3>
-                              <div className="font-semibold mt-1 text-sm">
+                              <div className="font-semibold mt-1 text-sm text-gray-700 dark:text-gray-300">
                                 <span>{dataCheckout?.user?.name}</span>
-                                <span className="ml-3 tracking-tighter">
+                                <span className="ml-3 tracking-tighter text-gray-600 dark:text-gray-400">
                                   {dataCheckout?.user?.phone_number}
                                 </span>
                               </div>
-                              <div className="mt-2">
-                                {
-                                  dataDiaChi?.map((e: any) => {
-                                    const addressParts = [
-                                      e?.address,
-                                      e?.ward?.name,
-                                      e?.district?.name,
-                                      e?.city?.name
-                                    ];
-                                    const fullAddress = addressParts.filter(Boolean).join(' - ');
-                                    return <div key={e.id}>{fullAddress}</div>;
-                                  })
-                                }
-
-
-                              </div>
-
                             </div>
-                            <button onClick={handleOpenModal} className="py-2 px-4 bg-slate-50 hover:bg-slate-100 mt-5 sm:mt-0 sm:ml-auto text-sm font-medium rounded-lg">
-                              Thay đổi
-                            </button>
-                          </div>
-                        }
-                        {/* <button onClick={handleOpenModal} className="py-2 px-4 bg-slate-50 hover:bg-slate-100 mt-5 sm:mt-0 sm:ml-auto text-sm font-medium rounded-lg">
-                           Địa chỉ nhận hàng
-                        </button> */}
-                        <div className="hd-no-account border-t border-slate-200 px-6 py-7 space-y-4 sm:space-y-6 hidden">
-                          <div className="flex justify-between flex-wrap items-baseline">
-                            <h3 className="text-lg font-semibold">
-                              Thông tin liên lạc
-                            </h3>
-                            <span className="block text-sm my-1 md:my-0">
-                              Bạn chưa có tài khoản?
-                              <Link
-                                to="##"
-                                className="text-primary-500 font-medium"
-                              >
-                                Đăng nhập
-                              </Link>
-                            </span>
-                          </div>
-                          <div className="max-w-lg">
-                            <label
-                              className="nc-Label font-medium text-neutral-900 text-sm"
-                              data-nc-id="Label"
-                            >
-                              Số điện thoại
-                            </label>
-                            <input
-                              className="block w-full outline-0 border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50 focus:border-neutral-200 rounded-2xl font-normal h-11 px-4 py-3 mt-1.5"
-                              type="text"
-                              defaultValue="+84 xxx"
-                            />
-                          </div>
-                          <div className="max-w-lg">
-                            <label
-                              className="nc-Label font-medium text-neutral-900 text-sm"
-                              data-nc-id="Label"
-                            >
-                              Email
-                            </label>
-                            <input
-                              className="block w-full outline-0 border border-neutral-200 focus:border-primary-300
-                                 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:focus:ring-primary-6000 
-                                 dark:focus:ring-opacity-25 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50
-                                  focus:border-neutral-200 rounded-2xl font-normal h-11 px-4 py-3 mt-1.5"
-                              type="email"
-                            />
-                          </div>
-                          <div className="flex flex-col sm:flex-row pt-6">
-                            <button className="hd-Button relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm sm:text-base font-medium py-3 px-4 sm:py-3.5 ttnc-ButtonPrimary disabled:bg-opacity-90 bg-slate-900 dark:bg-slate-100 hover:bg-slate-800 text-slate-50 dark:text-slate-800 sm:!px-7 shadow-none focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0">
-                              Lưu &amp; Tiếp tục mua sắm
-                            </button>
-                            <button className="hd-Button relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm sm:text-base font-medium py-3 px-4 sm:py-3.5 sm:px-6 ttnc-ButtonSecondary bg-white text-slate-700 dark:bg-slate-900 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800 mt-3 sm:mt-0 sm:ml-3 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0">
-                              Hủy
-                            </button>
                           </div>
                         </div>
+
+                        <div className="border border-slate-200 rounded-xl overflow-hidden z-0 mt-4 p-6 shadow-lg bg-white dark:bg-neutral-800">
+                          <div>
+                            <div className="sm:ml-4">
+                              <h3 className="text-black flex items-center space-x-2">
+                                <Map />
+                                <span className="uppercase tracking-tight font-semibold text-xl">Địa chỉ nhận hàng</span>
+                                <Completed />
+                              </h3>
+
+                              <div className="sm:flex space-y-4 sm:space-y-0 sm:space-x-4 mt-4">
+                                {/* Thành phố */}
+                                <div className="flex-1">
+                                  <label className="hd-Label text-base font-medium text-neutral-900">Thành phố</label>
+                                  <Select
+                                    labelInValue
+                                    onChange={handleChangeTinh}
+                                    showSearch
+                                    optionFilterProp="children"
+                                    className={`hd-Select outline-none h-11 mt-1.5 block w-full text-sm rounded-2xl border ${error?.tinh ? 'border-red-500' : 'border-neutral-200'} focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:bg-neutral-50 dark:focus:ring-primary-6000 dark:focus:ring-opacity-25`}
+                                  >
+                                    {tinhThanh?.provinces?.map((e: any) => (
+                                      <Option key={e?.ProvinceID} value={e?.ProvinceID}>
+                                        {e?.ProvinceName}
+                                      </Option>
+                                    ))}
+                                  </Select>
+                                  {error?.tinh && <p className="text-sm text-red-500">{error?.tinh[0]}</p>}
+                                </div>
+
+                                {/* Quận huyện */}
+                                <div className="flex-1">
+                                  <label className="hd-Label text-base font-medium text-neutral-900">Quận huyện</label>
+                                  <Select
+                                    labelInValue
+                                    value={idQuanHuyen ? { value: idQuanHuyen } : ''}
+                                    onChange={handleChangeQuanHuyen}
+                                    className={`hd-Select outline-none h-11 mt-1.5 block w-full text-sm rounded-2xl border ${error?.huyen ? 'border-red-500' : 'border-neutral-200'} focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:bg-neutral-50 dark:focus:ring-primary-6000 dark:focus:ring-opacity-25`}
+                                  >
+                                    {quanHuyen?.districts?.map((quan: any) => (
+                                      <Option key={quan.DistrictID} value={quan.DistrictID}>
+                                        {quan.DistrictName}
+                                      </Option>
+                                    ))}
+                                  </Select>
+                                  {error?.huyen && <p className="text-sm text-red-500">{error?.huyen[0]}</p>}
+                                </div>
+
+                                {/* Phường xã */}
+                                <div className="flex-1">
+                                  <label className="hd-Label text-base font-medium text-neutral-900">Phường Xã</label>
+                                  <Select
+                                    labelInValue
+                                    value={idXa ? { value: String(idXa) } : null}
+                                    onChange={handleChangeXa}
+                                    className={`hd-Select outline-none h-11 mt-1.5 block w-full text-sm rounded-2xl border ${error?.xa ? 'border-red-500' : 'border-neutral-200'} focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:bg-neutral-50 dark:focus:ring-primary-6000 dark:focus:ring-opacity-25`}
+                                  >
+                                    {phuongXa?.wards?.map((e: any) => (
+                                      <Option key={e?.WardCode} value={`${e?.WardCode}`}>
+                                        {e?.WardName}
+                                      </Option>
+                                    ))}
+                                  </Select>
+                                  {error?.xa && <p className="text-sm text-red-500">{error?.xa[0]}</p>}
+                                </div>
+                              </div>
+                              <div className="mt-2">
+                                <label className="hd-Label text-base font-medium text-neutral-900">Địa chỉ cụ thể</label>
+                                <input
+                                  className={`block w-full outline-none border ${error?.ship_user_address ? 'border-red-500' : 'border-neutral-200'} focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50 rounded-2xl font-normal h-11 px-4 py-3 mt-1.5`}
+                                  type="text"
+                                  placeholder="Nhập địa chỉ cụ thể"
+                                  onChange={(e) => setForm("ship_user_address", e.target.value)}
+                                />
+                                {error?.ship_user_address && (
+                                  <p className="text-sm text-red-500">{error?.ship_user_address[0]}</p>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
                       </div>
-                    </div>
+                    }
                     <div id="hd-ShippingAddress" className="scroll-mt-24">
                       <div className="border border-slate-200 rounded-xl">
                         <div className="hd-body-ShippingAddress border-t border-slate-200 px-6 py-7 space-y-4 sm:space-y-6 block">
                           {
                             !token && (
                               <>
-                                <h3>Thông tin người nhận hàng</h3>
+                                <h3 className="text-2xl font-bold text-center text-gray-900 border-b-2 border-gray-300 pb-2 mb-6">
+                                  Thông tin người nhận hàng
+                                </h3>
 
                                 {/* Nhập thông tin người nhận */}
                                 <div className="sm:flex space-y-4 sm:space-y-0 sm:space-x-3">
@@ -512,7 +522,6 @@ const Checkout = () => {
                                     )}
                                   </div>
                                 </div>
-
                                 {/* Chọn địa chỉ */}
                                 <div className="sm:flex space-y-4 sm:space-y-0 sm:space-x-3">
                                   {/* Thành phố */}
@@ -579,10 +588,6 @@ const Checkout = () => {
                               </>
                             )
                           }
-
-
-
-
                           <div className="sm:flex space-y-4 sm:space-y-0 sm:space-x-3">
                             <div className="flex-1">
                               <label
@@ -658,15 +663,15 @@ const Checkout = () => {
                   </div>
                 </div>
                 {/*end-left*/}
-                <div className="flex-shrink-0 border-t lg:border-t-0 lg:border-l border-slate-200 my-10 lg:my-0 lg:mx-10 xl:lg:mx-14 2xl:mx-16" />
-                <div className="w-full lg:w-[36%]">
+                <div className="flex-shrink-0 border-t lg:border-t-0 lg:border-l border-slate-200 my-10 lg:my-0 lg:mx-10 xl:lg:mx-14 2xl:mx-8" />
+                <div className="w-full lg:w-[40%] bg-white dark:bg-neutral-800 p-6 rounded-xl shadow-lg">
                   <h3 className="text-lg font-semibold mb-4">Đặt hàng</h3>
                   {
                     // isLoading ? <Loading /> :
                     dataCheckout?.order_items.map((e: any) => (
                       <>
                         <div className="relative flex  first:pt-0 last:pb-0">
-                          <div className="relative h-36 w-24 sm:w-28 flex-shrink-0 overflow-hidden  ">
+                          <div className="relative h-36 w-24 sm:w-28 flex-shrink-0 overflow-hidden my-2 ">
                             <img
                               alt={e?.product?.name || "Product Image"}
                               loading="lazy"
@@ -756,6 +761,9 @@ const Checkout = () => {
                       </>
                     ))}
 
+                  {error?.quantity && (
+                    <p className="text-sm text-red-500 mt-2">{error?.quantity[0]}</p>
+                  )}
                   <div className="hd-checkout-pro mt-8 divide-y divide-slate-200/70">
 
 
@@ -800,7 +808,13 @@ const Checkout = () => {
                     }
                     <div className="flex justify-between py-2.5 mt-2">
                       <span>Phí ship</span>
-                      <span className="font-semibold text-slate-900">{FormatMoney(Number(shiping)) ? FormatMoney(Number(shiping)) : 21000}</span>
+                      <span className="font-semibold text-slate-900">
+                        {/* {FormatMoney(Number(21000))} */}
+                        {/* {
+                          console.log("shiping", shiping)
+                        } */}
+                        {FormatMoney(Number(shiping)) ? FormatMoney(Number(shiping)) : FormatMoney(Number(21000))}
+                      </span>
                     </div>
 
                     <div className="flex justify-between font-semibold text-slate-900 text-base pt-4">

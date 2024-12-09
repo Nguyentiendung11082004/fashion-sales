@@ -17,6 +17,7 @@ import HeartRedPopup from "../icons/detail/HeartRedPopup";
 
 const CartPopup = forwardRef((props: any, ref) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { slugProduct, setSlugProduct }: any = props;
   const { idProduct, setIdProduct }: any = props;
   const [product, setProduct] = useState<any>();
   const { handleAddToWishlist, isInWishlist } = useWishlist();
@@ -27,20 +28,21 @@ const CartPopup = forwardRef((props: any, ref) => {
     product_variant: {},
   });
   const { data, isLoading } = useQuery({
-    queryKey: ["product", idProduct],
+    queryKey: ["product", slugProduct],
     queryFn: async () => {
-      if (!idProduct) {
+      if (!slugProduct) {
         return;
       }
       try {
-        return await productShow_client(`${idProduct}`);
+        return await productShow_client(`${slugProduct}`);
       } catch (error) {
         throw new Error("Không có sản phẩm nào phù hợp");
       }
     },
-    enabled: !!idProduct,
+    enabled: !!slugProduct,
   });
-
+  console.log("kiểm tra slug nè : ", slugProduct);
+  console.log("kiểm tra id nè : ", idProduct);
   const getUniqueAttributes = data?.getUniqueAttributes;
 
   console.log("data", data);
@@ -109,7 +111,6 @@ const CartPopup = forwardRef((props: any, ref) => {
   useEffect(() => {
     setIsInitialLoad(true);
   }, [idProduct]);
-  console.log("kiểm tra result[0]: ", result);
   useEffect(() => {
     if (result && result.length > 0 && isInitialLoad) {
       setSelectedAttributes({ product_variant: result[0] });
@@ -175,6 +176,7 @@ const CartPopup = forwardRef((props: any, ref) => {
   };
   const handleClose = () => {
     setIsModalOpen(false);
+    setSlugProduct("");
     setIdProduct("");
   };
   useImperativeHandle(ref, () => ({
@@ -308,7 +310,7 @@ const CartPopup = forwardRef((props: any, ref) => {
     //           onClick={() => {
     //             handleClose();
     //             console.log("số lượng : ", quantity);
-    //             onHandleAddToCart(idProduct, product?.id, quantity);
+    //             onHandleAddToCart(slugProduct, product?.id, quantity);
     //           }}
     //           className="h-12 w-full mt-4 rounded-full bg-[#56cfe1] text-white text-lg font-medium hover:bg-[#4bc3d5]"
     //         >
