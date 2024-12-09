@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { notifyOrdersChanged, useRealtimeOrders } from "@/common/hooks/useRealtimeOrders";
 import instance from "@/configs/axios";
 import { EyeOutlined } from "@ant-design/icons";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -22,6 +23,7 @@ const FastDelivery = () => {
       }
     },
   });
+  useRealtimeOrders();
   const orStatus: Record<number, string> = {
     1: "Đang giao hàng",
     2: "Giao hàng thành công",
@@ -41,6 +43,7 @@ const FastDelivery = () => {
       });
       queryClient.invalidateQueries({ queryKey: ["ghn_get_order"] });
       toast.success("Cập nhật trạng thái thành công");
+      notifyOrdersChanged();
     } catch (error) {
       console.error("Cập nhật trạng thái thất bại:", error);
     }
@@ -133,6 +136,7 @@ const FastDelivery = () => {
         <div>
           <Table
             className="custom-table"
+            scroll={{ x: "max-content" }}
             dataSource={dataSource.slice(
               (currentPage - 1) * pageSize,
               currentPage * pageSize

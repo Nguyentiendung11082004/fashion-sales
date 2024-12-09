@@ -225,15 +225,15 @@ const SidebarMenu = memo(({ selectedKey }: { selectedKey: string }) => (
           </NavLink>
         ),
       },
-      {
-        key: "11",
-        icon: <CommentOutlined />,
-        label: (
-          <NavLink className="text-white" to="/admin/chatbox">
-            Tin nhắn
-          </NavLink>
-        ),
-      },
+      // {
+      //   key: "11",
+      //   icon: <CommentOutlined />,
+      //   label: (
+      //     <NavLink className="text-white" to="/admin/chatbox">
+      //       Tin nhắn
+      //     </NavLink>
+      //   ),
+      // },
 
       {
         key: "13",

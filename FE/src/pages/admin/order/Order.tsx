@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { notifyOrdersChanged, useRealtimeOrders } from "@/common/hooks/useRealtimeOrders";
 import Loading from "@/common/Loading/Loading";
 import { IOrder } from "@/common/types/order";
 import { IVouchers } from "@/common/types/vouchers";
@@ -48,6 +49,8 @@ const OrderPage = () => {
       }
     },
   });
+
+  useRealtimeOrders();
 
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
 
@@ -121,6 +124,7 @@ const OrderPage = () => {
         queryClient.invalidateQueries({ queryKey: ["order-status"] });
 
         toast.success("Cập nhật trạng thái đơn hàng thành công!");
+        notifyOrdersChanged();
       } else {
         const errorMessage = response.data?.message;
 

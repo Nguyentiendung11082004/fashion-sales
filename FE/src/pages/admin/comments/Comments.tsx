@@ -163,6 +163,7 @@ const CommentPage = () => {
           <>
             <Table
               className="custom-table"
+              scroll={{ x: "max-content" }}
               dataSource={dataSource.slice(
                 (currentPage - 1) * pageSize,
                 currentPage * pageSize
