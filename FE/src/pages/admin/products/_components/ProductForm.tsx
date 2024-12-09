@@ -327,8 +327,8 @@ const ProductForm = () => {
                                 {/* {
                                     variants[index]?.map((e: any) => (
                                         <> */}
-                                            <img src={variants[index]?.image} alt="Uploaded" style={{ marginTop: 16, width: 30, height: '30px', marginBottom: '10px' }} />
-                                        {/* </>
+                                <img src={variants[index]?.image} alt="Uploaded" style={{ marginTop: 16, width: 30, height: '30px', marginBottom: '10px' }} />
+                                {/* </>
                                     ))
                                 } */}
                             </div>

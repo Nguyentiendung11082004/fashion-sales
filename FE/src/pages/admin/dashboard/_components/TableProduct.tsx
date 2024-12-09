@@ -93,89 +93,98 @@ const TableProduct: React.FC = () => {
     status: [],
   });
   const [dataProduct, setDataProduct] = useState<ProductData | null>(null);
+
   const getData = async () => {
-    let res = await instance.post(`/getproductstatistics`, {
-      status: filter.status,
-      type: filter.type
-    })
-    if (res) {
-      setDataProduct(res?.data)
+    try {
+      const res = await instance.post(`/getproductstatistics`, {
+        status: filter.status,
+        type: filter.type,
+      });
+      if (res?.data) {
+        setDataProduct(res.data); // Cập nhật dữ liệu mới, không thêm vào
+      }
+    } catch (error) {
+      console.error("Error fetching product data:", error);
     }
-  }
-  const handleStatusChange = (value: any) => {
-    setFilter(prev => ({
+  };
+
+  // Xử lý khi thay đổi trạng thái
+  const handleStatusChange = (value: number[]) => {
+    setFilter((prev) => ({
       ...prev,
-      status: value
+      status: value,
     }));
   };
-  const handleTypeChange = (value: any) => {
-    setFilter(prev => ({
+
+  // Xử lý khi thay đổi loại sản phẩm
+  const handleTypeChange = (value: number[]) => {
+    setFilter((prev) => ({
       ...prev,
-      type: value
+      type: value,
     }));
   };
-  const variantProducts = (dataProduct?.variant_products || [])?.map((item: any) => ({
-    key: item.variant_id,
-    name: item.product_name + ' - ' + item.variant_sku,
-    sku: item.variant_sku,
-    total_sold: item.total_sold,
-    remaining_quantity: item.remaining_quantity,
-    status: item.status,
-    attributes: item.attributes.map((attr: any) => `${attr.attribute_name}: ${attr.attribute_value}`).join(", "),
-  })) || [];
-  console.log("variantProducts", variantProducts)
-  const simpleProducts = Object.values(dataProduct?.simple_products || {}).map((item: any) => ({
-    key: item.id,
-    name: item.name,
-    sku: item.sku,
-    total_sold: item.total_sold,
-    remaining_quantity: item.remaining_quantity,
-    status: item.status,
-  }));
+
+  // Kết hợp dữ liệu đơn giản và biến thể
+  const variantProducts =
+    dataProduct?.variant_products?.map((item) => ({
+      key: `variant-${item.variant_id}`,
+      name: `${item.product_name} - ${item.variant_sku}`,
+      sku: item.variant_sku,
+      total_sold: item.total_sold,
+      remaining_quantity: item.remaining_quantity,
+      status: item.status,
+      attributes: item.attributes
+        .map((attr) => `${attr.attribute_name}: ${attr.attribute_value}`)
+        .join(", "),
+    })) || [];
+
+  const simpleProducts =
+    Object.values(dataProduct?.simple_products || {})?.map((item) => ({
+      key: `simple-${item.id}`,
+      name: item.name,
+      sku: item.sku,
+      total_sold: item.total_sold,
+      remaining_quantity: item.remaining_quantity,
+      status: item.status,
+    }));
+
+  // Dữ liệu được tái tạo mỗi lần `dataProduct` thay đổi
   const combinedData = [...simpleProducts, ...variantProducts];
-  const statusOptions = [
-    { value: 1, label: 'Tồn kho' },
-    { value: 2, label: 'Sắp Hết hàng' },
-    { value: 3, label: 'Bán chạy' },
-  ];
+
+  // Gọi API mỗi lần bộ lọc thay đổi
   useEffect(() => {
-    getData()
-  }, [filter])
+    getData();
+  }, [filter]);
+
   return (
     <>
-      <Space style={{ marginBottom: 16, width: '100%' }}>
+      <Space style={{ marginBottom: 16, width: "100%" }}>
         <Select
-          mode='multiple'
+          mode="multiple"
           value={filter.status}
           onChange={handleStatusChange}
-          style={{ width: 400, height: 40 }}
+          style={{ width: 400 }}
           placeholder="Chọn trạng thái"
-        // options={statusOptions}
         >
-          {statusOptions.map((option) => (
-            <Select.Option key={option.value} value={option.value}>
-              {option.label}
-            </Select.Option>
-          ))}
+          <Select.Option value={1}>Tồn kho</Select.Option>
+          <Select.Option value={2}>Sắp hết hàng</Select.Option>
+          <Select.Option value={3}>Bán chạy</Select.Option>
         </Select>
         <Select
-          mode='multiple'
+          mode="multiple"
           value={filter.type}
           onChange={handleTypeChange}
-          style={{ width: 400, height: 40 }}
+          style={{ width: 400 }}
           placeholder="Chọn loại sản phẩm"
         >
           <Select.Option value={0}>Sản phẩm đơn</Select.Option>
           <Select.Option value={1}>Sản phẩm biến thể</Select.Option>
         </Select>
       </Space>
-      <Table
-        columns={columns}
-        dataSource={combinedData}
-        rowKey="key"
-      />
+      <Table columns={columns} dataSource={combinedData} rowKey="key" />
     </>
   );
 };
+
 
 export default TableProduct;

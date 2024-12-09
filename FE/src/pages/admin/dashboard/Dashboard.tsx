@@ -10,7 +10,6 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import DonutChartWithStats from "./_components/pieChart/DonutChartWithStats";
-import TableProduct from "../products/_components/TableProduct";
 import TableOrder from "../tableOrder/TableOrder";
 import Chart from "./_components/chart/Chart";
 import LocationChart from "./_components/locationChart/LocationChart";
@@ -20,9 +19,11 @@ import { DatePicker, Select, Space } from 'antd';
 const { RangePicker } = DatePicker;
 import type { DatePickerProps, GetProps } from 'antd';
 type RangePickerProps = GetProps<typeof DatePicker.RangePicker>;
-import dayjs from 'dayjs';
 import { FormatMoney } from "@/common/utils/utils";
 import { useUser } from "@/common/context/User/UserContext";
+import TableProduct from "./_components/TableProduct";
+import dayjs from 'dayjs';
+
 export const DashboardContext = createContext<any | undefined>(undefined);
 
 const Dashboard = () => {
@@ -127,6 +128,7 @@ const Dashboard = () => {
               style={{ width: 280, height: '38px' }}
               className="border-none mr-5"
               onChange={hanldeChangeType}
+              defaultValue="day"
               allowClear
             >
               <Option value="day">Tìm theo ngày</Option>
@@ -141,6 +143,7 @@ const Dashboard = () => {
                 className="border border-gray-300 rounded-lg p-2 mt-4  text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Chọn"
                 picker={filter.filter_type === 'day' ? 'date' : filter.filter_type}
+                defaultValue={filter.filter_type === 'day' ? dayjs(new Date()) : undefined}
               />
             }
             {
@@ -199,7 +202,7 @@ const Dashboard = () => {
               <h3 className="text-xs text-gray-400 font-bold">Tổng số đơn hàng</h3>
               {/* <span className="order text-red-500 font-medium">- 3.57 %</span> */}
             </div>
-            <p className="text-xl font-semibold text-gray-600 mt-4">{tongDonHang?.total_quantity_in_order}</p>
+            <p className="text-xl font-semibold text-gray-600 mt-4">{tongDonHang?.total_quantity_in_order || 0}</p>
             <div className="flex justify-between items-center">
               <a
                 href="#"
