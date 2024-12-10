@@ -1,6 +1,6 @@
 <?php
 
-use App\Events\CartEvent;
+// use App\Events\CartEvent;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\Admin\TagController;
 use App\Http\Controllers\Api\V1\Admin\BrandController;
