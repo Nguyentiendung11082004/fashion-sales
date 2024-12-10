@@ -52,7 +52,7 @@ const ProductDetail = () => {
       try {
         return await productShow_client(`${slug}`);
       } catch (error) {
-        navigate("*");
+        navigate("/notfound");
         throw new Error("Không có sản phẩm nào phù hợp");
       }
     },
