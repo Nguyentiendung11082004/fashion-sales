@@ -44,6 +44,7 @@ const Checkout = () => {
       payment_method_id: newPaymentMethod,
     }));
   };
+
   const qty = dataCheckout?.order_items?.map((e: any) => e?.quantity);
   const cartItemIds = dataCheckout?.order_items?.map((e: any) => e);
   const quantityOfCart = cartItemIds?.reduce((acc: any, id: any, index: number) => {
@@ -129,6 +130,13 @@ const Checkout = () => {
     }))
     mutationVoucher.mutate();
   };
+  // const handleCancelVoucher = () => {
+  //   setOrder((prev: any) => ({
+  //     ...prev,
+  //     voucher_code: ""
+  //   }))
+  //   mutationVoucher.mutate();
+  // }
   const setForm = (props: any, value: any) => {
     setOrder((prev) => ({
       ...prev,
@@ -233,11 +241,9 @@ const Checkout = () => {
   })
   const handleBuyCart = async () => {
     let payload = { cart_item_ids: cartIds };
-    console.log("cartIds", cartIds)
     if (cartIds.length > 0) {
       try {
         setIsLoading(true);
-        console.log("1")
         const response = await fetch('http://127.0.0.1:8000/api/v1/checkout', {
           method: 'POST',
           headers: {
@@ -265,7 +271,6 @@ const Checkout = () => {
   const handleBuyNow = async () => {
     try {
       if (_payload || payloadDiaChi) {
-        console.log("2")
         setIsLoading(true);
         const response = await fetch('http://127.0.0.1:8000/api/v1/checkout', {
           method: 'POST',
@@ -441,6 +446,7 @@ const Checkout = () => {
                                 <input
                                   className={`block w-full outline-none border ${error?.ship_user_address ? 'border-red-500' : 'border-neutral-200'} focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50 rounded-2xl font-normal h-11 px-4 py-3 mt-1.5`}
                                   type="text"
+                                  defaultValue={dataCheckout?.user?.address}
                                   placeholder="Nhập địa chỉ cụ thể"
                                   onChange={(e) => setForm("ship_user_address", e.target.value)}
                                 />
@@ -487,6 +493,7 @@ const Checkout = () => {
                                       className={`block w-full outline-0 border ${error?.ship_user_address ? 'border-red-500' : 'border-neutral-200'} focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50 focus:border-neutral-200 rounded-2xl font-normal h-11 px-4 py-3 mt-1.5`}
                                       type="text"
                                       placeholder="Nhập địa chỉ cụ thể"
+                                      defaultValue={dataCheckout?.user?.address}
                                       onChange={(e) => setForm("ship_user_address", e.target.value)}
                                     />
                                     {error?.ship_user_address && (
@@ -798,6 +805,9 @@ const Checkout = () => {
                             <button onClick={() => handleVoucher()} className="ml-5 bg-[#00BADB] hover:bg-[#23b6cd] text-white rounded-lg my-2 p-2">
                               Áp dụng
                             </button>
+                            {/* <button onClick={() => handleCancelVoucher()} className="ml-5 bg-[#00BADB] hover:bg-[#23b6cd] text-white rounded-lg my-2 p-2">
+                              Bỏ áp dụng
+                            </button> */}
                           </div>
                         </div>
                         <div className="flex justify-between py-2.5">

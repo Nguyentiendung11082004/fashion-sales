@@ -12,7 +12,7 @@ import {
   OrderedListOutlined,
 } from "@ant-design/icons";
 import { Button, Layout, Menu } from "antd";
-import { NavLink, Outlet, useLocation } from "react-router-dom";
+import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBell,
@@ -517,6 +517,7 @@ const LayoutAdmin: React.FC = () => {
                 <p className="text-sm font-medium">{user?.InforUser?.name}</p>
                 <span className="text-xs text-gray-500">Super admin</span>
               </div>
+            
             </div>
           </div>
         </div>
