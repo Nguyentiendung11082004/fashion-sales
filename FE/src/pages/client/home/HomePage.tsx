@@ -851,6 +851,7 @@ const HomePage = () => {
             </Button>
           )}
         </section>
+        
         <Post />
 
         <Slideshow />

@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { notifyOrdersChanged, useRealtimeOrders } from "@/common/hooks/useRealtimeOrders";
 import Loading from "@/common/Loading/Loading";
 import { IOrder } from "@/common/types/order";
 import { IVouchers } from "@/common/types/vouchers";
@@ -9,6 +10,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { DatePickerProps, GetProps } from "antd";
 import { Button, DatePicker, Pagination, Select } from "antd";
 import Table, { ColumnType } from "antd/es/table";
+import Pusher from "pusher-js";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -75,6 +77,9 @@ const OrderPage = () => {
     
   });
   const dataOrder = data?.data?.data;
+
+  useRealtimeOrders();
+
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
 
   const prinfOrderAll = async () => {
@@ -143,6 +148,7 @@ const OrderPage = () => {
         queryClient.invalidateQueries({ queryKey: ["order-status"] });
 
         toast.success("Cập nhật trạng thái đơn hàng thành công!");
+        notifyOrdersChanged();
       } else {
         const errorMessage = response.data?.message;
         toast.error(errorMessage);
@@ -300,6 +306,51 @@ const OrderPage = () => {
   const closePdfViewer = () => {
     setPdfUrl(null);
   };
+
+  useEffect(() => {
+    const pusher = new Pusher("4d3e0d70126f2605977e", {
+      cluster: "ap1",
+    });
+  
+    const channel = pusher.subscribe("orders");
+    pusher.connection.bind("connected", () => {
+      console.log("Connected to Pusher!");
+    });
+  
+    channel.bind("order.updated", (newOrder: any) => {
+      console.log("Data received from Pusher:", newOrder);
+  
+      const updatedOrder = newOrder.order; 
+      console.log("Extracted updated order:", updatedOrder);
+      
+      queryClient.invalidateQueries({ queryKey: ["order-status"] });
+  
+      // queryClient.setQueryData(["order-status"], (oldData: any) => {
+      //   const orders = Array.isArray(oldData?.data) ? [...oldData.data] : [];
+      //   console.log("order:", orders);
+      //   const index = orders.findIndex((order) => order.id === updatedOrder.id);
+      
+      //   if (index >= 0) {
+      //     orders[index] = updatedOrder; 
+      //   } else {
+      //     orders.push(updatedOrder);
+      //   }
+      //   console.log("Updated cache data:", { ...oldData, data: orders });
+      //   return {
+      //     ...oldData, 
+      //     data: orders, 
+      //   };
+      // });
+      
+    });
+  
+    return () => {
+      channel.unbind_all();
+      channel.unsubscribe();
+    };
+  }, [queryClient]);
+  
+
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>{error.message}</div>;
 
