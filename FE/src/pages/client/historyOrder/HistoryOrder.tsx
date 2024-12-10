@@ -9,12 +9,13 @@ import {
 import instance from "@/configs/axios";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Input, Modal, Table } from "antd";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import CommentProduct from "../productDetail/CommentProduct";
 import ReasonReturn from "../requestOrder/components/ReasonReturn";
 import { useUser } from "@/common/context/User/UserContext";
+import Pusher from "pusher-js";
 
 const HistoryOrder = () => {
   const [expandedOrders, setExpandedOrders] = useState<number[]>([]);
@@ -231,6 +232,50 @@ const HistoryOrder = () => {
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber);
   };
+
+  useEffect(() => {
+    const pusher = new Pusher("4d3e0d70126f2605977e", {
+      cluster: "ap1",
+    });
+
+    const channel = pusher.subscribe("orders");
+    pusher.connection.bind("connected", () => {
+      console.log("Connected to Pusher!");
+    });
+    channel.bind("order.updated", (newOrder: any) => {
+      // queryClient.setQueryData(["order-status"], (oldData: any) => {
+      //   const orders = Array.isArray(oldData) ? oldData : [];
+      //   return orders.map((order: any) =>
+      //     order.id === newOrder.id ? newOrder : order
+      //   );
+      // });
+      queryClient.invalidateQueries({ queryKey: ["history-order"] });
+    });
+
+    return () => {
+      channel.unbind_all();
+      channel.unsubscribe();
+    };
+  }, [queryClient]);
+  //   const pusher = new Pusher("4d3e0d70126f2605977e", {
+  //     cluster: "ap1",
+  //   });
+
+  //   const channel = pusher.subscribe("orders");
+  //   channel.bind("order.updated", (newOrder: any) => {
+  //     queryClient.setQueryData(["history-order"], (oldData: any) => {
+  //       if (!oldData) return [newOrder];
+  //       return oldData.map((order: any) =>
+  //         order.id === newOrder.id ? newOrder : order
+  //       );
+  //     });
+  //   });
+
+  //   return () => {
+  //     channel.unbind_all();
+  //     channel.unsubscribe();
+  //   };
+  // }, [queryClient]);
   return (
     <>
       <main
@@ -837,7 +882,9 @@ const HistoryOrder = () => {
                         <p className="mr-2">Thành tiền: </p>
                         <span className="text-[red] font-medium text-xl">
                           {/* {FormatMoney(order.total)}đ */}
-                          {new Intl.NumberFormat("vi-VN").format(order.total)}₫
+                          {new Intl.NumberFormat("vi-VN").format(
+                            order.total
+                          )}₫
                         </span>
                       </div>
                     </div>
