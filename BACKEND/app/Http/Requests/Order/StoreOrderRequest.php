@@ -75,41 +75,41 @@ class StoreOrderRequest extends FormRequest
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
-            $this->validateProduct($validator);
+            // $this->validateProduct($validator);
             $this->validateVoucher($validator);
         });
     }
 
-    protected function validateProduct($validator)
-    {
-        if ($this->has('product_id')) {
-            $product = Product::find($this->product_id);
-            if ($product->type) {
-                if (!$this->filled('product_variant_id')) {
-                    $validator->errors()->add('product_variant_id', 'Vui lòng chọn biến thể sản phẩm.');
-                } else {
-                    $this->validateVariant($validator, $product);
-                }
-            } else {
-                if ($this->filled('product_variant_id')) {
-                    $validator->errors()->add('product_variant_id', 'Sản phẩm đơn không có biến thể.');
-                }
-                if ($this->quantity > $product->quantity) {
-                    $validator->errors()->add('quantity', 'Số lượng mua vượt quá số lượng tồn kho.');
-                }
-            }
-        }
-    }
+    // protected function validateProduct($validator)
+    // {
+    //     if ($this->has('product_id')) {
+    //         $product = Product::find($this->product_id);
+    //         if ($product->type) {
+    //             if (!$this->filled('product_variant_id')) {
+    //                 $validator->errors()->add('product_variant_id', 'Vui lòng chọn biến thể sản phẩm.');
+    //             } else {
+    //                 $this->validateVariant($validator, $product);
+    //             }
+    //         } else {
+    //             if ($this->filled('product_variant_id')) {
+    //                 $validator->errors()->add('product_variant_id', 'Sản phẩm đơn không có biến thể.');
+    //             }
+    //             if ($this->quantity > $product->quantity) {
+    //                 $validator->errors()->add('quantity', 'Số lượng mua vượt quá số lượng tồn kho.');
+    //             }
+    //         }
+    //     }
+    // }
 
-    protected function validateVariant($validator, $product)
-    {
-        $variant = ProductVariant::find($this->product_variant_id);
-        if (!$variant || $variant->product_id != $product->id) {
-            $validator->errors()->add('product_variant_id', 'Biến thể sản phẩm không hợp lệ.');
-        } elseif ($this->quantity > $variant->quantity) {
-            $validator->errors()->add('quantity', 'Số lượng mua vượt quá số lượng tồn kho của biến thể.');
-        }
-    }
+    // protected function validateVariant($validator, $product)
+    // {
+    //     $variant = ProductVariant::find($this->product_variant_id);
+    //     if (!$variant || $variant->product_id != $product->id) {
+    //         $validator->errors()->add('product_variant_id', 'Biến thể sản phẩm không hợp lệ.');
+    //     } elseif ($this->quantity > $variant->quantity) {
+    //         $validator->errors()->add('quantity', 'Số lượng mua vượt quá số lượng tồn kho của biến thể.');
+    //     }
+    // }
 
     protected function validateVoucher($validator)
     {
