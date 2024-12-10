@@ -17,7 +17,7 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id(); // ID đơn hàng
-            $table->foreignIdFor(User::class)->nullable()->constrained()->onDelete('cascade'); // Liên kết với bảng users
+            $table->foreignIdFor(User::class)->nullable()->constrained()->onDelete('set null'); // Liên kết với bảng users
             $table->foreignIdFor(PaymentMethod::class)->constrained()->onDelete('cascade'); // Liên kết với bảng payment_methods
             $table->enum('order_status', \App\Models\Order::getOrderStatuses())->default(\App\Models\Order::STATUS_PENDING); // Trạng thái đơn hàng (completed, pending, shipped, v.v.).
             $table->enum('payment_status', \App\Models\Order::getPaymentStatuses())->default(\App\Models\Order::PAYMENT_PENDING); // Trạng thái thanh toán
