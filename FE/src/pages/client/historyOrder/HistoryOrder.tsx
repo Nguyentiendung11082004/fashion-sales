@@ -221,41 +221,7 @@ const HistoryOrder = () => {
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber);
   };
-    
-
-  useEffect(() => {
-    // Kết nối với Pusher
-    const pusher = new Pusher('4d3e0d70126f2605977e', {
-      cluster: "ap1",
-    });
-
-    // Đăng ký kênh và sự kiện
-    const channel = pusher.subscribe("orders");
-    channel.bind("order.updated", (newOrder: any) => {
-      console.log("newOrder", newOrder);
-      
-      // Cập nhật danh sách đơn hàng trong cache React Query
-      queryClient.setQueryData(["history-order"], (oldData: any) => {
-        // console.log(newOrder.id);
-        const orders = Array.isArray(oldData) ? oldData : [];
-        return orders.map((order: any) =>
-
-          order.id === newOrder.id ? newOrder : order
-          
-        );
-        
-      });
-    });
-
-    // Cleanup khi component bị hủy
-    return () => {
-      channel.unbind_all();
-      channel.unsubscribe();
-    };
-  }, [queryClient]);
-
-
-
+ 
   return (
     <>
       <main
