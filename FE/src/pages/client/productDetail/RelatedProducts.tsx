@@ -71,7 +71,7 @@ const RelatedProducts = () => {
             <div key={relatedProduct.id} className="lg:mb-[25px] mb-[20px]">
               <div className="lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] sm:h-[345px] overflow-hidden">
                 <Link
-                  to={`/products/${relatedProduct?.id}`}
+                  to={`/products/${relatedProduct?.slug}.html`}
                   className="absolute inset-0"
                 >
                   <img
@@ -93,10 +93,7 @@ const RelatedProducts = () => {
                   </Link>
                 </div>
                 <div className="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100">
-                  <Link
-                    to={`/products/${product?.slug}.html`}
-                    className="group/btn relative m-auto"
-                  >
+                  <Link to={""} className="group/btn relative m-auto">
                     <button className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]">
                       <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
                         Xem thêm
@@ -137,7 +134,11 @@ const RelatedProducts = () => {
                 </div>
               </div>
               <div>
-                <p className="text-sm text-black mb-1">{relatedProduct.name}</p>
+                <Link to={`/products/${relatedProduct?.slug}.html`}>
+                  <p className="text-sm text-black mb-1">
+                    {relatedProduct.name}
+                  </p>
+                </Link>
                 <del className="mr-1">{relatedProduct.price_regular}</del>
                 <span className="text-[red]">{relatedProduct.price_sale}</span>
               </div>

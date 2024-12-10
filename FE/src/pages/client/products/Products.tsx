@@ -1278,10 +1278,12 @@ const Products = () => {
                             </div>
                           </div>
                           <div>
-                            <p className="text-base font-medium text-black mb-1 cursor-pointer hd-all-hover-bluelight">
-                              {product.name.charAt(0).toUpperCase() +
-                                product.name.slice(1).toLowerCase()}
-                            </p>
+                            <Link to={`/products/${product?.slug}.html`}>
+                              <p className="text-base font-medium text-black mb-1 cursor-pointer hd-all-hover-bluelight">
+                                {product.name.charAt(0).toUpperCase() +
+                                  product.name.slice(1).toLowerCase()}
+                              </p>
+                            </Link>
                             {(product?.price_regular ||
                               product?.variants?.length) && (
                               <div>

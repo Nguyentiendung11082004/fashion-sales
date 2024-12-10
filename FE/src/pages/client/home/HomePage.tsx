@@ -10,7 +10,7 @@ import DetailPopup from "@/components/ModalPopup/DetailPopup";
 import { Button } from "antd";
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useWishlist } from "../../../common/context/Wishlist/WishlistContext";
 import Banner from "./Banner/Banner";
 import Post from "./Post";
@@ -227,7 +227,7 @@ const HomePage = () => {
                   </div>
                   <div>
                     <Link
-                      to={`/products/${product?.id}`}
+                      to={`/products/${product?.slug}.html`}
                       className="text-base font-medium text-black mb-1 cursor-pointer hd-all-hover-bluelight"
                     >
                       {product.name.charAt(0).toUpperCase() +
@@ -637,7 +637,7 @@ const HomePage = () => {
                   </div>
                   <div>
                     <Link
-                      to={`/products/${product?.id}`}
+                      to={`/products/${product?.slug}.html`}
                       className="text-base font-medium text-black mb-1 cursor-pointer hd-all-hover-bluelight"
                     >
                       {product.name.charAt(0).toUpperCase() +
