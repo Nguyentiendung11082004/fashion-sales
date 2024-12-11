@@ -8,6 +8,7 @@ import React, {
   useState,
 } from "react";
 import { useLocalStorage } from "../../hooks/useStogare";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface AuthContextType {
   isAuth: boolean;
@@ -46,8 +47,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       setUser(userData?.user);
     }
   };
+  const queryClient = useQueryClient()
   const logout = () => {
     setIsAuth(false);
+    localStorage.removeItem("checkedItems"); 
+    queryClient.clear();
+    setUser(null);
     setToken(null);
   };
 
