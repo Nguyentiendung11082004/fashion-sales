@@ -61,6 +61,7 @@ const HomePage = () => {
   const [productSeeMore, setProductSeeMore] = useState({});
   const [visiable, setVisible] = useState(false);
   const handleOpenSeeMore = (product: any) => {
+    console.log("product",product)
     setVisible(true);
     setProductSeeMore(product);
   };

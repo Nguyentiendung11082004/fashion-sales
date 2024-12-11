@@ -44,6 +44,7 @@ const Cart = () => {
     },
     refetchOnWindowFocus: true,
     refetchOnMount: true,
+    staleTime: 0,
   });
 
   const updateQuantity = useMutation({
@@ -172,9 +173,9 @@ const Cart = () => {
       return updatedCheckedItems;
     });
     setIdCart((prevIdCart) => {
-      const currentIdCart = Array.isArray(prevIdCart) ? prevIdCart : []; 
+      const currentIdCart = Array.isArray(prevIdCart) ? prevIdCart : [];
       const updatedIdCarts = [...currentIdCart, idCart].filter(
-        (value, index, self) => self.indexOf(value) === index 
+        (value, index, self) => self.indexOf(value) === index
       );
       return updatedIdCarts;
     });
@@ -246,7 +247,7 @@ const Cart = () => {
   // const saveCheckedItems = (userId: string, checkedItems: any) => {
   //   localStorage.setItem(`checkedItems_${userId}`, JSON.stringify(checkedItems));
   // };
-  
+
   // const getCheckedItems = (userId: string) => {
   //   const stored = localStorage.getItem(`checkedItems_${userId}`);
   //   return stored ? JSON.parse(stored) : {};
@@ -257,23 +258,47 @@ const Cart = () => {
   //     setCheckedItems(userCheckedItems);
   //   }
   // }, [user]);
-  
-  const handleCheckout = () => {
-    const validIdCart = idCart?.filter((id: number) => checkedItems[id]);
-    console.log("validIdCart", validIdCart)
-    if (!validIdCart || validIdCart.length === 0) {
+
+  const handleCheckout = async () => {
+    try {
+      const res = await instance.get("/cart", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const updatedCartItems = res?.data.cart.cartitems;
+      // Lọc lại idCart và kiểm tra số lượng từng sản phẩm
+      const validIdCart = idCart?.filter((id: number) => {
+        const cartItem = updatedCartItems.find((item: any) => item.id === id);
+        return cartItem && cartItem.quantity > 0; // Kiểm tra số lượng > 0
+      });
+      // await refetch();
+      console.log('validIdCart', validIdCart);
+      if (!validIdCart || validIdCart.length === 0) {
+        MySwal.fire({
+          title: <strong>Cảnh báo</strong>,
+          icon: "error",
+          text: "Bạn chưa chọn sản phẩm nào để thanh toán",
+          timer: 1500,
+          timerProgressBar: true,
+          showConfirmButton: false,
+        });
+      } else {
+        navigate("/checkout", { state: { cartIds: validIdCart } });
+      }
+    } catch (error) {
+      console.error("Error fetching cart items:", error);
       MySwal.fire({
         title: <strong>Cảnh báo</strong>,
         icon: "error",
-        text: "Bạn chưa chọn sản phẩm nào để thanh toán",
+        text: "Có lỗi xảy ra khi tải giỏ hàng",
         timer: 1500,
         timerProgressBar: true,
         showConfirmButton: false,
       });
-    } else {
-      navigate("/checkout", { state: { cartIds: validIdCart } });
     }
   };
+
   // const handleCheckout = () => {
   //   console.log("idCart", idCart)
   //   if (!idCart || idCart.length === 0) {
@@ -490,13 +515,36 @@ const Cart = () => {
                                 attributes={updatedAttributes[idCart as unknown as string | number] || []}
                               />
 
-                              <div className="hd-qty-total block lg:hidden">
+                              {/* <div className="hd-qty-total block lg:hidden">
                                 <div className="flex items-center justify-between border-2 border-slate-200 rounded-full py-[10px] px-[10px]">
                                   <div className="hd-quantity-item relative hd-col-item">
                                     <div className="hd-quantity relative block min-w-[100px] w-[100px] h-8 mx-auto hd-all-btn">
                                       <button
                                         type="button"
-                                        className="hd-btn-item left-0 text-left pl-[15px] pb-[10px] text-sm cursor-pointer shadow-none transform-none touch-manipulation"
+                                        className="hd-btn-item left-0 text-left pl-[15px] p-0 top-0 text-sm cursor-pointer shadow-none transform-none touch-manipulation"
+                                        onClick={() =>
+                                          handleDecrease(
+                                            e?.id,
+                                            e?.quantity,
+                                            attributesObject
+                                          )
+                                        }
+                                      >
+                                        <MinusOutlined />
+                                      </button>
+                                      <span className="select-none leading-9 cursor-text font-semibold text-base">
+                                        {e?.quantity}
+                                      </span>
+                                      <button
+                                        onClick={() =>
+                                          handleIncrease(
+                                            e?.id,
+                                            e?.quantity,
+                                            attributesObject
+                                          )
+                                        }
+                                        type="button"
+                                        className="hd-btn-item right-0 text-right pr-[15px] p-0 top-0 text-sm cursor-pointer shadow-none transform-none touch-manipulation"
                                       >
                                         <svg
                                           xmlns="http://www.w3.org/2000/svg"
@@ -509,57 +557,37 @@ const Cart = () => {
                                           <path
                                             strokeLinecap="round"
                                             strokeLinejoin="round"
-                                            d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
+                                            d="M12 4.5v15m7.5-7.5h-15"
                                           />
                                         </svg>
-                                      </button>
-                                      <span className="select-none leading-8 cursor-text font-semibold text-sm">
-                                        1
-                                      </span>
-                                      <button
-                                        type="button"
-                                        className="hd-btn-item pb-[10px] right-0 text-right pr-[15px] p-0 top-0 text-sm cursor-pointer shadow-none transform-none touch-manipulation"
-                                      >
-                                        <AddCount />
                                       </button>
                                     </div>
                                   </div>
                                 </div>
-                              </div>
-                            </div>
+                              </div> */}
 
-                            {/*end hd-infor-item*/}
-                            <div className="hd-price-item !text-center w-3/12 hd-col-item lg:block hidden">
+                            </div>
+                            {/* Cột giá */}
+                            <div className="hd-price-item !text-center w-3/12 hd-col-item lg:block mt-4 block">
                               <div className="hs-prices">
                                 <div className="hd-text-price">
                                   <del className="text-[#696969]">
-                                    {FormatMoney(
-                                      e?.productvariant?.price_regular ||
-                                      e?.product?.price_regular
-                                    )}
+                                    {FormatMoney(e?.productvariant?.price_regular || e?.product?.price_regular)}
                                   </del>
                                   <ins className="ms-[6px] no-underline text-[#ec0101]">
-                                    {FormatMoney(
-                                      e?.productvariant?.price_sale ||
-                                      e?.product?.price_sale
-                                    )}
+                                    {FormatMoney(e?.productvariant?.price_sale || e?.product?.price_sale)}
                                   </ins>
                                 </div>
                               </div>
                             </div>
-                            {/*end hd-price-item*/}
-                            <div className="hd-quantity-item !text-center w-2/12 hd-col-item lg:block hidden">
+
+                            {/* Cột số lượng */}
+                            <div className="hd-quantity-item !text-center w-2/12 hd-col-item lg:block mt-4 block">
                               <div className="hd-quantity relative block min-w-[120px] w-[120px] h-10 mx-auto hd-all-btn">
                                 <button
                                   type="button"
                                   className="hd-btn-item left-0 text-left pl-[15px] p-0 top-0 text-sm cursor-pointer shadow-none transform-none touch-manipulation"
-                                  onClick={() =>
-                                    handleDecrease(
-                                      e?.id,
-                                      e?.quantity,
-                                      attributesObject
-                                    )
-                                  }
+                                  onClick={() => handleDecrease(e?.id, e?.quantity, attributesObject)}
                                 >
                                   <MinusOutlined />
                                 </button>
@@ -567,39 +595,24 @@ const Cart = () => {
                                   {e?.quantity}
                                 </span>
                                 <button
-                                  onClick={() =>
-                                    handleIncrease(
-                                      e?.id,
-                                      e?.quantity,
-                                      attributesObject
-                                    )
-                                  }
+                                  onClick={() => handleIncrease(e?.id, e?.quantity, attributesObject)}
                                   type="button"
                                   className="hd-btn-item right-0 text-right pr-[15px] p-0 top-0 text-sm cursor-pointer shadow-none transform-none touch-manipulation"
                                 >
-                                  <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    strokeWidth={2}
-                                    stroke="currentColor"
-                                    className="size-3 hd-all-hover-bluelight"
-                                  >
-                                    <path
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      d="M12 4.5v15m7.5-7.5h-15"
-                                    />
+                                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="size-3 hd-all-hover-bluelight">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                                   </svg>
                                 </button>
                               </div>
                             </div>
-                            {/*end hd-quantity-item*/}
-                            <div className="hd-total-item hd-col-item text-end w-2/12 lg:block hidden">
+
+                            {/* Cột tổng tiền */}
+                            <div className="hd-total-item hd-col-item text-end w-2/12 lg:block mt-4 block">
                               <span className="font-medium">
                                 {FormatMoney(e?.total_price)}
                               </span>
                             </div>
+
                             {/*end hd-total-item*/}
                           </div>
                         </>
