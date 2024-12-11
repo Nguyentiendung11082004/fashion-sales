@@ -101,13 +101,6 @@ const CommentPage = lazy(() => import("@/pages/admin/comments/Comments"));
 
 const Router = () => {
   return (
-    <Suspense
-      fallback={
-        <div>
-          <Loading />
-        </div>
-      }
-    >
       <Routes>
         <Route path="/" element={<LayoutWebsite />}>
           <Route index element={<HomePage />} />
@@ -190,7 +183,6 @@ const Router = () => {
 
         <Route path="*" element={<NotFound />} />
       </Routes>
-    </Suspense>
   );
 };
 
