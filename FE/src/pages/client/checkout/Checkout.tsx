@@ -20,8 +20,11 @@ const Checkout = () => {
   const queryClient = useQueryClient()
   const location = useLocation();
   const navigate = useNavigate();
-  const savedCartIds = localStorage.getItem('cartIds');
-  const cartIds = location.state?.cartIds || (savedCartIds ? JSON.parse(savedCartIds) : []);
+  // const savedCartIds = localStorage.getItem('cartIds');
+  // || (savedCartIds ? JSON.parse(savedCartIds) : []);
+  const cartIds = location.state?.cartIds;  
+  console.log("cartIds",cartIds)
+  const [validCartIds, setValidCartIds] = useState<any[]>([])
   const [_payload, _setPayLoad] = useState(location.state?._payload);
   const [paymentMethhod, setPaymentMethod] = useState('1');
   const [shiping, setShipPing] = useState<string>('');
@@ -35,6 +38,11 @@ const Checkout = () => {
   const [idQuanHuyen, setIdQuanHuyen] = useState<number | null>(0)
   const [idXa, setIdXa] = useState<number | null>(0);
   const [payloadDiaChi, setPayLoadDiaChi] = useState<any>(null);
+
+  // lỗi
+  const [error, setError] = useState<any>()
+  const [errorOrder, setErrorOrder] = useState<any>()
+  const [errorCheckout, setErrorCheckout] = useState<any>()
 
   const handleChangeMethod = (e: any) => {
     const newPaymentMethod = e.target.value;
@@ -62,7 +70,7 @@ const Checkout = () => {
     voucher_code: voucher,
     shipping_fee: shiping,
     cart_item_ids: cartIds || [],
-    quantityOfCart: quantityOfCart || {},
+    // quantityOfCart: quantityOfCart || {},
     product_id: _payload?.product_id || null,
     product_variant_id: _payload?.product_variant_id || null,
     quantity: _payload?.quantity || null,
@@ -86,7 +94,8 @@ const Checkout = () => {
       return res.data;
     },
   });
-  const [error, setError] = useState<any>()
+
+  console.log("order", order)
   const orderMutation = useMutation({
     mutationFn: async () => {
       console.log("order", order)
@@ -111,14 +120,29 @@ const Checkout = () => {
         localStorage.removeItem('checkedItems');
         navigate('/thank', { replace: true });
       }
-      localStorage.removeItem('cartIds')
+      // localStorage.removeItem('cartIds')
       localStorage.removeItem('checkedItems');
     },
     onError: (error: any) => {
+      setErrorOrder(error?.response?.data?.errors)
       setError(error?.response?.data?.errors)
       toast.error(error?.response?.data?.errors);
     }
   });
+
+  useEffect(() => {
+    if (errorOrder && Array.isArray(errorOrder.out_of_stock)) {
+      const allErrors = [...errorOrder.out_of_stock, ...errorOrder.insufficient_stock];
+      allErrors.forEach(error => toast.error(error.message));
+    } else if (errorCheckout && Array.isArray(errorCheckout.out_of_stock)) {
+      const allErrors = [...errorCheckout.out_of_stock, ...errorCheckout.insufficient_stock,];
+      allErrors.forEach(error => toast.error(error.message));
+      // const outOfStockCartIds = errorCheckout.out_of_stock.map((error: any) => error.cart_id);
+      // const filteredCartIds = cartIds.filter((id: any) => outOfStockCartIds.includes(id));
+      // setValidCartIds(filteredCartIds);
+    }
+  }, [errorOrder, errorCheckout]);
+
 
   const handleOrder = () => {
     orderMutation.mutate();
@@ -230,7 +254,7 @@ const Checkout = () => {
         // tinh: dataDiaChi[0]?.city?.name || '',
         // huyen: dataDiaChi[0]?.district?.name || '',
         // xa: dataDiaChi[0]?.ward?.name || '',
-        quantityOfCart: quantityOfCart,
+        // quantityOfCart: quantityOfCart,
       }));
     }
   }, [dataCheckout]);
@@ -240,7 +264,7 @@ const Checkout = () => {
     }
   })
   const handleBuyCart = async () => {
-    let payload = { cart_item_ids: cartIds };
+    const payload = { cart_item_ids: cartIds };
     if (cartIds.length > 0) {
       try {
         setIsLoading(true);
@@ -257,6 +281,7 @@ const Checkout = () => {
           throw new Error('Network response was not ok');
         }
         const data = await response.json();
+        setErrorCheckout(data.errors)
         setDataCheckout(data);
         setIsLoading(false);
       } catch (error) {
@@ -314,7 +339,7 @@ const Checkout = () => {
   }, [_payload, payloadDiaChi])
   useEffect(() => {
     handleBuyCart()
-  }, [payloadDiaChi]);
+  }, [payloadDiaChi, errorOrder]);
   useEffect(() => {
     // if (payloadDiaChi && payloadDiaChi.district && payloadDiaChi.ward) {
     //   getShipp();
@@ -446,7 +471,7 @@ const Checkout = () => {
                                 <input
                                   className={`block w-full outline-none border ${error?.ship_user_address ? 'border-red-500' : 'border-neutral-200'} focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50 rounded-2xl font-normal h-11 px-4 py-3 mt-1.5`}
                                   type="text"
-                                  defaultValue={dataCheckout?.user?.address}
+                                  // defaultValue={dataCheckout?.user?.address}
                                   placeholder="Nhập địa chỉ cụ thể"
                                   onChange={(e) => setForm("ship_user_address", e.target.value)}
                                 />

@@ -7,6 +7,7 @@ type Props = {}
 
 const CheckAdmin = (props: Props) => {
     const { user } = useUser();
+    const {token} = useAuth();
     console.log("user", user)
     if (user?.InforUser?.role_id !== 4) {
         toast.error('Bạn không phải admin')
@@ -15,5 +16,4 @@ const CheckAdmin = (props: Props) => {
         return <Outlet />
     }
 }
-
 export default CheckAdmin

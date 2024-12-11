@@ -22,7 +22,7 @@ import ModalCart from "./_components/Modal";
 const MySwal = withReactContent(Swal);
 const Cart = () => {
   const [visiable, setVisible] = useState(false);
-  const [idCart, setIdCart] = useState<any>("");
+  const [idCart, setIdCart] = useState<number[]>([]); // Chắc chắn idCart luôn là một mảng
   const [updatedAttributes, setUpdatedAttributes] = useState<any>({});
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -114,13 +114,13 @@ const Cart = () => {
       });
     },
   });
-  const handleDeleteCart = (idCarts: number[]) => {
+  const handleDeleteCart = (idCarts: any) => {
     deleteCart.mutate(
       { idCarts },
       {
         onSuccess: () => {
           const updatedCheckedItems = { ...checkedItems };
-          idCarts.forEach((id) => {
+          idCarts.forEach((id: any) => {
             delete updatedCheckedItems[id];
           });
           setCheckedItems(updatedCheckedItems);
@@ -133,7 +133,7 @@ const Cart = () => {
             .filter((key) => updatedCheckedItems[Number(key)])
             .map(Number);
           setIdCart(updatedIdCart);
-          localStorage.setItem("idCart", JSON.stringify(updatedIdCart));
+          // localStorage.setItem("idCart", JSON.stringify(updatedIdCart));
           const isAllCheckedNow = updatedIdCart.length === carts.length;
           setIsAllChecked(isAllCheckedNow);
           if (updatedIdCart.length === 0) {
@@ -157,24 +157,29 @@ const Cart = () => {
       [idCart]: variants,
     }));
   };
-  const handleUpdateAttributes = (newIdCart: any, attributes: any) => {
-    setUpdatedAttributes((prevAttributes: any) => ({
-      ...prevAttributes,
-      [newIdCart]: attributes,
+
+  const handleUpdateAttributes = (idCart: number, attributes: any) => {
+    setUpdatedAttributes((prev: any) => ({
+      ...prev,
+      [idCart]: attributes,
     }));
-
-    setIdCart((prevIdCart: any) => {
-      const currentIdCart = Array.isArray(prevIdCart) ? prevIdCart : [];
-      const isChecked = checkedItems[newIdCart]; // Kiểm tra trạng thái checkbox
-      if (isChecked) {
-        const allCheckedIds = [...currentIdCart, newIdCart];
-        return Array.from(new Set(allCheckedIds)); // Loại bỏ trùng lặp
-      }
-      return currentIdCart; // Giữ nguyên nếu sản phẩm chưa được checkbox
+    setCheckedItems((prevCheckedItems) => {
+      const updatedCheckedItems = {
+        ...prevCheckedItems,
+        [idCart]: true,
+      };
+      localStorage.setItem("checkedItems", JSON.stringify(updatedCheckedItems));
+      return updatedCheckedItems;
     });
-  };
-  console.log("idCart", idCart);
+    setIdCart((prevIdCart) => {
+      const currentIdCart = Array.isArray(prevIdCart) ? prevIdCart : []; 
+      const updatedIdCarts = [...currentIdCart, idCart].filter(
+        (value, index, self) => self.indexOf(value) === index 
+      );
+      return updatedIdCarts;
+    });
 
+  };
   const carts = data?.cart?.cartitems;
   carts?.map((cartItem: any) => {
     const {
@@ -236,12 +241,27 @@ const Cart = () => {
       .filter((key) => updatedCheckedItems[Number(key)])
       .map(Number);
     setIdCart(updatedIdCarts);
-
     setIsAllChecked(updatedIdCarts.length === carts.length);
   };
+  // const saveCheckedItems = (userId: string, checkedItems: any) => {
+  //   localStorage.setItem(`checkedItems_${userId}`, JSON.stringify(checkedItems));
+  // };
+  
+  // const getCheckedItems = (userId: string) => {
+  //   const stored = localStorage.getItem(`checkedItems_${userId}`);
+  //   return stored ? JSON.parse(stored) : {};
+  // };
+  // useEffect(() => {
+  //   if (user?.id) {
+  //     const userCheckedItems = getCheckedItems(user.id);
+  //     setCheckedItems(userCheckedItems);
+  //   }
+  // }, [user]);
+  
   const handleCheckout = () => {
-    const validIdCart = idCart.filter((id: number) => checkedItems[id]);
-    if (validIdCart.length === 0) {
+    const validIdCart = idCart?.filter((id: number) => checkedItems[id]);
+    console.log("validIdCart", validIdCart)
+    if (!validIdCart || validIdCart.length === 0) {
       MySwal.fire({
         title: <strong>Cảnh báo</strong>,
         icon: "error",
@@ -254,34 +274,58 @@ const Cart = () => {
       navigate("/checkout", { state: { cartIds: validIdCart } });
     }
   };
+  // const handleCheckout = () => {
+  //   console.log("idCart", idCart)
+  //   if (!idCart || idCart.length === 0) {
+  //     MySwal.fire({
+  //       title: <strong>Cảnh báo</strong>,
+  //       icon: "error",
+  //       text: "Bạn chưa chọn sản phẩm nào để thanh toán",
+  //       timer: 1500,
+  //       timerProgressBar: true,
+  //       showConfirmButton: false,
+  //     });
+  //   } else {
+  //     navigate("/checkout", { state: { cartIds: idCart } });
+  //   }
+  // };
+  useEffect(() => {
+    const updatedIdCarts = Object.keys(checkedItems)
+      .filter((key) => checkedItems[Number(key)])
+      .map(Number);
+    setIdCart(updatedIdCarts);
+    // localStorage.setItem("idCart", JSON.stringify(updatedIdCarts));
+  }, [checkedItems]);
+
   useEffect(() => {
     const storedCheckedItems = localStorage.getItem("checkedItems");
     if (storedCheckedItems) {
       const parsedCheckedItems = JSON.parse(storedCheckedItems);
       setCheckedItems(parsedCheckedItems);
-      setIsAllChecked(Object.values(parsedCheckedItems).every(Boolean));
+
       const updatedIdCarts = Object.keys(parsedCheckedItems)
         .filter((key) => parsedCheckedItems[Number(key)])
         .map(Number);
       setIdCart(updatedIdCarts);
+      const isAllCheckedNow = carts?.every((item: any) =>
+        parsedCheckedItems[item.id]
+      );
+      setIsAllChecked(isAllCheckedNow);
     }
-  }, []);
+  }, [carts]);
+
   useEffect(() => {
-    // Khi dữ liệu giỏ hàng (carts) thay đổi, kiểm tra lại các checkbox
     if (carts && carts.length > 0) {
-      // Cập nhật checkedItems từ localStorage nếu có
       const storedCheckedItems = localStorage.getItem("checkedItems");
       if (storedCheckedItems) {
         const parsedCheckedItems = JSON.parse(storedCheckedItems);
         setCheckedItems(parsedCheckedItems);
-        // Tính toán lại isAllChecked
         const isAllCheckedNow = carts.every(
           (item: any) => parsedCheckedItems[item.id]
         );
         setIsAllChecked(isAllCheckedNow);
       }
     } else {
-      // Nếu giỏ hàng trống, set isAllChecked = false
       setIsAllChecked(false);
     }
   }, [carts]);
@@ -443,7 +487,7 @@ const Cart = () => {
                                 onClose={closeModal}
                                 idCart={idCart}
                                 onUpdateAttributes={handleUpdateAttributes}
-                                attributes={updatedAttributes[idCart] || []}
+                                attributes={updatedAttributes[idCart as unknown as string | number] || []}
                               />
 
                               <div className="hd-qty-total block lg:hidden">
