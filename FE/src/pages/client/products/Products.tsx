@@ -1342,13 +1342,13 @@ const Products = () => {
                                             {new Intl.NumberFormat(
                                               "vi-VN"
                                             ).format(productPriceRegular)}
-                                            ₫
+                                            VNĐ
                                           </del>
                                           <span className="text-[red]">
                                             {new Intl.NumberFormat(
                                               "vi-VN"
                                             ).format(productPriceSale)}
-                                            ₫
+                                            VNĐ
                                           </span>
                                         </>
                                       );
@@ -1361,7 +1361,7 @@ const Products = () => {
                                           {new Intl.NumberFormat(
                                             "vi-VN"
                                           ).format(productPriceRegular)}
-                                          ₫
+                                          VNĐ
                                         </span>
                                       );
                                     } else {
@@ -1375,13 +1375,13 @@ const Products = () => {
                                               ).format(
                                                 pricesRegularVar[0]
                                               )}{" "}
-                                              ₫
+                                              VNĐ
                                             </del>
                                             <span className="text-[red]">
                                               {new Intl.NumberFormat(
                                                 "vi-VN"
                                               ).format(pricesSaleVar[0])}{" "}
-                                              ₫
+                                              VNĐ
                                             </span>
                                           </>
                                         );
@@ -1391,11 +1391,11 @@ const Products = () => {
                                             {new Intl.NumberFormat(
                                               "vi-VN"
                                             ).format(minPriceSale)}
-                                            ₫ -{" "}
+                                            VNĐ -{" "}
                                             {new Intl.NumberFormat(
                                               "vi-VN"
                                             ).format(maxPriceRegular)}
-                                            ₫
+                                            VNĐ
                                           </span>
                                         );
                                       }
@@ -1406,11 +1406,11 @@ const Products = () => {
                                         {new Intl.NumberFormat("vi-VN").format(
                                           minPriceRegular
                                         )}
-                                        ₫ -{" "}
+                                        VNĐ -{" "}
                                         {new Intl.NumberFormat("vi-VN").format(
                                           maxPriceRegular
                                         )}
-                                        ₫
+                                        VNĐ
                                       </span>
                                     );
                                   }
@@ -1484,15 +1484,13 @@ const Products = () => {
                                           key={index}
                                           className="t4s-pr-color__item flex flex-col items-center cursor-pointer mr-1"
                                         >
-                                          <span className="t4s-pr-color__value border border-gray-400 w-5 h-5 hover:border-black hover:border-2 rounded-full p-[5px]">
-                                            <div
-                                              className={`w-[17px] h-[17px] rounded-full ml-[-4.25px] mt-[-4px] hover:mt-[-5px] hover:ml-[-5px]`}
-                                              style={{
-                                                backgroundColor:
-                                                  color.toLowerCase(),
-                                              }}
-                                            ></div>
-                                          </span>
+                                          <span
+                                            style={{
+                                              backgroundColor:
+                                                color.toLowerCase(),
+                                            }}
+                                            className="t4s-pr-color__value border border-gray-400 w-5 h-5 hover:border-black hover:border-2 rounded-full p-[5px]"
+                                          ></span>
                                         </span>
                                       ))}
                                     </div>

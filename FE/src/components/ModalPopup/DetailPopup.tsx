@@ -386,7 +386,7 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
               </button>
             </div>
           </div>
-          <Link to={`/products/${productSeeMore?.id}`} className="flex mt-2">
+          <Link to={`/products/${productSeeMore?.slug}.html`} className="flex mt-2">
             <p className="mr-1 font-medium text-black">Xem chi tiết</p>
             <svg
               xmlns="http://www.w3.org/2000/svg"
