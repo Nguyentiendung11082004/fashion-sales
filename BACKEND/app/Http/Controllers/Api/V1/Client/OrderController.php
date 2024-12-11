@@ -152,15 +152,28 @@ class OrderController extends Controller
 
                             foreach ($cart->cartitems as $key => $cartItem) {
                                 // Kiểm tra nếu sản phẩm hết hàng
-                                if ($hasOutOfStockError && $errors['out_of_stock'][$key]['cart_id'] == $cartItem->id) {
-                                    // Nếu sản phẩm hết hàng, xóa sản phẩm khỏi giỏ hàng
-                                    $cartItem->delete();
+                                // dd($errors['insufficient_stock'][$key]['cart_id']);
+                                if ($hasOutOfStockError) {
+                                    foreach ($errors['out_of_stock'] as $error) {
+                                        // dd($error['cart_id']); 
+                                        // Nếu sản phẩm hết hàng, xóa sản phẩm khỏi giỏ hàng
+                                        if ($error['cart_id'] == $cartItem->id) {
+                                            $cartItem->delete();
+                                        }
+                                    }
                                 }
                                 // Kiểm tra nếu số lượng yêu cầu lớn hơn số lượng có sẵn
-                                if ($hasInsufficientStockError && $errors['insufficient_stock'][$key]['cart_id'] == $cartItem->id) {
+                                if ($hasInsufficientStockError) {
+                                    foreach ($errors['insufficient_stock'] as $error) {
+                                        // dd($error['cart_id']); 
+                                        // Nếu sản phẩm hết hàng, xóa sản phẩm khỏi giỏ hàng
+                                        if ($error['cart_id'] == $cartItem->id) {
+                                            $availableQuantity = $cartItem->productvariant ? $cartItem->productvariant->quantity : $cartItem->product->quantity;
+                                            $cartItem->update(['quantity' => $availableQuantity]); // Cập nhật lại số lượng
+                                        }
+                                    }
                                     // Nếu không đủ số lượng, cập nhật lại số lượng trong giỏ hàng
-                                    $availableQuantity = $cartItem->productvariant ? $cartItem->productvariant->quantity : $cartItem->product->quantity;
-                                    $cartItem->update(['quantity' => $availableQuantity]); // Cập nhật lại số lượng
+
                                 }
                             }
                         }

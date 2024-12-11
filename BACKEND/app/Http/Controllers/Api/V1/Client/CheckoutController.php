@@ -208,7 +208,7 @@ class CheckoutController extends Controller
                 }
             }
 
-            if (!empty($errors['insufficient_stock']) || (empty($errors['insufficient_stock']) && empty($errors['out_of_stock']))) {
+            if (!empty($errors['insufficient_stock']) || (empty($errors['insufficient_stock']) && empty($errors['out_of_stock']))||(!empty($errors['out_of_stock']) && $sub_total !== 0)) {
                 return response()->json([
                     "errors" => $errors,
                     "user" => auth('sanctum')->check() ? $user : null,
