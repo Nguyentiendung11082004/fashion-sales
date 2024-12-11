@@ -783,7 +783,7 @@ class OrderController extends Controller
                     }
                 }
             }],
-            'order_code' => 'required|string',
+            'order_code' => 'required_if:type,email|string',
         ]);
 
         // Nếu type là email, tìm đơn hàng với order_code và email
@@ -795,7 +795,7 @@ class OrderController extends Controller
 
         // Nếu type là phoneNumber, tìm đơn hàng với số điện thoại
         if ($request->type == "phoneNumber") {
-            $order = Order::query()->with('orderDetails')->where('order_code', $request->order_code)
+            $order = Order::query()->with('orderDetails')
                 ->where('ship_user_phonenumber', $request->contact)->latest('id')
                 ->first();
         }
