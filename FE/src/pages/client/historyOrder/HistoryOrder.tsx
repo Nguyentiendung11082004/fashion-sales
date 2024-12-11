@@ -243,12 +243,6 @@ const HistoryOrder = () => {
       console.log("Connected to Pusher!");
     });
     channel.bind("order.updated", (newOrder: any) => {
-      // queryClient.setQueryData(["order-status"], (oldData: any) => {
-      //   const orders = Array.isArray(oldData) ? oldData : [];
-      //   return orders.map((order: any) =>
-      //     order.id === newOrder.id ? newOrder : order
-      //   );
-      // });
       queryClient.invalidateQueries({ queryKey: ["history-order"] });
     });
 
@@ -257,25 +251,7 @@ const HistoryOrder = () => {
       channel.unsubscribe();
     };
   }, [queryClient]);
-  //   const pusher = new Pusher("4d3e0d70126f2605977e", {
-  //     cluster: "ap1",
-  //   });
 
-  //   const channel = pusher.subscribe("orders");
-  //   channel.bind("order.updated", (newOrder: any) => {
-  //     queryClient.setQueryData(["history-order"], (oldData: any) => {
-  //       if (!oldData) return [newOrder];
-  //       return oldData.map((order: any) =>
-  //         order.id === newOrder.id ? newOrder : order
-  //       );
-  //     });
-  //   });
-
-  //   return () => {
-  //     channel.unbind_all();
-  //     channel.unsubscribe();
-  //   };
-  // }, [queryClient]);
   return (
     <>
       <main

@@ -303,23 +303,24 @@ const OrderPage = () => {
   
       const updatedOrder = newOrder.order; 
       console.log("Extracted updated order:", updatedOrder);
-      
+
       queryClient.invalidateQueries({ queryKey: ["order-status"] });
   
       // queryClient.setQueryData(["order-status"], (oldData: any) => {
       //   const orders = Array.isArray(oldData?.data) ? [...oldData.data] : [];
-      //   console.log("order:", orders);
       //   const index = orders.findIndex((order) => order.id === updatedOrder.id);
       
       //   if (index >= 0) {
-      //     orders[index] = updatedOrder; 
+      //     orders[index] = { ...orders[index], ...updatedOrder };
       //   } else {
       //     orders.push(updatedOrder);
       //   }
-      //   console.log("Updated cache data:", { ...oldData, data: orders });
+      
+      //   console.log("Updated orders:", orders);
+      
       //   return {
-      //     ...oldData, 
-      //     data: orders, 
+      //     ...oldData,
+      //     data: orders,
       //   };
       // });
       
@@ -381,10 +382,10 @@ const OrderPage = () => {
         </div>
       </div>
       <div className="">
-        {isFetching ? (
+        {/* {isFetching ? (
           <Loading />
         ) : (
-          <>
+          <> */}
             <div className="flex mb-2">
               <RangePicker className="mt-4"
                 onChange={(value, dateString) => {
@@ -449,8 +450,8 @@ const OrderPage = () => {
                 setCurrentPage(page);
               }}
             />
-          </>
-        )}
+          {/* </>
+        )} */}
       </div>
     </div>
   );

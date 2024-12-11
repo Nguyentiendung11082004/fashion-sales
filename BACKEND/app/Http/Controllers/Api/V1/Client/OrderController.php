@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1\Client;
 
+use App\Events\OrderStatusUpdated;
 use Carbon\Carbon;
 use App\Models\Cart;
 use App\Models\User;
@@ -638,6 +639,8 @@ class OrderController extends Controller
         }
 
         $order->save();
+        
+        broadcast(new OrderStatusUpdated($order))->toOthers();
 
         return response()->json([
             'message' => 'Trạng thái đơn hàng đã được cập nhật thành công.',
