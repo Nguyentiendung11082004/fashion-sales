@@ -5,9 +5,13 @@
 /* eslint-disable @typescript-eslint/ban-types */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import Loading from "@/common/Loading/Loading";
 import { useAuth } from "@/common/context/Auth/AuthContext";
 import { useCart } from "@/common/context/Cart/CartContext";
 import { useUser } from "@/common/context/User/UserContext";
+import { useWishlist } from "@/common/context/Wishlist/WishlistContext";
+import HeartBlack from "@/components/icons/detail/HeartBlack";
+import HeartRedPopup from "@/components/icons/detail/HeartRedPopup";
 import instance from "@/configs/axios";
 import { categoriesShow } from "@/services/api/admin/categories";
 import {
@@ -18,45 +22,42 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button, Modal, Popconfirm } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useRef, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import Less from "../../../components/icons/detail/Less";
 import CommentProduct from "./CommentProduct";
 import RelatedProducts from "./RelatedProducts";
 import ReplyComment from "./ReplyComment";
-import Loading from "@/common/Loading/Loading";
-import HeartRedPopup from "@/components/icons/detail/HeartRedPopup";
-import HeartBlack from "@/components/icons/detail/HeartBlack";
-import { useWishlist } from "@/common/context/Wishlist/WishlistContext";
 
 interface IinitialAttributes {
   [key: string]: string;
 }
 const ProductDetail = () => {
-  const { id } = useParams<{ id: string }>();
+  // const { id } = useParams<{ id: string }>();
   const { slug } = useParams<{ slug: string }>();
 
-  const productId = Number(id);
+  // const productId = Number(id);
   const [product, setProduct] = useState<any>();
   const [selectedImage, setSelectedImage] = useState<string>();
   const { handleAddToWishlist, isInWishlist } = useWishlist();
-
   // sửa bình luận
   const closeFormCmt = () => {
     setShowFormCmtOpen(false);
   };
   const [listIdProduct, setListIdProduct] = useState<any[]>([]);
-
+  const navigate = useNavigate();
   const { data, isLoading } = useQuery({
     queryKey: ["product", slug],
     queryFn: async () => {
       try {
         return await productShow_client(`${slug}`);
       } catch (error) {
+        navigate("/notfound");
         throw new Error("Không có sản phẩm nào phù hợp");
       }
     },
   });
+  const productId = data?.product?.id;
 
   const getUniqueAttributes = data?.getUniqueAttributes;
   useEffect(() => {
@@ -386,7 +387,7 @@ const ProductDetail = () => {
           return (
             x[key] &&
             x[key].toString() ===
-              selectedAttributes?.product_variant[key].toString()
+            selectedAttributes?.product_variant[key].toString()
           );
         }
         return true;
@@ -446,13 +447,10 @@ const ProductDetail = () => {
   const [isShowFormCmtOpen, setShowFormCmtOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  console.log("resultGetUniqueAttribute", resultGetUniqueAttribute);
-  console.log("getUniqueAttributes", getUniqueAttributes);
 
   const [editIdComment, setEditIdComment] = useState<string | null>(null);
   const [InForCommentId, setInForCommentId] = useState<string | null>(null);
 
-  console.log("InForCommentId: ", InForCommentId);
 
   const onHandleEdit = (id: any, value: any) => {
     if (value.parent_id) {
@@ -498,11 +496,67 @@ const ProductDetail = () => {
     }
   };
 
+  // mua ngay
+  const transformAttributes = (variants: any) => {
+    return (Array.isArray(variants) ? variants : []).reduce(
+      (acc: any, variant: any) => {
+        variant?.attributes?.forEach((attribute: any) => {
+          acc[attribute.name.toLowerCase()] =
+            attribute.pivot.attribute_item_id.toString();
+        });
+        return acc;
+      },
+      {}
+    );
+  };
+  const attributes = data?.product?.variants;
+  const [selectedVariantId, setSelectedVariantId] = useState<any>(null);
+  const [dataAttribute, setDataAttribute] = useState<any>(
+    transformAttributes(attributes)
+  );
+  const getAttribute = (attribute: any, id: any) => {
+    setDataAttribute((prev: any) => ({
+      ...prev,
+      [attribute]: id,
+    }));
+  };
+
+  const getSelectedVariantId = () => {
+    const matchingVariant = data?.product?.variants?.find((variant: any) => {
+      return variant.attributes.every((attribute: any) => {
+        const attributeName = attribute.name.toLowerCase();
+        const attributeItemId = attribute.pivot.attribute_item_id;
+        return (
+          dataAttribute[attributeName] &&
+          dataAttribute[attributeName] === attributeItemId.toString()
+        );
+      });
+    });
+    if (matchingVariant) {
+      setSelectedVariantId(matchingVariant.id); // Lưu product_variant_id vào state
+    } else {
+      setSelectedVariantId(null); // Nếu không tìm thấy variant, set null
+    }
+  };
+  useEffect(() => {
+    getSelectedVariantId();
+  }, [dataAttribute]);
+  const _payload = {
+    product_id: productId || product?.id,
+    product_variant_id: selectedVariantId,
+    quantity: quantity,
+  };
+  const handleOpenSeeMore = () => {
+    console.log("_payload",_payload)
+    navigate("/checkout", { state: { _payload: _payload } });
+  }
+
   if (isLoading) return <Loading />;
   // if (isError) return <p>{error.message}</p>;
 
   return (
     <>
+
       <div>
         <div className="hd-detail-head bg-[#f6f6f6]">
           <div className="container h-[55px] flex items-center">
@@ -530,7 +584,7 @@ const ProductDetail = () => {
                     data-nimg="fill"
                     className="w-full lg:h-[100%] h-full lg:w-[500px] object-cover transition-transform ease-in-out duration-300 group-hover:scale-150"
                     src={mainImage || selectedImage}
-                    // src={selectedImage}
+                  // src={selectedImage}
                   />
                 </div>
               </div>
@@ -616,18 +670,18 @@ const ProductDetail = () => {
                           <span className="font-medium">{key.attribute}:</span>
                           {selectedAttributes.product_variant[key.attribute] !==
                             undefined && (
-                            <span className="ml-2">
-                              {key.attributeValue
-                                .find(
-                                  (item) =>
-                                    item.id ===
-                                    selectedAttributes.product_variant[
+                              <span className="ml-2">
+                                {key.attributeValue
+                                  .find(
+                                    (item) =>
+                                      item.id ===
+                                      selectedAttributes.product_variant[
                                       key.attribute
-                                    ]
-                                )
-                                ?.name.toLowerCase()}
-                            </span>
-                          )}
+                                      ]
+                                  )
+                                  ?.name.toLowerCase()}
+                              </span>
+                            )}
                         </label>
                         <div className="flex mt-3 gap-2">
                           {key.attributeValue.map((item) => {
@@ -637,20 +691,19 @@ const ProductDetail = () => {
                             );
                             const isSelected =
                               selectedAttributes.product_variant[
-                                key.attribute
+                              key.attribute
                               ] === item.id;
 
                             return (
                               <div
                                 key={item.id}
                                 className={`relative flex-1 max-w-[70px] h-6 sm:h-9 rounded-full cursor-pointer flex items-center justify-center
-                                   ${
-                                     isSelected
-                                       ? "border-gray-800 border-2"
-                                       : isDisabled
-                                         ? "border-gray-200 border-2 opacity-50 cursor-not-allowed"
-                                         : ""
-                                   }`}
+                                   ${isSelected
+                                    ? "border-gray-800 border-2"
+                                    : isDisabled
+                                      ? "border-gray-200 border-2 opacity-50 cursor-not-allowed"
+                                      : ""
+                                  }`}
                                 style={{
                                   backgroundColor:
                                     key.attribute === "color"
@@ -670,6 +723,7 @@ const ProductDetail = () => {
                                         [key.attribute]: item.id,
                                       },
                                     }));
+                                    getAttribute(key.attribute, item.id)
                                   }
                                 }}
                               >
@@ -748,7 +802,7 @@ const ProductDetail = () => {
 
                 <Button
                   onClick={() => {
-                    onHandleAddToCart(id, product?.id, quantity);
+                    onHandleAddToCart(productId, product?.id, quantity);
                   }}
                   className={`h-11 w-full px-2 py-2 rounded-full ...`}
                   disabled={isLoading}
@@ -785,7 +839,9 @@ const ProductDetail = () => {
                 </button>
               </div>
               {/* mua ngay */}
-              <button className=" nc-Button relative right-2 h-11 w-full inline-flex items-center justify-center rounded-full text-sm sm:text-base font-medium sm:py-3.5 sm:px-2 lg:px-2 shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0 text-md mt-3 border bg-[#222222] text-white">
+              <button
+                onClick={() => handleOpenSeeMore()}
+                className=" nc-Button relative right-2 h-11 w-full inline-flex items-center justify-center rounded-full text-sm sm:text-base font-medium sm:py-3.5 sm:px-2 lg:px-2 shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0 text-md mt-3 border bg-[#222222] text-white">
                 <span className="xl:ml-3 ml-1 lg:text-base xl:text-base">
                   Mua ngay
                 </span>
@@ -807,11 +863,10 @@ const ProductDetail = () => {
                   setReplyToCommentId(null);
                   setInForCommentId("");
                 }}
-                className={`${
-                  activeButton === "details"
-                    ? "border-black text-black border-2"
-                    : " text-[#8e8e8e]"
-                } font-medium cursor-pointer lg:text-base text-[10px] lg:py-2 lg:px-6 px-2 py-2 rounded-full`}
+                className={`${activeButton === "details"
+                  ? "border-black text-black border-2"
+                  : " text-[#8e8e8e]"
+                  } font-medium cursor-pointer lg:text-base text-[10px] lg:py-2 lg:px-6 px-2 py-2 rounded-full`}
               >
                 Chi tiết sản phẩm
               </button>
@@ -823,11 +878,10 @@ const ProductDetail = () => {
                   setReplyToCommentId(null);
                   setInForCommentId("");
                 }}
-                className={`${
-                  activeButton === "reviews"
-                    ? "border-black text-black border-2"
-                    : "border-black text-[#8e8e8e]"
-                } btn_cmt text-[10px] lg:text-base font-medium cursor-pointer lg:py-2 lg:px-6 px-2 py-2 rounded-full`}
+                className={`${activeButton === "reviews"
+                  ? "border-black text-black border-2"
+                  : "border-black text-[#8e8e8e]"
+                  } btn_cmt text-[10px] lg:text-base font-medium cursor-pointer lg:py-2 lg:px-6 px-2 py-2 rounded-full`}
               >
                 Xem đánh giá sản phẩm
               </button>

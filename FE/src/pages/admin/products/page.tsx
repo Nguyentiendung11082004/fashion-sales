@@ -9,6 +9,8 @@ import {
   EditOutlined,
   EyeOutlined,
   PlusOutlined,
+  SearchOutlined,
+  SyncOutlined,
 } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button, Input, Modal, Pagination, Table, Tag } from "antd";
@@ -38,10 +40,17 @@ const ProductPageManager = () => {
     try {
       const res = await instance.post('/product/search', { query });
       setDataSearch(res?.data?.data || []);
-      setCurrentPage(1);  // Reset to the first page after search
+      setCurrentPage(1); // Quay lại trang đầu khi tìm kiếm
     } catch (error) {
-      toast.error("Error occurred during search.");
+      toast.error("Có lỗi xảy ra khi tìm kiếm sản phẩm.");
     }
+  };
+
+  // Cancel search and reset to all products
+  const handleCancelSearch = () => {
+    setQuery('');
+    setDataSearch([]);
+    setCurrentPage(1);
   };
 
   // Mutation to delete a product
@@ -84,7 +93,7 @@ const ProductPageManager = () => {
       title: "Type",
       dataIndex: "type",
       render: (text, record: Iproduct) => (
-        <p>{record.type == 0 ? "Sản phẩm đơn" : "Sản phẩm biến thể"}</p>
+        <p>{record.type === 0 ? "Sản phẩm đơn" : "Sản phẩm biến thể"}</p>
       ),
     },
     {
@@ -113,7 +122,7 @@ const ProductPageManager = () => {
       title: "is_show_home",
       dataIndex: "is_show_home",
       render: (is_show_home: boolean) => (
-        <Tag color={is_show_home ? "green" : "red"}>{is_show_home ? "Còn hàng" : "Hết hàng"}</Tag>
+        <Tag color={is_show_home ? "green" : "red"}>{is_show_home ? "Yes" : "No"}</Tag>
       ),
     },
     {
@@ -130,12 +139,12 @@ const ProductPageManager = () => {
         <div>
           <Link to={`${record?.id}`}>
             <Button className="btn-info" style={{ width: "46px" }}>
-              <EyeOutlined className="pl-2" />
+              <EyeOutlined className="" />
             </Button>
           </Link>
           <Link to={`edit/${record?.id}`}>
             <Button className="btn-warning mx-2" style={{ width: "46px" }}>
-              <EditOutlined className="pl-2" />
+              <EditOutlined className="" />
             </Button>
           </Link>
           <Button
@@ -143,7 +152,7 @@ const ProductPageManager = () => {
             className="btn-danger"
             style={{ width: "46px" }}
           >
-            <DeleteOutlined className="pl-2" />
+            <DeleteOutlined className="" />
           </Button>
         </div>
       ),
@@ -173,17 +182,24 @@ const ProductPageManager = () => {
           </Button>
         </Link>
       </div>
-      <div className="">
+      <div>
         {isFetching ? (
           <Loading />
         ) : (
           <>
-            <Input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Tìm kiếm sản phẩm"
-            />
-            <Button onClick={handleSearch} className="ml-2">Tìm kiếm</Button>
+            <div className="w-[36%] flex mb-4 float-right">
+              <Input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Tìm kiếm sản phẩm"
+              />
+              <Button onClick={handleSearch} className="ml-2">
+                <SearchOutlined />
+              </Button>
+              <Button onClick={handleCancelSearch} className="ml-2">
+                <SyncOutlined />
+              </Button>
+            </div>
             <Table
               className="custom-table"
               dataSource={dataSource.slice(

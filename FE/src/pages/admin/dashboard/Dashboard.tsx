@@ -10,7 +10,6 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import DonutChartWithStats from "./_components/pieChart/DonutChartWithStats";
-import TableProduct from "../products/_components/TableProduct";
 import TableOrder from "../tableOrder/TableOrder";
 import Chart from "./_components/chart/Chart";
 import LocationChart from "./_components/locationChart/LocationChart";
@@ -20,9 +19,11 @@ import { DatePicker, Select, Space } from 'antd';
 const { RangePicker } = DatePicker;
 import type { DatePickerProps, GetProps } from 'antd';
 type RangePickerProps = GetProps<typeof DatePicker.RangePicker>;
-import dayjs from 'dayjs';
 import { FormatMoney } from "@/common/utils/utils";
 import { useUser } from "@/common/context/User/UserContext";
+import TableProduct from "./_components/TableProduct";
+import dayjs from 'dayjs';
+
 export const DashboardContext = createContext<any | undefined>(undefined);
 
 const Dashboard = () => {
@@ -118,15 +119,20 @@ const Dashboard = () => {
     <DashboardContext.Provider value={_props}>
       <div className="page-dashboard bg-[#f3f3f9] py-0 px-5 font-[Poppins]">
         <div className="page-dashboard__header flex justify-between items-center py-5">
-          <div className="page-dashboard__header__left">
-            <p className="text-[14px] font-medium">Good Morning, {user?.InforUser?.name}</p>
+          <div className="page-dashboard__header__left bg-gradient-to-r from-pink-500 to-rose-400 p-4 rounded-md shadow-md flex items-center">
+            <p className="text-white text-lg font-medium">
+              Xin chào: <span className="text-black font-semibold">{user?.InforUser?.name}</span>
+            </p>
           </div>
+
+
           <div >
             <Select
               placeholder="Chọn kiểu tìm kiếm"
               style={{ width: 280, height: '38px' }}
               className="border-none mr-5"
               onChange={hanldeChangeType}
+              defaultValue="day"
               allowClear
             >
               <Option value="day">Tìm theo ngày</Option>
@@ -141,6 +147,7 @@ const Dashboard = () => {
                 className="border border-gray-300 rounded-lg p-2 mt-4  text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Chọn"
                 picker={filter.filter_type === 'day' ? 'date' : filter.filter_type}
+                defaultValue={filter.filter_type === 'day' ? dayjs(new Date()) : undefined}
               />
             }
             {
@@ -174,62 +181,70 @@ const Dashboard = () => {
           </div> */}
         </div>
         <div className="page-dashboard__card bg-gray-100 py-0 flex  w-[100%] font-poppins">
-          <div className="card-item flex-wrap bg-white w-1/4 p-3 mr-4 rounded shadow-sm hover:transform hover:-translate-y-1 transition-all ease duration-400">
-            <div className="flex justify-between">
-              <h3 className="text-xs text-gray-400 font-medium">
+          <div className="card-item flex flex-col bg-white w-1/4 p-6 mr-4 rounded-lg shadow-lg hover:transform hover:-translate-y-1 transition-all ease duration-400">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xs text-gray-500 font-semibold uppercase tracking-wider">
                 Doanh thu
               </h3>
-              {/* <span className="text-green-500 font-medium">+16.24 %</span> */}
+              <p className="text-sm text-gray-400">Tháng này</p>
             </div>
-            <p className="text-xl font-semibold text-gray-600 mt-4">{tongDoanhThu}</p>
-            <div className="flex justify-between items-center">
+            <p className="text-2xl font-bold text-gray-800 mt-4">{tongDoanhThu}</p>
+            <div className="flex justify-between items-center mt-4">
               <a
                 href="#"
-                className="text-blue-600 text-xs underline font-poppins"
+                className="text-blue-600 text-xs underline font-poppins mr-2"
               >
-                View net earnings
               </a>
-              <button className="btn-faDollarSign w-10 h-10 bg-green-100 text-green-500 rounded">
+              <button className="btn-faDollarSign w-10 h-10 bg-green-100 text-green-500 rounded-full hover:bg-green-200 transition-all">
                 <FontAwesomeIcon className="icon text-lg" icon={faDollarSign} />
               </button>
             </div>
           </div>
-          <div className=" flex-wrap bg-white w-1/4 p-3 mr-4 rounded shadow-sm hover:transform hover:-translate-y-1 transition-all ease duration-400">
-            <div className="flex justify-between">
-              <h3 className="text-xs text-gray-400 font-bold">Tổng số đơn hàng</h3>
+
+          <div className="card-item flex flex-col bg-white w-1/4 p-6 mr-4 rounded-lg shadow-lg hover:transform hover:-translate-y-1 transition-all ease duration-400">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xs text-gray-500 font-semibold uppercase tracking-wider">
+                Tổng số đơn hàng
+              </h3>
               {/* <span className="order text-red-500 font-medium">- 3.57 %</span> */}
             </div>
-            <p className="text-xl font-semibold text-gray-600 mt-4">{tongDonHang?.total_quantity_in_order}</p>
-            <div className="flex justify-between items-center">
+            <p className="text-2xl font-bold text-gray-800 mt-4">
+              {tongDonHang?.total_quantity_in_order || 0}
+            </p>
+            <div className="flex justify-between items-center mt-4">
               <a
                 href="#"
-                className="text-blue-600 text-xs underline font-poppins"
+                className="text-blue-600 text-xs underline font-poppins mr-2"
               >
-                View all orders
+                {/* View all orders */}
               </a>
-              <button className="btn-faBagShopping w-10 h-10 bg-blue-100 text-blue-500 rounded">
+              <button className="w-10 h-10 bg-blue-100 text-blue-500 rounded-full hover:bg-blue-200 transition-all">
                 <FontAwesomeIcon className="icon text-lg" icon={faBagShopping} />
               </button>
             </div>
           </div>
-          <div className="card-item flex-wrap bg-white w-1/4 p-3 mr-4 rounded shadow-sm hover:transform hover:-translate-y-1 transition-all ease duration-400">
-            <div className="flex justify-between">
-              <h3 className="text-xs text-gray-400 font-medium">Tổng số người dùng</h3>
+
+          <div className="card-item flex flex-col bg-white w-1/4 p-6 mr-4 rounded-lg shadow-lg hover:transform hover:-translate-y-1 transition-all ease duration-400">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xs text-gray-500 font-semibold uppercase tracking-wider">
+                Tổng số người dùng
+              </h3>
               {/* <span className="text-green-500 font-medium">+29.08 %</span> */}
             </div>
-            <p className="text-xl font-semibold text-gray-600 mt-4">{tongUser}</p>
-            <div className="flex justify-between items-center">
+            <p className="text-2xl font-bold text-gray-800 mt-4">{tongUser}</p>
+            <div className="flex justify-between items-center mt-4">
               <a
                 href="#"
-                className="text-blue-600 text-xs underline font-poppins"
+                className="text-blue-600 text-xs underline font-poppins mr-2"
               >
-                See details
+                {/* See details */}
               </a>
-              <button className="btn-faUser w-10 h-10 bg-yellow-100 text-yellow-500 rounded">
+              <button className="w-10 h-10 bg-yellow-100 text-yellow-500 rounded-full hover:bg-yellow-200 transition-all">
                 <FontAwesomeIcon className="icon text-lg" icon={faUser} />
               </button>
             </div>
           </div>
+
           {/* <div className="card-item flex-wrap bg-white w-1/4 p-3 rounded shadow-sm hover:transform hover:-translate-y-1 transition-all ease duration-400">
             <div className="flex justify-between">
               <h3 className="text-xs text-gray-400 font-medium">MY BALANCE</h3>

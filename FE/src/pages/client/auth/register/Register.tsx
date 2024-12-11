@@ -149,8 +149,8 @@ const Register = () => {
                   </Form.Item>
                 </div>
                 <div className="col-span-3 sm:col-span-3">
-                  <Form.Item name="address" label="Địa chỉ">
-                    <Input placeholder="Nhập địa chỉ"
+                  <Form.Item name="address" label="Địa chỉ cụ thể">
+                    <Input placeholder="Nhập địa chỉ cụ thể"
                       className=" text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-3 px-4 block w-full appearance-none"
 
                     ></Input>

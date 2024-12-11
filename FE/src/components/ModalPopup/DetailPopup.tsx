@@ -179,7 +179,7 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
       // console.log("selectedProduct", selectedProduct)
       if (productSeeMore) {
         if (_payload.quantity > productSeeMore.quantity) {
-          toast.error("Sản phẩm này đã hết hàng");
+          toast.error("Số lượng yêu cầu vượt quá số lượng còn lại trong kho");
           return;
         }
       }

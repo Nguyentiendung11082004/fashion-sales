@@ -50,8 +50,6 @@ export const UserProvider: React.FC<{ children: ReactNode }> = ({
 
   useEffect(() => {
     if (user && user["Infor User"]) {
-      // console.log("User data:", user["Infor User"]);
-      // console.log("Setting urlImage to:", user["Infor User"].avatar);
       setUrlImage(user["Infor User"].avatar);
     }
   }, [user]);

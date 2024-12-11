@@ -24,9 +24,8 @@ class CheckoutController extends Controller
 
     public function __construct()
     {
-        $this->api_key=env('API_KEY');
-        $this->shop_id=env('SHOP_ID');
-
+        $this->api_key = env('API_KEY');
+        $this->shop_id = env('SHOP_ID');
     }
     public function store(StoreCheckoutRequest $request)
     {
@@ -50,7 +49,7 @@ class CheckoutController extends Controller
             $sub_total = 0;
             $total_items = 0;
             $order_items = [];
-            $message = [];
+            $errors = [];
             $voucher_discount = 0;
 
             // Kiểm tra thông tin người dùng nếu đã đăng nhập
@@ -58,7 +57,10 @@ class CheckoutController extends Controller
                 $user_id = auth('sanctum')->id();
                 $user = User::with('addresses')->findOrFail($user_id)->makeHidden(['role_id', 'email_verified_at', 'password', 'is_active', 'remember_toke', 'created_at', 'updated_at']);
                 if ($isCartPurchase) {
-                    // Handle cart purchase logic for logged-in users
+                    $errors = [
+                        'out_of_stock' => [], // Lỗi sản phẩm hết hàng
+                        'insufficient_stock' => [], // Lỗi số lượng không đủ
+                    ];
                     $cart = Cart::query()
                         ->where('user_id', $user['id'])
                         ->with([
@@ -84,58 +86,48 @@ class CheckoutController extends Controller
                         ], 400);
                     }
                     foreach ($cart->cartitems as $cart_item) {
-                        // dd($cart_item->productvariant->product_id);
                         $quantity = $cart_item->quantity;
-                        if ($cart_item->productvariant) {
-                            $variant_price = $cart_item->productvariant->price_sale;
-                            $available_quantity = $cart_item->productvariant->quantity;
-                            if ($quantity > $available_quantity) {
-                                // Nếu số lượng mua lớn hơn số lượng còn lại trong kho, điều chỉnh lại số lượng và thông báo cho người dùng
-                                $quantity = $available_quantity;
-                                $message[$cart_item->productvariant->product_id] = "Số lượng sản phẩm này trong kho không đủ. Bạn chỉ có thể mua tối đa $available_quantity sản phẩm.";
-                                // Bạn có thể lưu thông báo này vào session hoặc trả về cho người dùng để hiển thị
-                                $cart_item->update([
-                                    'quantity' => $available_quantity
-                                ]);
-                            }
-                            if ($available_quantity == 0) {
-                                // Nếu trong kho không còn sản phẩm, bỏ qua sản phẩm này 
-                                // Thông báo có thể được lưu lại cho người dùng ở đây
-                                $message[$cart_item->productvariant->product_id] = "Sản phẩm này đã hết hàng.";
-                                continue;
-                            }
-                            $total_price = $variant_price * $quantity;
-                        } else {
-                            $product_price = $cart_item->product->price_sale;
-                            $available_quantity = $cart_item->product->quantity;
-                            if ($quantity > $available_quantity) {
-                                // Nếu số lượng mua lớn hơn số lượng còn lại trong kho, điều chỉnh lại số lượng và thông báo cho người dùng
-                                $quantity = $available_quantity;
-                                $message[$cart_item->product->id] = "Số lượng sản phẩm này trong kho không đủ. Bạn chỉ có thể mua tối đa $available_quantity sản phẩm.";
-                                $cart_item->update([
-                                    'quantity' => $available_quantity
-                                ]);
-                                // Bạn có thể lưu thông báo này vào session hoặc trả về cho người dùng để hiển thị
-                            }
+                        $variant = $cart_item->productvariant;
+                        $product = $cart_item->product;
 
-                            if ($available_quantity == 0) {
-                                // Nếu trong kho không còn sản phẩm, bỏ qua sản phẩm này 
-                                // Thông báo có thể được lưu lại cho người dùng ở đây
-                                $message[$cart_item->product->id] = "Sản phẩm này đã hết hàng.";
-                                continue;
-                            }
-                            $total_items += 1;
-                            $total_price = $product_price * $quantity;
+                        // Kiểm tra tồn kho và giá theo loại sản phẩm (variant hoặc đơn giản)
+                        $price = $variant ? $variant->price_sale : $product->price_sale;
+                        $available_quantity = $variant ? $variant->quantity : $product->quantity;
+
+                        // Xử lý trường hợp hết hàng
+                        if ($available_quantity == 0) {
+                            $errors['out_of_stock'][] = [
+                                'message' => "Sản phẩm {$product->name} đã hết hàng.",
+                                'product_id' => $product->id,
+                                'cart_id' => $cart_item->id,
+                            ];
+                            $cart_item->delete();
+                            continue;
                         }
 
+                        // Xử lý trường hợp số lượng không đủ
+                        if ($quantity > $available_quantity) {
+                            $quantity = $available_quantity;
+                            $errors['insufficient_stock'][] = [
+                                'message' => "Số lượng sản phẩm {$product->name} trong kho không đủ. Bạn chỉ có thể mua tối đa $available_quantity sản phẩm.",
+                                'product_id' => $product->id,
+                                'cart_id' => $cart_item->id,
+                            ];
+                            $cart_item->update(['quantity' => $available_quantity]);
+                        }
+
+                        // Tính toán giá trị sản phẩm và thêm vào danh sách đơn hàng
+                        $total_price = $price * $quantity;
                         $sub_total += $total_price;
                         $order_items[] = [
-                            "message" => $message,
+                            // 'errors' => $errors ?? [],
                             'quantity' => $quantity,
                             'total_price' => $total_price,
-                            'product' => $cart_item->product,
-                            'variant' => $cart_item->productvariant ?? null
+                            'product' => $product,
+                            'variant' => $variant,
                         ];
+
+                        $total_items += 1;
                     }
                 } elseif ($isImmediatePurchase) {
                     // Handle immediate purchase
@@ -216,16 +208,20 @@ class CheckoutController extends Controller
                 }
             }
 
-            return response()->json([
-                "message" => $message,
-                "user" => auth('sanctum')->check() ? $user : null,
-                "sub_total" => $sub_total,
-                "total_items" => $total_items,
-                "voucher_discount" => $voucher_result['voucher_description'] ?? null, // Sử dụng mô tả chiết khấu voucher
-                "total_discount" => $total_discount ?? 0, // Tổng số tiền giảm
-                "order_items" => $order_items,
-                "listVoucher" => $listVoucher,
-            ], Response::HTTP_OK);
+            if (!empty($errors['insufficient_stock']) || (empty($errors['insufficient_stock']) && empty($errors['out_of_stock']))||(!empty($errors['out_of_stock']) && $sub_total !== 0)) {
+                return response()->json([
+                    "errors" => $errors,
+                    "user" => auth('sanctum')->check() ? $user : null,
+                    "sub_total" => $sub_total,
+                    "total_items" => $total_items,
+                    "voucher_discount" => $voucher_result['voucher_description'] ?? null, // Sử dụng mô tả chiết khấu voucher
+                    "total_discount" => $total_discount ?? 0, // Tổng số tiền giảm
+                    "order_items" => $order_items,
+                    "listVoucher" => $listVoucher,
+                ], Response::HTTP_OK);
+            } else {
+                return response()->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
+            }
         } catch (\Exception $ex) {
             return response()->json(["message" => $ex->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -359,7 +355,7 @@ class CheckoutController extends Controller
         try {
 
             // $api_key = '18f28540-8fbc-11ef-839a-16ebf09470c6';
-            
+
 
             $ch = curl_init();
 
@@ -476,8 +472,8 @@ class CheckoutController extends Controller
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
                 // 'shop_id' => 5404595,  // Thay YOUR_SHOP_ID bằng mã shop GHN của bạn
 
-                'shop_id' =>(int) $this->shop_id,  // Thay YOUR_SHOP_ID bằng mã shop GHN của bạn
-                
+                'shop_id' => (int) $this->shop_id,  // Thay YOUR_SHOP_ID bằng mã shop GHN của bạn
+
                 'from_district' => 1804, //đan phượng
                 'to_district' => $to_district_id,
                 'weight' => $weight

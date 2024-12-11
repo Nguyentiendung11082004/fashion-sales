@@ -5,7 +5,7 @@ import Loading from "@/common/Loading/Loading";
 import { IOrder } from "@/common/types/order";
 import { IVouchers } from "@/common/types/vouchers";
 import instance from "@/configs/axios";
-import { EyeOutlined } from "@ant-design/icons";
+import { EyeOutlined, SearchOutlined, SyncOutlined } from "@ant-design/icons";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { DatePickerProps, GetProps } from "antd";
 import { Button, DatePicker, Pagination, Select } from "antd";
@@ -21,6 +21,7 @@ const OrderPage = () => {
   const [pageSize] = useState(5);
   const [hasError, setHasError] = useState(false);
   const [rangeValue, setRangeValue] = useState<any>([]);
+  const [isSearching, setIsSearching] = useState(false);
   const [filter, setFilter] = useState<any>({
     statuses: [],
     filter_end_date: null,
@@ -30,17 +31,37 @@ const OrderPage = () => {
   });
   const [dataFilter, setDataFilter] = useState<any>([]);
   const handleSearch = async () => {
-    let res = await instance.post(`/order/search`, filter)
-    setDataFilter(res?.data.data)
-  }
-  // console.log("dataFilter", dataFilter)
-  // useEffect(() => {
-  //   handleSearch()
-  // }, [filter])
+    try {
+      const res = await instance.post(`/order/search`, filter);
+      setDataFilter(res?.data.data);
+      setIsSearching(true); // Bật trạng thái tìm kiếm
+    } catch (err) {
+      console.error('Search error:', err);
+    }
+  };
   const handleCancelSearch = () => {
     setDataFilter([]);
-    setFilter(null)
+    setFilter({
+      statuses: [],
+      filter_end_date: null,
+      filter_start_date: null,
+      filter_type: 'ranger',
+      filter_value: new Date().toISOString().split('T')[0],
+    });
+    setRangeValue([]); // Clear RangePicker UI
+    setCurrentPage(1); // Nhảy về trang 1
+    setIsSearching(false); // Tắt trạng thái tìm kiếm
   };
+  // const handleClearFilter = () => {
+  //   setRangeValue([]); // Clear giá trị UI của RangePicker
+  //   setFilter({
+  //     filter_type: 'range',
+  //     filter_start_date: null,
+  //     filter_end_date: null,
+  //   }); // Reset bộ lọc
+  //   setDataFilter([]); // Xóa kết quả tìm kiếm
+  //   setCurrentPage(1); // Quay về trang đầu tiên
+  // };
   const filterRange = (value: DatePickerProps['value'] | RangePickerProps['value']) => {
     console.log('filterRange: ', value);
   };
@@ -55,6 +76,7 @@ const OrderPage = () => {
     },
     
   });
+  const dataOrder = data?.data?.data;
 
   useRealtimeOrders();
 
@@ -105,7 +127,6 @@ const OrderPage = () => {
 
   const queryClient = useQueryClient();
 
-  const dataOrder = data?.data?.data;
 
   const orStatus = {
     1: "Đang chờ xác nhận",
@@ -151,14 +172,12 @@ const OrderPage = () => {
         ...item,
       }))
       : [];
-  console.log("dataSource", dataSource)
   const dataSourceSearch = dataFilter
     ? dataFilter?.map((item: IOrder) => ({
         key: item?.id,
         ...item,
       }))
     : [];
-  console.log("dataSourceSearch", dataSourceSearch)
 
   const columns: ColumnType<IOrder>[] = [
     {
@@ -338,7 +357,7 @@ const OrderPage = () => {
 
   return (
     <div className="p-6 min-h-screen">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-2">
         <h1 className="text-3xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2">
           Quản lí đơn hàng
         </h1>
@@ -385,66 +404,77 @@ const OrderPage = () => {
         {/* {isFetching ? (
           <Loading />
         ) : (
+          <>
+            <div className="flex mb-4 float-right">
+              <RangePicker
+                className="mt-4"
+                value={rangeValue} // Giá trị hiện tại của RangePicker
           <> */}
             <div className="flex mb-2">
               <RangePicker className="mt-4"
                 onChange={(value, dateString) => {
-                  // setRangeValue(value)
-                  setFilter((prev: any) => ({
-                    ...prev,
-                    filter_type: "range",
-                    filter_start_date: dateString[0],
-                    filter_end_date: dateString[1],
-                  }))
+                  if (value) {
+                    setRangeValue(value); // Cập nhật UI
+                    setFilter((prev: any) => ({
+                      ...prev,
+                      filter_type: 'range',
+                      filter_start_date: dateString[0],
+                      filter_end_date: dateString[1],
+                    }));
+                  } else {
+                    // handleClearFilter(); // Xóa bộ lọc khi người dùng xóa
+                  }
                 }}
-              // value={rangeValue}
+                allowClear
               />
-              <div className="flex items-center space-x-4 mt-4">
-                {/* <Select
-                size="large"
-                mode="multiple"
-                options={
-                  trangThai?.map((item: any) => ({
-                    value: item?.id,
-                    label: item?.name
-                  })) || []
-                }
-                onChange={(e) => setFilter((prev: any) => ({ ...prev, statuses: e }))}
-                // value={filter?.statuses}
-                placeholder="Chọn kiểu"
-                placement="bottomLeft"
-                className="w-full max-w-md mb-2"
-              /> */}
+              <div className="flex items-center mt-4">
+                <Select
+                  size="large"
+                  mode="multiple"
+                  options={
+                    trangThai?.map((item: any) => ({
+                      value: item?.id,
+                      label: item?.name
+                    })) || []
+                  }
+                  onChange={(e) => setFilter((prev: any) => ({ ...prev, statuses: e }))}
+                  // value={filter?.statuses}
+                  placeholder="Chọn trạng thái"
+                  placement="bottomLeft"
+                  className="w-[480px] max-w-md mx-2"
+                />
                 <Button
                   onClick={handleSearch}
-                  className="bg-blue-600 mx-2 text-white px-6 py-2 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                  className="ml-2"
                 >
-                  Tìm kiếm
+                  <SearchOutlined />
                 </Button>
                 <Button
                   onClick={handleCancelSearch}
-                  className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+                  className="ml-2"
                 >
-                  Xem tất cả đơn hàng
+                  <SyncOutlined />
                 </Button>
               </div>
             </div>
 
             <Table
               className="custom-table"
-              dataSource={(dataSource ? dataSource : dataSourceSearch).slice(
-                (currentPage - 1) * pageSize,
-                currentPage * pageSize
-              )}
+              dataSource={
+                (isSearching ? dataSourceSearch : dataSource).slice(
+                  (currentPage - 1) * pageSize,
+                  currentPage * pageSize
+                )
+              }
               columns={columns}
-              scroll={{ x: "max-content" }}
+              scroll={{ x: 'max-content' }}
               pagination={false}
             />
             <Pagination
               className="mt-4"
               align="end"
               current={currentPage}
-              total={(dataSource ? dataSource : dataSourceSearch).length}
+              total={(isSearching ? dataSourceSearch : dataSource).length}
               pageSize={pageSize}
               onChange={(page) => {
                 setCurrentPage(page);

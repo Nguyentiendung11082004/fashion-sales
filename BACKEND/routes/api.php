@@ -1,6 +1,6 @@
 <?php
 
-use App\Events\CartEvent;
+// use App\Events\CartEvent;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\Admin\TagController;
 use App\Http\Controllers\Api\V1\Admin\BrandController;
@@ -71,7 +71,7 @@ Route::prefix("v1/")->group(function () {
     Route::get('/posts-by-category', [PostController::class, 'getPostsGroupedByCategory']);
 
     Route::get('product-home', [HomeProductController::class, "getHomeProducts"]);
-    Route::get('product-detail/{product_id}', [ProductDetailController::class, "productdetail"]);
+    Route::get('product-detail/{product_slug}', [ProductDetailController::class, "productdetail"]);
     Route::post('product-shop', [ProductShopController::class, "getAllProduct"]);
     Route::get('find-variant/{product_id}', [ProductDetailController::class, "findvariant"]);
     Route::resource('order', OrderController::class);
