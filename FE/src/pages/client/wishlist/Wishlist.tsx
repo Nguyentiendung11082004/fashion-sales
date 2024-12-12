@@ -4,13 +4,15 @@ import { ResponseWishlist } from "@/common/types/responseDataFilter";
 import CartDetail from "@/components/icons/detail/CartDetail";
 import Eye from "@/components/icons/detail/Eye";
 import HeartRed from "@/components/icons/detail/HeartRed";
+import CartPopup from "@/components/ModalPopup/CartPopup";
 import instance from "@/configs/axios";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 
 const Wishlist = () => {
   const queryClient = useQueryClient();
+  const modalRef = useRef<HTMLDialogElement>(null);
 
   const { token } = useAuth(); // Lấy token
   const { data, isFetching } = useQuery<ResponseWishlist[]>({
@@ -25,6 +27,8 @@ const Wishlist = () => {
     },
   });
   // console.log(data);
+  const [slugProduct, setSlugProduct] = useState();
+  const [idProduct, setIdProduct] = useState();
 
   const [currentPage, setCurrentPage] = useState(1); // Trang hiện tại
   const productsPerPage = 12; // Mỗi trang có 12 sản phẩm
@@ -100,15 +104,21 @@ const Wishlist = () => {
                   <div className="product-item" key={wishlist_id}>
                     <div className="lg:mb-[25px] mb-[20px]">
                       <div className="cursor-pointer lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] sm:h-[345px] overflow-hidden">
-                        <img
-                          className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover/image:opacity-0 object-cover "
-                          src={product.img_thumbnail}
-                        />
-                        <img
-                          className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover/image:opacity-100 object-cover"
-                          src={product.img_thumbnail}
-                        />
-                        <div className="absolute inset-0 bg-black opacity-0 transition-opacity duration-300 ease-in-out group-hover:opacity-10"></div>
+                        <Link
+                          to={`/products/${product?.slug}.html`}
+                          className="absolute inset-0"
+                        >
+                          <img
+                            className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover/image:opacity-0 object-cover "
+                            src={product.img_thumbnail}
+                          />
+                          <img
+                            className="group-hover/image:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover/image:opacity-100 object-cover"
+                            src={product.img_thumbnail}
+                          />
+                        </Link>
+
+                        <div className="image-overlay"></div>
                         <div>
                           <Link to="" className="absolute left-5 top-5">
                             <HeartRed />
@@ -145,8 +155,23 @@ const Wishlist = () => {
                               <Eye />
                             </button>
                           </Link>
-                          <Link to="" className="group/btn relative">
+                          {/* <Link to="" className="group/btn relative">
                             <button className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]">
+                              <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
+                                Thêm vào giỏ hàng
+                              </p>
+                              <CartDetail />
+                            </button>
+                          </Link> */}
+                          <Link to="" className="group/btn relative">
+                            <button
+                              className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]"
+                              onClick={() => {
+                                modalRef.current?.showModal(),
+                                  setSlugProduct(product?.slug);
+                                setIdProduct(product?.id);
+                              }}
+                            >
                               <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
                                 Thêm vào giỏ hàng
                               </p>
@@ -197,6 +222,13 @@ const Wishlist = () => {
                           </div>
                         )}
                       </div>
+                      <CartPopup
+                        slugProduct={slugProduct}
+                        idProduct={idProduct}
+                        setIdProduct={setIdProduct}
+                        ref={modalRef}
+                        setSlugProduct={setSlugProduct}
+                      />
                       <div>
                         <p className="text-base font-medium text-black mb-1 cursor-pointer hd-all-hover-bluelight">
                           {product.name.charAt(0).toUpperCase() +
@@ -211,22 +243,24 @@ const Wishlist = () => {
                                   {new Intl.NumberFormat("vi-VN").format(
                                     product.price_regular
                                   )}
-                                  ₫{/* Dạng tiền tệ VN */}
+                                  <span> VNĐ</span>
                                 </del>
                                 <span className="text-[red]">
                                   {new Intl.NumberFormat("vi-VN").format(
                                     product.price_sale
                                   )}
-                                  ₫
                                 </span>
+                                <span> VNĐ</span>
                               </>
                             ) : (
-                              <span className="">
-                                {new Intl.NumberFormat("vi-VN").format(
-                                  product.price_regular
-                                )}
-                                ₫
-                              </span>
+                              <>
+                                <span className="">
+                                  {new Intl.NumberFormat("vi-VN").format(
+                                    product.price_regular
+                                  )}
+                                </span>
+                                <span> VNĐ</span>
+                              </>
                             )}
                           </div>
                         )}
