@@ -9,17 +9,25 @@ import {
 import instance from "@/configs/axios";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Input, Modal, Table } from "antd";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import CommentProduct from "../productDetail/CommentProduct";
 import ReasonReturn from "../requestOrder/components/ReasonReturn";
+import { useUser } from "@/common/context/User/UserContext";
+import Pusher from "pusher-js";
 
 const HistoryOrder = () => {
   const [expandedOrders, setExpandedOrders] = useState<number[]>([]);
   const [currentCancelOrderId, setCurrentCancelOrderId] = useState<
     number | null
   >(null);
+  const { user } = useUser();
+  const dataUser = user?.InforUser;
+  const [tempName, setTempName] = useState<string | undefined>(dataUser?.name);
+  const [tempEmail, setTempEmail] = useState<string | undefined>(
+    dataUser?.email
+  );
   // const [receivedOrders, setReceivedOrders] = useState<number[]>([]);
   // const [ratedOrders, setRatedOrders] = useState<number[]>([]);
   const [isCancelPopupOpen, setCancelPopupOpen] = useState(false);
@@ -205,21 +213,45 @@ const HistoryOrder = () => {
   };
 
   const handleGetReturnRequest = (id: number) => {
+    console.log(" kiểm tra id xem yêu cầu : ", id);
     navigate(`return_requests`, { state: { id } });
   };
 
   console.log("data lịch sử đơn hàng: ", data);
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const productsPerPage = 6;
-  const totalProducts = data?.length || 0;
+  const [currentPage, setCurrentPage] = useState(1); // Trang hiện tại
+  const productsPerPage = 6; // Mỗi trang có 12 sản phẩm
+  const totalProducts = data?.length || 0; // Tổng số sản phẩm
+  // Tính toán các sản phẩm hiển thị trên trang hiện tại
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
   const currentProducts = data?.slice(indexOfFirstProduct, indexOfLastProduct);
+  // Tính số trang
   const totalPages = Math.ceil(totalProducts / productsPerPage);
+  // Hàm để chuyển trang
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber);
   };
+
+  useEffect(() => {
+    const pusher = new Pusher("4d3e0d70126f2605977e", {
+      cluster: "ap1",
+    });
+
+    const channel = pusher.subscribe("orders");
+    pusher.connection.bind("connected", () => {
+      console.log("Connected to Pusher!");
+    });
+    channel.bind("order.updated", (newOrder: any) => {
+      queryClient.invalidateQueries({ queryKey: ["history-order"] });
+    });
+
+    return () => {
+      channel.unbind_all();
+      channel.unsubscribe();
+    };
+  }, [queryClient]);
+
   return (
     <>
       <main
@@ -244,8 +276,10 @@ const HistoryOrder = () => {
             <div className="max-w-auto">
               <div className="max-w-[42rem]">
                 <span className="hd-all-textgrey block mt-4">
-                  <span className="text-black font-semibold">Thu Hằng,</span>
-                  ha9671889@gmail.com · Hà Nội, Việt Nam
+                  <span className="text-black font-semibold">
+                    {tempName || dataUser?.name}
+                  </span>
+                  <span className="mx-2">{tempEmail || dataUser?.email}</span>
                 </span>
               </div>
               <hr className="mt-[1rem] h-0 border-solid border-b-2" />
@@ -312,16 +346,16 @@ const HistoryOrder = () => {
                     "đang chờ xác nhận" ||
                   order.order_status.trim().toLowerCase() === "đã xác nhận";
                 const canCel =
-                  order.order_status.trim().toLowerCase() === "đã hủy";
+                  order.order_status.trim().toLowerCase() === "đã hủy"; //
                 const shipOk =
                   order.order_status.trim().toLowerCase() === "đang vận chuyển";
                 const complete =
-                  order.order_status.trim().toLowerCase() === "hoàn thành";
+                  order.order_status.trim().toLowerCase() === "hoàn thành"; //
                 const requestReturn =
                   order.order_status.trim().toLowerCase() ===
                   "yêu cầu hoàn trả hàng";
                 const completedReturn =
-                  order.order_status.trim().toLowerCase() === "hoàn trả hàng";
+                  order.order_status.trim().toLowerCase() === "hoàn trả hàng"; //
 
                 const handleCancelClick = (id: number, status: string) => {
                   if (!isCancelOk) {
@@ -404,19 +438,6 @@ const HistoryOrder = () => {
                                 {selectedOrder.created_at}
                               </p>
                             </p>
-                            {/* <div className="flex items-center space-x-5 my-5"> */}
-                            {/* <div>
-                                <p className="font-medium text-base mb-2">
-                                  Địa chỉ nhận hàng:{" "}
-                                </p>
-                              
-                                Tên: {selectedOrder.ship_user_name}
-                                <br />
-                                Số điện thoại:{" "}
-                                {selectedOrder.ship_user_phonenumber}
-                                <br />
-                                Địa chỉ: {selectedOrder.ship_user_address}
-                              </div> */}
                             <div className="py-5">
                               <p className="font-medium text-base mb-2">
                                 Sản phẩm:
@@ -547,14 +568,14 @@ const HistoryOrder = () => {
                       </div>
                     </button>
                     {/*end hd-head-form-order*/}
-                    <div className="hd-body-form-order border-b border-t border-slate-200 p-2 sm:p-8 divide-y divide-y-slate-20">
+                    <div className="hd-body-form-order border-b border-t border-slate-200 p-2 sm:p-8">
                       {/* Luôn hiển thị ít nhất 1 sản phẩm */}
                       {order.order_details.length > 0 && (
                         <div
                           className="flex py-4 sm:py-7 last:pb-0 first:pt-0"
                           key={order.order_details[0].id}
                         >
-                          <div className="relative sm:w-20 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
+                          <div className="relative sm:w-20 h-24 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
                             <img
                               alt={order.order_details[0].product_name}
                               loading="lazy"
@@ -624,13 +645,13 @@ const HistoryOrder = () => {
                         </div>
                       )}
                       {isExpanded && order.order_details.length > 1 && (
-                        <div>
+                        <div className="divide-y divide-y-slate-20 border-t pt-8">
                           {order.order_details.slice(1).map((detail: any) => (
                             <div
-                              className="flex py-4 sm:py-7 last:pb-0 first:pt-0"
+                              className="flex py-4 sm:py-7 last:pb-0 first:pt-0 "
                               key={detail.id}
                             >
-                              <div className="relative sm:w-20 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
+                              <div className="relative sm:w-20 h-24 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
                                 <img
                                   alt={detail.product_name}
                                   loading="lazy"
@@ -653,7 +674,7 @@ const HistoryOrder = () => {
                                           Object.entries(detail.attributes)
                                             .length > 0 && (
                                             <>
-                                              Phân loại hàng:
+                                              {/* Phân loại hàng: */}
                                               {Object.entries(
                                                 detail.attributes
                                               ).map(([key, value]) => (
@@ -730,9 +751,7 @@ const HistoryOrder = () => {
                                   }`}
                                   disabled={shipOk}
                                   onClick={() =>
-                                    handleGetReturnRequest(
-                                      order?.return_requests[0]?.id
-                                    )
+                                    handleGetReturnRequest(order?.id)
                                   }
                                 >
                                   Xem yêu cầu hoàn trả
@@ -786,7 +805,7 @@ const HistoryOrder = () => {
                           )}
 
                           {(canCel || complete || completedReturn) && (
-                            // Nút "Mua Lại" khi đơn hàng đã hủy hoặc hoàn thành
+                            // Nút "Mua Lại" khi đơn hàng đã hủy/ hoàn thành/hoàn trả hàng
                             <button
                               className="nc-Button relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB] text-white font-medium"
                               onClick={() => mutateReorder(order.id)}
@@ -814,24 +833,6 @@ const HistoryOrder = () => {
                               />
                             </>
                           )}
-
-                          {completedReturn && (
-                            <button
-                              className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB]  font-medium ${
-                                shipOk
-                                  ? "bg-gray-200 text-gray-400 border cursor-pointer border-gray-300"
-                                  : "text-white"
-                              }`}
-                              disabled={shipOk}
-                              onClick={() =>
-                                handleGetReturnRequest(
-                                  order?.return_requests[0]?.id
-                                )
-                              }
-                            >
-                              Xem phản hồi hoàn trả hàng
-                            </button>
-                          )}
                         </div>
 
                         <Modal
@@ -857,7 +858,9 @@ const HistoryOrder = () => {
                         <p className="mr-2">Thành tiền: </p>
                         <span className="text-[red] font-medium text-xl">
                           {/* {FormatMoney(order.total)}đ */}
-                          {new Intl.NumberFormat("vi-VN").format(order.total)}₫
+                          {new Intl.NumberFormat("vi-VN").format(
+                            order.total
+                          )}₫
                         </span>
                       </div>
                     </div>

@@ -12,7 +12,7 @@ import {
   OrderedListOutlined,
 } from "@ant-design/icons";
 import { Button, Layout, Menu } from "antd";
-import { NavLink, Outlet, useLocation } from "react-router-dom";
+import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBell,
@@ -226,15 +226,15 @@ const SidebarMenu = memo(({ selectedKey }: { selectedKey: string }) => (
           </NavLink>
         ),
       },
-      {
-        key: "11",
-        icon: <CommentOutlined />,
-        label: (
-          <NavLink className="text-white" to="/admin/chatbox">
-            Tin nhắn
-          </NavLink>
-        ),
-      },
+      // {
+      //   key: "11",
+      //   icon: <CommentOutlined />,
+      //   label: (
+      //     <NavLink className="text-white" to="/admin/chatbox">
+      //       Tin nhắn
+      //     </NavLink>
+      //   ),
+      // },
 
       {
         key: "13",
@@ -417,6 +417,19 @@ const LayoutAdmin: React.FC = () => {
     if (pathname.startsWith("/admin/brands/edit/")) {
       return "14";
     }
+
+    if (pathname === "/admin/returnRequests" || pathname.startsWith("/admin/returnRequests/")) {
+      return "16";
+    }
+
+    if (pathname === "/admin/return-item" || pathname.startsWith("/admin/return-item/")) {
+      return "16";
+    }
+
+    if (pathname === "/admin/fastDelivery" || pathname.startsWith("/admin/fastDelivery/")) {
+      return "17";
+    }
+
     return "1"; // Mặc định nếu không khớp`
   };
 
@@ -507,17 +520,29 @@ const LayoutAdmin: React.FC = () => {
               </span>
             </div> */}
             <div className="info flex items-center space-x-2">
-              <div className="avatar w-8 h-8 rounded-full overflow-hidden">
+              <div className="avatar w-8 h-8 rounded-full overflow-hidden relative group">
                 <img
                   src={`${user?.InforUser?.avatar}`}
                   alt="Avatar"
+                  className="w-full h-full object-cover"
                 />
+                {/* Nút hiển thị khi hover vào ảnh */}
+
               </div>
               <div className="name">
-                <p className="text-sm font-medium">{user?.InforUser?.name}</p>
-                <span className="text-xs text-gray-500">Super admin</span>
+                {/* <p className="text-sm font-medium">{user?.InforUser?.name}</p> */}
+                <Link
+                  to="/"
+                >
+                  <Button
+                    className=" inset-0 bg-opacity-70 text-xs flex items-center justify-center transition-opacity duration-200"
+                  >
+                    Chuyển sang client
+                  </Button>
+                </Link>
               </div>
             </div>
+
           </div>
         </div>
         <Content>

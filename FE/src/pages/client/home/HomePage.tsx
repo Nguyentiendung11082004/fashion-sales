@@ -10,7 +10,7 @@ import DetailPopup from "@/components/ModalPopup/DetailPopup";
 import { Button } from "antd";
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useWishlist } from "../../../common/context/Wishlist/WishlistContext";
 import Banner from "./Banner/Banner";
 import Post from "./Post";
@@ -21,6 +21,7 @@ const HomePage = () => {
   const [trendProducts, setTrendProducts] = useState<any[]>([]);
   const [homeProducts, setHomeProducts] = useState<any[]>([]);
   const { handleAddToWishlist, isInWishlist } = useWishlist();
+  const [slugProduct, setSlugProduct] = useState();
   const [idProduct, setIdProduct] = useState();
   const [visibleProducts, setVisibleProducts] = useState(8);
   const [visProducts, setVisProducts] = useState(8);
@@ -60,13 +61,16 @@ const HomePage = () => {
   const [productSeeMore, setProductSeeMore] = useState({});
   const [visiable, setVisible] = useState(false);
   const handleOpenSeeMore = (product: any) => {
+    console.log("product",product)
     setVisible(true);
     setProductSeeMore(product);
   };
   const closeModal = () => {
     setVisible(false);
   };
-  const navigate = useNavigate();
+  useEffect(() => {
+    console.log("idProduct updated:", idProduct);
+  }, [idProduct]);
 
   return (
     <>
@@ -93,7 +97,7 @@ const HomePage = () => {
                   <div className="cursor-pointer lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] sm:h-[345px] overflow-hidden">
                     <Link
                       to={`/products/${product?.slug}.html`}
-                     className="absolute inset-0"
+                      className="absolute inset-0"
                     >
                       <img
                         className="group-hover:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover:opacity-0 object-cover"
@@ -137,7 +141,8 @@ const HomePage = () => {
                           className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]"
                           onClick={() => {
                             modalRef.current?.showModal(),
-                              setIdProduct(product?.id);
+                              setSlugProduct(product?.slug);
+                            setIdProduct(product?.id);
                           }}
                         >
                           <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
@@ -223,7 +228,7 @@ const HomePage = () => {
                   </div>
                   <div>
                     <Link
-                      to={`/products/${product?.id}`}
+                      to={`/products/${product?.slug}.html`}
                       className="text-base font-medium text-black mb-1 cursor-pointer hd-all-hover-bluelight"
                     >
                       {product.name.charAt(0).toUpperCase() +
@@ -278,13 +283,13 @@ const HomePage = () => {
                                     {new Intl.NumberFormat("vi-VN").format(
                                       productPriceRegular
                                     )}
-                                    ₫
+                                    VNĐ
                                   </del>
                                   <span className="text-[red]">
                                     {new Intl.NumberFormat("vi-VN").format(
                                       productPriceSale
                                     )}
-                                    ₫
+                                    VNĐ
                                   </span>
                                 </>
                               );
@@ -297,7 +302,7 @@ const HomePage = () => {
                                   {new Intl.NumberFormat("vi-VN").format(
                                     productPriceRegular
                                   )}
-                                  ₫
+                                  VNĐ
                                 </span>
                               );
                             } else {
@@ -309,13 +314,13 @@ const HomePage = () => {
                                       {new Intl.NumberFormat("vi-VN").format(
                                         pricesRegularVar[0]
                                       )}{" "}
-                                      ₫
+                                      VNĐ
                                     </del>
                                     <span className="text-[red]">
                                       {new Intl.NumberFormat("vi-VN").format(
                                         pricesSaleVar[0]
                                       )}{" "}
-                                      ₫
+                                      VNĐ
                                     </span>
                                   </>
                                 );
@@ -325,11 +330,11 @@ const HomePage = () => {
                                     {new Intl.NumberFormat("vi-VN").format(
                                       minPriceSale
                                     )}
-                                    ₫ -{" "}
+                                    VNĐ -{" "}
                                     {new Intl.NumberFormat("vi-VN").format(
                                       maxPriceRegular
                                     )}
-                                    ₫
+                                    VNĐ
                                   </span>
                                 );
                               }
@@ -340,11 +345,11 @@ const HomePage = () => {
                                 {new Intl.NumberFormat("vi-VN").format(
                                   minPriceRegular
                                 )}
-                                ₫ -{" "}
+                                VNĐ -{" "}
                                 {new Intl.NumberFormat("vi-VN").format(
                                   maxPriceRegular
                                 )}
-                                ₫
+                                VNĐ
                               </span>
                             );
                           }
@@ -411,14 +416,12 @@ const HomePage = () => {
                                   key={index}
                                   className="t4s-pr-color__item flex flex-col items-center cursor-pointer mr-1"
                                 >
-                                  <span className="t4s-pr-color__value border border-gray-400 w-5 h-5 hover:border-black hover:border-2 rounded-full p-[5px]">
-                                    <div
-                                      className={`w-[17px] h-[17px] rounded-full ml-[-4.25px] mt-[-4px] hover:mt-[-5px] hover:ml-[-5px]`}
-                                      style={{
-                                        backgroundColor: color.toLowerCase(),
-                                      }}
-                                    ></div>
-                                  </span>
+                                  <span
+                                    style={{
+                                      backgroundColor: color.toLowerCase(),
+                                    }}
+                                    className="t4s-pr-color__value border border-gray-400 w-5 h-5 hover:border-black hover:border-2 rounded-full p-[5px]"
+                                  ></span>
                                 </span>
                               ))}
                             </div>
@@ -429,9 +432,11 @@ const HomePage = () => {
               </div>
             ))}
             <CartPopup
+              slugProduct={slugProduct}
               idProduct={idProduct}
-              ref={modalRef}
               setIdProduct={setIdProduct}
+              ref={modalRef}
+              setSlugProduct={setSlugProduct}
             />
           </div>
           <DetailPopup
@@ -544,7 +549,8 @@ const HomePage = () => {
                           className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]"
                           onClick={() => {
                             modalRef.current?.showModal(),
-                              setIdProduct(product?.id);
+                              setSlugProduct(product?.slug);
+                            setIdProduct(product?.id);
                           }}
                         >
                           <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
@@ -630,7 +636,7 @@ const HomePage = () => {
                   </div>
                   <div>
                     <Link
-                      to={`/products/${product?.id}`}
+                      to={`/products/${product?.slug}.html`}
                       className="text-base font-medium text-black mb-1 cursor-pointer hd-all-hover-bluelight"
                     >
                       {product.name.charAt(0).toUpperCase() +
@@ -685,13 +691,13 @@ const HomePage = () => {
                                     {new Intl.NumberFormat("vi-VN").format(
                                       productPriceRegular
                                     )}
-                                    ₫
+                                    VNĐ
                                   </del>
                                   <span className="text-[red]">
                                     {new Intl.NumberFormat("vi-VN").format(
                                       productPriceSale
                                     )}
-                                    ₫
+                                    VNĐ
                                   </span>
                                 </>
                               );
@@ -704,7 +710,7 @@ const HomePage = () => {
                                   {new Intl.NumberFormat("vi-VN").format(
                                     productPriceRegular
                                   )}
-                                  ₫
+                                  VNĐ
                                 </span>
                               );
                             } else {
@@ -716,13 +722,13 @@ const HomePage = () => {
                                       {new Intl.NumberFormat("vi-VN").format(
                                         pricesRegularVar[0]
                                       )}{" "}
-                                      ₫
+                                      VNĐ
                                     </del>
                                     <span className="text-[red]">
                                       {new Intl.NumberFormat("vi-VN").format(
                                         pricesSaleVar[0]
                                       )}{" "}
-                                      ₫
+                                      VNĐ
                                     </span>
                                   </>
                                 );
@@ -732,11 +738,11 @@ const HomePage = () => {
                                     {new Intl.NumberFormat("vi-VN").format(
                                       minPriceSale
                                     )}
-                                    ₫ -{" "}
+                                    VNĐ -{" "}
                                     {new Intl.NumberFormat("vi-VN").format(
                                       maxPriceRegular
                                     )}
-                                    ₫
+                                    VNĐ
                                   </span>
                                 );
                               }
@@ -747,11 +753,11 @@ const HomePage = () => {
                                 {new Intl.NumberFormat("vi-VN").format(
                                   minPriceRegular
                                 )}
-                                ₫ -{" "}
+                                VNĐ -{" "}
                                 {new Intl.NumberFormat("vi-VN").format(
                                   maxPriceRegular
                                 )}
-                                ₫
+                                VNĐ
                               </span>
                             );
                           }
@@ -818,14 +824,12 @@ const HomePage = () => {
                                   key={index}
                                   className="t4s-pr-color__item flex flex-col items-center cursor-pointer mr-1"
                                 >
-                                  <span className="t4s-pr-color__value border border-gray-400 w-5 h-5 hover:border-black hover:border-2 rounded-full p-[5px]">
-                                    <div
-                                      className={`w-[17px] h-[17px] rounded-full ml-[-4.25px] mt-[-4px] hover:mt-[-5px] hover:ml-[-5px]`}
-                                      style={{
-                                        backgroundColor: color.toLowerCase(),
-                                      }}
-                                    ></div>
-                                  </span>
+                                  <span
+                                    style={{
+                                      backgroundColor: color.toLowerCase(),
+                                    }}
+                                    className="t4s-pr-color__value border border-gray-400 w-5 h-5 hover:border-black hover:border-2 rounded-full p-[5px]"
+                                  ></span>
                                 </span>
                               ))}
                             </div>
@@ -844,6 +848,7 @@ const HomePage = () => {
             </Button>
           )}
         </section>
+
         <Post />
 
         <Slideshow />

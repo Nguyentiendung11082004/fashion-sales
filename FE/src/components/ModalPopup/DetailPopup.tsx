@@ -179,7 +179,7 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
       // console.log("selectedProduct", selectedProduct)
       if (productSeeMore) {
         if (_payload.quantity > productSeeMore.quantity) {
-          toast.error("Sản phẩm này đã hết hàng");
+          toast.error("Số lượng yêu cầu vượt quá số lượng còn lại trong kho");
           return;
         }
       }
@@ -386,7 +386,7 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
               </button>
             </div>
           </div>
-          <Link to={`/products/${productSeeMore?.id}`} className="flex mt-2">
+          <Link to={`/products/${productSeeMore?.slug}.html`} className="flex mt-2">
             <p className="mr-1 font-medium text-black">Xem chi tiết</p>
             <svg
               xmlns="http://www.w3.org/2000/svg"

@@ -1,11 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { LogoClient } from "@/components/icons";
 import instance from "@/configs/axios";
 import { UploadOutlined } from "@ant-design/icons";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { Button, Form, Input, Upload, UploadProps, message } from "antd";
-import axios from "axios";
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 
 const Register = () => {
@@ -149,8 +149,8 @@ const Register = () => {
                   </Form.Item>
                 </div>
                 <div className="col-span-3 sm:col-span-3">
-                  <Form.Item name="address" label="Địa chỉ">
-                    <Input placeholder="Nhập địa chỉ"
+                  <Form.Item name="address" label="Địa chỉ cụ thể">
+                    <Input placeholder="Nhập địa chỉ cụ thể"
                       className=" text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-3 px-4 block w-full appearance-none"
 
                     ></Input>
@@ -174,7 +174,7 @@ const Register = () => {
                   </label>
                 </div>
                 <div className="col-span-6">
-                  <p className="text-sm text-gray-500">
+                  {/* <p className="text-sm text-gray-500">
                     Bằng cách tạo một tài khoản, bạn đồng ý với chúng tôi
                     <Link to="#" className="text-gray-700 underline">
                       {" "}
@@ -185,7 +185,7 @@ const Register = () => {
                       Chính sách bảo mật
                     </Link>
                     .
-                  </p>
+                  </p> */}
                 </div>
                 <div className="col-span-6 sm:flex sm:items-center sm:gap-4">
                   <Button htmlType="submit" className=" shrink-0 rounded-md border border-blue-600 bg-blue-600 px-12 py-6 text-sm font-medium text-white transition hover:bg-transparent hover:text-blue-600 focus:outline-none focus:ring active:text-blue-500">

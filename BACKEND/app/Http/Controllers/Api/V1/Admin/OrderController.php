@@ -20,7 +20,7 @@ class OrderController extends Controller
     public function index()
     {
         try {
-            
+
             Order::where('order_status', 'Giao hàng thành công')
                 ->whereDate('updated_at', '<', now()->subDays(3))
                 ->update(['order_status' => 'Hoàn thành']);
@@ -29,7 +29,7 @@ class OrderController extends Controller
             $orders = Order::with('orderDetails')
                 ->latest()
                 ->get();
-    
+
             // Trả lại dữ liệu cho frontend
             return response()->json([
                 'message' => 'Thông tin đơn hàng',
@@ -41,7 +41,7 @@ class OrderController extends Controller
             ], 500);
         }
     }
-    
+
 
     /**
      * Show the form for creating a new resource.
@@ -120,7 +120,7 @@ class OrderController extends Controller
                 'Hoàn trả hàng' => 7,
                 'Hoàn thành' => 8,
                 'Đã nhận hàng' => 9,
-              
+
             ];
 
 
@@ -128,7 +128,7 @@ class OrderController extends Controller
                 $newStatus = array_search((int)$newStatus, $statusMap);
             }
 
-            // Kiểm tra trạng thái đơn hàng 
+            // Kiểm tra trạng thái đơn hàng
             if (!array_key_exists($newStatus, $statusMap)) {
                 return response()->json(['message' => 'Trạng thái không hợp lệ.'], Response::HTTP_BAD_REQUEST);
             }
@@ -136,8 +136,8 @@ class OrderController extends Controller
             if ($currentStatus === 'Đã hủy' || $currentStatus === 'Hoàn thành' || $currentStatus === 'Hoàn trả hàng' || $currentStatus === 'Yêu cầu hoàn trả hàng') {
                 return response()->json(['message' => "Không thể thay đổi trạng thái \"$currentStatus\"."], Response::HTTP_BAD_REQUEST);
             }
-            
-            
+
+
             if ($currentStatus === 'Đang chờ xác nhận' && !in_array($newStatus, ['Đã xác nhận', 'Đã hủy'])) {
                 return response()->json(['message' => 'Trạng thái tiếp theo chỉ có thể là "Đã xác nhận" hoặc "Đã hủy".'], Response::HTTP_BAD_REQUEST);
             }
@@ -163,7 +163,7 @@ class OrderController extends Controller
                 $newStatus = 'Hoàn thành';
             }
 
-          
+
 
             // Nếu có trạng thái mới từ request, thực hiện thay đổi trạng thái
             if ($newStatus && $newStatus !== $order->order_status) {

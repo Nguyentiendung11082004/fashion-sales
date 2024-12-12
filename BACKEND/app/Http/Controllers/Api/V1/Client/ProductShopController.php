@@ -115,6 +115,7 @@ class ProductShopController extends Controller
                     });
                 })
 
+
                 ->when($colors, function ($query, $colors) {
                     // Lọc theo màu sắc
                     return $query->whereHas('variants.attributes', function ($subQuery) use ($colors) {

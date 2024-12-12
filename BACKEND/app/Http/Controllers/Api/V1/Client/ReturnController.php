@@ -297,6 +297,7 @@ class ReturnController extends Controller
                 'remaining_items' => $remainingItems,
                 'request_status' => $remainingItems === 0 ? 'canceled' : 'partially_canceled',
             ], 200);
+            
         } catch (\Exception $ex) {
             return response()->json([
                 "message" => "Error: " . $ex->getMessage()
