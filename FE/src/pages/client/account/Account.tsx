@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useAuth } from "@/common/context/Auth/AuthContext";
 import { useUser } from "@/common/context/User/UserContext";
 import { IUser } from "@/common/types/users";
