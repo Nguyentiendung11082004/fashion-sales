@@ -14,7 +14,7 @@ export interface IProductGalleries {
 }
 export interface Iproduct {
   id: number | string;
-  type: number;
+  type: any;
   brand_id: number;
   category_id: number;
   name: string;

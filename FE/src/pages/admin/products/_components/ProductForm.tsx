@@ -360,7 +360,8 @@ const ProductForm = () => {
             dataIndex: 'quantity',
             render: (text: any, record: any, index: number) => (
                 <Input
-                    value={variants[index]?.quantity || ''}
+                    value={variants[index]?.quantity || 0}
+                    min={0}
                     onChange={(e) => handleInputChange(index, 'quantity', e.target.value)} />
             )
         },
@@ -890,25 +891,38 @@ const ProductForm = () => {
                                 label="Chọn mảng nhiều ảnh"
                                 className="col-span-1"
                             >
-                                <Upload
-                                    {...propsGallery}
-                                >
+                                <Upload {...propsGallery}>
                                     <Button icon={<UploadOutlined />}>Tải lên gallery</Button>
                                 </Upload>
                                 {productShow?.galleries && (
                                     <>
-                                        {productShow.galleries.map((e: any) => (
-                                            <div >
+                                        {productShow.galleries.map((e: any, index: number) => (
+                                            <div key={index} style={{ position: 'relative', display: 'inline-block', margin: '10px' }}>
                                                 <img
                                                     src={e.image}
-                                                    style={{ marginTop: 16, width: 100, marginBottom: '10px' }}
+                                                    alt={`gallery-${index}`}
+                                                    style={{ width: 100, marginBottom: '10px' }}
                                                 />
+                                                {/* <Button
+                                                    danger
+                                                    size="small"
+                                                    style={{
+                                                        position: 'absolute',
+                                                        top: '5px',
+                                                        right: '5px',
+                                                    }}
+                                                    onClick={() => handleRemoveImage(index)}
+                                                >
+                                                    Xoá
+                                                </Button> */}
                                             </div>
                                         ))}
                                     </>
                                 )}
                                 {error?.gallery && <div className='text-red-600'>{error.gallery.join(', ')}</div>}
                             </Form.Item>
+
+
                             <Form.Item name="type" label="Kiểu sản phẩm" className="col-span-3">
                                 <Select
                                     value={productShow?.type ? 1 : 0}
