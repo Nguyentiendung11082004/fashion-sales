@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1\Admin;
 
+use App\Events\ReturnItemStatusUpdated;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderDetail;
@@ -383,6 +384,12 @@ class ReturnAdminController extends Controller
                         $this->updateOrder($returnRequest->id);
                     }
                 }
+                event(new ReturnItemStatusUpdated([
+                    'returnItemId' => $returnItemId,
+                    'status' => $validated['status'],
+                    'refund_amount' => $returnItem->refund_amount,
+                    // 'message' => "Return item status updated to {$validated['status']}."
+                ]));
             });
 
             return response()->json([
