@@ -30,7 +30,6 @@ const Cart = () => {
     // setIdCart("");
     setVisible(false);
   };
-  console.log("updatedAttributes", updatedAttributes);
   const { token } = useAuth();
   const { data, isLoading, isFetching } = useQuery({
     queryKey: ["cart"],
@@ -273,7 +272,6 @@ const Cart = () => {
         return cartItem && cartItem.quantity > 0; // Kiểm tra số lượng > 0
       });
       // await refetch();
-      console.log('validIdCart', validIdCart);
       if (!validIdCart || validIdCart.length === 0) {
         MySwal.fire({
           title: <strong>Cảnh báo</strong>,
