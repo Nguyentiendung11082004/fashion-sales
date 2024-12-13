@@ -267,24 +267,7 @@ const LayoutAdmin: React.FC = () => {
   const location = useLocation();
   // Map đường dẫn thành key
   const pathToKeyMap = (pathname: string): string => {
-    // "/admin": "1",
-    // "/admin/products": "2",
-    // "/admin/products/create": "2",
-    // "/admin/products/:id": "2",
-    // "/admin/products/edit/:id": "2",
-    // "/admin/orders": "12",
-    // "/admin/categories": "3",
-    // "/admin/banners": "20",
-    // "/admin/attributes": "5",
-    // "/admin/attribute-values": "6",
-    // "/admin/clients": "8",
-    // "/admin/employees": "9",
-    // "/admin/posts": "15",
-    // "/admin/vouchers": "30",
-    // "/admin/comments": "10",
-    // "/admin/chatbox": "11",
-    // "/admin/tags": "13",
-    // "/admin/brands": "14",
+
     if (pathname === "/admin") {
       return "1";
     }

@@ -10,7 +10,7 @@ import { toast } from "react-toastify";
 
 const Register = () => {
   const [urlImage, setUrlImage] = useState<any>();
-  const [error, setError] = useState<any>('')
+  const [error, setError] = useState<any>("");
   const { mutate } = useMutation({
     mutationFn: async (user: any) => {
       const { data } = await instance.post(`/register`, user);
@@ -18,13 +18,13 @@ const Register = () => {
     },
     onSuccess: (data) => {
       toast.success(data.message);
-      setError('')
+      setError("");
     },
     onError: (error: any) => {
-      setError(error.response.data)
-      toast.error("Đăng ký thất bại")
-    }
-  })
+      setError(error.response.data);
+      toast.error("Đăng ký thất bại");
+    },
+  });
   const propImgUser: UploadProps = {
     name: "file",
     action: "https://api.cloudinary.com/v1_1/dlvwxauhf/image/upload",
@@ -50,9 +50,9 @@ const Register = () => {
   const onFinish = (data: any) => {
     mutate({
       ...data,
-      avatar: urlImage
-    })
-  }
+      avatar: urlImage,
+    });
+  };
   return (
     <>
       <section className="bg-white">
@@ -73,56 +73,78 @@ const Register = () => {
 
           <main className="flex items-center justify-center px-8 py-8 sm:px-12 lg:col-span-7 lg:px-16 lg:py-12 xl:col-span-6">
             <div className="max-w-xl lg:max-w-3xl">
-              <img
-                src={LogoClient}
-                className="h-10 mb-10"
-                alt="Logo"
-              />
+              <Link to="/">
+                <img src={LogoClient} className=" h-14 mb-10" alt="Logo" />
+              </Link>
               <p className="mt-6 text-2xl font-medium text-gray-900">
                 Chào mừng bạn đến với Mix & Match
               </p>
               <h1 className="font-bold text-4xl text-center mt-10">
                 Đăng ký tài khoản
               </h1>
-              <Form className="mt-8 grid grid-cols-6 gap-6" layout="vertical" onFinish={onFinish} >
+              <Form
+                className="mt-8 grid grid-cols-6 gap-6"
+                layout="vertical"
+                onFinish={onFinish}
+              >
                 <div className="col-span-6">
                   <Form.Item name="email" label="Email">
-                    <Input placeholder="Nhập Email"
+                    <Input
+                      placeholder="Nhập Email"
                       className=" text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none"
                     ></Input>
                   </Form.Item>
-                  {error && error.errors && error.errors.email && error.errors.email.length > 0 ? (
+                  {error &&
+                  error.errors &&
+                  error.errors.email &&
+                  error.errors.email.length > 0 ? (
                     <div className="text-red-600">{error.errors.email[0]}</div>
                   ) : null}
                 </div>
                 <div className="col-span-6 sm:col-span-6">
                   <Form.Item name="password" label="Mật khẩu">
-                    <Input placeholder="Nhập mật khẩu"
+                    <Input
+                      placeholder="Nhập mật khẩu"
                       className=" text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none"
                     ></Input>
                   </Form.Item>
-                  {error && error.errors && error.errors.password && error.errors.password.length > 0 ? (
-                    <div className="text-red-600">{error.errors.password[0]}</div>
+                  {error &&
+                  error.errors &&
+                  error.errors.password &&
+                  error.errors.password.length > 0 ? (
+                    <div className="text-red-600">
+                      {error.errors.password[0]}
+                    </div>
                   ) : null}
                 </div>
                 <div className="col-span-6 sm:col-span-3">
                   <Form.Item name="name" label="Tên">
-                    <Input placeholder="Nhập tên "
+                    <Input
+                      placeholder="Nhập tên "
                       className=" text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none"
                     ></Input>
                   </Form.Item>
-                  {error && error.errors && error.errors.name && error.errors.name.length > 0 ? (
+                  {error &&
+                  error.errors &&
+                  error.errors.name &&
+                  error.errors.name.length > 0 ? (
                     <div className="text-red-600">{error.errors.name[0]}</div>
                   ) : null}
                 </div>
                 <div className="col-span-6 sm:col-span-3">
                   <Form.Item name="phone_number" label="Số điện thoại">
-                    <Input placeholder="Nhập số điện thoại"
+                    <Input
+                      placeholder="Nhập số điện thoại"
                       className=" text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none"
                     ></Input>
                   </Form.Item>
-                  {error && error.errors && error.errors.phone_number && error.errors.phone_number.length > 0 ? (
-                    <div className="text-red-600">{error.errors.phone_number[0]}</div>
+                  {error &&
+                  error.errors &&
+                  error.errors.phone_number &&
+                  error.errors.phone_number.length > 0 ? (
+                    <div className="text-red-600">
+                      {error.errors.phone_number[0]}
+                    </div>
                   ) : null}
                 </div>
                 <div className="col-span-3 sm:col-span-3">
@@ -132,9 +154,9 @@ const Register = () => {
                       className=" text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none"
                     ></Input> : ''}
                   </Form.Item> */}
-                  <Form.Item name="avatar" label="Ảnh" >
+                  <Form.Item name="avatar" label="Ảnh">
                     <Upload
-                    className="w-full"
+                      className="w-full"
                       {...propImgUser}
                       showUploadList={{
                         showPreviewIcon: false,
@@ -144,19 +166,26 @@ const Register = () => {
                         setUrlImage(null);
                       }}
                     >
-                      <Button icon={<UploadOutlined />} className="w-full">Tải lên ảnh</Button>
+                      <Button icon={<UploadOutlined />} className="w-full">
+                        Tải lên ảnh
+                      </Button>
                     </Upload>
                   </Form.Item>
                 </div>
                 <div className="col-span-3 sm:col-span-3">
                   <Form.Item name="address" label="Địa chỉ cụ thể">
-                    <Input placeholder="Nhập địa chỉ cụ thể"
+                    <Input
+                      placeholder="Nhập địa chỉ cụ thể"
                       className=" text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-3 px-4 block w-full appearance-none"
-
                     ></Input>
                   </Form.Item>
-                  {error && error.errors && error.errors.address && error.errors.address.length > 0 ? (
-                    <div className="text-red-600">{error.errors.address[0]}</div>
+                  {error &&
+                  error.errors &&
+                  error.errors.address &&
+                  error.errors.address.length > 0 ? (
+                    <div className="text-red-600">
+                      {error.errors.address[0]}
+                    </div>
                   ) : null}
                 </div>
                 <div className="col-span-6">
@@ -188,7 +217,10 @@ const Register = () => {
                   </p>
                 </div>
                 <div className="col-span-6 sm:flex sm:items-center sm:gap-4">
-                  <Button htmlType="submit" className=" shrink-0 rounded-md border border-blue-600 bg-blue-600 px-12 py-6 text-sm font-medium text-white transition hover:bg-transparent hover:text-blue-600 focus:outline-none focus:ring active:text-blue-500">
+                  <Button
+                    htmlType="submit"
+                    className=" shrink-0 rounded-md border border-blue-600 bg-blue-600 px-12 py-6 text-sm font-medium text-white transition hover:bg-transparent hover:text-blue-600 focus:outline-none focus:ring active:text-blue-500"
+                  >
                     Tạo tài khoản
                   </Button>
                   <p className="mt-4 text-sm text-gray-500 sm:mt-0">

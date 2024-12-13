@@ -38,11 +38,13 @@ const ForgotPassword = () => {
         <div>
           <BackgroundLogin />
         </div>
-        <img
-          src={LogoClient}
-          className="fixed h-10 z-10 lg:ml-[140px] mt-[30px] mx-auto"
-          alt="Logo"
-        />
+        <Link to="/">
+          <img
+            src={LogoClient}
+            className="fixed h-14 z-10 lg:ml-[140px] mt-[30px] mx-auto"
+            alt="Logo"
+          />
+        </Link>
         <section
           className="bg-[url('../src/assets/images/loginpage.svg')] 
              hidden lg:block  bg-no-repeat bg-cover bg-center text-white  lg:min-h-[620px] md:min-h-[420px]   lg:items-center lg:py-0 mt-16"
