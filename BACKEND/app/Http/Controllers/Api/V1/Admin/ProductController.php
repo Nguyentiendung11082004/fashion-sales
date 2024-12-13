@@ -237,13 +237,13 @@ class ProductController extends Controller
 
                     foreach ($request->gallery as $galleryItem) {
 
-                        if (isset($galleryItem['id']) && isset($galleryItem['image'])) {
+                        // if ($galleryItem['image'])) {
 
-                            $gallery = ProductGallery::query()->findOrFail($galleryItem['id']);
-                            $gallery->update([
-                                "image" => $galleryItem['image']
+                            // $gallery = ProductGallery::query()->findOrFail($galleryItem['id']);
+                            ProductGallery::query()->update([
+                                "image" => $galleryItem
                             ]);
-                        }
+                        // }
                     }
                 }
 

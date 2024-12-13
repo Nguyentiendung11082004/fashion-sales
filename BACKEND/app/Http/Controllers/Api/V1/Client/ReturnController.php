@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1\Client;
 
+use App\Events\ReturnItemStatusUpdated;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderDetail;
@@ -290,6 +291,12 @@ class ReturnController extends Controller
                     'order_status' => "Hoàn thành"
                 ]);
             }
+            // event(new ReturnItemStatusUpdated([
+            //     'returnItemId' => $returnItemId,
+            //     'status' => $validated['status'],
+            //     'refund_amount' => $returnItem->refund_amount,
+            //     // 'message' => "Return item status updated to {$validated['status']}."
+            // ]));
 
             return response()->json([
                 'message' => 'Cancellation successful.',
