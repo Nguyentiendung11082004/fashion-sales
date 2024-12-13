@@ -24,7 +24,6 @@ const Checkout = () => {
   // || (savedCartIds ? JSON.parse(savedCartIds) : []);
   // const cartIds = location.state?.cartIds;
   const [cartIds, setCartIds] = useState<number[]>(location.state?.cartIds || []);
-  console.log("cartIds", cartIds)
   const [validCartIds, setValidCartIds] = useState<any[]>([])
   const [_payload, _setPayLoad] = useState(location.state?._payload);
   const [paymentMethhod, setPaymentMethod] = useState('1');
@@ -113,13 +112,12 @@ const Checkout = () => {
           navigate('/thank', { replace: true });
         }, 2000);
       } else {
-        queryClient.invalidateQueries({
-          queryKey: ['cart']
-        });
+        // queryClient.invalidateQueries({
+        //   queryKey: ['cart']
+        // });
         localStorage.removeItem('checkedItems');
         navigate('/thank', { replace: true });
       }
-      // localStorage.removeItem('cartIds')
       localStorage.removeItem('checkedItems');
     },
     onError: (error: any) => {
@@ -128,9 +126,8 @@ const Checkout = () => {
       toast.error(error?.response?.data?.errors);
     }
   });
-
   useEffect(() => {
-    if (errorOrder && Array.isArray(errorOrder.out_of_stock)) {
+    if (errorOrder) {
       const allErrors = [...errorOrder.out_of_stock, ...errorOrder.insufficient_stock];
       allErrors.forEach(error => toast.error(error.message));
       const outOfStockCartIds = errorOrder.out_of_stock.map((error: any) => error.cart_id);
@@ -140,8 +137,8 @@ const Checkout = () => {
         ...prev,
         cart_item_ids: filteredCartIds
       }))
-    } else if (errorCheckout && Array.isArray(errorCheckout.out_of_stock)) {
-      const allErrors = [...errorCheckout.out_of_stock, ...errorCheckout.insufficient_stock,];
+    } else if (errorCheckout) {
+      const allErrors = [...errorCheckout?.out_of_stock, ...errorCheckout?.insufficient_stock,];
       allErrors.forEach(error => toast.error(error.message));
       const outOfStockCartIds = errorCheckout.out_of_stock.map((error: any) => error.cart_id);
       const filteredCartIds = cartIds.filter((id: number) => !outOfStockCartIds.includes(id));
@@ -152,8 +149,6 @@ const Checkout = () => {
       }))
     }
   }, [errorOrder, errorCheckout]);
-
-
   const handleOrder = () => {
     orderMutation.mutate();
   };
@@ -289,6 +284,8 @@ const Checkout = () => {
           body: JSON.stringify(payload),
         });
         if (!response.ok) {
+          navigate('/cart', { replace: true });
+          // toast.error("Sản phẩm đã hết hàng")
           throw new Error('Network response was not ok');
         }
         const data = await response.json();
@@ -304,6 +301,7 @@ const Checkout = () => {
     }
 
   }
+
   const handleBuyNow = async () => {
     try {
       if (_payload || payloadDiaChi) {
@@ -322,6 +320,8 @@ const Checkout = () => {
           throw new Error('Network response was not ok');
         }
         const data = await response.json();
+        console.log("data",data )
+        // setErrorCheckout(data?.errors)
         setDataCheckout(data);
         setIsLoading(false);
       }
@@ -347,10 +347,21 @@ const Checkout = () => {
   };
   useEffect(() => {
     handleBuyNow()
-  }, [_payload, payloadDiaChi])
+  }, [_payload, payloadDiaChi,errorOrder])
   useEffect(() => {
     handleBuyCart()
   }, [payloadDiaChi, errorOrder]);
+  // useEffect(() => {
+  //   console.log("errorOrder", errorOrder)
+  //   if (errorOrder) {
+  //     handleBuyCart(payload);
+  //   } else {
+  //     let payload = { cart_item_ids: cartIds };
+  //     handleBuyCart(payload);
+  //   }
+  // }, [payloadDiaChi, errorOrder]);
+
+
   useEffect(() => {
     // if (payloadDiaChi && payloadDiaChi.district && payloadDiaChi.ward) {
     //   getShipp();

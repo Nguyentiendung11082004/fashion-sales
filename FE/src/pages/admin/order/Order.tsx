@@ -383,7 +383,7 @@ const OrderPage = () => {
                     })) || []
                   }
                   onChange={(e) => setFilter((prev: any) => ({ ...prev, statuses: e }))}
-                  // value={filter?.statuses}
+                  value={filter?.statuses}
                   placeholder="Chọn trạng thái"
                   placement="bottomLeft"
                   className="w-[480px] max-w-md mx-2"
