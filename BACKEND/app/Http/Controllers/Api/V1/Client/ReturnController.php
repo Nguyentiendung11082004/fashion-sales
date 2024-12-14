@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Api\V1\Client;
 
+use App\Events\OrderStatusUpdated;
 use App\Events\ReturnItemStatusUpdated;
+use App\Events\ReturnRequestStatusUpdate;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderDetail;
@@ -238,7 +240,7 @@ class ReturnController extends Controller
             // Kiểm tra trạng thái yêu cầu hoàn trả
             if ($returnRequest->status !== 'pending') {
                 return response()->json([
-                    'message' => 'Only pending return requests can be canceled.'
+                    'message' => 'Chỉ những yêu cầu trả hàng đang chờ xử lý mới có thể hủy được.'
                 ], 400);
             }
 
@@ -287,16 +289,16 @@ class ReturnController extends Controller
                     'action' => 'canceled',
                     'comment' => 'Canceled the entire return request.',
                 ]);
-                Order::query()->findOrFail($returnRequest->order_id)->update([
+                $order=Order::query()->findOrFail($returnRequest->order_id)->update([
                     'order_status' => "Hoàn thành"
                 ]);
+                broadcast(new OrderStatusUpdated($order))->toOthers();
+
+                broadcast(new ReturnRequestStatusUpdate($returnRequest))->toOthers();
+                
+
             }
-            // event(new ReturnItemStatusUpdated([
-            //     'returnItemId' => $returnItemId,
-            //     'status' => $validated['status'],
-            //     'refund_amount' => $returnItem->refund_amount,
-            //     // 'message' => "Return item status updated to {$validated['status']}."
-            // ]));
+           
 
             return response()->json([
                 'message' => 'Cancellation successful.',
