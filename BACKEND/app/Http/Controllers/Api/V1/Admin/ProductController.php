@@ -233,17 +233,15 @@ class ProductController extends Controller
                 //         }
                 //     }
                 // }
-                if (isset($request->gallery)) {
+                if (!empty($request->gallery)) {
+                    ProductGallery::query()->where("product_id", $product->id)->delete();
 
-                    foreach ($request->gallery as $galleryItem) {
+                    foreach ($request->gallery as $img) {
 
-                        // if ($galleryItem['image'])) {
-
-                            // $gallery = ProductGallery::query()->findOrFail($galleryItem['id']);
-                            ProductGallery::query()->update([
-                                "image" => $galleryItem
-                            ]);
-                        // }
+                        ProductGallery::query()->create([
+                            "product_id" => $product->id,
+                            "image" => $img
+                        ]);
                     }
                 }
 
