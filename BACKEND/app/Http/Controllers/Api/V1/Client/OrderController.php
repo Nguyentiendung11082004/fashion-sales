@@ -360,7 +360,7 @@ class OrderController extends Controller
                 // Nếu không còn sản phẩm trong kho
                 if ($availableQuantity == 0) {
                     $errors['out_of_stock'][] = [
-                        'message' => "Sản phẩm $product->name đã hết hàng.",
+                        'message' => "Sản phẩm $product->name hiện đã hết hàng và hệ thống đã tự động loại bỏ khỏi giỏ hàng của bạn. Vui lòng kiểm tra và xác nhận lại đơn hàng.",
                         'product_id' => $product->id,
                         'cart_id' => $cartItem->id,
                     ];
