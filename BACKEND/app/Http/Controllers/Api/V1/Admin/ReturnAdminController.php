@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api\V1\Admin;
 
+use App\Events\OrderStatusUpdated;
+use App\Events\ReturnItemStatusUpdated;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderDetail;
@@ -382,7 +384,14 @@ class ReturnAdminController extends Controller
                         ]);
                         $this->updateOrder($returnRequest->id);
                     }
+                    // $this->updateOrder($returnRequest->id);
                 }
+                event(new ReturnItemStatusUpdated([
+                    'returnItemId' => $returnItemId,
+                    'status' => $validated['status'],
+                    'refund_amount' => $returnItem->refund_amount,
+                    // 'message' => "Return item status updated to {$validated['status']}."
+                ]));
             });
 
             return response()->json([
@@ -415,11 +424,12 @@ class ReturnAdminController extends Controller
                     // Nếu tất cả các item được chấp nhận
                     $returnRequest->update(['status' => 'completed']);
 
-
                     $order->update([
 
                         'order_status' => Order::STATUS_RETURNED, // Đặt trạng thái là 'Hoàn trả hàng'
                     ]);
+
+                    broadcast(new OrderStatusUpdated($order))->toOthers();
 
                     return [
                         'status' => true,
@@ -434,6 +444,7 @@ class ReturnAdminController extends Controller
                     $order->update([
                         'order_status' => Order::STATUS_COMPLETED, // Đặt trạng thái là 'Hoàn thành'
                     ]);
+                    broadcast(new OrderStatusUpdated($order))->toOthers();
 
                     return [
                         'status' => true,
@@ -443,13 +454,11 @@ class ReturnAdminController extends Controller
 
                 // Nếu có một số item được chấp nhận, một số bị từ chối
                 $returnRequest->update(['status' => 'completed']);
-
-
-
                 $order->update([
-
                     'order_status' => Order::STATUS_RETURNED, // Đặt trạng thái là 'Hoàn trả hàng'
                 ]);
+
+                broadcast(new OrderStatusUpdated($order))->toOthers();
 
                 return [
                     'status' => true,

@@ -63,7 +63,7 @@ class ProductController extends Controller
         }
     }
 
-    
+
     public function store(StoreProduct $request)
     {
         try {
@@ -157,9 +157,9 @@ class ProductController extends Controller
     public function show(string $id)
     {
         try {
-           
+
             $product = Product::query()->latest('id')->findOrFail($id)->load(["brand", "category", "attributes", "variants.attributes", "galleries", "tags"]);
-           
+
             foreach ($product->attributes as  $item) {
                 $item->pivot->attribute_item_ids = json_decode($item->pivot->attribute_item_ids);
             }
@@ -176,7 +176,6 @@ class ProductController extends Controller
                 "brand" => $brand,
 
             ], Response::HTTP_OK);
-           
         } catch (\Exception $ex) {
             Log::error('API/V1/Admin/ProductController@show: ', [$ex->getMessage()]);
 
@@ -206,32 +205,43 @@ class ProductController extends Controller
 
                 $dataProduct['slug'] = Str::slug($dataProduct["name"]);
 
-                if (isset($request->gallery)) {
-                    // Lấy danh sách các ID ảnh từ request
-                    $galleryIdsToKeep = collect($request->gallery)
-                        ->whereNotNull('id') // Chỉ lấy các phần tử có 'id'
-                        ->pluck('id')        // Lấy danh sách ID
-                        ->toArray();
+                // if (isset($request->gallery)) {
+                //     // Lấy danh sách các ID ảnh từ request
+                //     $galleryIdsToKeep = collect($request->gallery)
+                //         ->whereNotNull('id') // Chỉ lấy các phần tử có 'id'
+                //         ->pluck('id')        // Lấy danh sách ID
+                //         ->toArray();
 
-                    // Xóa các ảnh không nằm trong danh sách $galleryIdsToKeep
-                    ProductGallery::where('product_id', $product->id)
-                        ->whereNotIn('id', $galleryIdsToKeep)
-                        ->delete();
-                    foreach ($request->gallery as $galleryItem) {
-                        // Nếu có 'id' thì thực hiện cập nhật
-                        if (isset($galleryItem['id']) && isset($galleryItem['image'])) {
-                            $gallery = ProductGallery::query()->findOrFail($galleryItem['id']);
-                            $gallery->update([
-                                "image" => $galleryItem['image']
-                            ]);
-                        }
-                        // Nếu không có 'id', nghĩa là ảnh mới, thì tạo mới trong database
-                        elseif (!isset($galleryItem['id']) && isset($galleryItem['image'])) {
-                            ProductGallery::create([
-                                "product_id" => $product->id,
-                                "image" => $galleryItem['image']
-                            ]);
-                        }
+                //     // Xóa các ảnh không nằm trong danh sách $galleryIdsToKeep
+                //     ProductGallery::where('product_id', $product->id)
+                //         ->whereNotIn('id', $galleryIdsToKeep)
+                //         ->delete();
+                //     foreach ($request->gallery as $galleryItem) {
+                //         // Nếu có 'id' thì thực hiện cập nhật
+                //         if (isset($galleryItem['id']) && isset($galleryItem['image'])) {
+                //             $gallery = ProductGallery::query()->findOrFail($galleryItem['id']);
+                //             $gallery->update([
+                //                 "image" => $galleryItem['image']
+                //             ]);
+                //         }
+                //         // Nếu không có 'id', nghĩa là ảnh mới, thì tạo mới trong database
+                //         elseif (!isset($galleryItem['id']) && isset($galleryItem['image'])) {
+                //             ProductGallery::create([
+                //                 "product_id" => $product->id,
+                //                 "image" => $galleryItem['image']
+                //             ]);
+                //         }
+                //     }
+                // }
+                if (!empty($request->gallery)) {
+                    ProductGallery::query()->where("product_id", $product->id)->delete();
+
+                    foreach ($request->gallery as $img) {
+
+                        ProductGallery::query()->create([
+                            "product_id" => $product->id,
+                            "image" => $img
+                        ]);
                     }
                 }
 
@@ -439,9 +449,10 @@ class ProductController extends Controller
             ->get();
 
         if ($results->isEmpty()) {
-            return response()->json(['message' => 'Không tìm thấy sản phẩm nào phù hợp.',
-            'data' => []
-        ],404);
+            return response()->json([
+                'message' => 'Không tìm thấy sản phẩm nào phù hợp.',
+                'data' => []
+            ], 404);
         }
 
         return response()->json(['message' => 'Kết quả tìm kiếm.', 'data' => $results]);
