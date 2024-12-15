@@ -84,6 +84,10 @@ const Router = () => {
           path="/history-order/return_requests"
           element={<GetReturnRequestOrderId />}
         />
+        <Route
+          path="/historyReturnRequests/return_requests"
+          element={<GetReturnRequestOrderId />}
+        />
         <Route path="/order" element={<Order />} />
         <Route path="/order_lookup" element={<OrderLookup />} />
       </Route>
