@@ -22,66 +22,33 @@ interface Order {
 
 const OrderLookup = () => {
   const [orderCode, setOrderCode] = useState("");
-  const [email, setEmail] = useState("");
+  const [contact, setContact] = useState("");
   const [otp, setOtp] = useState("");
   const [showOtpInput, setShowOtpInput] = useState(false);
   const [order, setOrder] = useState<Order | null>(null);
 
   const [errors, setErrors] = useState({
     orderCode: "",
-    email: "",
+    contact: "",
     otp: "",
   });
 
-  const validateInputs = (isOtpStep: boolean) => {
-    let hasError = false;
-    const tempErrors = { orderCode: "", email: "", otp: "" };
-
-    // Kiểm tra mã đơn hàng
-    if (!orderCode.trim()) {
-      tempErrors.orderCode = "Vui lòng nhập mã đơn hàng.";
-      hasError = true;
-    }
-
-    // Kiểm tra email
-    if (
-      !email.trim() ||
-      !/^[\w.%+-]+@[a-zA-Z\d.-]+\.[a-zA-Z]{2,}$/.test(email)
-    ) {
-      tempErrors.email = "Vui lòng nhập email hợp lệ.";
-      hasError = true;
-    }
-
-    // Kiểm tra OTP nếu đang ở bước xác thực OTP
-    if (isOtpStep && (!otp.trim() || otp.length !== 6)) {
-      tempErrors.otp = "Mã OTP phải có 6 ký tự.";
-      hasError = true;
-    }
-
-    setErrors(tempErrors);
-    return !hasError;
-  };
-
   const { mutate: sendOtp } = useMutation({
     mutationFn: async () => {
-      const response = await instance.post(
-        "/search-order",
-        {
-          order_code: orderCode,
-          email: email,
-        },
-        {
-          timeout: 3000,
-        }
-      );
+      const response = await instance.post("/search-order", {
+        order_code: orderCode,
+        contact: contact,
+      });
       return response.data;
     },
     onSuccess: () => {
       setShowOtpInput(true); // Hiển thị ô nhập OTP
       toast.success("Mã OTP đã được gửi đến email của bạn.");
+      setErrors({ orderCode: "", contact: "", otp: "" });
     },
     onError: (error: any) => {
       console.error("Có lỗi xảy ra:", error);
+      setErrors(error.response?.data?.errors || {});
       toast.error(error.response?.data?.message || "Gửi OTP thất bại.");
     },
   });
@@ -90,32 +57,28 @@ const OrderLookup = () => {
     mutationFn: async () => {
       const response = await instance.post("/verify-otp", {
         order_code: orderCode,
-        email: email,
+        contact: contact,
         otp: otp,
       });
       return response.data;
     },
     onSuccess: (data) => {
       setOrder(data.order); // Lưu thông tin đơn hàng
-      toast.success("Đã tìm thấy đơn hàng.");
+      // toast.success("Đã tìm thấy đơn hàng.");
+      setErrors({ orderCode: "", contact: "", otp: "" });
     },
     onError: (error: any) => {
       console.error("Có lỗi xảy ra:", error);
+      setErrors(error.response?.data?.errors || {});
       toast.error(error.response?.data?.message || "Xác thực OTP thất bại.");
     },
   });
 
   const handleContinue = () => {
-    const isValid = validateInputs(false); // Không kiểm tra OTP
-    if (!isValid) return;
-
     sendOtp();
   };
 
   const handleSearch = () => {
-    const isValid = validateInputs(true); // Kiểm tra thêm OTP
-    if (!isValid) return;
-
     verifyOtp();
   };
 
@@ -143,18 +106,20 @@ const OrderLookup = () => {
               )}
             </div>
             <div>
-              <h2 className="text-xl font-bold mb-4">Email</h2>
+              <h2 className="text-xl font-bold mb-4">
+                Email hoặc Số điện thoại
+              </h2>
               <input
                 type="text"
-                placeholder="VD: mix&match2024@gmail.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                placeholder="VD: example@gmail.com hoặc 0987654321"
+                value={contact}
+                onChange={(e) => setContact(e.target.value)}
                 className={`w-full px-4 py-2 border ${
-                  errors.email ? "border-red-500" : "border-gray-300"
-                } rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-black`}
+                  errors.contact ? "border-red-500" : "border-gray-300"
+                } rounded-lg shadow-sm focus:outline-none`}
               />
-              {errors.email && (
-                <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+              {errors.contact && (
+                <p className="text-red-500 text-sm mt-1">{errors.contact}</p>
               )}
             </div>
             {/* OTP */}
@@ -177,10 +142,17 @@ const OrderLookup = () => {
 
             <button
               type="button"
-              onClick={showOtpInput ? handleSearch : handleContinue}
+              onClick={() => {
+                const isPhone = /^[0-9]{10,11}$/.test(contact); // Kiểm tra số điện thoại
+                if (isPhone || showOtpInput) {
+                  handleSearch();
+                } else {
+                  handleContinue();
+                }
+              }}
               className="w-full my-10 flex items-center justify-center space-x-2 bg-red-500 text-white font-semibold py-2 px-4 rounded-lg shadow hover:bg-red-600 transition"
             >
-              <p>{showOtpInput ? "TRA CỨU" : "TIẾP TỤC"}</p>
+              <p>{(showOtpInput || /^[0-9]{10,11}$/.test(contact)) ? "TRA CỨU" : "TIẾP TỤC"}</p>
               <p className="mb-[3px]">→</p>
             </button>
           </form>
@@ -245,7 +217,7 @@ const OrderLookup = () => {
                             ) {
                               return colorTranslations[value];
                             }
-                            return value; 
+                            return value;
                           })
                           .join(", ")
                       : ""}

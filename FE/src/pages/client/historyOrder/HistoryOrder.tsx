@@ -839,9 +839,7 @@ const HistoryOrder = () => {
                                       : "text-white"
                                   }`}
                                   disabled={shipOk}
-                                  onClick={() =>
-                                    handleGetReturnRequest(order?.return_requests[0]?.id)
-                                  }
+                                  onClick={() => handleOpenFormReason(order)}
                                 >
                                   Yêu cầu trả hàng
                                 </button>

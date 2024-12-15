@@ -6,7 +6,7 @@ import { LogoClient } from "../icons";
 import MapFooter from "../icons/FooterWebsite/MapFooter";
 import EmailFooter from "../icons/FooterWebsite/EmailFooter";
 import PhoneFooter from "../icons/FooterWebsite/PhoneFooter";
-import imgfooter from "@/assets/images/footer-method.png"
+import imgfooter from "@/assets/images/footer-method.png";
 
 type Props = {};
 
@@ -15,11 +15,9 @@ const Footer = (props: Props) => {
     <footer className="bg-[#f6f6f8] mt-5 py-16 z-1">
       <div className="container grid lg:grid-cols-12 md:grid-cols-2 sm:grid-cols-1 gap-4 ">
         <div className=" mt-5 lg:col-span-3 md:col-span-6 md:order-1 lg:order-1">
-          <img
-            src={LogoClient}
-            className="h-[50px] mb-10"
-            alt="Logo"
-          />
+          <Link to="/">
+            <img src={LogoClient} className="h-[50px] mb-10" alt="Logo" />
+          </Link>
           <div className="flex mb-5">
             <div className="mr-2">
               <MapFooter />
@@ -32,7 +30,6 @@ const Footer = (props: Props) => {
           </div>
           <div className="flex mb-5">
             <div className="mr-2">
-
               <PhoneFooter />
             </div>
             <p>+84 879 202 919</p>
@@ -233,13 +230,11 @@ const Footer = (props: Props) => {
                   </form>
                 </div>
               </div>
-
             </div>
             <img src={imgfooter} />
           </div>
         </div>
       </div>
-
     </footer>
   );
 };
