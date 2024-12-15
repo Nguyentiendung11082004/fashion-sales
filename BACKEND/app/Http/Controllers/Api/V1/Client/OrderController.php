@@ -895,51 +895,38 @@ class OrderController extends Controller
         ], 200);
     }
     // thanh toán lại(chưa xong)
-    // function handlePayment(Request $request)
-    // {
-    //     try {
-    //         // Lấy ID người dùng hiện tại (nếu có)
-    //         $currentUserId = auth()->id();
+    function handlePayment(Request $request)
+    {
+        try {
+            // Validate orderId là số và tồn tại trong bảng orders
+            $request->validate([
+                'orderId' => 'required|numeric|exists:orders,id',
+            ]);
+            $user_id = auth('sanctum')->id() ?? null;
 
-    //         // Tìm đơn hàng dựa vào ID
-    //         $order = Order::findOrFail($request->orderId); // Tự động ném ngoại lệ nếu không tìm thấy đơn hàng
+            // Tìm đơn hàng dựa vào ID
+            $order = Order::query()
+                ->where('user_id', $user_id)
+                ->where('id', $request->orderId)
+                ->where('payment_method_id', 2)
+                ->where('payment_status', Order::PAYMENT_PENDING)
+                ->first();
+            // Kiểm tra xem đơn hàng có tồn tại không
+            if (!$order) {
+                return response()->json([
+                    'message' => 'Đơn hàng không tồn tại hoặc không thể xử lý thanh toán.'
+                ], Response::HTTP_NOT_FOUND);
+            }
+            // Xử lý thanh toán COD
+            $order->update([
+                'payment_method_id' => 1, // Cập nhật phương thức thanh toán thành COD
+            ]);
 
-    //         // Kiểm tra quyền sở hữu đơn hàng
-    //         if ($order->user_id !== $currentUserId) {
-    //             return response()->json([
-    //                 'message' => 'Bạn không có quyền xử lý đơn hàng này.'
-    //             ], Response::HTTP_FORBIDDEN);
-    //         }
-
-    //         // Xử lý thanh toán online
-    //         if ($request->paymentMethodId == 2) { // Phương thức thanh toán online
-    //             $payment = new PaymentController();
-
-    //             $response = $payment->createPayment($order); // Gọi hàm tạo thanh toán
-
-    //             // Trả về URL thanh toán
-    //             return response()->json([
-    //                 'payment_url' => $response['payment_url']
-    //             ], Response::HTTP_OK);
-    //         }
-
-    //         // Xử lý thanh toán COD
-    //         if ($request->paymentMethodId == 1) { // Phương thức thanh toán COD
-    //             $order->payment_method_id = 1; // COD
-    //             $order->status = 'Chờ xác nhận';
-    //             $order->save();
-
-    //             return response()->json([
-    //                 'message' => 'Phương thức thanh toán đã được chuyển sang COD.',
-    //             ], Response::HTTP_OK);
-    //         }
-
-    //         return response()->json([
-    //             'message' => 'Phương thức thanh toán không hợp lệ.'
-    //         ], Response::HTTP_BAD_REQUEST);
-    //     } catch (\Exception $ex) {
-    //         DB::rollBack();
-    //         return response()->json(['message' => $ex->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
-    //     }
-    // }
+            return response()->json([
+                'message' => 'Phương thức thanh toán đã được chuyển sang COD.',
+            ], Response::HTTP_OK);
+        } catch (\Exception $ex) {
+            return response()->json(['message' => $ex->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 }
