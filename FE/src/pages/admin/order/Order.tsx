@@ -318,31 +318,7 @@ const OrderPage = () => {
     });
   
     channel.bind("order.updated", (newOrder: any) => {
-      console.log("Data received from Pusher:", newOrder);
-  
-      const updatedOrder = newOrder.order; 
-      console.log("Extracted updated order:", updatedOrder);
-
       queryClient.invalidateQueries({ queryKey: ["order-status"] });
-  
-      // queryClient.setQueryData(["order-status"], (oldData: any) => {
-      //   const orders = Array.isArray(oldData?.data) ? [...oldData.data] : [];
-      //   const index = orders.findIndex((order) => order.id === updatedOrder.id);
-      
-      //   if (index >= 0) {
-      //     orders[index] = { ...orders[index], ...updatedOrder };
-      //   } else {
-      //     orders.push(updatedOrder);
-      //   }
-      
-      //   console.log("Updated orders:", orders);
-      
-      //   return {
-      //     ...oldData,
-      //     data: orders,
-      //   };
-      // });
-      
     });
   
     return () => {

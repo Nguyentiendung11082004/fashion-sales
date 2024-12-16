@@ -270,6 +270,9 @@ const ProductDetailAdmin = () => {
             <h2 className="text-xl font-semibold text-gray-800">
               Thuộc tính sản phẩm
             </h2>
+            {Object.entries(productShow?.variants || {}).map(([key, values]) => (
+
+            ))}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               {/* Màu sắc */}
               <div className="bg-gray-100 p-4 rounded-lg">

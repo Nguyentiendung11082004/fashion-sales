@@ -245,7 +245,7 @@ const HistoryReturnRequests = () => {
       console.log("Connected to Pusher!");
     });
     channel.bind("order.updated", (newOrder: any) => {
-      queryClient.invalidateQueries({ queryKey: ["history-order"] });
+      queryClient.invalidateQueries({ queryKey: ["return-requests"] });
     });
 
     return () => {
@@ -573,7 +573,7 @@ const HistoryReturnRequests = () => {
                     <div className="hd-head-form-order flex sm:flex-row justify-between lg:justify-between sm:justify-between sm:items-center p-4 sm:p-8">
                       <div className="mt-3 sm:mt-0">
                         <div className="flex items-center space-x-2">
-                          {(isDelivered || requestReturn || shipOk) && (
+                          {(isDelivered || shipOk) && (
                             <>
                               <button
                                 className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB]  font-medium ${
@@ -586,25 +586,25 @@ const HistoryReturnRequests = () => {
                               >
                                 Đã Nhận Hàng
                               </button>
-
-                              {requestReturn && (
-                                <button
-                                  className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB] font-medium ${
-                                    shipOk
-                                      ? "bg-gray-200 text-gray-400 border cursor-pointer border-gray-300"
-                                      : "text-white"
-                                  }`}
-                                  disabled={shipOk}
-                                  onClick={() =>
-                                    handleGetReturnRequest(
-                                      order?.return_requests[0]?.id
-                                    )
-                                  }
-                                >
-                                  Chi tiết hoàn trả
-                                </button>
-                              )}
                             </>
+                          )}
+
+                          {requestReturn && (
+                            <button
+                              className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB] font-medium ${
+                                shipOk
+                                  ? "bg-gray-200 text-gray-400 border cursor-pointer border-gray-300"
+                                  : "text-white"
+                              }`}
+                              disabled={shipOk}
+                              onClick={() =>
+                                handleGetReturnRequest(
+                                  order?.return_requests[0]?.id
+                                )
+                              }
+                            >
+                              Chi tiết hoàn trả
+                            </button>
                           )}
 
                           {order?.return_requests[0]?.status ===

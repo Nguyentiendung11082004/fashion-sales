@@ -921,104 +921,13 @@ const Products = () => {
                   </div>
                 ))}
               </div>
-              {/* colors */}
-              {/* <div className="relative flex flex-col py-8 space-y-4">
-                <h3 className="font-semibold mb-2.5">Màu sắc</h3>
-                {pro?.attributes?.color?.map((item) => (
-                  <div className="" key={item.id}>
-                    <div className="flex text-sm sm:text-base ">
-                      <input
-                        id={`color-${item.id}`}
-                        className="focus:ring-action-primary text-primary-500 rounded border-slate-400 hover:border-slate-700 bg-transparent dark:border-slate-700 dark:hover:border-slate-500 dark:checked:bg-primary-500 focus:ring-primary-500 w-5 h-5"
-                        type="checkbox"
-                        name={item.name}
-                        value={
-                          item.value.charAt(0).toUpperCase() +
-                          item.value.slice(1).toLowerCase()
-                        }
-                        checked={selectedColors.includes(
-                          item.value.charAt(0).toUpperCase() +
-                            item.value.slice(1).toLowerCase()
-                        )}
-                        onChange={() =>
-                          handleCheckboxChange(
-                            "colors",
-                            item.value.charAt(0).toUpperCase() +
-                              item.value.slice(1).toLowerCase()
-                          )
-                        }
-                      />
-                      <label
-                        htmlFor={`color-${item.id}`}
-                        className="pl-2.5 sm:pl-3.5 flex flex-col flex-1 justify-center select-none"
-                      >
-                        <span className="text-slate-900 text-sm font-normal ">
-                          {colorTranslations[
-                            item.value.charAt(0).toUpperCase() +
-                              item.value.slice(1).toLowerCase()
-                          ] || "No Size"}
-                        </span>
-                      </label>
-                    </div>
-                  </div>
-                ))}
-              </div> */}
-
-              {/* sizes */}
-              {/* <div className="relative flex flex-col py-8 space-y-4">
-                <h3 className="font-semibold mb-2.5">Kích thước</h3>
-                {pro?.attributes?.size
-                  ?.sort((a, b) => {
-                    const aValue = a.value.toLowerCase();
-                    const bValue = b.value.toLowerCase();
-
-                    const aNumeric = aValue.replace(/[^0-9]/g, ""); 
-                    const bNumeric = bValue.replace(/[^0-9]/g, "");
-
-                    const isANumber = !isNaN(Number(aNumeric)); 
-                    const isBNumber = !isNaN(Number(bNumeric));
-
-                    if (!isANumber && !isBNumber)
-                      return aValue.localeCompare(bValue); 
-                    if (isANumber && !isBNumber) return 1; 
-                    if (!isANumber && isBNumber) return -1; 
-
-                    return Number(aNumeric) - Number(bNumeric);
-                  })
-                  .map((item) => (
-                    <div className="" key={item.id}>
-                      <div className="flex text-sm sm:text-base ">
-                        <input
-                          id={`size-${item.id}`}
-                          className="focus:ring-action-primary text-primary-500 rounded border-slate-400 hover:border-slate-700 bg-transparent dark:border-slate-700 dark:hover:border-slate-500 dark:checked:bg-primary-500 focus:ring-primary-500 w-5 h-5"
-                          type="checkbox"
-                          name={item.name}
-                          value={item.value}
-                          checked={selectedSizes.includes(item.value)}
-                          onChange={() =>
-                            handleCheckboxChange("sizes", item.value)
-                          }
-                        />
-                        <label
-                          htmlFor={`size-${item.id}`}
-                          className="pl-2.5 sm:pl-3.5 flex flex-col flex-1 justify-center select-none"
-                        >
-                          <span className="text-slate-900 text-sm font-normal ">
-                            {item.value || "No Size"}
-                          </span>
-                        </label>
-                      </div>
-                    </div>
-                  ))}
-              </div> */}
-
+              
               {Object.entries(pro?.attributes || {}).map(([key, values]) => (
                 <div
                   className="relative flex flex-col py-8 space-y-4"
                   key={key}
                 >
                   <h3 className="font-semibold mb-2.5">
-                    {/* {attributeTranslations[key] || key} */}
                     {key}
                   </h3>
                   {values?.map((item) => (
