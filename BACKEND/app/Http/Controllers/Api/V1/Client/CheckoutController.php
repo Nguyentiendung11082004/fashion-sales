@@ -31,7 +31,11 @@ class CheckoutController extends Controller
     {
         try {
             $data = $request->validated(); // Lấy dữ liệu đã xác thực
-            $listVoucher = Voucher::query()->with('meta')->get();
+            $listVoucher = Voucher::query()->with('meta')
+                ->where('is_active', true)
+                ->whereColumn('used_count', '<', 'usage_limit')
+                ->whereDate('start_date', '<=', now())
+                ->whereDate('end_date', '>=', now())->get();
             // Kiểm tra xem người dùng có muốn mua ngay hay không
             $isImmediatePurchase = isset($data['product_id']) && isset($data['quantity']);
 
