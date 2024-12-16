@@ -97,14 +97,21 @@ class CheckoutController extends Controller
                         // Xử lý trường hợp hết hàng
                         if ($available_quantity == 0) {
                             $errors['out_of_stock'][] = [
-                                'message' => "Sản phẩm {$product->name} đã hết hàng.",
+                                'message' => "Sản phẩm {$product->name} hiện đã hết hàng và hệ thống đã tự động loại bỏ khỏi giỏ hàng của bạn. Vui lòng kiểm tra và xác nhận lại đơn hàng.",
                                 'product_id' => $product->id,
                                 'cart_id' => $cart_item->id,
                             ];
                             $cart_item->delete();
+                            if ($variant) {
+                                $tongSoLuong = $product->variants->sum('quantity');
+                                if ($tongSoLuong <= 0) {
+                                    $product->update(["status" => false]);
+                                }
+                            } else {
+                                $product->update(["status" => false]);
+                            }
                             continue;
                         }
-
                         // Xử lý trường hợp số lượng không đủ
                         if ($quantity > $available_quantity) {
                             $quantity = $available_quantity;
@@ -208,7 +215,7 @@ class CheckoutController extends Controller
                 }
             }
 
-            if (!empty($errors['insufficient_stock']) || (empty($errors['insufficient_stock']) && empty($errors['out_of_stock']))||(!empty($errors['out_of_stock']) && $sub_total !== 0)) {
+            if (!empty($errors['insufficient_stock']) || (empty($errors['insufficient_stock']) && empty($errors['out_of_stock'])) || (!empty($errors['out_of_stock']) && $sub_total !== 0)) {
                 return response()->json([
                     "errors" => $errors,
                     "user" => auth('sanctum')->check() ? $user : null,
@@ -220,7 +227,9 @@ class CheckoutController extends Controller
                     "listVoucher" => $listVoucher,
                 ], Response::HTTP_OK);
             } else {
-                return response()->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
+                return response()->json([
+                    'errors' => $errors,
+                ], Response::HTTP_BAD_REQUEST);
             }
         } catch (\Exception $ex) {
             return response()->json(["message" => $ex->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);

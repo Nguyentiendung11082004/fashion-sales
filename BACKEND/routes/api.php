@@ -81,6 +81,7 @@ Route::prefix("v1/")->group(function () {
     // Tìm kiếm đơn hàng khi k đăng nhập
     Route::post('/search-order', [OrderController::class, 'searchOrder']);
     Route::post('/verify-otp', [OrderController::class, 'verifyOtp']);
+    Route::post('/payment/handle', [OrderController::class, 'handlePayment']);
     //Tìm kiếm trong Admin
     Route::post('/client/search', [ClientController::class, 'search']);
     Route::post('/employee/search', [EmployeeController::class, 'search']);

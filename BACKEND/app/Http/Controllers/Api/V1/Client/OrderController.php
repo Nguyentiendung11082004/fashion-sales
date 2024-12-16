@@ -297,7 +297,7 @@ class OrderController extends Controller
             // Nếu không có biến thể
             if ($product->quantity == 0) {
                 $errors['out_of_stock'][] = [
-                    'message' => "Sản phẩm {$product->name} đã hết hàng.",
+                    'message' => "Sản phẩm $product->name hiện đã hết hàng và hệ thống đã tự động loại bỏ khỏi giỏ hàng của bạn. Vui lòng kiểm tra và xác nhận lại đơn hàng.",
                     'product_id' => $product->id,
                 ];
                 // return ['errors' => $errors];
@@ -360,7 +360,7 @@ class OrderController extends Controller
                 // Nếu không còn sản phẩm trong kho
                 if ($availableQuantity == 0) {
                     $errors['out_of_stock'][] = [
-                        'message' => "Sản phẩm $product->name đã hết hàng.",
+                        'message' => "Sản phẩm $product->name hiện đã hết hàng và hệ thống đã tự động loại bỏ khỏi giỏ hàng của bạn. Vui lòng kiểm tra và xác nhận lại đơn hàng.",
                         'product_id' => $product->id,
                         'cart_id' => $cartItem->id,
                     ];
@@ -451,7 +451,6 @@ class OrderController extends Controller
                 $ineligible_products[] = $item;
             }
         }
-
         // Kiểm tra giá trị tối thiểu của đơn hàng
         if (isset($voucher_metas['_voucher_min_order_value']) && $sub_total < $voucher_metas['_voucher_min_order_value']) {
             return [
@@ -683,69 +682,73 @@ class OrderController extends Controller
      */
     public function update(UpdateOrderRequest $request, Order $order)
     {
-        if (!auth('sanctum')->check()) {
-            return response()->json(['message' => 'Không có quyền truy cập'], 403);
+        try {
+            if (!auth('sanctum')->check()) {
+                return response()->json(['message' => 'Không có quyền truy cập'], 403);
+            }
+
+            $user_id = auth('sanctum')->id();
+
+            // Kiểm tra quyền sở hữu
+            if ($order->user_id !== $user_id) {
+                return response()->json(['message' => 'Không có quyền truy cập'], 403);
+            }
+
+            // Kiểm tra trạng thái không hợp lệ
+            if (in_array($order->order_status, [Order::STATUS_CANCELED, Order::STATUS_COMPLETED])) {
+                return response()->json(['message' => 'Đơn hàng không thể cập nhật vì đã hoàn thành hoặc đã bị hủy.'], 400);
+            }
+
+            $order_status = $request->input('order_status');
+
+            // Xử lý các trạng thái
+            switch ($order_status) {
+                case Order::STATUS_CANCELED:
+                    if (!in_array($order->order_status, [Order::STATUS_PENDING, Order::STATUS_CONFIRMED])) {
+                        return response()->json([
+                            'message' => 'Chỉ có thể hủy đơn hàng khi đơn hàng đang ở trạng thái Đang chờ xác nhận hoặc Đã xác nhận.'
+                        ], 400);
+                    }
+
+                    $user_note = $request->input('user_note');
+                    $this->handleOrderCancellation($order, $user_note);
+
+                    // Cập nhật trạng thái voucher nếu cần
+                    $voucher_logs = VoucherLog::query()
+                        ->where('user_id', $user_id)
+                        ->where('order_id', $order->id)
+                        ->first();
+
+                    if ($voucher_logs) {
+                        $voucher_logs->update(['action' => 'reverted']);
+                    }
+                    $order->order_status = $order_status;
+                    break;
+
+                case Order::STATUS_COMPLETED:
+                    if ($order->order_status !== Order::STATUS_SUCCESS) {
+                        return response()->json([
+                            'message' => 'Chỉ có thể hoàn thành đơn hàng khi đơn hàng đang ở trạng thái giao hàng thành công.'
+                        ], 400);
+                    }
+                    $order->order_status = $order_status;
+                    break;
+
+                default:
+                    return response()->json(['message' => 'Trạng thái không hợp lệ.'], 400);
+            }
+
+            $order->save();
+
+            broadcast(new OrderStatusUpdated($order))->toOthers();
+
+            return response()->json([
+                'message' => 'Trạng thái đơn hàng đã được cập nhật thành công.',
+                'order' => $order->load('orderDetails'),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Đã xảy ra lỗi khi lấy thông tin đơn hàng', 'error' => $e->getMessage()], 500);
         }
-
-        $user_id = auth('sanctum')->id();
-
-        // Kiểm tra quyền sở hữu
-        if ($order->user_id !== $user_id) {
-            return response()->json(['message' => 'Không có quyền truy cập'], 403);
-        }
-
-        // Kiểm tra trạng thái không hợp lệ
-        if (in_array($order->order_status, [Order::STATUS_CANCELED, Order::STATUS_COMPLETED])) {
-            return response()->json(['message' => 'Đơn hàng không thể cập nhật vì đã hoàn thành hoặc đã bị hủy.'], 400);
-        }
-
-        $order_status = $request->input('order_status');
-
-        // Xử lý các trạng thái
-        switch ($order_status) {
-            case Order::STATUS_CANCELED:
-                if (!in_array($order->order_status, [Order::STATUS_PENDING, Order::STATUS_CONFIRMED])) {
-                    return response()->json([
-                        'message' => 'Chỉ có thể hủy đơn hàng khi đơn hàng đang ở trạng thái Đang chờ xác nhận hoặc Đã xác nhận.'
-                    ], 400);
-                }
-
-                $user_note = $request->input('user_note');
-                $this->handleOrderCancellation($order, $user_note);
-
-                // Cập nhật trạng thái voucher nếu cần
-                $voucher_logs = VoucherLog::query()
-                    ->where('user_id', $user_id)
-                    ->where('order_id', $order->id)
-                    ->first();
-
-                if ($voucher_logs) {
-                    $voucher_logs->update(['action' => 'reverted']);
-                }
-                $order->order_status = $order_status;
-                break;
-
-            case Order::STATUS_COMPLETED:
-                if ($order->order_status !== Order::STATUS_SUCCESS) {
-                    return response()->json([
-                        'message' => 'Chỉ có thể hoàn thành đơn hàng khi đơn hàng đang ở trạng thái giao hàng thành công.'
-                    ], 400);
-                }
-                $order->order_status = $order_status;
-                break;
-
-            default:
-                return response()->json(['message' => 'Trạng thái không hợp lệ.'], 400);
-        }
-
-        $order->save();
-        
-        broadcast(new OrderStatusUpdated($order))->toOthers();
-
-        return response()->json([
-            'message' => 'Trạng thái đơn hàng đã được cập nhật thành công.',
-            'order' => $order->load('orderDetails'),
-        ]);
     }
     protected function handleOrderCancellation(Order $order, string $user_note)
     {
@@ -786,7 +789,7 @@ class OrderController extends Controller
                     }
                 }
             }],
-            'order_code' => 'required|string',
+            'order_code' => 'required_if:type,email|string',
         ]);
 
         // Nếu type là email, tìm đơn hàng với order_code và email
@@ -798,9 +801,9 @@ class OrderController extends Controller
 
         // Nếu type là phoneNumber, tìm đơn hàng với số điện thoại
         if ($request->type == "phoneNumber") {
-            $order = Order::query()->with('orderDetails')->where('order_code', $request->order_code)
+            $order = Order::query()->with('orderDetails')
                 ->where('ship_user_phonenumber', $request->contact)->latest('id')
-                ->first();
+                ->get();
         }
         // Nếu không tìm thấy đơn hàng
         if (!$order) {
@@ -890,5 +893,40 @@ class OrderController extends Controller
             'status' => 'success',
             'order' => $order,
         ], 200);
+    }
+    // thanh toán lại(chưa xong)
+    function handlePayment(Request $request)
+    {
+        try {
+            // Validate orderId là số và tồn tại trong bảng orders
+            $request->validate([
+                'orderId' => 'required|numeric|exists:orders,id',
+            ]);
+            $user_id = auth('sanctum')->id() ?? null;
+
+            // Tìm đơn hàng dựa vào ID
+            $order = Order::query()
+                ->where('user_id', $user_id)
+                ->where('id', $request->orderId)
+                ->where('payment_method_id', 2)
+                ->where('payment_status', Order::PAYMENT_PENDING)
+                ->first();
+            // Kiểm tra xem đơn hàng có tồn tại không
+            if (!$order) {
+                return response()->json([
+                    'message' => 'Đơn hàng không tồn tại hoặc không thể xử lý thanh toán.'
+                ], Response::HTTP_NOT_FOUND);
+            }
+            // Xử lý thanh toán COD
+            $order->update([
+                'payment_method_id' => 1, // Cập nhật phương thức thanh toán thành COD
+            ]);
+
+            return response()->json([
+                'message' => 'Phương thức thanh toán đã được chuyển sang COD.',
+            ], Response::HTTP_OK);
+        } catch (\Exception $ex) {
+            return response()->json(['message' => $ex->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 }
