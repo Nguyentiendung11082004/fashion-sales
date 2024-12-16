@@ -168,20 +168,14 @@ class ProductController extends Controller
             $tag = Tag::query()->latest('id')->pluck('name', 'id');
             $attribute = Attribute::with(["attributeitems"])->get();
             $brand = Brand::query()->pluck('name', 'id');
-            $attributes = Attribute::with('attributeitems')->get();
-
-            $allAttribute = [];
-            // converte dữ liệu cho hằng dễ làm việc
-            foreach ($attributes as $attribute) {
-                $allAttribute[$attribute->name] = $attribute->attributeitems->toArray();
-            }
+           
             return response()->json([
                 "product" => $product,
                 "category" => $category,
                 "tag" => $tag,
                 "attribute" => $attribute,
                 "brand" => $brand,
-                "allAttribute"=> $allAttribute 
+                // "allAttribute"=> $allAttribute 
             ], Response::HTTP_OK);
         } catch (\Exception $ex) {
             Log::error('API/V1/Admin/ProductController@show: ', [$ex->getMessage()]);
