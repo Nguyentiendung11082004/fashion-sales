@@ -649,6 +649,20 @@ const HistoryReturnRequests = () => {
                             </button>
                           )}
 
+                          {order?.status === "canceled" && (
+                            <button
+                              className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB] font-medium ${
+                                shipOk
+                                  ? "bg-gray-200 text-gray-400 border cursor-pointer border-gray-300"
+                                  : "text-white"
+                              }`}
+                              disabled={shipOk}
+                              onClick={() => handleGetReturnRequest(order?.id)}
+                            >
+                              Chi tiết hoàn trả
+                            </button>
+                          )}
+
                           {order?.status === "completed" && (
                             <button
                               className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB] font-medium ${
