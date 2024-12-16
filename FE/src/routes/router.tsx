@@ -97,7 +97,7 @@ const Router = () => {
       <Route path="account/forgotpassword" element={<ForgotPassword />} />
       <Route path="/password/reset/:token" element={<PasswordResetHandler />} />
       <Route path="password/reset" element={<ResetPassword />} />
-      <Route path="" element={<CheckAdmin />}>
+      {/* <Route path="" element={<CheckAdmin />}> */}
         <Route path="/admin" element={<LayoutAdmin />}>
           <Route index element={<Dashboard />} />
           <Route path="products" element={<ProductPageManager />} />
@@ -105,7 +105,7 @@ const Router = () => {
           <Route path="products/create" element={<ProductForm />} />
           <Route path="products/edit/:id" element={<ProductForm />} />
           <Route path="categories" element={<CategoryPage />} />
-<Route path="categories/create" element={<CategoryForm />} />
+          <Route path="categories/create" element={<CategoryForm />} />
           <Route path="categories/edit/:id" element={<CategoryForm />} />
           <Route path="attributes" element={<AttributeItem />} />
           <Route path="attribute-values" element={<AttributeItemValues />} />
@@ -138,7 +138,7 @@ const Router = () => {
           <Route path="fastDelivery" element={<FastDelivery />} />
           <Route path="orders/:id" element={<OrderDetail />} />
         </Route>
-      </Route>
+      {/* </Route> */}
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

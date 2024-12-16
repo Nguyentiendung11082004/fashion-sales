@@ -5,6 +5,7 @@ import CartDetail from "@/components/icons/detail/CartDetail";
 import Eye from "@/components/icons/detail/Eye";
 import HeartRed from "@/components/icons/detail/HeartRed";
 import CartPopup from "@/components/ModalPopup/CartPopup";
+import DetailPopup from "@/components/ModalPopup/DetailPopup";
 import instance from "@/configs/axios";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
@@ -67,8 +68,25 @@ const Wishlist = () => {
     },
   });
 
+  const [productSeeMore, setProductSeeMore] = useState({});
+  const [visiable, setVisible] = useState(false);
+  const handleOpenSeeMore = (product: any) => {
+    console.log("product", product)
+    setVisible(true);
+    setProductSeeMore(product);
+  };
+  const closeModal = () => {
+    setVisible(false);
+  };
+
   return (
     <>
+      <DetailPopup
+        open={visiable}
+        onClose={closeModal}
+        trendProducts={{}}
+        productSeeMore={productSeeMore}
+      />
       <div>
         <div className="hd-page-head">
           <div className="hd-header-banner bg-[url('./src/assets/images/shopping-cart-head.webp')] bg-no-repeat bg-cover bg-center">
@@ -148,7 +166,9 @@ const Wishlist = () => {
                         </div>
                         <div className="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100">
                           <Link to="" className="group/btn relative m-auto">
-                            <button className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]">
+                            <button
+                              onClick={() => handleOpenSeeMore(product)}
+                              className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]">
                               <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
                                 Xem thêm
                               </p>
@@ -203,7 +223,7 @@ const Wishlist = () => {
                         {product.price_regular && (
                           <div>
                             {product.price_sale > 0 &&
-                            product.price_sale < product.price_regular ? (
+                              product.price_sale < product.price_regular ? (
                               <>
                                 <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400">
                                   -
@@ -211,7 +231,7 @@ const Wishlist = () => {
                                     ((product.price_regular -
                                       product.price_sale) /
                                       product.price_regular) *
-                                      100
+                                    100
                                   )}
                                   %
                                 </div>
@@ -239,7 +259,7 @@ const Wishlist = () => {
                         {product.price_regular && (
                           <div>
                             {product.price_sale > 0 &&
-                            product.price_sale < product.price_regular ? (
+                              product.price_sale < product.price_regular ? (
                               <>
                                 <del className="mr-1">
                                   {new Intl.NumberFormat("vi-VN").format(
@@ -326,11 +346,10 @@ const Wishlist = () => {
                   <button
                     key={pageNumber}
                     onClick={() => handlePageChange(pageNumber)}
-                    className={`px-4 py-2 mx-1 ${
-                      currentPage === pageNumber
+                    className={`px-4 py-2 mx-1 ${currentPage === pageNumber
                         ? "text-black"
                         : "text-gray-300"
-                    } rounded`}
+                      } rounded`}
                   >
                     {pageNumber}
                   </button>

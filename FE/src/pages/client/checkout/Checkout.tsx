@@ -52,7 +52,7 @@ const Checkout = () => {
       payment_method_id: newPaymentMethod,
     }));
   };
-
+  console.log("error", error)
   const qty = dataCheckout?.order_items?.map((e: any) => e?.quantity);
   const cartItemIds = dataCheckout?.order_items?.map((e: any) => e);
   const quantityOfCart = cartItemIds?.reduce((acc: any, id: any, index: number) => {
@@ -112,9 +112,9 @@ const Checkout = () => {
           navigate('/thank', { replace: true });
         }, 2000);
       } else {
-        // queryClient.invalidateQueries({
-        //   queryKey: ['cart']
-        // });
+        queryClient.invalidateQueries({
+          queryKey: ['cart']
+        });
         localStorage.removeItem('checkedItems');
         navigate('/thank', { replace: true });
       }
@@ -128,7 +128,7 @@ const Checkout = () => {
   });
   useEffect(() => {
     if (errorOrder) {
-      const allErrors = [...errorOrder.out_of_stock, ...errorOrder.insufficient_stock];
+      const allErrors = [...errorOrder?.out_of_stock, ...errorOrder?.insufficient_stock];
       allErrors.forEach(error => toast.error(error.message));
       const outOfStockCartIds = errorOrder.out_of_stock.map((error: any) => error.cart_id);
       const filteredCartIds = cartIds.filter((id: number) => !outOfStockCartIds.includes(id));
@@ -320,7 +320,7 @@ const Checkout = () => {
           throw new Error('Network response was not ok');
         }
         const data = await response.json();
-        console.log("data",data )
+        console.log("data", data)
         // setErrorCheckout(data?.errors)
         setDataCheckout(data);
         setIsLoading(false);
@@ -347,7 +347,7 @@ const Checkout = () => {
   };
   useEffect(() => {
     handleBuyNow()
-  }, [_payload, payloadDiaChi,errorOrder])
+  }, [_payload, payloadDiaChi, errorOrder])
   useEffect(() => {
     handleBuyCart()
   }, [payloadDiaChi, errorOrder]);
