@@ -472,6 +472,13 @@ const HistoryReturnRequests = () => {
                                             Đang gửi yêu cầu hoàn trả hàng
                                           </p>
                                         )}
+                                      {order.items.length > 0 &&
+                                        order.items[0].status ===
+                                          "canceled" && (
+                                          <p className="text-[red]">
+                                            Đã hủy yêu cầu hoàn trả
+                                          </p>
+                                        )}
                                     </span>
                                   </h3>
 
