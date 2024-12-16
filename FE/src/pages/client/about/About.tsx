@@ -212,6 +212,7 @@ const About = () => {
                       sizes="300px"
                       srcSet="
               "
+                      src="./src/assets/images/iamgeKimHue.jpg"
                       style={{
                         position: "absolute",
                         height: "100%",
@@ -447,7 +448,7 @@ const About = () => {
                       className="ttnc-ButtonCircle flex items-center justify-center rounded-full !leading-none disabled:bg-opacity-70 bg-[#00BADB] hover:bg-[#00b0cf] text-slate-50 absolute transform top-1/2 -translate-y-1/2 right-1 w-9 h-9 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0"
                       type="submit"
                     >
-                    <ButtonSubmit/>
+                      <ButtonSubmit />
                     </button>
                   </form>
                 </div>

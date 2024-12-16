@@ -101,8 +101,8 @@ const Register = () => {
                 </div>
                 <div className="col-span-6 sm:col-span-6">
                   <Form.Item name="password" label="Mật khẩu">
-                    <Input.Password
-                      placeholder="Nhập mật khẩu"
+                    <Input placeholder="Nhập mật khẩu"
+                      type="password"
                       className=" text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none"
                     />
                   </Form.Item>

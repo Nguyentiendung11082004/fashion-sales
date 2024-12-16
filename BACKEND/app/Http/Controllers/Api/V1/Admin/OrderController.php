@@ -105,7 +105,7 @@ class OrderController extends Controller
             // dd($test->createOrder($id));
 
             $order = Order::findOrFail($id);
-            // broadcast(new OrderStatusUpdated($order))->toOthers();
+            broadcast(new OrderStatusUpdated($order))->toOthers();
 
             $currentStatus = $order->order_status;
             $newStatus = $request->input('order_status');

@@ -35,11 +35,6 @@ const GetReturnRequestOrderId = () => {
       }))
     : [];
 
-  console.log(
-    "dataReturnRequest?.data?.data?.data?.total_refund_amount  : ",
-    dataReturnRequest?.data?.data?.total_refund_amount
-  );
-
   const columns: any = [
     {
       title: "STT",
@@ -91,6 +86,8 @@ const GetReturnRequestOrderId = () => {
               return "Từ chối";
             case "pending":
               return "Đang chờ xử lý";
+            case "rejected":
+              return "Bị từ chối";
             default:
               return "Không xác định";
           }

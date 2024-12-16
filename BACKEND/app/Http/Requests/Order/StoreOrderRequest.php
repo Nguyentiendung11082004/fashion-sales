@@ -56,7 +56,7 @@ class StoreOrderRequest extends FormRequest
                 'required',
                 'regex:/^0[3|5|7|8|9][0-9]{8}$/',
             ],
-            'ship_user_email' => 'nullable|email|max:255',
+            'ship_user_email' => 'required|email|max:255',
             'xa'=> 'required|string|max:255',
             'huyen'=> 'required|string|max:255',
             'tinh'=> 'required|string|max:255',

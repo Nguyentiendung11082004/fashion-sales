@@ -43,6 +43,8 @@ import Cart from "@/pages/client/cart/Cart";
 import Checkout from "@/pages/client/checkout/Checkout";
 import Contact from "@/pages/client/contact/Contact";
 import HistoryOrder from "@/pages/client/historyOrder/HistoryOrder";
+import HistoryReturnRequests from "@/pages/client/historyOrder/components/HistoryReturnRequests";
+
 import HomePage from "@/pages/client/home/HomePage";
 import LayoutWebsite from "@/pages/client/layout";
 import NotFound from "@/pages/client/notfound/NotFound";
@@ -73,10 +75,18 @@ const Router = () => {
         <Route path="contact" element={<Contact />} />
         <Route path="thank" element={<Thanks />} />
         <Route path="history-order" element={<HistoryOrder />} />
+        <Route
+          path="historyReturnRequests"
+          element={<HistoryReturnRequests />}
+        />
         <Route path="requestOrder" element={<RequestOrder />} />
         <Route path="return/request_order" element={<ReturnRequest />} />
         <Route
           path="/history-order/return_requests"
+          element={<GetReturnRequestOrderId />}
+        />
+        <Route
+          path="/historyReturnRequests/return_requests"
           element={<GetReturnRequestOrderId />}
         />
         <Route path="/order" element={<Order />} />
@@ -95,7 +105,7 @@ const Router = () => {
           <Route path="products/create" element={<ProductForm />} />
           <Route path="products/edit/:id" element={<ProductForm />} />
           <Route path="categories" element={<CategoryPage />} />
-          <Route path="categories/create" element={<CategoryForm />} />
+<Route path="categories/create" element={<CategoryForm />} />
           <Route path="categories/edit/:id" element={<CategoryForm />} />
           <Route path="attributes" element={<AttributeItem />} />
           <Route path="attribute-values" element={<AttributeItemValues />} />

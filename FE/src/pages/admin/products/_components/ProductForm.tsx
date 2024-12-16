@@ -359,18 +359,35 @@ const ProductForm = () => {
             title: 'Số lượng',
             dataIndex: 'quantity',
             render: (text: any, record: any, index: number) => (
-                <Input
-                    value={variants[index]?.quantity || ''}
-                    onChange={(e) => handleInputChange(index, 'quantity', e.target.value)} />
+                <div>
+                    <Input
+                        value={variants[index]?.quantity || 0}
+                        min={0}
+                        onChange={(e) => handleInputChange(index, 'quantity', e.target.value)}
+                    />
+                    {variantErrors[index]?.quantity && (
+                        <div style={{ color: 'red', fontSize: '12px' }}>
+                            {variantErrors[index].quantity}
+                        </div>
+                    )}
+                </div>
             )
         },
         {
             title: 'SKU',
             dataIndex: 'sku',
             render: (text: any, record: any, index: number) => (
-                <Input
-                    value={variants[index]?.sku || ''}
-                    onChange={(e) => handleInputChange(index, 'sku', e.target.value)} />
+                <div>
+                    <Input
+                        value={variants[index]?.sku || ''}
+                        onChange={(e) => handleInputChange(index, 'sku', e.target.value)}
+                    />
+                    {variantErrors[index]?.sku && (
+                        <div style={{ color: 'red', fontSize: '12px' }}>
+                            {variantErrors[index].sku}
+                        </div>
+                    )}
+                </div>
             )
         },
         // {
@@ -651,7 +668,10 @@ const ProductForm = () => {
             getProduct(productShow);
         }
     }, [productShow, form]);
+    const [variantErrors, setVariantErrors] = useState<Record<number, Record<string, string>>>({});
+
     const handleErrorResponse = (error: any) => {
+        console.log("error", error)
         setIsLoading(false);
         if (error.response && error.response.data.errors) {
             const errorFields: ErrorResponse = error.response.data.errors;
@@ -666,10 +686,22 @@ const ProductForm = () => {
                     form.setFields([{ name: field, errors: [] }]);
                 }
             });
+            const variantErrors = Object.entries(errorFields).reduce((acc, [key, messages]) => {
+                if (key.includes("product_variant")) {
+                    const [, index, field] = key.split(".");
+                    const rowIndex = parseInt(index);
+                    if (!acc[rowIndex]) acc[rowIndex] = {};
+                    acc[rowIndex][field] = messages.join(", "); // Gộp nhiều lỗi
+                }
+                return acc;
+            }, {} as Record<number, Record<string, string>>);
+
+            setVariantErrors(variantErrors);
         } else {
             toast.error('Có lỗi xảy ra');
         }
     };
+    console.log("error", error)
     // const handleCheckboxChange = (index: number) => {
     //     setCheckedItems(prev => {
     //         const newCheckedItems = [...prev];
@@ -890,25 +922,38 @@ const ProductForm = () => {
                                 label="Chọn bộ sưu tập"
                                 className="col-span-1"
                             >
-                                <Upload
-                                    {...propsGallery}
-                                >
-                                    <Button icon={<UploadOutlined />}>Tải lên bộ sưu tập</Button>
+                                <Upload {...propsGallery}>
+                                    <Button icon={<UploadOutlined />}>Tải lên gallery</Button>
                                 </Upload>
                                 {productShow?.galleries && (
                                     <>
-                                        {productShow.galleries.map((e: any) => (
-                                            <div >
+                                        {productShow.galleries.map((e: any, index: number) => (
+                                            <div key={index} style={{ position: 'relative', display: 'inline-block', margin: '10px' }}>
                                                 <img
                                                     src={e.image}
-                                                    style={{ marginTop: 16, width: 100, marginBottom: '10px' }}
+                                                    alt={`gallery-${index}`}
+                                                    style={{ width: 100, marginBottom: '10px' }}
                                                 />
+                                                {/* <Button
+                                                    danger
+                                                    size="small"
+                                                    style={{
+                                                        position: 'absolute',
+                                                        top: '5px',
+                                                        right: '5px',
+                                                    }}
+                                                    onClick={() => handleRemoveImage(index)}
+                                                >
+                                                    Xoá
+                                                </Button> */}
                                             </div>
                                         ))}
                                     </>
                                 )}
                                 {error?.gallery && <div className='text-red-600'>{error.gallery.join(', ')}</div>}
                             </Form.Item>
+
+
                             <Form.Item name="type" label="Kiểu sản phẩm" className="col-span-3">
                                 <Select
                                     value={productShow?.type ? 1 : 0}
