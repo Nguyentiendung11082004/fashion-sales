@@ -203,9 +203,11 @@ class ReturnController extends Controller
                 ]);
 
                 // Cập nhật trạng thái đơn hàng
-                Order::query()->findOrFail($validated['order_id'])->update([
+                $order=Order::query()->findOrFail($validated['order_id'])->update([
                     'order_status' => 'Yêu cầu hoàn trả hàng',
                 ]);
+                broadcast(new OrderStatusUpdated($order))->toOthers();
+
 
                 return [
                     'message' => 'Return request created successfully.',
