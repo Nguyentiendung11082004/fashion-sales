@@ -124,7 +124,7 @@ const BrandForm = () => {
     <div className="p-6 min-h-screen">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2">
-          {id ? "Sửa Brands" : "Thêm Brands"}
+          {id ? "Sửa Thương Hiệu" : "Thêm Thương Hiệu"}
         </h1>
       </div>
 
@@ -137,7 +137,7 @@ const BrandForm = () => {
           onFinish={onFinish}
           initialValues={data}
         >
-          <Form.Item name="name" label="name">
+          <Form.Item name="name" label="Tên thương hiệu">
             <Input placeholder="name" />
           </Form.Item>
           {error &&
@@ -147,7 +147,7 @@ const BrandForm = () => {
             <div className="text-red-600">{error.errors.name[0]}</div>
           ) : null}
 
-          <Form.Item name="image" label="image">
+          <Form.Item name="image" label="Ảnh đại diện">
             <Upload {...propsImgThumbnail}>
               <Button icon={<UploadOutlined />}>Tải lên ảnh</Button>
             </Upload>
@@ -166,7 +166,7 @@ const BrandForm = () => {
             <div className="text-red-600">{error.errors.image[0]}</div>
           ) : null}
 
-          <Form.Item name="email" label="email">
+          <Form.Item name="email" label="Email">
             <Input placeholder="email" />
           </Form.Item>
           {error &&
@@ -176,7 +176,7 @@ const BrandForm = () => {
             <div className="text-red-600">{error.errors.email[0]}</div>
           ) : null}
 
-          <Form.Item name="phone_number" label="phone_number">
+          <Form.Item name="phone_number" label="Số điện thoại">
             <Input placeholder="phone_number" />
           </Form.Item>
           {error &&
@@ -186,7 +186,7 @@ const BrandForm = () => {
             <div className="text-red-600">{error.errors.phone_number[0]}</div>
           ) : null}
 
-          <Form.Item name="address" label="address">
+          <Form.Item name="address" label="Địa chỉ">
             <Input placeholder="address" />
           </Form.Item>
           {error &&

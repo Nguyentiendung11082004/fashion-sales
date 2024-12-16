@@ -229,7 +229,7 @@ const VoucherDetail = () => {
             {new Intl.NumberFormat("vi-VN").format(voucher.min_order_value)} VNĐ
           </p>
           <p className="text-gray-600">
-            <strong>Số lượng: </strong>
+            <strong>Số lượng phát hành: </strong>
             {voucher.usage_limit}
           </p>
           <p className="text-gray-600">
@@ -237,7 +237,7 @@ const VoucherDetail = () => {
             {voucher.used_count}
           </p>
           <p className="text-gray-600">
-            <strong>Số lượng chưa sử dụng: </strong>
+            <strong>Số lượt chưa sử dụng: </strong>
             {voucher.usage_limit - voucher.used_count > 0
               ? voucher.usage_limit - voucher.used_count
               : "Out of Stock"}

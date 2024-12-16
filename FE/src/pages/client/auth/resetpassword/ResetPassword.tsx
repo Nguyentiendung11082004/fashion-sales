@@ -76,20 +76,20 @@ const ResetPassword = () => {
 
                             </div>
                             <div className="mt-4">
-                                <Form.Item name='password' label="Mật khẩu của bạn" className="block text-gray-700 text-sm font-bold mb-2">
+                                <Form.Item name='password' label="Mật khẩu mới" className="block text-gray-700 text-sm font-bold mb-2">
                                     <Input
                                         type="password"
                                         className="bg-white text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none"
-                                        placeholder="Nhập mật khẩu "
+                                        placeholder="Nhập mật khẩu mới "
                                     />
                                 </Form.Item>
                             </div>
                             <div className="mt-4">
-                                <Form.Item name='password_confirmation' label="Nhập lại mật khẩu" className="block text-gray-700 text-sm font-bold mb-2">
+                                <Form.Item name='password_confirmation' label="Nhập lại mật khẩu mới" className="block text-gray-700 text-sm font-bold mb-2">
                                     <Input
                                         type="password"
                                         className="bg-white text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none"
-                                        placeholder="Nhập lại mật khẩu "
+                                        placeholder="Nhập lại mật khẩu mới "
                                     />
                                     {error && error.errors && error?.response?.data?.errors?.password[0] && error?.response?.data?.errors?.password[0].length > 0 ? (
                                         <div className="text-red-600">{error?.response?.data?.errors?.password[0]}</div>
