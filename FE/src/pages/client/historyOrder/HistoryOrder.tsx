@@ -609,7 +609,7 @@ const HistoryOrder = () => {
                                             Yêu cầu hoàn trả bị từ chối
                                           </p>
                                         )}
-                                   
+
                                       {order.return_requests.length > 0 &&
                                         order.return_requests[0].status ===
                                           "completed" && (

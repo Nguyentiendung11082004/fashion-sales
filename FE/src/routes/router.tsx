@@ -43,7 +43,7 @@ import Cart from "@/pages/client/cart/Cart";
 import Checkout from "@/pages/client/checkout/Checkout";
 import Contact from "@/pages/client/contact/Contact";
 import HistoryOrder from "@/pages/client/historyOrder/HistoryOrder";
-import HistoryReturnRequests from "@/pages/client/historyOrder/components/historyReturnRequests";
+import HistoryReturnRequests from "@/pages/client/historyOrder/components/HistoryReturnRequests";
 import HomePage from "@/pages/client/home/HomePage";
 import LayoutWebsite from "@/pages/client/layout";
 import NotFound from "@/pages/client/notfound/NotFound";
