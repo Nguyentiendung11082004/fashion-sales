@@ -24,8 +24,6 @@ class OrderController extends Controller
             Order::where('order_status', 'Giao hàng thành công')
                 ->whereDate('updated_at', '<', now()->subDays(3))
                 ->update(['order_status' => 'Hoàn thành']);
-
-
             $orders = Order::with('orderDetails')
                 ->latest()
                 ->get();
@@ -116,7 +114,7 @@ class OrderController extends Controller
                 'Đã hủy' => 3,
                 'Đang vận chuyển' => 4,
                 'Giao hàng thành công' => 5,
-                'Yêu cầu hoàn trả hàng'=> 6,
+                'Yêu cầu hoàn trả hàng' => 6,
                 'Hoàn trả hàng' => 7,
                 'Hoàn thành' => 8,
                 'Đã nhận hàng' => 9,
@@ -141,7 +139,11 @@ class OrderController extends Controller
             if ($currentStatus === 'Đang chờ xác nhận' && !in_array($newStatus, ['Đã xác nhận', 'Đã hủy'])) {
                 return response()->json(['message' => 'Trạng thái tiếp theo chỉ có thể là "Đã xác nhận" hoặc "Đã hủy".'], Response::HTTP_BAD_REQUEST);
             }
-
+            if ($currentStatus === 'Đang chờ xác nhận' && $newStatus === 'Đã xác nhận') {
+                if ($order->payment_method_id == 2 && $order->payment_status == 'Chưa thanh toán') {
+                    $order->payment_method_id = 1;
+                }
+            }
             if ($currentStatus === 'Đã xác nhận' && !in_array($newStatus, ['Đang vận chuyển', 'Đã hủy'])) {
 
                 return response()->json(['message' => 'Trạng thái tiếp theo chỉ có thể là "Đang vận chuyển" hoặc "Đã hủy".'], Response::HTTP_BAD_REQUEST);
@@ -150,15 +152,13 @@ class OrderController extends Controller
             if ($currentStatus === 'Đang vận chuyển' && !in_array($newStatus, ['Giao hàng thành công'])) {
                 return response()->json(['message' => 'Khi đang vận chuyển, chỉ có thể cập nhật thành "Giao hàng thành công".'], Response::HTTP_BAD_REQUEST);
             }
-
-            if ($currentStatus === 'Giao hàng thành công' && !in_array($newStatus, [ 'Đã nhận hàng', 'Hoàn thành'])) {
+            if ($currentStatus === 'Giao hàng thành công' && !in_array($newStatus, ['Đã nhận hàng', 'Hoàn thành'])) {
                 return response()->json(['message' => 'Sau "Giao hàng thành công", chỉ có thể chuyển sang "Hoàn thành".'], Response::HTTP_BAD_REQUEST);
             }
 
             // if ($currentStatus === 'Hoàn trả hàng' && $newStatus !== 'Hoàn thành') {
             //     return response()->json(['message' => 'Từ "Hoàn trả hàng", chỉ có thể chuyển sang "Hoàn thành".'], Response::HTTP_BAD_REQUEST);
             // }
-
             if ($newStatus === 'Đã nhận hàng') {
                 $newStatus = 'Hoàn thành';
             }
@@ -175,12 +175,12 @@ class OrderController extends Controller
             $order->save();
             if ($newStatus === 'Đang vận chuyển') {
                 $createOrder = new OrderGHNController();
-             $createResponse = $createOrder->createOrder($id);  // Gọi hàm tạo đơn hàng giao hàng nhanh với ID đơn hàng
+                $createResponse = $createOrder->createOrder($id);  // Gọi hàm tạo đơn hàng giao hàng nhanh với ID đơn hàng
                 // return response()->json([
                 //     // 'message' => 'Trạng thái đơn hàng được cập nhật thành công. Đơn hàng GHN đã được tạo.',
                 //     'message' =>  $createResponse  // Trả về kết quả từ GHN
                 // ], Response::HTTP_OK);
-                return $createResponse ;
+                return $createResponse;
             }
 
             return response()->json(['message' => 'Cập nhật trạng thái đơn hàng thành công.', 'order' => $order], Response::HTTP_OK);
