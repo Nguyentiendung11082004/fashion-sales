@@ -71,55 +71,11 @@ class StoreProduct extends FormRequest
         ];
     }
 
-//     public function messages(): array
-// {
-//     return [
-//         // Global messages
-//         'required' => 'Trường :attribute là bắt buộc.',
-//         'integer' => 'Trường :attribute phải là số nguyên.',
-//         'numeric' => 'Trường :attribute phải là số.',
-//         'array' => 'Trường :attribute phải là một mảng.',
-//         'string' => 'Trường :attribute phải là chuỗi.',
-//         'max' => 'Trường :attribute không được vượt quá :max ký tự.',
-//         'min' => 'Trường :attribute phải có ít nhất :min.',
-//         'in' => 'Trường :attribute không hợp lệ.',
-//         'unique' => 'Trường :attribute đã tồn tại.',
-//         'exists' => 'Giá trị của trường :attribute không tồn tại.',
-//         'lte' => 'Trường :attribute phải nhỏ hơn hoặc bằng :other.',
-//         'distinct' => 'Các giá trị trong trường :attribute phải là duy nhất.',
-//         'required_if' => 'Trường :attribute là bắt buộc khi :other có giá trị :value.',
-
-//         // Specific field messages
-//         'brand_id.required' => 'Vui lòng chọn thương hiệu.',
-//         'brand_id.exists' => 'Thương hiệu được chọn không tồn tại.',
-//         'category_id.required' => 'Vui lòng chọn danh mục.',
-//         'category_id.exists' => 'Danh mục được chọn không tồn tại.',
-//         'tags.required' => 'Vui lòng chọn ít nhất một thẻ.',
-//         'tags.*.exists' => 'Thẻ được chọn không tồn tại.',
-//         'gallery.required' => 'Vui lòng thêm ít nhất một ảnh.',
-//         'gallery.*.string' => 'Mỗi ảnh trong thư viện phải là chuỗi hợp lệ.',
-//         'type.required' => 'Vui lòng chọn loại sản phẩm.',
-//         'type.in' => 'Loại sản phẩm không hợp lệ (chỉ được phép 0 hoặc 1).',
-//         'sku.required' => 'Vui lòng nhập mã SKU.',
-//         'sku.unique' => 'Mã SKU đã tồn tại, vui lòng nhập mã khác.',
-//         // 'weight.required' => 'Vui lòng nhập khối lượng sản phẩm.',
-//         'name.required' => 'Vui lòng nhập tên sản phẩm.',
-//         'name.unique' => 'Tên sản phẩm đã tồn tại, vui lòng chọn tên khác.',
-//         'img_thumbnail.required' => 'Vui lòng thêm ảnh đại diện của sản phẩm.',
-//         'price_regular.required_if' => 'Vui lòng nhập giá gốc.',
-//         'price_sale.lte' => 'Giá khuyến mãi phải nhỏ hơn hoặc bằng giá gốc.',
-//         'quantity.required_if' => 'Vui lòng nhập số lượng.',
-//         'description.required' => 'Vui lòng nhập mô tả sản phẩm.',
-//         'description_title.required' => 'Vui lòng nhập tiêu đề mô tả.',
-
-//         'attribute_id.required_if' => 'Vui lòng chọn thuộc tính khi sản phẩm là loại biến thể.',
-//         'attribute_id.*.exists' => 'Thuộc tính được chọn không tồn tại.',
-//         'attribute_item_id.required_if' => 'Vui lòng chọn giá trị thuộc tính khi sản phẩm là loại biến thể.',
-//         'attribute_item_id.*.*.exists' => 'Giá trị thuộc tính không tồn tại.',
-//         'product_variant.required_if' => 'Vui lòng thêm ít nhất một biến thể sản phẩm.',
-//         'product_variant.*.sku.distinct' => 'Mã SKU của mỗi biến thể phải là duy nhất.',
-//         'product_variant.*.price_sale.lte' => 'Giá khuyến mãi của biến thể phải nhỏ hơn hoặc bằng giá gốc.',
-//         'price_sale.required_if' => 'Vui lòng nhập giá khuyến mãi.',
-//     ];
-// }
+    public function messages(): array
+{
+    return [
+        // Specific field messages
+        
+    ];
+}
 }

@@ -75,29 +75,13 @@ class UpdateProduct extends FormRequest
     public function messages(): array
     {
         return [
-            // Global messages
-            'required' => 'Trường :attribute là bắt buộc.',
-            'integer' => 'Trường :attribute phải là số nguyên.',
-            'numeric' => 'Trường :attribute phải là số.',
-            'array' => 'Trường :attribute phải là một mảng.',
-            'string' => 'Trường :attribute phải là chuỗi.',
-            'max' => 'Trường :attribute không được vượt quá :max ký tự.',
-            'min' => 'Trường :attribute phải có ít nhất :min.',
-            'in' => 'Trường :attribute không hợp lệ.',
-            'unique' => 'Trường :attribute đã tồn tại.',
-            'exists' => 'Giá trị của trường :attribute không tồn tại.',
-            'lte' => 'Trường :attribute phải nhỏ hơn hoặc bằng :other.',
-            'distinct' => 'Các giá trị trong trường :attribute phải là duy nhất.',
-            'required_if' => 'Trường :attribute là bắt buộc khi :other có giá trị :value.',
-
-            // Specific field messages
             'brand_id.required' => 'Vui lòng chọn thương hiệu.',
             'brand_id.exists' => 'Thương hiệu được chọn không tồn tại.',
             'category_id.required' => 'Vui lòng chọn danh mục.',
             'category_id.exists' => 'Danh mục được chọn không tồn tại.',
             'tags.required' => 'Vui lòng chọn ít nhất một thẻ.',
             'tags.*.exists' => 'Thẻ được chọn không tồn tại.',
-            'gallery.required' => 'Vui lòng thêm ít nhất một ảnh trong thư viện.',
+            'gallery.required' => 'Vui lòng thêm ít nhất một ảnh.',
             'gallery.*.string' => 'Mỗi ảnh trong thư viện phải là chuỗi hợp lệ.',
             'type.required' => 'Vui lòng chọn loại sản phẩm.',
             'type.in' => 'Loại sản phẩm không hợp lệ (chỉ được phép 0 hoặc 1).',
@@ -106,16 +90,15 @@ class UpdateProduct extends FormRequest
             'weight.required' => 'Vui lòng nhập khối lượng sản phẩm.',
             'name.required' => 'Vui lòng nhập tên sản phẩm.',
             'name.unique' => 'Tên sản phẩm đã tồn tại, vui lòng chọn tên khác.',
-            'img_thumbnail.required' => 'Vui lòng thêm hình thu nhỏ của sản phẩm.',
-            'price_regular.required_if' => 'Giá gốc là bắt buộc khi sản phẩm là loại đơn giản.',
+            'img_thumbnail.required' => 'Vui lòng thêm ảnh đại diện của sản phẩm.',
+            'price_regular.required_if' => 'Vui lòng nhập giá gốc.',
+            'price_regular.numberic' => 'Giá gốc không hợp lệ',
             'price_sale.lte' => 'Giá khuyến mãi phải nhỏ hơn hoặc bằng giá gốc.',
-            'quantity.required_if' => 'Số lượng là bắt buộc khi sản phẩm là loại đơn giản.',
+            'quantity.required_if' => 'Vui lòng nhập số lượng.',
+            'quantity.integer' => 'Số lượng không hợp lệ.',
+            'quantity.min' => 'Số lượng không hợp lệ.',
             'description.required' => 'Vui lòng nhập mô tả sản phẩm.',
             'description_title.required' => 'Vui lòng nhập tiêu đề mô tả.',
-
-            'product_variant.*.quantity.required_if' => "Vui lòng nhập số lượng",
-            'product_variant.*.quantity.min' => "Số lượng không hợp lệ",
-            'product_variant.*.quantity.integer' => "Số lượng không hợp lệ",
 
             'attribute_id.required_if' => 'Vui lòng chọn thuộc tính khi sản phẩm là loại biến thể.',
             'attribute_id.*.exists' => 'Thuộc tính được chọn không tồn tại.',
@@ -123,10 +106,15 @@ class UpdateProduct extends FormRequest
             'attribute_item_id.*.*.exists' => 'Giá trị thuộc tính không tồn tại.',
             'product_variant.required_if' => 'Vui lòng thêm ít nhất một biến thể sản phẩm.',
             'product_variant.*.sku.distinct' => 'Mã SKU của mỗi biến thể phải là duy nhất.',
+            'product_variant.*.price_sale.lte' => 'Giá khuyến mãi của biến thể phải nhỏ hơn hoặc bằng giá gốc.',
+            'price_sale.required_if' => 'Vui lòng nhập giá khuyến mãi.',
+            'product_variant.*.quantity.required_if' => "Vui lòng nhập số lượng",
+            'product_variant.*.quantity.min' => "Số lượng không hợp lệ",
+            'product_variant.*.quantity.integer' => "Số lượng không hợp lệ",
             'product_variant.*.sku.required_if' => 'Vui lòng nhập mã SKU.',
 
-            
-            'product_variant.*.price_sale.lte' => 'Giá khuyến mãi của biến thể phải nhỏ hơn hoặc bằng giá gốc.',
+
+
         ];
     }
 }
