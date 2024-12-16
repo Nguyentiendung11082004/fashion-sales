@@ -285,7 +285,7 @@ const Checkout = () => {
         });
         if (!response.ok) {
           navigate('/cart', { replace: true });
-          // toast.error("Sản phẩm đã hết hàng")
+          toast.error("Sản phẩm đã hết hàng")
           throw new Error('Network response was not ok');
         }
         const data = await response.json();
