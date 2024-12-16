@@ -36,12 +36,22 @@ class StoreBannerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'nullable|string|min:3|max:255',  
-            'image' => 'required|string',               
-            'link' => 'nullable|url|max:255',          
+            'title' => 'nullable|string|min:3|max:255',
+            'image' => 'required|string',
+            'link' => 'nullable|url|max:255',
             'start_date' => 'required|date|before_or_equal:end_date',
-            'end_date' => 'required|date|after_or_equal:start_date',  
+            'end_date' => 'required|date|after_or_equal:start_date',
             // 'status' => 'required|boolean' // Chấp nhận cả true/false hoặc 0/1
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'image.required' => 'Vui lòng tải ảnh',
+            'start_date.required' => 'Vui lòng chọn ngày bắt đầu',
+            'end_date.required' => 'Vui lòng chọn ngày kết thúc',
+            'link.url'=> 'Link không hợp lệ'
         ];
     }
 }

@@ -40,7 +40,7 @@ const SidebarMenu = memo(({ selectedKey }: { selectedKey: string }) => (
         icon: <AreaChartOutlined />,
         label: (
           <NavLink to="/admin" className="text-white">
-            Thống kê
+            Thống Kê
           </NavLink>
         ),
       },
@@ -49,7 +49,7 @@ const SidebarMenu = memo(({ selectedKey }: { selectedKey: string }) => (
         icon: <VideoCameraOutlined />,
         label: (
           <NavLink className="text-white" to="/admin/products">
-            Sản phẩm
+            Sản Phẩm
           </NavLink>
         ),
       },
@@ -58,7 +58,7 @@ const SidebarMenu = memo(({ selectedKey }: { selectedKey: string }) => (
         icon: <ShoppingCartOutlined />,
         label: (
           <NavLink className="text-white" to="/admin/orders">
-            Đơn hàng
+            Đơn Hàng
           </NavLink>
         ),
       },
@@ -67,7 +67,7 @@ const SidebarMenu = memo(({ selectedKey }: { selectedKey: string }) => (
         icon: <ShoppingCartOutlined />,
         label: (
           <NavLink className="text-white" to="/admin/returnRequests">
-            Hoàn hàng
+            Hoàn Hàng
           </NavLink>
         ),
       },
@@ -76,7 +76,7 @@ const SidebarMenu = memo(({ selectedKey }: { selectedKey: string }) => (
         icon: <ShoppingCartOutlined />,
         label: (
           <NavLink className="text-white" to="/admin/fastDelivery">
-            Giao hàng nhanh
+            Giao Hàng Nhanh
           </NavLink>
         ),
       },
@@ -85,7 +85,7 @@ const SidebarMenu = memo(({ selectedKey }: { selectedKey: string }) => (
         icon: <UploadOutlined />,
         label: (
           <NavLink className="text-white" to="/admin/categories">
-            Danh mục
+            Danh Mục
           </NavLink>
         ),
       },
@@ -119,7 +119,7 @@ const SidebarMenu = memo(({ selectedKey }: { selectedKey: string }) => (
         icon: <OrderedListOutlined />,
         label: (
           <NavLink className="text-white" to="/admin">
-            Biến thể
+            Biến Thể Sản Phẩm
           </NavLink>
         ),
         children: [
@@ -146,7 +146,7 @@ const SidebarMenu = memo(({ selectedKey }: { selectedKey: string }) => (
         icon: <UserOutlined />,
         label: (
           <NavLink to={""} className="text-white">
-            Tài khoản
+            Tài Khoản
           </NavLink>
         ),
         children: [
@@ -154,7 +154,7 @@ const SidebarMenu = memo(({ selectedKey }: { selectedKey: string }) => (
             key: "8",
             label: (
               <NavLink to="/admin/clients" className="text-white">
-                Khách hàng
+                Khách Hàng
               </NavLink>
             ),
           },
@@ -162,7 +162,7 @@ const SidebarMenu = memo(({ selectedKey }: { selectedKey: string }) => (
             key: "9",
             label: (
               <NavLink to="/admin/employees" className="text-white">
-                Nhân viên
+                Nhân Viên
               </NavLink>
             ),
           },
@@ -188,7 +188,7 @@ const SidebarMenu = memo(({ selectedKey }: { selectedKey: string }) => (
         ),
         label: (
           <NavLink to="/admin/posts" className="text-white">
-            Bài viết
+            Bài Viết
           </NavLink>
         ),
       },
@@ -212,7 +212,7 @@ const SidebarMenu = memo(({ selectedKey }: { selectedKey: string }) => (
         ),
         label: (
           <NavLink to="/admin/vouchers" className="text-white">
-            Voucher
+            Mã Giảm Giá
           </NavLink>
         ),
       },
@@ -222,7 +222,7 @@ const SidebarMenu = memo(({ selectedKey }: { selectedKey: string }) => (
         icon: <CommentOutlined />,
         label: (
           <NavLink className="text-white" to="/admin/comments">
-            Bình luận
+            Bình Luận
           </NavLink>
         ),
       },
@@ -250,7 +250,7 @@ const SidebarMenu = memo(({ selectedKey }: { selectedKey: string }) => (
         icon: <TagsOutlined />,
         label: (
           <NavLink className="text-white" to="/admin/brands">
-            Brands
+            Thương hiệu
           </NavLink>
         ),
       },

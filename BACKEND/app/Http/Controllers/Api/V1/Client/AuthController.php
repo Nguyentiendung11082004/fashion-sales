@@ -27,37 +27,20 @@ class AuthController extends Controller
         try {
             $request->validate([
                 'email'    => 'required|email',
-                'password' => 'required'
+                'password' => 'required',
+            ], [
+                'email.required' => 'Vui lòng nhập địa chỉ email.',
+                'email.email'    => 'Địa chỉ email không hợp lệ.',
+                'password.required' => 'Vui lòng nhập mật khẩu.',
             ]);
 
             $user = User::where('email', request('email'))->first();
-            // dd($user);
 
-            // if (
-            //     !$user || !Hash::check(request('password'), $user->password) ||
-            //     $user->role_id != 1
-            // ) {
-            //     throw ValidationException::withMessages([
-            //         'infor' => ['The provided credentials are incorrect.'],
-            //     ]);
-            // }
-
-            // // Kiểm tra xem email đã được xác thực chưa
-            // if (!$user->hasVerifiedEmail()) {
-            //     // Gửi lại email xác thực
-            //     event(new Registered($user));
-            //     return response()->json([
-            //         'message' => 'Vui lòng xác thực tài khoản của bạn.
-            //          Email xác thực tài khoản đã được gửi đến địa chỉ email của bạn!!'
-            //     ], 403); // Forbidden
-            // }
-
-            //Case 2: Có đăng nhập cả Admin và Client
             if (
                 !$user || !Hash::check(request('password'), $user->password)
             ) {
                 throw ValidationException::withMessages([
-                    'infor' => ['The provided credentials are incorrect.'],
+                    'Thông tin tài khoản hoặc mật khẩu không đúng.',
                 ]);
             }
             if ($user->role_id === 1) {
@@ -161,16 +144,12 @@ class AuthController extends Controller
 
             // Xác thực email
             $user->markEmailAsVerified();
-
-            // return redirect("http://localhost:5173/");
-
             // Gửi sự kiện đã xác thực email
             event(new Verified($user));
-            // $token = $user->createToken($user->id)->plainTextToken;
-            return response()->json([
-                'message' => 'Email has been verified successfully.',
-                // 'token'   => $token
-            ], 200);
+            return redirect("http://localhost:5173/login");
+            // return response()->json([
+            //     'message' => 'Email has been verified successfully.',
+            // ], 200);
         } catch (\Throwable $th) {
             return response()->json([
                 'errors' => $th->getMessage()
@@ -245,7 +224,7 @@ class AuthController extends Controller
             Notification::send($user, new ResetPasswordNotification($url, $token));
 
             return response()->json([
-                'message' => 'Reset password email sent successfully!',
+                'message' => 'Email đặt lại mật khẩu đã được gửi thành công. Vui lòng kiểm tra email !',
                 'token'   => $token,
                 'url'     => $url
             ], 200);

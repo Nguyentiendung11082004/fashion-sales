@@ -69,7 +69,7 @@ const FormEmployee = () => {
     },
   });
   const location = useLocation();
-  console.log("locaion: ",location)
+  console.log("locaion: ", location);
   const currentPage = location.state?.currentPage || 1;
   console.log("currentPage: ", location.state?.currentPage);
 
@@ -146,7 +146,7 @@ const FormEmployee = () => {
         <Loading />
       ) : (
         <Form form={form} layout="vertical" onFinish={onFinish}>
-          <Form.Item<IUser> label="Username" name="name">
+          <Form.Item<IUser> label="Họ và Tên" name="name">
             <Input />
           </Form.Item>
           {errors.name && <div className="text-red-600">{errors.name}</div>}
@@ -173,14 +173,14 @@ const FormEmployee = () => {
             )}
           </Form.Item>
 
-          <Form.Item<IUser> label="Password" name="password">
+          <Form.Item<IUser> label="Mật khẩu" name="password">
             <Input.Password />
           </Form.Item>
           {errors.password && (
             <div className="text-red-600">{errors.password}</div>
           )}
 
-          <Form.Item<IUser> label="Number phone" name="phone_number">
+          <Form.Item<IUser> label="Số điện thoại" name="phone_number">
             <Input />
           </Form.Item>
           {errors.phone_number && (
@@ -192,22 +192,22 @@ const FormEmployee = () => {
           </Form.Item>
           {errors.email && <div className="text-red-600">{errors.email}</div>}
 
-          <Form.Item<IUser> label="Address" name="address">
+          <Form.Item<IUser> label="Địa chỉ" name="address">
             <Input />
           </Form.Item>
           {errors.address && (
             <div className="text-red-600">{errors.address}</div>
           )}
 
-          <Form.Item label="Birth Date" name="birth_date">
+          <Form.Item label="Ngày sinh" name="birth_date">
             <DatePicker format="DD/MM/YYYY" placeholder="Chọn ngày sinh" />
           </Form.Item>
           {errors.birth_date && (
             <div className="text-red-600">{errors.birth_date}</div>
           )}
 
-          <Form.Item label="Gender" name="gender">
-            <Select placeholder="Choose gender">
+          <Form.Item label="Giới tính" name="gender">
+            <Select placeholder="Chọn giới tính">
               <Select.Option value={1}>Nam</Select.Option>
               <Select.Option value={0}>Nữ</Select.Option>
             </Select>
@@ -217,7 +217,7 @@ const FormEmployee = () => {
           </Form.Item>
 
           <Form.Item name="role_id" label="Role">
-            <Select placeholder="Select Role">
+            <Select placeholder="Chọn chức vụ">
               <Select.Option value={3}>Shipper</Select.Option>
               <Select.Option value={2}>MemberShip</Select.Option>
             </Select>

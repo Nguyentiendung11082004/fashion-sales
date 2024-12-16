@@ -38,9 +38,9 @@ class InforUserController extends Controller
     public function  updateInforUser(Request $request,) {
         try {
             $user = Auth::user();
-    
 
-            $validatedData = $request->validate([
+
+             $request->validate([
                 'name'         => 'nullable|string|max:255',
                 'phone_number' => [
                     'required',
@@ -87,7 +87,7 @@ class InforUserController extends Controller
                 'success' => false,
                 'message' => 'Update failed.',
                 'error'   => $e->getMessage()
-            ], 500); 
+            ], 500);
         }
     }
 }
