@@ -609,6 +609,7 @@ const HistoryOrder = () => {
                                             Yêu cầu hoàn trả bị từ chối
                                           </p>
                                         )}
+                                   
                                       {order.return_requests.length > 0 &&
                                         order.return_requests[0].status ===
                                           "completed" && (
@@ -885,6 +886,27 @@ const HistoryOrder = () => {
                             </button>
                           )}
 
+                          {/* {complete && (
+                            <>
+                              <button
+                                className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB] font-medium ${
+                                  shipOk
+                                    ? "bg-gray-200 text-gray-400 border cursor-pointer border-gray-300"
+                                    : "text-white"
+                                }`}
+                                disabled={shipOk}
+                                onClick={() => handleOpenFormReason(order)}
+                              >
+                                Yêu cầu trả hàng
+                              </button>
+
+                              <ReasonReturn
+                                open={visiable}
+                                onClose={handleCloseFormReason}
+                                dataOrderRequest={dataOrderRequest}
+                              />
+                            </>
+                          )} */}
                           {complete && (
                             <>
                               <button
