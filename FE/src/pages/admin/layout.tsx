@@ -267,11 +267,13 @@ const LayoutAdmin: React.FC = () => {
   const location = useLocation();
   // Map đường dẫn thành key
   const pathToKeyMap = (pathname: string): string => {
-
     if (pathname === "/admin") {
       return "1";
     }
-    if (pathname === "/admin/products" || pathname.startsWith("/admin/products/")) {
+    if (
+      pathname === "/admin/products" ||
+      pathname.startsWith("/admin/products/")
+    ) {
       return "2";
     }
     if (pathname === "/admin/products/create") {
@@ -291,7 +293,10 @@ const LayoutAdmin: React.FC = () => {
       return "12";
     }
 
-    if (pathname === "/admin/categories" || pathname.startsWith("/admin/categories/")) {
+    if (
+      pathname === "/admin/categories" ||
+      pathname.startsWith("/admin/categories/")
+    ) {
       return "3";
     }
     if (pathname === "/admin/categories/create") {
@@ -301,7 +306,10 @@ const LayoutAdmin: React.FC = () => {
       return "3";
     }
 
-    if (pathname === "/admin/banners" || pathname.startsWith("/admin/banners/")) {
+    if (
+      pathname === "/admin/banners" ||
+      pathname.startsWith("/admin/banners/")
+    ) {
       return "20";
     }
     if (pathname === "/admin/banners/create") {
@@ -311,7 +319,10 @@ const LayoutAdmin: React.FC = () => {
       return "20";
     }
 
-    if (pathname === "/admin/attributes" || pathname.startsWith("/admin/attributes/")) {
+    if (
+      pathname === "/admin/attributes" ||
+      pathname.startsWith("/admin/attributes/")
+    ) {
       return "5";
     }
     if (pathname === "/admin/attributes/create") {
@@ -321,7 +332,10 @@ const LayoutAdmin: React.FC = () => {
       return "5";
     }
 
-    if (pathname === "/admin/attribute-values" || pathname.startsWith("/admin/attribute-values/")) {
+    if (
+      pathname === "/admin/attribute-values" ||
+      pathname.startsWith("/admin/attribute-values/")
+    ) {
       return "6";
     }
     if (pathname === "/admin/attribute-values/create") {
@@ -331,7 +345,10 @@ const LayoutAdmin: React.FC = () => {
       return "6";
     }
 
-    if (pathname === "/admin/clients" || pathname.startsWith("/admin/clients/")) {
+    if (
+      pathname === "/admin/clients" ||
+      pathname.startsWith("/admin/clients/")
+    ) {
       return "8";
     }
     if (pathname === "/admin/clients/create") {
@@ -341,7 +358,10 @@ const LayoutAdmin: React.FC = () => {
       return "8";
     }
 
-    if (pathname === "/admin/employees" || pathname.startsWith("/admin/employees/")) {
+    if (
+      pathname === "/admin/employees" ||
+      pathname.startsWith("/admin/employees/")
+    ) {
       return "9";
     }
     if (pathname === "/admin/employees/create") {
@@ -361,7 +381,10 @@ const LayoutAdmin: React.FC = () => {
       return "15";
     }
 
-    if (pathname === "/admin/vouchers" || pathname.startsWith("/admin/vouchers/")) {
+    if (
+      pathname === "/admin/vouchers" ||
+      pathname.startsWith("/admin/vouchers/")
+    ) {
       return "30";
     }
     if (pathname === "/admin/vouchers/create") {
@@ -371,7 +394,10 @@ const LayoutAdmin: React.FC = () => {
       return "30";
     }
 
-    if (pathname === "/admin/comments" || pathname.startsWith("/admin/comments/")) {
+    if (
+      pathname === "/admin/comments" ||
+      pathname.startsWith("/admin/comments/")
+    ) {
       return "10";
     }
     if (pathname === "/admin/comments/create") {
@@ -401,15 +427,24 @@ const LayoutAdmin: React.FC = () => {
       return "14";
     }
 
-    if (pathname === "/admin/returnRequests" || pathname.startsWith("/admin/returnRequests/")) {
+    if (
+      pathname === "/admin/returnRequests" ||
+      pathname.startsWith("/admin/returnRequests/")
+    ) {
       return "16";
     }
 
-    if (pathname === "/admin/return-item" || pathname.startsWith("/admin/return-item/")) {
+    if (
+      pathname === "/admin/return-item" ||
+      pathname.startsWith("/admin/return-item/")
+    ) {
       return "16";
     }
 
-    if (pathname === "/admin/fastDelivery" || pathname.startsWith("/admin/fastDelivery/")) {
+    if (
+      pathname === "/admin/fastDelivery" ||
+      pathname.startsWith("/admin/fastDelivery/")
+    ) {
       return "17";
     }
 
@@ -433,13 +468,17 @@ const LayoutAdmin: React.FC = () => {
         </div>
 
         {collapsed ? (
-          <div className="w-[50px] mt-3 mb-11 m-auto">
-            <img src={LogoM} alt="" className="" />
-          </div>
+          <Link to="/">
+            <div className="w-[50px] mt-3 mb-11 m-auto">
+              <img src={LogoM} alt="" className="" />
+            </div>
+          </Link>
         ) : (
-          <div className="w-[150px] -mt-8 -mb-3 m-auto">
-            <img src={LogoAdmin} alt="" className="" />
-          </div>
+          <Link to="/">
+            <div className="w-[150px] -mt-8 -mb-3 m-auto">
+              <img src={LogoAdmin} alt="" className="" />
+            </div>
+          </Link>
         )}
         <SidebarMenu selectedKey={currentKey} />
       </Sider>
@@ -510,22 +549,16 @@ const LayoutAdmin: React.FC = () => {
                   className="w-full h-full object-cover"
                 />
                 {/* Nút hiển thị khi hover vào ảnh */}
-
               </div>
               <div className="name">
                 {/* <p className="text-sm font-medium">{user?.InforUser?.name}</p> */}
-                <Link
-                  to="/"
-                >
-                  <Button
-                    className=" inset-0 bg-opacity-70 text-xs flex items-center justify-center transition-opacity duration-200"
-                  >
+                <Link to="/">
+                  <Button className=" inset-0 bg-opacity-70 text-xs flex items-center justify-center transition-opacity duration-200">
                     Chuyển sang client
                   </Button>
                 </Link>
               </div>
             </div>
-
           </div>
         </div>
         <Content>
