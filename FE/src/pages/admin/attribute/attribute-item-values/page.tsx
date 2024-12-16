@@ -64,19 +64,15 @@ const AttributeItemValues: React.FC = () => {
 
     const columns = [
         {
-            title: 'STT',
+            title: 'Stt',
             render: (text: any, record: Iattributeitem, index: number) => (index + 1) + (currentPage - 1) * pageSize,
         },
         {
-            title: 'Thuộc Tính',
-            dataIndex: 'attribute_name',
-        },
-        {
-            title: 'Giá Trị Thuộc Tính',
+            title: 'Giá trị thuộc tính',
             dataIndex: 'value',
         },
         {
-            title: 'Thao Tác',
+            title: 'Thao tác',
             render: (record: Iattributeitem) => (
                 <div>
                     <Button className="mx-2 btn-warning" onClick={() => handleEdit(record.id)}>
@@ -99,7 +95,7 @@ const AttributeItemValues: React.FC = () => {
     return (
         <div className="p-6 min-h-screen bg-gray-100">
             <div className="flex items-center justify-between mb-6">
-                <h1 className="text-3xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2 uppercase">
+                <h1 className="text-3xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2">
                     Giá trị thuộc tính
                 </h1>
                 <Button className="my-2" type="primary" onClick={openModal}>

@@ -16,49 +16,18 @@ class AttributeItemController extends Controller
     /**
      * Display a listing of the resource.
      */
-    // public function index()
-    // {
-    //     try {
-    //         $attributeItems = AttributeItem::query()->with('attribute')->latest('id')->get();
-    //         return response()->json($attributeItems, 200);
-    //     } catch (ModelNotFoundException $e) {
-    //         // Trả về lỗi 404 nếu không tìm thấy attribute
-    //         return response()->json([
-    //             'message' => 'Không có thuộc tính!'
-    //         ], 404);
-    //     }
-    // }
-
     public function index()
-{
-    try {
-        // Lấy danh sách AttributeItems cùng với Attribute
-        $attributeItems = AttributeItem::query()
-            ->with('attribute')  // Tải attribute liên quan
-            ->latest('id')
-            ->get()
-            ->map(function ($item) {
-                // Thêm attribute_name vào cùng cấp với các trường khác
-                return [
-                    'id' => $item->id,
-                    'attribute_id' => $item->attribute_id,
-                    'value' => $item->value,
-                    'slug' => $item->slug,
-                    'created_at' => $item->created_at,
-                    'updated_at' => $item->updated_at,
-                    'attribute_name' => $item->attribute->name,  // Thêm attribute_name
-                ];
-            });
-
-        // Trả về kết quả với danh sách AttributeItems
-        return response()->json($attributeItems, 200);
-    } catch (ModelNotFoundException $e) {
-        // Trả về lỗi 404 nếu không tìm thấy attribute
-        return response()->json([
-            'message' => 'Không có thuộc tính!'
-        ], 404);
+    {
+        try {
+            $attributeItems = AttributeItem::query()->latest('id')->get();
+            return response()->json($attributeItems, 200);
+        } catch (ModelNotFoundException $e) {
+            // Trả về lỗi 404 nếu không tìm thấy attribute
+            return response()->json([
+                'message' => 'Thuộc tính Tồn Tại!'
+            ], 404);
+        }
     }
-}
     /**
      * Store a newly created resource in storage.
      */
@@ -93,15 +62,12 @@ class AttributeItemController extends Controller
     {
         try {
             // Tìm attribute theo ID
-            $attributeItem = AttributeItem::with('attribute')
-            ->findOrFail($id);
-            return response()->json(
-                $attributeItem,
-                 200);
+            $attributeItem = AttributeItem::findOrFail($id);
+            return response()->json($attributeItem, 200);
         } catch (ModelNotFoundException $e) {
             // Trả về lỗi 404 nếu không tìm thấy attribute
             return response()->json([
-                'message' => 'Không tìm thấy thuộc tính!'
+                'message' => 'Thuộc tính Tồn Tại!'
             ], 404);
         }
     }
