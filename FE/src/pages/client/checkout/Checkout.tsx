@@ -40,7 +40,7 @@ const Checkout = () => {
   const [payloadDiaChi, setPayLoadDiaChi] = useState<any>(null);
 
   // lỗi
-  const [error, setError] = useState<any>()
+  const [error, setError] = useState<any>({})
   const [errorOrder, setErrorOrder] = useState<any>()
   const [errorCheckout, setErrorCheckout] = useState<any>()
 
@@ -52,7 +52,7 @@ const Checkout = () => {
       payment_method_id: newPaymentMethod,
     }));
   };
-  console.log("error", error)
+  // console.log("error", error)
   const qty = dataCheckout?.order_items?.map((e: any) => e?.quantity);
   const cartItemIds = dataCheckout?.order_items?.map((e: any) => e);
   const quantityOfCart = cartItemIds?.reduce((acc: any, id: any, index: number) => {
@@ -121,8 +121,14 @@ const Checkout = () => {
       localStorage.removeItem('checkedItems');
     },
     onError: (error: any) => {
-      setErrorOrder(error?.response?.data?.errors)
-      setError(error?.response?.data?.errors)
+      const errors = error?.response?.data?.errors;
+      if (errors?.out_of_stock || errors?.insufficient_stock) {
+        // Lỗi liên quan đến số lượng
+        setErrorOrder(errors);
+      } else {
+        // Lỗi liên quan đến validate thông tin
+        setError(errors);
+      }
       toast.error(error?.response?.data?.errors);
     }
   });
@@ -299,7 +305,6 @@ const Checkout = () => {
         setIsLoading(false);
       }
     }
-
   }
 
   const handleBuyNow = async () => {
@@ -320,7 +325,7 @@ const Checkout = () => {
           throw new Error('Network response was not ok');
         }
         const data = await response.json();
-        console.log("data", data)
+        // console.log("data", data)
         // setErrorCheckout(data?.errors)
         setDataCheckout(data);
         setIsLoading(false);
@@ -529,7 +534,6 @@ const Checkout = () => {
                           </div>
                         </div>
                       </div>
-
                     }
                     {
                       !token && (
@@ -551,7 +555,7 @@ const Checkout = () => {
                                     onChange={(e) => setForm("ship_user_name", e.target.value)}
                                   />
                                   {error?.ship_user_name && (
-                                    <p className="text-sm text-red-500 mt-1">{error?.ship_user_name[0]}</p>
+                                    <p className="text-sm text-red-500 mt-1">{error.ship_user_name[0]}</p>
                                   )}
                                 </div>
 
@@ -677,8 +681,8 @@ const Checkout = () => {
                         <div className="flex items-center space-x-3 text-sm sm:text-base">
                           <div
                             className={`flex items-center border-2 rounded-lg p-3 transition-all duration-300 
-          ${paymentMethhod == '1' ? 'border-[#0099B5] bg-[#A0E3F8]' : 'bg-transparent'}
-          hover:border-[#0099B5] focus-within:bg-[#e3f0f1]`}
+             ${paymentMethhod == '1' ? 'border-[#0099B5] bg-[#A0E3F8]' : 'bg-transparent'}
+             hover:border-[#0099B5] focus-within:bg-[#e3f0f1]`}
                           >
                             <Radio
                               value={'1'}
