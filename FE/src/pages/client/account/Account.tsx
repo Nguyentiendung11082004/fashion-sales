@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useAuth } from "@/common/context/Auth/AuthContext";
 import { useUser } from "@/common/context/User/UserContext";
 import { IUser } from "@/common/types/users";
@@ -198,6 +199,16 @@ const Account = () => {
                 Thông tin tài khoản
               </Link>
               <Link
+                to="/password/reset"
+                className={`${
+                  isActive("/password/reset")
+                    ? "block w-1/4 lg:text-left text-center flex-shrink-0 py-[1.5rem] leading-4 relative border-b-[3px] border-[#00BADB]"
+                    : "hd-account-menu-item "
+                }`}
+              >
+                Đổi mật khẩu
+              </Link>
+              <Link
                 to="/wishlist"
                 className={`${
                   isActive("/wishlist")
@@ -216,16 +227,6 @@ const Account = () => {
                 }`}
               >
                 Lịch sử mua hàng
-              </Link>
-              <Link
-                to="/password/reset"
-                className={`${
-                  isActive("/password/reset")
-                    ? "block w-1/4 lg:text-left text-center flex-shrink-0 py-[1.5rem] leading-4 relative border-b-[3px] border-[#00BADB]"
-                    : "hd-account-menu-item "
-                }`}
-              >
-                Đổi mật khẩu
               </Link>
             </div>
             <hr className="h-0 border-solid border-b-2" />

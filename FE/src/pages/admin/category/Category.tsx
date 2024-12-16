@@ -135,6 +135,7 @@ const CategoryPage = () => {
           <>
             <Table
               className="custom-table"
+              scroll={{ x: "max-content" }}
               dataSource={dataSource.slice(
                 (currentCategoryPage - 1) * pageSize,
                 currentCategoryPage * pageSize

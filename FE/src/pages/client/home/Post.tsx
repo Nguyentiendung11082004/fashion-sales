@@ -25,11 +25,19 @@ const Post = () => {
     },
   });
 
-  if (isLoading) return <div>isLoading...</div>;
-  if (isError) return <div>{error.message}</div>;
+  const posts = data?.data?.data;
+
+  // Không render gì nếu đang loading hoặc không có dữ liệu
+  if (isLoading || !posts || posts.length === 0) {
+    return null;
+  }
+
+
+  // if (isLoading) return <div>isLoading...</div>;
+  // if (isError) return <div>{error.message}</div>;
   return (
     <>
-      <section className="container mt-28">
+      <div className="container mt-28">
         <div className="custom-heading ">
           <div className="flex-auto items-center mx-auto">
             <div className="mx-4 text-2xl font-bold text-gray-900">
@@ -50,8 +58,8 @@ const Post = () => {
           modules={[FreeMode, Pagination]}
           className="mySwiper grid grid-cols-1 lg:grid-cols-3 lg:gap-8 md:grid-cols-3 md:gap-4"
         >
-          {data?.data?.data &&
-            data?.data?.data.map((value: any) => (
+          {posts &&
+            posts.map((value: any) => (
               <SwiperSlide key={value.id}>
                 <div className="overflow-hidden mt-4 lg:mt-0 md:mt-0 border relative h-[400px]">
                   <img
@@ -73,7 +81,7 @@ const Post = () => {
               </SwiperSlide>
             ))}
         </Swiper>
-      </section>
+      </div>
     </>
   );
 };

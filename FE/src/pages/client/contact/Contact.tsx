@@ -70,7 +70,7 @@ const Contact = () => {
                 <span className="block mt-2 text-neutral-500 dark:text-neutral-400">
                   <span style={{ verticalAlign: "inherit" }}>
                     <span style={{ verticalAlign: "inherit" }}>
-                      nc.example@example.com
+                    mixmatchfashionbrand@gmail.com
                     </span>
                   </span>
                 </span>
@@ -86,7 +86,7 @@ const Contact = () => {
                 <span className="block mt-2 text-neutral-500 dark:text-neutral-400">
                   <span style={{ verticalAlign: "inherit" }}>
                     <span style={{ verticalAlign: "inherit" }}>
-                      0921 735 576
+                      +84 879 202 919
                     </span>
                   </span>
                 </span>

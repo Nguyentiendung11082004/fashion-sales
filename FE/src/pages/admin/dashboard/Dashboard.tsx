@@ -204,7 +204,7 @@ const Dashboard = () => {
           <div className="card-item flex flex-col bg-white w-1/4 p-6 mr-4 rounded-lg shadow-lg hover:transform hover:-translate-y-1 transition-all ease duration-400">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-xs text-gray-500 font-semibold uppercase tracking-wider">
-                Tổng số đơn hàng
+          Tổng số sản phẩm trong đơn hàng
               </h3>
               {/* <span className="order text-red-500 font-medium">- 3.57 %</span> */}
             </div>

@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { useRealtimeOrders } from "@/common/hooks/useRealtimeOrders";
 import Loading from "@/common/Loading/Loading";
 import instance from "@/configs/axios";
 import { EyeOutlined } from "@ant-design/icons";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Button, Select, Table } from "antd";
+import { Button, Pagination, Select, Table } from "antd";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -110,7 +111,16 @@ const ReturnOrder = () => {
             scroll={{ x: "max-content" }}
             pagination={false}
           />
+          <div className="mt-4 flex justify-end">
+            <Pagination
+              current={currentPage}
+              total={dataSource.length}
+              pageSize={pageSize}
+              onChange={(page) => setCurrentPage(page)}
+            />
+          </div>
         </div>
+        
       )}
     </div>
   );

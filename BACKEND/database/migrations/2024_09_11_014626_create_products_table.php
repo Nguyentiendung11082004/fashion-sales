@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(Brand::class)->nullable()->constrained()->onDelete("set null");
-            $table->foreignIdFor(Category::class)->constrained();
+            $table->foreignIdFor(Category::class)->nullable()->constrained()->onDelete("set null");
             $table->boolean('type')->default(false)->comment("loại sản phẩm 1-productvariant|0-simpleproduct");
             $table->string('slug');
             $table->string('sku');
@@ -33,7 +33,6 @@ return new class extends Migration
             $table->boolean('is_show_home')->default(true);
             $table->boolean('trend')->default(true);
             $table->boolean('is_new')->default(true);
-            
             $table->timestamps();
         });
     }

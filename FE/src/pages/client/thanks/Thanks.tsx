@@ -34,7 +34,7 @@ const Thanks = () => {
                 to="/order_lookup"
                 className="text-blue-600 hover:text-blue-800 font-medium underline"
               >
-                Tại đây
+                Tra cứu đơn hàng
               </Link>
             </p>}
             {token ? <Link to="/history-order" className="inline-flex items-center rounded border border-indigo-600 bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700 focus:outline-none focus:ring">
@@ -46,6 +46,6 @@ const Thanks = () => {
       </div>
     </div>
   );
-}
+};
 
-export default Thanks
+export default Thanks;

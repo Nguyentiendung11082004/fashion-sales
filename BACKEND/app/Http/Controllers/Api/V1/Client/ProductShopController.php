@@ -107,13 +107,14 @@ class ProductShopController extends Controller
                         foreach ($keywords as $keyword) {
                             $q->where(function ($subQuery) use ($keyword) {
                                 $subQuery->where('name', 'like', "% {$keyword} %")
-                                         ->orWhere('name', 'like', "{$keyword} %")
-                                         ->orWhere('name', 'like', "% {$keyword}")
-                                         ->orWhere('name', '=', "{$keyword}");
+                                    ->orWhere('name', 'like', "{$keyword} %")
+                                    ->orWhere('name', 'like', "% {$keyword}")
+                                    ->orWhere('name', '=', "{$keyword}");
                             });
                         }
                     });
                 })
+
 
                 ->when($colors, function ($query, $colors) {
                     // Lọc theo màu sắc
@@ -178,12 +179,25 @@ class ProductShopController extends Controller
             $allProducts = []; // Mảng chứa tất cả sản phẩm và biến thể
 
             foreach ($products as $product) {
+                // dd($product);
+                $discountPercentage  = 0;
+                if ($product->type == '0') {
+                    // Sản phẩm đơn giản (không có biến thể)
+                    $discountPercentage  = ($product->price_regular - $product->price_sale) / $product->price_regular * 100;
+                } else if ($product->variants && $product->variants->isNotEmpty()) {
+                    // Sản phẩm có biến thể
+                    $discountPercentage  = $product->variants->map(function ($variant) {
+                        return ($variant->price_regular - $variant->price_sale) / $variant->price_regular * 100;
+                    })->max(); // Lấy % giảm giá lớn nhất từ các biến thể
+                }
+                $discountPercentage  = round($discountPercentage, 1); // Làm tròn 1 chữ số thập phân
                 $product->increment('views'); // Tăng số lượt xem
                 $getUniqueAttributes = new GetUniqueAttribute();
 
                 // Thêm sản phẩm và biến thể vào mảng
                 $allProducts[] = [
                     'product' => $product,
+                    'discountPercentage' => $discountPercentage,
                     'getUniqueAttributes' => $getUniqueAttributes->getUniqueAttributes($product["variants"]),
                 ];
             }

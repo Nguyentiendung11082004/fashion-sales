@@ -12,6 +12,7 @@ export const colorClassMap: Record<string, string> = {
     rose: "bg-rose-500",
     violet: "bg-violet-500",
     slate: "bg-slate-500",
+    brown:"bg-brown-500"
     // Thêm các màu khác nếu cần (lưu ý trong database phải khai báo value là tiếng anh)
   };
 
@@ -38,6 +39,7 @@ export const colorClassMap: Record<string, string> = {
     Rose: "Đỏ hồng",
     Violet: "Tím",
     Slate: "Xám ",
+    Brown:"Ghi"
     // Thêm các màu khác nếu cần (lưu ý chữ cái đầu phải viết hoa)
   };
   

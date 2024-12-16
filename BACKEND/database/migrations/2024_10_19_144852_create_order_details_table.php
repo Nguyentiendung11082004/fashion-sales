@@ -16,7 +16,7 @@ return new class extends Migration
     {
         Schema::create('order_details', function (Blueprint $table) {
             $table->id(); // ID của order_detail
-            $table->foreignIdFor(Product::class)->constrained()->onDelete('cascade'); // Liên kết với bảng products
+            $table->foreignIdFor(Product::class)->nullable()->constrained()->onDelete('set null'); // Liên kết với bảng products
             $table->foreignIdFor(ProductVariant::class)->nullable()->constrained()->onDelete('cascade'); // Liên kết với bảng product_variants nếu có
             $table->foreignIdFor(Order::class)->constrained()->onDelete('cascade'); // Liên kết với bảng orders
             $table->string('product_name'); // Tên sản phẩm

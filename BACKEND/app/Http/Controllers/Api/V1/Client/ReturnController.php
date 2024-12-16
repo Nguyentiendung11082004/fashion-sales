@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers\Api\V1\Client;
 
+use App\Events\OrderStatusUpdated;
+use App\Events\ReturnItemStatusUpdated;
+use App\Events\ReturnRequestStatusUpdate;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\ReturnItem;
 use App\Models\ReturnLog;
 use App\Models\ReturnRequest;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -20,14 +24,16 @@ class ReturnController extends Controller
     public function getUserReturnRequests()
     {
         try {
-            // Lấy thông tin người dùng hiện tại
             $user = auth()->user();
+
             // Lấy danh sách return_requests của người dùng hiện tại
             $returnRequests = ReturnRequest::with(["order.orderDetails", 'items'])
                 ->where('user_id', $user->id)->latest('id')
                 ->get()
-                // dd($returnRequests->toArray());
                 ->map(function ($returnRequest) {
+                    // Tách thông tin order
+                    $order = $returnRequest->order;
+        
                     return [
                         'id' => $returnRequest->id,
                         'order_id' => $returnRequest->order_id,
@@ -37,8 +43,9 @@ class ReturnController extends Controller
                         'status' => $returnRequest->status,
                         'created_at' => $returnRequest->created_at->format('Y-m-d H:i:s'),
                         'updated_at' => $returnRequest->updated_at->format('Y-m-d H:i:s'),
-
-                        'items' => $returnRequest->items->map(function ($item) use ($returnRequest) {
+        
+                        // Map items mà không lặp lại order
+                        'items' => $returnRequest->items->map(function ($item) {
                             return [
                                 'id' => $item->id,
                                 'request_id' => $item->return_request_id,
@@ -47,38 +54,35 @@ class ReturnController extends Controller
                                 'quantity' => $item->quantity,
                                 'refund_amount' => $item->refund_amount,
                                 'status' => $item->status,
-
-                                'order' => [
-                                    'id' => $returnRequest->order->id,
-                                    'total' => $returnRequest->order->total,
-                                    'total_quantity' => $returnRequest->order->total_quantity,
-                                    'order_status' => $returnRequest->order->order_status,
-                                    'order_code' => $returnRequest->order->order_code,
-                                    'payment_status' => $returnRequest->order->payment_status,
-
-                                    'order_detail' => $returnRequest->order->orderDetails->map(function ($detail) {
-                                        return [
-                                            "id" => $detail->id,
-                                            "product_id" => $detail->product_id,
-                                            "product_variant_id" => $detail->product_variant_id,
-                                            "order_id" => $detail->order_id,
-                                            "product_name" => $detail->product_name,
-                                            "product_img" => $detail->product_img,
-                                            "attributes" => $detail->attributes,
-                                            "quantity" => $detail->quantity,
-                                            "price" => $detail->price,
-                                            "total_price" => $detail->total_price,
-                                            "discount" => $detail->discount,
-                                            "created_at" => $detail->created_at,
-                                            "updated_at" => $detail->updated_at,
-                                        ];
-                                    })
-
-
-                                ],
-
                             ];
                         }),
+        
+                        // Gán order và orderDetails ngoài vòng lặp
+                        'order' => [
+                            'id' => $order->id,
+                            'total' => $order->total,
+                            'total_quantity' => $order->total_quantity,
+                            'order_status' => $order->order_status,
+                            'order_code' => $order->order_code,
+                            'payment_status' => $order->payment_status,
+                            'order_detail' => $order->orderDetails->map(function ($detail) {
+                                return [
+                                    "id" => $detail->id,
+                                    "product_id" => $detail->product_id,
+                                    "product_variant_id" => $detail->product_variant_id,
+                                    "order_id" => $detail->order_id,
+                                    "product_name" => $detail->product_name,
+                                    "product_img" => $detail->product_img,
+                                    "attributes" => $detail->attributes,
+                                    "quantity" => $detail->quantity,
+                                    "price" => $detail->price,
+                                    "total_price" => $detail->total_price,
+                                    "discount" => $detail->discount,
+                                    "created_at" => $detail->created_at,
+                                    "updated_at" => $detail->updated_at,
+                                ];
+                            })
+                        ],
                     ];
                 });
 
@@ -154,6 +158,10 @@ class ReturnController extends Controller
                     'items.*.quantity' => 'required|integer|min:1',
                     'reason' => 'required|string',
                 ]);
+                $order=Order::query()->findOrFail($request->input('order_id'));
+                if (Carbon::parse($order->created_at)->addDays(3)->isPast()) {
+                    return response()->json(['message' => 'Bạn chỉ có thể hoàn trả hàng sau 3 ngày kể từ ngày nhận hàng.'], 400);
+                }
 
                 // Tạo yêu cầu hoàn trả
                 $returnRequest = ReturnRequest::create([
@@ -162,6 +170,7 @@ class ReturnController extends Controller
                     'reason' => $validated['reason'],
                     'total_refund_amount' => 0, // Sẽ được tính sau
                 ]);
+
 
                 $totalRefundAmount = 0;
 
@@ -237,7 +246,7 @@ class ReturnController extends Controller
             // Kiểm tra trạng thái yêu cầu hoàn trả
             if ($returnRequest->status !== 'pending') {
                 return response()->json([
-                    'message' => 'Only pending return requests can be canceled.'
+                    'message' => 'Chỉ những yêu cầu trả hàng đang chờ xử lý mới có thể hủy được.'
                 ], 400);
             }
 
@@ -268,7 +277,7 @@ class ReturnController extends Controller
                     'return_request_id' => $returnRequest->id,
                     'user_id' => $user->id,
                     'action' => 'canceled',
-                    'comment' => "Canceled item ID: {$item->id}",
+                    'comment' => "Khách hàng tên: {$user->name} hủy item ID: {$item->id}",
                 ]);
             }
 
@@ -284,12 +293,18 @@ class ReturnController extends Controller
                     'return_request_id' => $returnRequest->id,
                     'user_id' => $user->id,
                     'action' => 'canceled',
-                    'comment' => 'Canceled the entire return request.',
+                    'comment' => "Khách hàng tên: {$user->name} đã hủy toàn bộ yêu cầu.",
                 ]);
-                Order::query()->findOrFail($returnRequest->order_id)->update([
+                $order=Order::query()->findOrFail($returnRequest->order_id)->update([
                     'order_status' => "Hoàn thành"
                 ]);
+                broadcast(new OrderStatusUpdated($order))->toOthers();
+
+                broadcast(new ReturnRequestStatusUpdate($returnRequest))->toOthers();
+                
+
             }
+           
 
             return response()->json([
                 'message' => 'Cancellation successful.',
@@ -297,6 +312,7 @@ class ReturnController extends Controller
                 'remaining_items' => $remainingItems,
                 'request_status' => $remainingItems === 0 ? 'canceled' : 'partially_canceled',
             ], 200);
+            
         } catch (\Exception $ex) {
             return response()->json([
                 "message" => "Error: " . $ex->getMessage()

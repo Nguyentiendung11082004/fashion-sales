@@ -442,50 +442,50 @@ const Cart = () => {
                                   </Link>
                                   {/*end hd-price-item*/}
                                   {updatedAttributes.dataAttributes &&
-                                    Object.entries(
-                                      updatedAttributes.dataAttributes
-                                    ).length > 0
+                                  Object.entries(
+                                    updatedAttributes.dataAttributes
+                                  ).length > 0
                                     ? Object.entries(
-                                      updatedAttributes.dataAttributes
-                                    ).map(
-                                      ([attributeName, attributeValue]) => {
-                                        const attributeItem =
-                                          updatedAttributes.find(
-                                            (item: any) =>
-                                              item.name === attributeName
+                                        updatedAttributes.dataAttributes
+                                      ).map(
+                                        ([attributeName, attributeValue]) => {
+                                          const attributeItem =
+                                            updatedAttributes.find(
+                                              (item: any) =>
+                                                item.name === attributeName
+                                            );
+                                          return (
+                                            <div
+                                              className="hd-infor-text-meta text-[13px] text-[#878787]"
+                                              key={attributeName}
+                                            >
+                                              <p>
+                                                {attributeName}:{" "}
+                                                <strong>
+                                                  {attributeItem
+                                                    ? attributeItem.pivot.value
+                                                    : attributeValue}
+                                                </strong>
+                                              </p>
+                                            </div>
                                           );
-                                        return (
+                                        }
+                                      )
+                                    : e?.productvariant?.attributes?.map(
+                                        (item: any) => (
                                           <div
                                             className="hd-infor-text-meta text-[13px] text-[#878787]"
-                                            key={attributeName}
+                                            key={item.id}
                                           >
                                             <p>
-                                              {attributeName}:{" "}
+                                              {item?.name}:{" "}
                                               <strong>
-                                                {attributeItem
-                                                  ? attributeItem.pivot.value
-                                                  : attributeValue}
+                                                {item?.pivot?.value}
                                               </strong>
                                             </p>
                                           </div>
-                                        );
-                                      }
-                                    )
-                                    : e?.productvariant?.attributes?.map(
-                                      (item: any) => (
-                                        <div
-                                          className="hd-infor-text-meta text-[13px] text-[#878787]"
-                                          key={item.id}
-                                        >
-                                          <p>
-                                            {item?.name}:{" "}
-                                            <strong>
-                                              {item?.pivot?.value}
-                                            </strong>
-                                          </p>
-                                        </div>
-                                      )
-                                    )}
+                                        )
+                                      )}
 
                                   <div className="hd-infor-text-tools mt-[10px]">
                                     {e.productvariant && (
@@ -570,10 +570,16 @@ const Cart = () => {
                               <div className="hs-prices">
                                 <div className="hd-text-price">
                                   <del className="text-[#696969]">
-                                    {FormatMoney(e?.productvariant?.price_regular || e?.product?.price_regular)}
+                                    {FormatMoney(
+                                      e?.productvariant?.price_regular ||
+                                        e?.product?.price_regular
+                                    )}
                                   </del>
                                   <ins className="ms-[6px] no-underline text-[#ec0101]">
-                                    {FormatMoney(e?.productvariant?.price_sale || e?.product?.price_sale)}
+                                    {FormatMoney(
+                                      e?.productvariant?.price_sale ||
+                                        e?.product?.price_sale
+                                    )}
                                   </ins>
                                 </div>
                               </div>
@@ -635,79 +641,12 @@ const Cart = () => {
               <div className="hd-pagecart-footer lg:my-[60px]">
                 <div className="hd-footer lg:flex lg:flex-wrap mt-[30px]">
                   <div className="hd-note-text text-start lg:w-[50%] !order-2 hd-col-item mt-8 lg:max-w-full">
-                    <div className="hd-node-gift mb-6 lg:items-center lg:flex">
-                      {/* <div class="hd-text-gift w-2/3"> */}
-                      <div className="flex items-center lg:w-2/3 mb-[5px] lg:text-start">
-                        <Gift />
-                        <span className="my-3 mx-2">
-                          Bạn có muốn một gói quà không?
-                          <span className="hd-all-textgrey">
-                            Chỉ từ 130.000₫
-                          </span>
-                        </span>
-                        {/* </div> */}
-                      </div>
-                      {/* <div class="w-1/3"> */}
-                      <div className="hd-btn-gift lg:w-1/3 lg:text-end my-[15px]">
-                        <Link
-                          to=""
-                          className="hd-all-btn px-4 py-2 font-semibold min-h-10 hd-all-hoverblue-btn"
-                        >
-                          <span>Thêm</span>
-                        </Link>
-                      </div>
-                      {/* </div> */}
-                    </div>
-                    <label className="mb-3 !block">
-                      <span>Ghi chú đơn hàng</span>
-                      <span className="hidden">Chỉnh sửa ghi chú đơn hàng</span>
-                    </label>
-                    <textarea
-                      className="min-h-28 px-3 py-2 resize-none !w-full hd-cart-note"
-                      placeholder="Chúng tôi có thể giúp bạn?"
-                      defaultValue={""}
-                    />
-                    <label className="mt-5 mb-3 !block"> Mã giảm giá: </label>
-                    <p className="mb-5 hd-all-textgrey">
-                      Kiểm tra mã phiếu giảm giá sẽ hoạt động trên trang thanh
-                      toán
-                    </p>
-                    <input
-                      className="px-4 w-full hd-cart-note"
-                      type="text"
-                      placeholder="Mã giảm giá"
-                    />
+                   
                   </div>
                   {/*end hd-note-text*/}
                   <div className="hd-sub-total text-end !order-4 lg:w-[50%] hd-col-item my-[30px] hd-all-textgrey">
                     <div className="border-b-0 shadow-none pt-[10px] pb-[4px] pl-[20px] text-[13px] leading-normal">
-                      <div className="hd-cart-ship">
-                        <div className="hd-ship-text1">
-                          Gần xong rồi, mua thêm nhiều hơn
-                          <span className="font-semibold text-[#00BADB]">
-                            485.000₫
-                          </span>
-                          để nhận được
-                          <span className="uppercase text-black font-semibold">
-                            Miễn phí vận chuyển!
-                          </span>
-                        </div>
-                        <div className="hd-ship-text2 hidden">
-                          <span className="text-green-600">Chúc mừng!</span>
-                          Bạn đã nhận được mã
-                          <span className="uppercase text-black font-semibold">
-                            Miễn phí vận chuyển.
-                          </span>
-                        </div>
-                      </div>
-                      <div className="hd-ship-icon relative max-w-[420px] inline-block w-full h-[9px] bg-zinc-100 rounded-[5px] mt-[20px] mb-[10px]">
-                        <span
-                          className="!block relative h-full"
-                          style={{ width: "90.05802707930367%" }}
-                        >
-                          <Car />
-                        </span>
-                      </div>
+                     
                     </div>
                     <div className="hd-cart-total uppercase mb-[10px] text-black lg:text-[20px] text-[18px]">
                       <div className="flex-wrap !items-center !justify-between !inline-flex gap-[30px]">

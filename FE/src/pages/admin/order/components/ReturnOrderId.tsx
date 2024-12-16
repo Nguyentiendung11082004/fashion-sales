@@ -10,6 +10,7 @@ import { toast } from "react-toastify";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { notifyOrdersChanged, useRealtimeOrders } from "@/common/hooks/useRealtimeOrders";
 const ReturnOrderId = () => {
   const { id } = useParams();
 
@@ -29,6 +30,7 @@ const ReturnOrderId = () => {
       }
     },
   });
+  useRealtimeOrders();
   const dataReturnId = data?.data?.data;
   const status = {
     pending: "Đang đợi xử lí",
@@ -58,6 +60,7 @@ const ReturnOrderId = () => {
       if (response.status === 200) {
         queryClient.invalidateQueries({ queryKey: ["return-requests"] });
         toast.success("Đã xử lí yêu cầu!");
+        notifyOrdersChanged();
       } else {
         const errorMessage = response.data?.message;
         toast.error(errorMessage || "Có lỗi xảy ra!");
