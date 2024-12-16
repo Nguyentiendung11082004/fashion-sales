@@ -104,7 +104,7 @@ const Router = () => {
           <Route path="products/create" element={<ProductForm />} />
           <Route path="products/edit/:id" element={<ProductForm />} />
           <Route path="categories" element={<CategoryPage />} />
-<Route path="categories/create" element={<CategoryForm />} />
+          <Route path="categories/create" element={<CategoryForm />} />
           <Route path="categories/edit/:id" element={<CategoryForm />} />
           <Route path="attributes" element={<AttributeItem />} />
           <Route path="attribute-values" element={<AttributeItemValues />} />

@@ -649,8 +649,7 @@ const HistoryReturnRequests = () => {
                             </button>
                           )}
 
-                          {order?.return_requests[0]?.status ===
-                            "completed" && (
+                          {order?.status === "completed" && (
                             <button
                               className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB] font-medium ${
                                 shipOk
