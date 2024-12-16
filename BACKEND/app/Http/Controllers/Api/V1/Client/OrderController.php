@@ -124,7 +124,7 @@ class OrderController extends Controller
                         if ($orderDetail) {
                             // Cập nhật discount
                             $orderDetail->update([
-                                'discount' => $product['voucher_discount'],
+                                'discount' => $product['voucher_discount'] ?? 0,
                             ]);
                         }
                     }
