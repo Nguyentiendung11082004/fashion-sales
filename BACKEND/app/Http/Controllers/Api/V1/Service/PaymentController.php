@@ -95,7 +95,7 @@ class PaymentController extends Controller
                 if ($order) {
                     // Cập nhật trạng thái thanh toán và các thông tin liên quan
                     $order->update([
-                        'payment_status' => Order::STATUS_COMPLETED, // Cập nhật trạng thái thành công
+                        'payment_status' => Order::PAYMENT_PAID, // Cập nhật trạng thái thành công
                     ]);
                     // return [
                     //     'status' => 'success',
