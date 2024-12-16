@@ -119,7 +119,9 @@ const Header = (props: Props) => {
         <div className="w-[100%] bg-[#fff]">
           <header className="lg:mx-10 bg-[#fff] h-[70px] grid grid-cols-12 gap-4 top-0 z-40">
             <div className="lg:col-span-2 col-span-4 flex justify-center items-center md:items-center md:justify-center lg:justify-start  order-2 lg:order-1">
-              <img src={LogoClient} alt="" className="h-[40px]" />
+              <Link to="/">
+                <img src={LogoClient} className="h-[40px]" alt="Logo" />
+              </Link>
             </div>
             <div className="col-span-4 flex items-center justify-start md:items-center md:justify-start lg:hidden  order-1  ">
               <MenuHome />

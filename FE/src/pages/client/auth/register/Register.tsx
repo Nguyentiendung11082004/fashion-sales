@@ -73,7 +73,9 @@ const Register = () => {
 
           <main className="flex items-center justify-center px-8 py-8 sm:px-12 lg:col-span-7 lg:px-16 lg:py-12 xl:col-span-6">
             <div className="max-w-xl lg:max-w-3xl">
-              <img src={LogoClient} className="h-10 mb-10" alt="Logo" />
+              <Link to="/">
+                <img src={LogoClient} className=" h-14 mb-10" alt="Logo" />
+              </Link>
               <p className="mt-6 text-2xl font-medium text-gray-900">
                 Chào mừng bạn đến với Mix & Match
               </p>
@@ -101,8 +103,8 @@ const Register = () => {
                 </div>
                 <div className="col-span-6 sm:col-span-6">
                   <Form.Item name="password" label="Mật khẩu">
-                    <Input placeholder="Nhập mật khẩu"
-                      type="password"
+                    <Input
+                      placeholder="Nhập mật khẩu"
                       className=" text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none"
                     />
                   </Form.Item>
