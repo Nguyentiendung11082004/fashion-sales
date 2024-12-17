@@ -26,6 +26,11 @@ const Checkout = () => {
   const [cartIds, setCartIds] = useState<number[]>(location.state?.cartIds || []);
   const [validCartIds, setValidCartIds] = useState<any[]>([])
   const [_payload, _setPayLoad] = useState(location.state?._payload);
+  useEffect(() => {
+    if (!_payload && (!cartIds || cartIds.length === 0)) {
+      navigate('/', { replace: true });
+    }
+  }, [_payload, cartIds, navigate]);
   const [paymentMethhod, setPaymentMethod] = useState('1');
   const [shiping, setShipPing] = useState<string>('');
   const [voucher, setVoucher] = useState<any>();
@@ -34,7 +39,7 @@ const Checkout = () => {
   const [dataCheckout, setDataCheckout] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true); // Trạng thái loading
   const [visible, setVisible] = useState(false)
-  const [idTinh, setIdTinh] = useState<number | null>(0)
+  const [idTinh, setIdTinh] = useState<number | null>()
   const [idQuanHuyen, setIdQuanHuyen] = useState<number | null>(0)
   const [idXa, setIdXa] = useState<number | null>(0);
   const [payloadDiaChi, setPayLoadDiaChi] = useState<any>(null);
@@ -125,6 +130,7 @@ const Checkout = () => {
       if (errors?.out_of_stock || errors?.insufficient_stock) {
         // Lỗi liên quan đến số lượng
         setErrorOrder(errors);
+        setError({})
       } else {
         // Lỗi liên quan đến validate thông tin
         setError(errors);
@@ -375,7 +381,6 @@ const Checkout = () => {
       getShipp();
     }
   }, [idXa, idQuanHuyen]);
-
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);

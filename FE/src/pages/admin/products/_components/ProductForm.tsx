@@ -341,18 +341,33 @@ const ProductForm = () => {
             title: 'Price Regular',
             dataIndex: 'price_regular',
             render: (text: any, record: any, index: number) => (
-                <Input
-                    value={variants[index]?.price_regular || ''}
-                    onChange={(e) => handleInputChange(index, 'price_regular', e.target.value)} />
+                <div>
+                    <Input
+                        value={variants[index]?.price_regular || ''}
+                        onChange={(e) => handleInputChange(index, 'price_regular', e.target.value)} />
+                    {variantErrors[index]?.price_regular && (
+                        <div style={{ color: 'red', fontSize: '12px' }}>
+                            {variantErrors[index].price_regular}
+                        </div>
+                    )}
+                </div>
             )
         },
+
         {
             title: 'Price Sale',
             dataIndex: 'price_sale',
             render: (text: any, record: any, index: number) => (
-                <Input
-                    value={variants[index]?.price_sale || ''}
-                    onChange={(e) => handleInputChange(index, 'price_sale', e.target.value)} />
+                <div>
+                    <Input
+                        value={variants[index]?.price_sale || ''}
+                        onChange={(e) => handleInputChange(index, 'price_sale', e.target.value)} />
+                    {variantErrors[index]?.price_sale && (
+                        <div style={{ color: 'red', fontSize: '12px' }}>
+                            {variantErrors[index].price_sale}
+                        </div>
+                    )}
+                </div>
             )
         },
         {
