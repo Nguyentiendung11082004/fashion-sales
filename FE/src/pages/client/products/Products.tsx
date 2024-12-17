@@ -367,11 +367,7 @@ const Products = () => {
   const [visiable, setVisible] = useState(false);
   const [productSeeMore, setProductSeeMore] = useState({});
   const handleOpenSeeMore = (product: any) => {
-<<<<<<< HEAD
-    // console.log("product",product)
-=======
     console.log("product", product);
->>>>>>> af06b9630d1e8d66173a4e4e9d0572fb7d341bb0
     setVisible(true);
     setProductSeeMore(product);
   };
