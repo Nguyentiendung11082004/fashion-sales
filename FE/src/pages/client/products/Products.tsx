@@ -40,8 +40,9 @@ const Products = () => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedBrand, setSelectedBrand] = useState<string[]>([]);
   const [appliedBrands, setAppliedBrands] = useState<string[]>([]);
-  const [selectedColors, setSelectedColors] = useState<string[]>([]);
-  const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
+  const [selectedAttributes, setSelectedAttributes] = useState<
+    Record<string, any[]>
+  >({});
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
   const saleFromLink = location.state?.sale || false;
@@ -94,8 +95,8 @@ const Products = () => {
       search: searchTerm,
       categorys: selectedCategories,
       brands: selectedBrand,
-      sizes: selectedSizes,
-      colors: selectedColors,
+      sizes: selectedAttributes,
+      colors: selectedAttributes,
       min_price: minPrice,
       max_price: maxPrice,
       sale: isSale,
@@ -113,8 +114,8 @@ const Products = () => {
     searchTerm,
     selectedCategories,
     selectedBrand,
-    selectedSizes,
-    selectedColors,
+    selectedAttributes,
+    selectedAttributes,
     minPrice,
     maxPrice,
     isSale,
@@ -127,8 +128,7 @@ const Products = () => {
     setSearchTerm("");
     setSelectedCategories([]);
     setSelectedBrand([]);
-    setSelectedColors([]);
-    setSelectedSizes([]);
+    setSelectedAttributes({});
     setMinPrice("");
     setMaxPrice("");
     setIsSale(false);
@@ -162,6 +162,25 @@ const Products = () => {
 
   const handleCheckboxChange = (name: string, value: any) => {
     console.log(`Checkbox changed: ${name} -> ${value}`);
+
+    if (Object.keys(pro?.attributes || {}).includes(name)) {
+      setSelectedAttributes((prev) => {
+        const prevValues = prev[name] || [];
+        const newValues = prevValues.includes(value)
+          ? prevValues.filter((v) => v !== value) // Bỏ chọn
+          : [...prevValues, value]; // Chọn
+
+        return {
+          ...prev,
+          [name]: newValues, // Cập nhật giá trị cho key tương ứng
+        };
+      });
+
+      // Gọi hàm lọc sau khi cập nhật
+      applyFilters();
+      return;
+    }
+
     switch (name) {
       case "categories":
         setSelectedCategories((prev) => {
@@ -181,24 +200,24 @@ const Products = () => {
           return newBrands;
         });
         break;
-      case "sizes":
-        setSelectedSizes((prev) => {
-          const newSizes = prev.includes(value)
-            ? prev.filter((size) => size !== value)
-            : [...prev, value];
-          applyFilters();
-          return newSizes;
-        });
-        break;
-      case "colors":
-        setSelectedColors((prev) => {
-          const newColors = prev.includes(value)
-            ? prev.filter((color) => color !== value)
-            : [...prev, value];
-          applyFilters();
-          return newColors;
-        });
-        break;
+      // case "sizes":
+      //   setSelectedSizes((prev) => {
+      //     const newSizes = prev.includes(value)
+      //       ? prev.filter((size) => size !== value)
+      //       : [...prev, value];
+      //     applyFilters();
+      //     return newSizes;
+      //   });
+      //   break;
+      // case "colors":
+      //   setSelectedColors((prev) => {
+      //     const newColors = prev.includes(value)
+      //       ? prev.filter((color) => color !== value)
+      //       : [...prev, value];
+      //     applyFilters();
+      //     return newColors;
+      //   });
+      //   break;
       case "sale":
         setIsSale((prev) => {
           const newSale = !prev;
@@ -216,7 +235,7 @@ const Products = () => {
   /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     applyFilters();
-  }, [selectedCategories, selectedSizes, selectedColors, isSale]);
+  }, [selectedCategories, selectedAttributes, isSale]);
 
   const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -345,11 +364,14 @@ const Products = () => {
     setCurrentPage(pageNumber);
   };
 
-
   const [visiable, setVisible] = useState(false);
   const [productSeeMore, setProductSeeMore] = useState({});
   const handleOpenSeeMore = (product: any) => {
+<<<<<<< HEAD
     // console.log("product",product)
+=======
+    console.log("product", product);
+>>>>>>> af06b9630d1e8d66173a4e4e9d0572fb7d341bb0
     setVisible(true);
     setProductSeeMore(product);
   };
@@ -905,100 +927,56 @@ const Products = () => {
                   </div>
                 ))}
               </div>
-              {/* colors */}
-              <div className="relative flex flex-col py-8 space-y-4">
-                <h3 className="font-semibold mb-2.5">Màu sắc</h3>
-                {pro?.attributes?.color?.map((item) => (
-                  <div className="" key={item.id}>
-                    <div className="flex text-sm sm:text-base ">
-                      <input
-                        id={`color-${item.id}`}
-                        className="focus:ring-action-primary text-primary-500 rounded border-slate-400 hover:border-slate-700 bg-transparent dark:border-slate-700 dark:hover:border-slate-500 dark:checked:bg-primary-500 focus:ring-primary-500 w-5 h-5"
-                        type="checkbox"
-                        name={item.name}
-                        value={
-                          item.value.charAt(0).toUpperCase() +
-                          item.value.slice(1).toLowerCase()
-                        }
-                        checked={selectedColors.includes(
-                          item.value.charAt(0).toUpperCase() +
-                          item.value.slice(1).toLowerCase()
-                        )}
-                        onChange={() =>
-                          handleCheckboxChange(
-                            "colors",
-                            item.value.charAt(0).toUpperCase() +
-                            item.value.slice(1).toLowerCase()
-                          )
-                        }
-                      />
-                      <label
-                        htmlFor={`color-${item.id}`}
-                        className="pl-2.5 sm:pl-3.5 flex flex-col flex-1 justify-center select-none"
-                      >
-                        <span className="text-slate-900 text-sm font-normal ">
-                          {colorTranslations[
-                            item.value.charAt(0).toUpperCase() +
-                            item.value.slice(1).toLowerCase()
-                          ] || "No Size"}
-                          {/*Dịch sang TViet và Chữ cái đầu viết hoa */}
-                        </span>
-                      </label>
-                    </div>
-                  </div>
-                ))}
-              </div>
 
-              {/* sizes */}
-              <div className="relative flex flex-col py-8 space-y-4">
-                <h3 className="font-semibold mb-2.5">Kích thước</h3>
-                {pro?.attributes?.size
-                  ?.sort((a, b) => {
-                    const aValue = a.value.toLowerCase();
-                    const bValue = b.value.toLowerCase();
-
-                    // Kiểm tra xem aValue và bValue có phải là số hay không
-                    const aNumeric = aValue.replace(/[^0-9]/g, ""); // Lấy phần số từ chuỗi
-                    const bNumeric = bValue.replace(/[^0-9]/g, "");
-
-                    const isANumber = !isNaN(Number(aNumeric)); // Kiểm tra aValue có phải là số
-                    const isBNumber = !isNaN(Number(bNumeric));
-
-                    // So sánh chữ cái trước số, và số trước kích thước có đơn vị
-                    if (!isANumber && !isBNumber)
-                      return aValue.localeCompare(bValue); // Cả hai là chữ => so sánh trực tiếp
-                    if (isANumber && !isBNumber) return 1; // a là số, b là chữ => a ở sau
-                    if (!isANumber && isBNumber) return -1; // a là chữ, b là số => a ở trước
-
-                    // Nếu cả hai đều là số, so sánh trực tiếp
-                    return Number(aNumeric) - Number(bNumeric); // Ép kiểu thành số để so sánh
-                  })
-                  .map((item) => (
-                    <div className="" key={item.id}>
-                      <div className="flex text-sm sm:text-base ">
+              {Object.entries(pro?.attributes || {}).map(([key, values]) => (
+                <div
+                  className="relative flex flex-col py-8 space-y-4"
+                  key={key}
+                >
+                  <h3 className="font-semibold mb-2.5">{key}</h3>
+                  {values?.map((item) => (
+                    <div key={item.id}>
+                      <div className="flex text-sm sm:text-base">
                         <input
-                          id={`size-${item.id}`}
+                          id={`${key}-${item.id}`}
                           className="focus:ring-action-primary text-primary-500 rounded border-slate-400 hover:border-slate-700 bg-transparent dark:border-slate-700 dark:hover:border-slate-500 dark:checked:bg-primary-500 focus:ring-primary-500 w-5 h-5"
                           type="checkbox"
                           name={item.name}
-                          value={item.value}
-                          checked={selectedSizes.includes(item.value)}
+                          value={
+                            item.value.charAt(0).toUpperCase() +
+                            item.value.slice(1).toLowerCase()
+                          }
+                          checked={selectedAttributes[key]?.includes(
+                            item.value.charAt(0).toUpperCase() +
+                              item.value.slice(1).toLowerCase()
+                          )}
                           onChange={() =>
-                            handleCheckboxChange("sizes", item.value)
+                            handleCheckboxChange(
+                              key,
+                              item.value.charAt(0).toUpperCase() +
+                                item.value.slice(1).toLowerCase()
+                            )
                           }
                         />
                         <label
-                          htmlFor={`size-${item.id}`}
+                          htmlFor={`${key}-${item.id}`}
                           className="pl-2.5 sm:pl-3.5 flex flex-col flex-1 justify-center select-none"
                         >
-                          <span className="text-slate-900 text-sm font-normal ">
-                            {item.value || "No Size"}
+                          <span className="text-slate-900 text-sm font-normal">
+                            {colorTranslations[
+                              item.value.charAt(0).toUpperCase() +
+                                item.value.slice(1).toLowerCase()
+                            ] ||
+                              item.value.charAt(0).toUpperCase() +
+                                item.value.slice(1).toLowerCase() ||
+                              "No Value"}
                           </span>
                         </label>
                       </div>
                     </div>
                   ))}
-              </div>
+                </div>
+              ))}
 
               {/* prices */}
               <div className="relative flex flex-col py-8 space-y-5 pr-3">
@@ -1011,7 +989,7 @@ const Products = () => {
                       Giá nhỏ nhất
                     </label>
                     <div className="mt-1 relative rounded-md">
-                      <span className="absolute inset-y-0 right-[15px] flex items-center pointer-events-none text-neutral-500 sm:text-sm">
+                      <span className="absolute inset-y-0 right-[15px] flex items-center pointer-events-none text-neutral-400 sm:text-sm">
                         đ
                       </span>
                       <input
@@ -1038,7 +1016,7 @@ const Products = () => {
                       Giá lớn nhất
                     </label>
                     <div className="mt-1 relative rounded-md">
-                      <span className="absolute inset-y-0 right-[15px] flex items-center pointer-events-none text-neutral-500 sm:text-sm">
+                      <span className="absolute inset-y-0 right-[15px] flex items-center pointer-events-none text-neutral-400 sm:text-sm">
                         đ
                       </span>
                       <input
@@ -1146,275 +1124,323 @@ const Products = () => {
                     </div>
                   ))
                 ) : ( */}
-                {pro?.products?.map(({ product, getUniqueAttributes }) => {
-                  const inWishlist = isInWishlist(product.id);
+                {pro && pro.products && pro?.products?.length > 0 ? (
+                  currentProducts?.map(
+                    ({ product, getUniqueAttributes, discountPercentage }) => {
+                      const inWishlist = isInWishlist(product.id);
 
-                  return (
-                    <>
-                      <div
-                        className="nc-ProductCard relative flex flex-col bg-transparent"
-                        key={product.id}
-                      >
-                        <div className="lg:mb-[25px] mb-[20px]">
-                          <div className="cursor-pointer lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] sm:h-[345px] overflow-hidden">
-                            <Link
-                              to={`/products/${product?.slug}.html`}
-                              className="absolute inset-0"
-                            >
-                              <img
-                                className="group-hover:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover:opacity-0 object-cover"
-                                src={product.img_thumbnail}
-                                alt="Product"
-                              />
-                              <img
-                                className="group-hover:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover:opacity-100 object-cover"
-                                src={product.img_thumbnail}
-                                alt="Product"
-                              />
-                            </Link>
-
-                            <div className="image-overlay"></div>
-                            {/* <div className="absolute inset-0 bg-black opacity-0 transition-opacity duration-300 ease-in-out group-hover:opacity-10"></div> */}
-                            <div>
-                              <button
-                                className="absolute left-5 top-5 cursor-pointer"
-                                onClick={() => handleAddToWishlist(product)}
-                              >
-                                {inWishlist ? <HeartRed /> : <HeartWhite />}
-                              </button>
-                            </div>
-                            <div className="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100">
-                              <div className="group/btn relative">
-                                {product.variants.length > 0 ? (
-                                  <button className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]"
-                                    onClick={() => handleOpenSeeMore(product)}
-                                  >
-                                    <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                                      Mua ngay
-                                    </p>
-                                    <Eye />
-                                  </button>
-                                ) : (
-                                  <button
-                                    onClick={() => handleOpenSeeMore(product)}
-                                    className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]"
-                                  >
-                                    <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                                      Mua ngay
-                                    </p>
-                                    <Eye />
-                                  </button>
-                                )}
-                              </div>
-
-                              <Link to="" className="group/btn relative">
-                                <button
-                                  className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]"
-                                  onClick={() => {
-                                    modalRef.current?.showModal(),
-                                      setSlugProduct(product?.slug);
-                                    setIdProduct(product?.id);
-                                  }}
+                      return (
+                        <>
+                          <div
+                            className="nc-ProductCard relative flex flex-col bg-transparent"
+                            key={product.id}
+                          >
+                            <div className="lg:mb-[25px] mb-[20px]">
+                              <div className="cursor-pointer lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] sm:h-[345px] overflow-hidden">
+                                <Link
+                                  to={`/products/${product?.slug}.html`}
+                                  className="absolute inset-0"
                                 >
-                                  <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
-                                    Thêm vào giỏ hàng
-                                  </p>
-                                  <CartDetail />
-                                </button>
-                              </Link>
-                            </div>
-                            <div className="flex justify-center">
-                              <div
-                                className="absolute bottom-2 text-center text-white
+                                  <img
+                                    className="group-hover:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-100 group-hover:opacity-0 object-cover"
+                                    src={product.img_thumbnail}
+                                    alt="Product"
+                                  />
+                                  <img
+                                    className="group-hover:scale-125 absolute inset-0 w-full h-full transition-all duration-1000 ease-in-out opacity-0 group-hover:opacity-100 object-cover"
+                                    src={product.img_thumbnail}
+                                    alt="Product"
+                                  />
+                                </Link>
+
+                                <div className="image-overlay"></div>
+                                {/* <div className="absolute inset-0 bg-black opacity-0 transition-opacity duration-300 ease-in-out group-hover:opacity-10"></div> */}
+                                <div>
+                                  <button
+                                    className="absolute left-5 top-5 cursor-pointer"
+                                    onClick={() => handleAddToWishlist(product)}
+                                  >
+                                    {inWishlist ? <HeartRed /> : <HeartWhite />}
+                                  </button>
+                                </div>
+                                <div className="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100">
+                                  <div className="group/btn relative">
+                                    {product.variants.length > 0 ? (
+                                      <button
+                                        className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]"
+                                        onClick={() =>
+                                          handleOpenSeeMore(product)
+                                        }
+                                      >
+                                        <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
+                                          Mua ngay
+                                        </p>
+                                        <Eye />
+                                      </button>
+                                    ) : (
+                                      <button
+                                        onClick={() =>
+                                          handleOpenSeeMore(product)
+                                        }
+                                        className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]"
+                                      >
+                                        <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
+                                          Mua ngay
+                                        </p>
+                                        <Eye />
+                                      </button>
+                                    )}
+                                  </div>
+
+                                  <Link to="" className="group/btn relative">
+                                    <button
+                                      className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]"
+                                      onClick={() => {
+                                        modalRef.current?.showModal(),
+                                          setSlugProduct(product?.slug);
+                                        setIdProduct(product?.id);
+                                      }}
+                                    >
+                                      <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
+                                        Thêm vào giỏ hàng
+                                      </p>
+                                      <CartDetail />
+                                    </button>
+                                  </Link>
+                                </div>
+                                <div className="flex justify-center">
+                                  <div
+                                    className="absolute bottom-2 text-center text-white
                               -translate-y-7 transform
                                 transition-all duration-500 ease-in-out
                                 group-hover:translate-y-0
                                 opacity-0
                                 group-hover:opacity-100
                               "
-                              >
-                                <ul className="flex">
-                                  {getUniqueAttributes &&
-                                    Object.entries(getUniqueAttributes)
-                                      .filter(([key, value]) => {
-                                        // Hàm kiểm tra xem giá trị có phải là kích thước hay không
-                                        const isSizeValue = (v: any) => {
-                                          return (
-                                            /^[SMLX]{1,3}$/.test(v) ||
-                                            /^[0-9]+(\.\d+)?\s?(cm|inch|mm|kg)?$/.test(
-                                              v
-                                            ) ||
-                                            /^[0-9]+$/.test(v)
-                                          );
-                                        };
+                                  >
+                                    <ul className="flex">
+                                      {getUniqueAttributes &&
+                                        Object.entries(getUniqueAttributes)
+                                          .filter(([key, value]) => {
+                                            // Hàm kiểm tra xem giá trị có phải là kích thước hay không
+                                            const isSizeValue = (v: any) => {
+                                              return (
+                                                /^[SMLX]{1,3}$/.test(v) ||
+                                                /^[0-9]+(\.\d+)?\s?(cm|inch|mm|kg)?$/.test(
+                                                  v
+                                                ) ||
+                                                /^[0-9]+$/.test(v)
+                                              );
+                                            };
 
-                                        if (Array.isArray(value)) {
-                                          return value.every(isSizeValue); // Nếu là mảng, kiểm tra từng phần tử
-                                        }
-                                        if (
-                                          typeof value === "object" &&
-                                          value !== null
-                                        ) {
-                                          return Object.values(value).every(
-                                            isSizeValue
-                                          ); // Nếu là object, kiểm tra từng giá trị
-                                        }
-                                        return isSizeValue(value); // Nếu là giá trị đơn lẻ
-                                      })
-                                      .map(([key, value]) => (
-                                        <li key={key}>
-                                          {Array.isArray(value)
-                                            ? value.join(", ") // Nếu là mảng
-                                            : typeof value === "object" &&
+                                            if (Array.isArray(value)) {
+                                              return value.every(isSizeValue); // Nếu là mảng, kiểm tra từng phần tử
+                                            }
+                                            if (
+                                              typeof value === "object" &&
                                               value !== null
-                                              ? Object.values(value).join(", ") // Nếu là object
-                                              : String(value)}{" "}
-                                          {/* Nếu là giá trị đơn lẻ*/}
-                                        </li>
-                                      ))}
-                                </ul>
-                              </div>
+                                            ) {
+                                              return Object.values(value).every(
+                                                isSizeValue
+                                              ); // Nếu là object, kiểm tra từng giá trị
+                                            }
+                                            return isSizeValue(value); // Nếu là giá trị đơn lẻ
+                                          })
+                                          .map(([key, value]) => (
+                                            <li key={key}>
+                                              {Array.isArray(value)
+                                                ? value.join(", ") // Nếu là mảng
+                                                : typeof value === "object" &&
+                                                    value !== null
+                                                  ? Object.values(value).join(
+                                                      ", "
+                                                    ) // Nếu là object
+                                                  : String(value)}{" "}
+                                              {/* Nếu là giá trị đơn lẻ*/}
+                                            </li>
+                                          ))}
+                                    </ul>
+                                  </div>
 
-                              {product.price_regular && (
-                                <div>
-                                  {product.price_sale > 0 &&
-                                    product.price_sale < product.price_regular ? (
-                                    <>
-                                      <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400">
-                                        -
-                                        {Math.round(
-                                          ((product.price_regular -
-                                            product.price_sale) /
-                                            product.price_regular) *
-                                          100
-                                        )}
-                                        %
-                                      </div>
-                                    </>
-                                  ) : (
-                                    <div></div>
-                                  )}
+                                  <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[45px] lg:w-[45px] h-[40px] w-[40px] lg:text-sm text-[12px] rounded-full bg-red-400">
+                                    -{discountPercentage}%
+                                  </div>
                                 </div>
-                              )}
-                            </div>
-                          </div>
-                          <div>
-                            <Link to={`/products/${product?.slug}.html`}>
-                              <p className="text-base font-medium text-black mb-1 cursor-pointer hd-all-hover-bluelight">
-                                {product.name.charAt(0).toUpperCase() +
-                                  product.name.slice(1).toLowerCase()}
-                              </p>
-                            </Link>
-                            {(product?.price_regular ||
-                              product?.variants?.length) && (
-                                <div>
-                                  {(() => {
-                                    const variants = product?.variants || [];
-                                    // Tính toán giá bán và giá gốc từ các biến thể
-                                    const minPriceSale = Math.min(
-                                      ...variants
-                                        .map((variant: any) => variant.price_sale)
-                                        .filter((price: any) => price >= 0)
-                                    );
-                                    const minPriceRegular = Math.min(
-                                      ...variants
-                                        .map(
-                                          (variant: any) => variant.price_regular
-                                        )
-                                        .filter((price: any) => price >= 0)
-                                    );
-                                    const maxPriceRegular = Math.max(
-                                      ...variants
-                                        .map(
-                                          (variant: any) => variant.price_regular
-                                        )
-                                        .filter((price: any) => price > 0)
-                                    );
-                                    const productPriceSale = product?.price_sale;
-                                    const productPriceRegular =
-                                      product?.price_regular;
+                              </div>
+                              <div>
+                                <Link to={`/products/${product?.slug}.html`}>
+                                  <p className="text-base font-medium text-black mb-1 cursor-pointer hd-all-hover-bluelight">
+                                    {product.name.charAt(0).toUpperCase() +
+                                      product.name.slice(1).toLowerCase()}
+                                  </p>
+                                </Link>
+                                {(product?.price_regular ||
+                                  product?.variants?.length) && (
+                                  <div>
+                                    {(() => {
+                                      const variants = product?.variants || [];
+                                      // Tính toán giá bán và giá gốc từ các biến thể
+                                      const minPriceSale = Math.min(
+                                        ...variants
+                                          .map(
+                                            (variant: any) => variant.price_sale
+                                          )
+                                          .filter((price: any) => price >= 0)
+                                      );
+                                      const minPriceRegular = Math.min(
+                                        ...variants
+                                          .map(
+                                            (variant: any) =>
+                                              variant.price_regular
+                                          )
+                                          .filter((price: any) => price >= 0)
+                                      );
+                                      const maxPriceRegular = Math.max(
+                                        ...variants
+                                          .map(
+                                            (variant: any) =>
+                                              variant.price_regular
+                                          )
+                                          .filter((price: any) => price > 0)
+                                      );
+                                      const productPriceSale =
+                                        product?.price_sale;
+                                      const productPriceRegular =
+                                        product?.price_regular;
 
-                                    const pricesSaleVar = variants.map(
-                                      (variant: any) => variant.price_sale
-                                    );
-                                    const pricesRegularVar = variants.map(
-                                      (variant: any) => variant.price_regular
-                                    );
-                                    const allSaleEqual = pricesSaleVar.every(
-                                      (price: any) => price === pricesSaleVar[0]
-                                    );
-                                    const allRegularEqual =
-                                      pricesRegularVar.every(
+                                      const pricesSaleVar = variants.map(
+                                        (variant: any) => variant.price_sale
+                                      );
+                                      const pricesRegularVar = variants.map(
+                                        (variant: any) => variant.price_regular
+                                      );
+                                      const allSaleEqual = pricesSaleVar.every(
                                         (price: any) =>
-                                          price === pricesRegularVar[0]
+                                          price === pricesSaleVar[0]
                                       );
+                                      const allRegularEqual =
+                                        pricesRegularVar.every(
+                                          (price: any) =>
+                                            price === pricesRegularVar[0]
+                                        );
 
-                                    if (minPriceSale > 0) {
-                                      // Nếu có giá sale
-                                      if (
-                                        (productPriceSale &&
-                                          productPriceSale <
-                                          productPriceRegular) ||
-                                      productPriceSale === 0
-                                    ) {
-                                      return (
-                                        <>
-                                          <del className="mr-1">
-                                            {new Intl.NumberFormat(
-                                              "vi-VN"
-                                            ).format(productPriceRegular)}
-                                            VNĐ
-                                          </del>
-                                          <span className="text-[red]">
-                                            {new Intl.NumberFormat(
-                                              "vi-VN"
-                                            ).format(productPriceSale)}
-                                            VNĐ
-                                          </span>
-                                        </>
-                                      );
-                                    } else if (
-                                      productPriceSale &&
-                                      productPriceSale === productPriceRegular
-                                    ) {
-                                      return (
-                                        <span>
-                                          {new Intl.NumberFormat(
-                                            "vi-VN"
-                                          ).format(productPriceRegular)}
-                                          VNĐ
-                                        </span>
-                                      );
-                                    } else {
-                                      if (allSaleEqual && allRegularEqual) {
-                                        // Nếu tất cả giá sale và giá regular giống nhau
-                                        return (
-                                          <>
-                                            <del className="mr-1">
+                                      if (minPriceSale > 0) {
+                                        // Nếu có giá sale
+                                        if (
+                                          (productPriceSale &&
+                                            productPriceSale <
+                                              productPriceRegular) ||
+                                          productPriceSale === 0
+                                        ) {
+                                          return (
+                                            <>
+                                              <del className="mr-1">
+                                                {new Intl.NumberFormat(
+                                                  "vi-VN"
+                                                ).format(productPriceRegular)}
+                                                VNĐ
+                                              </del>
+                                              <span className="text-[red]">
+                                                {new Intl.NumberFormat(
+                                                  "vi-VN"
+                                                ).format(productPriceSale)}
+                                                VNĐ
+                                              </span>
+                                            </>
+                                          );
+                                        } else if (
+                                          productPriceSale &&
+                                          productPriceSale ===
+                                            productPriceRegular
+                                        ) {
+                                          return (
+                                            <span>
                                               {new Intl.NumberFormat(
                                                 "vi-VN"
-                                              ).format(
-                                                pricesRegularVar[0]
-                                              )}{" "}
-                                              VNĐ
-                                            </del>
-                                            <span className="text-[red]">
-                                              {new Intl.NumberFormat(
-                                                "vi-VN"
-                                              ).format(pricesSaleVar[0])}{" "}
+                                              ).format(productPriceRegular)}
                                               VNĐ
                                             </span>
-                                          </>
-                                        );
-                                      } else if (
-                                        productPriceSale &&
-                                        productPriceSale === productPriceRegular
-                                      ) {
+                                          );
+                                        } else {
+                                          if (allSaleEqual && allRegularEqual) {
+                                            // Nếu tất cả giá sale và giá regular giống nhau
+                                            return (
+                                              <>
+                                                <del className="mr-1">
+                                                  {new Intl.NumberFormat(
+                                                    "vi-VN"
+                                                  ).format(productPriceRegular)}
+                                                  VNĐ
+                                                </del>
+                                                <span className="text-[red]">
+                                                  {new Intl.NumberFormat(
+                                                    "vi-VN"
+                                                  ).format(productPriceSale)}
+                                                  VNĐ
+                                                </span>
+                                              </>
+                                            );
+                                          } else if (
+                                            productPriceSale &&
+                                            productPriceSale ===
+                                              productPriceRegular
+                                          ) {
+                                            return (
+                                              <span>
+                                                {new Intl.NumberFormat(
+                                                  "vi-VN"
+                                                ).format(productPriceRegular)}
+                                                VNĐ
+                                              </span>
+                                            );
+                                          } else {
+                                            if (
+                                              allSaleEqual &&
+                                              allRegularEqual
+                                            ) {
+                                              // Nếu tất cả giá sale và giá regular giống nhau
+                                              return (
+                                                <>
+                                                  <del className="mr-1">
+                                                    {new Intl.NumberFormat(
+                                                      "vi-VN"
+                                                    ).format(
+                                                      pricesRegularVar[0]
+                                                    )}{" "}
+                                                    VNĐ
+                                                  </del>
+                                                  <span className="text-[red]">
+                                                    {new Intl.NumberFormat(
+                                                      "vi-VN"
+                                                    ).format(
+                                                      pricesSaleVar[0]
+                                                    )}{" "}
+                                                    VNĐ
+                                                  </span>
+                                                </>
+                                              );
+                                            } else {
+                                              return (
+                                                <span>
+                                                  {new Intl.NumberFormat(
+                                                    "vi-VN"
+                                                  ).format(minPriceSale)}
+                                                  VNĐ -{" "}
+                                                  {new Intl.NumberFormat(
+                                                    "vi-VN"
+                                                  ).format(maxPriceRegular)}
+                                                  VNĐ
+                                                </span>
+                                              );
+                                            }
+                                          }
+                                        }
+                                      } else {
                                         return (
                                           <span>
                                             {new Intl.NumberFormat(
                                               "vi-VN"
-                                            ).format(minPriceSale)}
+                                            ).format(minPriceRegular)}
                                             VNĐ -{" "}
                                             {new Intl.NumberFormat(
                                               "vi-VN"
@@ -1422,166 +1448,109 @@ const Products = () => {
                                             VNĐ
                                           </span>
                                         );
-                                      } else {
-                                        if (allSaleEqual && allRegularEqual) {
-                                          // Nếu tất cả giá sale và giá regular giống nhau
-                                          return (
-                                            <>
-                                              <del className="mr-1">
-                                                {new Intl.NumberFormat(
-                                                  "vi-VN"
-                                                ).format(
-                                                  pricesRegularVar[0]
-                                                )}{" "}
-                                                ₫
-                                              </del>
-                                              <span className="text-[red]">
-                                                {new Intl.NumberFormat(
-                                                  "vi-VN"
-                                                ).format(pricesSaleVar[0])}{" "}
-                                                ₫
-                                              </span>
-                                            </>
-                                          );
-                                        } else {
-                                          return (
-                                            <span>
-                                              {new Intl.NumberFormat(
-                                                "vi-VN"
-                                              ).format(minPriceSale)}
-                                              ₫ -{" "}
-                                              {new Intl.NumberFormat(
-                                                "vi-VN"
-                                              ).format(maxPriceRegular)}
-                                              ₫
-                                            </span>
-                                          );
-                                        }
                                       }
-                                    // } else {
-                                    //   return (
-                                    //     <span>
-                                    //       {new Intl.NumberFormat("vi-VN").format(
-                                    //         minPriceRegular
-                                    //       )}
-                                    //       ₫ -{" "}
-                                    //       {new Intl.NumberFormat("vi-VN").format(
-                                    //         maxPriceRegular
-                                    //       )}
-                                    //       ₫
-                                    //     </span>
-                                    //   );
-                                    // }
-                                    }}else {
-                                    return (
-                                      <span>
-                                        {new Intl.NumberFormat("vi-VN").format(
-                                          minPriceRegular
-                                        )}
-                                        VNĐ -{" "}
-                                        {new Intl.NumberFormat("vi-VN").format(
-                                          maxPriceRegular
-                                        )}
-                                        VNĐ
-                                      </span>
-                                    );
-                                  }
-                                })()}
+                                    })()}
+                                  </div>
+                                )}
                               </div>
-                            )}
+
+                              <div className="t4s-product-colors flex">
+                                {getUniqueAttributes &&
+                                  Object.entries(getUniqueAttributes)
+                                    .filter(([key, value]) => {
+                                      // Hàm kiểm tra xem giá trị có phải là màu sắc không
+                                      const isColorValue = (v: any) => {
+                                        // Kiểm tra tên màu hợp lệ bằng cách tạo một phần tử DOM
+                                        const isValidColorName = (
+                                          color: string
+                                        ) => {
+                                          const s = new Option().style;
+                                          s.color = color;
+                                          return s.color !== ""; // Nếu gán thành công và không rỗng thì là màu hợp lệ
+                                        };
+
+                                        // Kiểm tra mã hex
+                                        const isHexColor = (color: string) =>
+                                          /^#[0-9A-F]{3}$|^#[0-9A-F]{6}$/i.test(
+                                            color
+                                          );
+
+                                        // Kiểm tra mã RGB/RGBA
+                                        const isRgbColor = (color: string) =>
+                                          /^rgba?\(\s?(\d{1,3}),\s?(\d{1,3}),\s?(\d{1,3})(,\s?([01](\.\d+)?))?\)$/.test(
+                                            color
+                                          );
+
+                                        // Kiểm tra mã HSL
+                                        const isHslColor = (color: string) =>
+                                          /^hsla?\(\s?(\d{1,3}),\s?(\d{1,3})%,\s?(\d{1,3})%(,\s?([01](\.\d+)?))?\)$/.test(
+                                            color
+                                          );
+
+                                        return (
+                                          isValidColorName(v) ||
+                                          isHexColor(v) ||
+                                          isRgbColor(v) ||
+                                          isHslColor(v)
+                                        );
+                                      };
+
+                                      return Array.isArray(value)
+                                        ? value.every(isColorValue)
+                                        : typeof value === "object" &&
+                                            value !== null
+                                          ? Object.values(value).every(
+                                              isColorValue
+                                            )
+                                          : isColorValue(value);
+                                    })
+
+                                    .map(([key, value]) => {
+                                      // console.log(value);
+                                      const colors = Array.isArray(value)
+                                        ? value
+                                        : typeof value === "object" &&
+                                            value !== null
+                                          ? Object.values(value)
+                                          : [value];
+
+                                      return (
+                                        <div key={key} className="mt-1 flex">
+                                          {colors.map((color, index) => (
+                                            <span
+                                              key={index}
+                                              className="t4s-pr-color__item flex flex-col items-center cursor-pointer mr-1"
+                                            >
+                                              <span
+                                                style={{
+                                                  backgroundColor:
+                                                    color.toLowerCase(),
+                                                }}
+                                                className="t4s-pr-color__value border border-gray-400 w-5 h-5 hover:border-black hover:border-2 rounded-full p-[5px]"
+                                              ></span>
+                                            </span>
+                                          ))}
+                                        </div>
+                                      );
+                                    })}
+                              </div>
+                            </div>
                           </div>
-
-                          <div className="t4s-product-colors flex">
-                            {getUniqueAttributes &&
-                              Object.entries(getUniqueAttributes)
-                                .filter(([key, value]) => {
-                                  // Hàm kiểm tra xem giá trị có phải là màu sắc không
-                                  const isColorValue = (v: any) => {
-                                    // Kiểm tra tên màu hợp lệ bằng cách tạo một phần tử DOM
-                                    const isValidColorName = (
-                                      color: string
-                                    ) => {
-                                      const s = new Option().style;
-                                      s.color = color;
-                                      return s.color !== ""; // Nếu gán thành công và không rỗng thì là màu hợp lệ
-                                    };
-
-                                    // Kiểm tra mã hex
-                                    const isHexColor = (color: string) =>
-                                      /^#[0-9A-F]{3}$|^#[0-9A-F]{6}$/i.test(
-                                        color
-                                      );
-
-                                    // Kiểm tra mã RGB/RGBA
-                                    const isRgbColor = (color: string) =>
-                                      /^rgba?\(\s?(\d{1,3}),\s?(\d{1,3}),\s?(\d{1,3})(,\s?([01](\.\d+)?))?\)$/.test(
-                                        color
-                                      );
-
-                                    // Kiểm tra mã HSL
-                                    const isHslColor = (color: string) =>
-                                      /^hsla?\(\s?(\d{1,3}),\s?(\d{1,3})%,\s?(\d{1,3})%(,\s?([01](\.\d+)?))?\)$/.test(
-                                        color
-                                      );
-
-                                    return (
-                                      isValidColorName(v) ||
-                                      isHexColor(v) ||
-                                      isRgbColor(v) ||
-                                      isHslColor(v)
-                                    );
-                                  };
-
-                                  return Array.isArray(value)
-                                    ? value.every(isColorValue)
-                                    : typeof value === "object" &&
-                                      value !== null
-                                      ? Object.values(value).every(isColorValue)
-                                      : isColorValue(value);
-                                })
-
-                                .map(([key, value]) => {
-                                  // console.log(value);
-                                  const colors = Array.isArray(value)
-                                    ? value
-                                    : typeof value === "object" &&
-                                      value !== null
-                                      ? Object.values(value)
-                                      : [value];
-
-                                  return (
-                                    <div key={key} className="mt-1 flex">
-                                      {colors.map((color, index) => (
-                                        <span
-                                          key={index}
-                                          className="t4s-pr-color__item flex flex-col items-center cursor-pointer mr-1"
-                                        >
-                                          <span
-                                            style={{
-                                              backgroundColor:
-                                                color.toLowerCase(),
-                                            }}
-                                            className="t4s-pr-color__value border border-gray-400 w-5 h-5 hover:border-black hover:border-2 rounded-full p-[5px]"
-                                          ></span>
-                                        </span>
-                                      ))}
-                                    </div>
-                                  );
-                                })}
-                          </div>
-                        </div>
-                      </div>
-                      {/* </div> */}
-                      <CartPopup
-                        slugProduct={slugProduct}
-                        idProduct={idProduct}
-                        setIdProduct={setIdProduct}
-                        ref={modalRef}
-                        setSlugProduct={setSlugProduct}
-                      />
-                    </>
-                  );
-                })}
+                          {/* </div> */}
+                          <CartPopup
+                            slugProduct={slugProduct}
+                            idProduct={idProduct}
+                            setIdProduct={setIdProduct}
+                            ref={modalRef}
+                            setSlugProduct={setSlugProduct}
+                          />
+                        </>
+                      );
+                    }
+                  )
+                ) : (
+                  <div></div>
+                )}
               </div>
               {/* phân trang  */}
               {totalProducts > productsPerPage && (
@@ -1600,10 +1569,11 @@ const Products = () => {
                     <button
                       key={pageNumber}
                       onClick={() => handlePageChange(pageNumber)}
-                      className={`px-4 py-2 mx-1 ${currentPage === pageNumber
-                        ? "text-black"
-                        : "text-gray-300"
-                        } rounded`}
+                      className={`px-4 py-2 mx-1 ${
+                        currentPage === pageNumber
+                          ? "text-black"
+                          : "text-gray-300"
+                      } rounded`}
                     >
                       {pageNumber}
                     </button>

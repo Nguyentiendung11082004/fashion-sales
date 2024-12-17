@@ -36,7 +36,7 @@ class UpdateCategoryRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => 'Trường tên danh mục là bắt buộc.',
+            'name.required' => 'Vui lòng nhập tên danh mục.',
             'name.string' => 'Tên danh mục phải là chuỗi ký tự.',
             'name.max' => 'Tên danh mục không được vượt quá 255 ký tự.',
             'name.unique' => 'Tên danh mục này đã tồn tại.',
@@ -44,7 +44,7 @@ class UpdateCategoryRequest extends FormRequest
             'parent_id.integer' => 'ID của danh mục cha phải là một số nguyên.',
             'parent_id.exists' => 'Danh mục cha không tồn tại.',
 
-           
+
             'description.string' => 'Mô tả phải là chuỗi ký tự.',
             'description.max' => 'Mô tả không được vượt quá 255 ký tự.',
         ];

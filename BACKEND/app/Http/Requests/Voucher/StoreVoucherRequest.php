@@ -51,7 +51,7 @@ class StoreVoucherRequest extends FormRequest
                     $decoded = json_decode($value);
                     if (json_last_error() !== JSON_ERROR_NONE) {
                         $fail('The ' . $attribute . ' must be a valid JSON string.');
-                    } 
+                    }
                     // else if (!is_array($decoded)) { // Kiểm tra xem kết quả có phải là mảng không
                     //     $fail('The ' . $attribute . ' must be a valid JSON array.');
                     // }
@@ -63,8 +63,26 @@ class StoreVoucherRequest extends FormRequest
     public function messages()
     {
         return [
-            'meta.*.meta_key.required' => 'The meta key field is required.',
-            'meta.*.meta_value.required' => 'The meta value field is required.',
+            'title.required' => 'Vui lòng nhập tên mã giảm giá.',
+            'start_date.required' => 'Vui lòng chọn ngày bắt đầu.',
+            'start_date.after_or_equal' => 'Ngày bắt đầu phải từ ngày hôm nay.',
+            'end_date.required' => 'Vui lòng chọn ngày kết thúc.',
+            'end_date.after_or_equal' => 'Ngày kết thúc phải sau hoặc bằng ngày bắt đầu.',
+            'min_order_value.required' => 'Vui lòng nhập giá trị áp dụng tối thiểu.',
+            'min_order_value.numeric' => 'Giá trị áp dụng tối thiểu không hợp lệ.',
+            'min_order_value.min' => 'Giá trị áp dụng tối thiểu không hợp lệ.',
+            'usage_limit.required' => 'Vui lòng nhập số lượng mã giảm giá.',
+            'usage_limit.integer' => 'Số lượng mã giảm giá không hợp lệ.',
+            'usage_limit.min' => 'Số lượng mã giảm giá không hợp lệ(lớn hơn 0).',
+            'discount_type.required' => 'Vui lòng chọn loại mã giảm giá.',
+            'discount_value.numeric' => 'Giá trị giảm giá phải là một số.',
+            'discount_value.min' => 'Giá trị giảm giá không được nhỏ hơn 0.',
+            'meta.array' => 'Trường meta phải là một mảng.',
+            'meta.*.meta_key.required' => 'Trường meta key là bắt buộc.',
+            'meta.*.meta_key.string' => 'Trường meta key phải là một chuỗi.',
+            'meta.*.meta_key.max' => 'Trường meta key không được vượt quá 255 ký tự.',
+            'meta.*.meta_value.required' => 'Trường meta value là bắt buộc.',
+            'meta.*.meta_value.string' => 'Trường meta value phải là một chuỗi.',
         ];
     }
 }

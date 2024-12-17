@@ -168,13 +168,14 @@ class ProductController extends Controller
             $tag = Tag::query()->latest('id')->pluck('name', 'id');
             $attribute = Attribute::with(["attributeitems"])->get();
             $brand = Brand::query()->pluck('name', 'id');
+           
             return response()->json([
                 "product" => $product,
                 "category" => $category,
                 "tag" => $tag,
                 "attribute" => $attribute,
                 "brand" => $brand,
-
+                // "allAttribute"=> $allAttribute 
             ], Response::HTTP_OK);
         } catch (\Exception $ex) {
             Log::error('API/V1/Admin/ProductController@show: ', [$ex->getMessage()]);

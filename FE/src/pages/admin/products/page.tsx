@@ -90,50 +90,50 @@ const ProductPageManager = () => {
       ),
     },
     {
-      title: "Type",
+      title: "Loại Sản Phẩm",
       dataIndex: "type",
       render: (text, record: Iproduct) => (
         <p>{record.type === false ? "Sản phẩm đơn" : "Sản phẩm biến thể"}</p>
       ),
     },
     {
-      title: "name",
+      title: "Tên",
       dataIndex: "name",
     },
     {
-      title: "views",
+      title: "Lượt xem",
       dataIndex: "views",
     },
     {
-      title: "img_thumbnail",
+      title: "Ảnh đại diện",
       dataIndex: "img_thumbnail",
       render: (img_thumbnail: string) => (
         <img src={img_thumbnail} style={{ height: "60px", margin: "0 auto" }} alt="Product Thumbnail" />
       ),
     },
     {
-      title: "status",
+      title: "Trạng thái",
       dataIndex: "status",
       render: (status: boolean) => (
         <Tag color={status ? "green" : "red"}>{status ? "Còn hàng" : "Hết hàng"}</Tag>
       ),
     },
     {
-      title: "is_show_home",
+      title: "Hiển thị ở trang chủ",
       dataIndex: "is_show_home",
       render: (is_show_home: boolean) => (
-        <Tag color={is_show_home ? "green" : "red"}>{is_show_home ? "Yes" : "No"}</Tag>
+        <Tag color={is_show_home ? "green" : "red"}>{is_show_home ? "Có" : "Không"}</Tag>
       ),
     },
     {
-      title: "trend",
+      title: "Xu Hướng",
       dataIndex: "trend",
       render: (is_trend: boolean) => (
         <Tag color={is_trend ? "green" : "red"}>{is_trend ? "Hot trend" : "Lỗi thời"}</Tag>
       ),
     },
     {
-      title: "Thao tác",
+      title: "Thao Tác",
       fixed: "right",
       render: (record: any) => (
         <div>
@@ -172,8 +172,8 @@ const ProductPageManager = () => {
   return (
     <div className="p-6 min-h-screen">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2">
-          Danh sách sản phẩm
+        <h1 className="text-3xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2 uppercase">
+          Danh Sách Sản Phẩm
         </h1>
         <Link to={`create`}>
           <Button className="bg-blue-500 text-white rounded-lg h-10 px-4 flex items-center hover:bg-blue-600 transition duration-200">

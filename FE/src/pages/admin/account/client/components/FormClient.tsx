@@ -135,7 +135,7 @@ const FormClient = () => {
     <div className="p-6 min-h-screen">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2">
-          Thêm khách hàng
+          Thêm Khách Hàng
         </h1>
       </div>
 
@@ -153,7 +153,7 @@ const FormClient = () => {
             gender: data?.gender === "1" ? "1" : "0",
           }}
         >
-          <Form.Item<IUser> label="Username" name="name">
+          <Form.Item<IUser> label="Họ và Tên" name="name">
             <Input />
           </Form.Item>
           {errors.name && <div className="text-red-600">{errors.name}</div>}
@@ -180,14 +180,14 @@ const FormClient = () => {
             )}
           </Form.Item>
 
-          <Form.Item<IUser> label="Password" name="password">
+          <Form.Item<IUser> label="Mật khẩu" name="password">
             <Input.Password />
           </Form.Item>
           {errors.password && (
             <div className="text-red-600">{errors.password}</div>
           )}
 
-          <Form.Item<IUser> label="Number phone" name="phone_number">
+          <Form.Item<IUser> label="Số điện thoại" name="phone_number">
             <Input />
           </Form.Item>
           {errors.phone_number && (
@@ -199,21 +199,21 @@ const FormClient = () => {
           </Form.Item>
           {errors.email && <div className="text-red-600">{errors.email}</div>}
 
-          <Form.Item<IUser> label="Address" name="address">
+          <Form.Item<IUser> label="Địa chỉ" name="address">
             <Input />
           </Form.Item>
           {errors.address && (
             <div className="text-red-600">{errors.address}</div>
           )}
 
-          <Form.Item label="Birth Date" name="birth_date">
+          <Form.Item label="Ngày sinh" name="birth_date">
             <DatePicker format="DD/MM/YYYY" placeholder="Chọn ngày sinh" />
           </Form.Item>
           {errors.birth_date && (
             <div className="text-red-600">{errors.birth_date}</div>
           )}
 
-          <Form.Item label="Gender" name="gender">
+          <Form.Item label="Giới tính" name="gender">
             <Select placeholder="Choose gender">
               <Option value="1">Nam</Option>
               <Option value="0">Nữ</Option>

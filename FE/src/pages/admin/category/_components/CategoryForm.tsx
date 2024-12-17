@@ -111,7 +111,7 @@ const CategoryForm = (props: Props) => {
     <div className="p-6 min-h-screen">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2">
-          {id ? "Sửa Category" : "Thêm Category"}
+          {id ? "Sửa Danh Mục" : "Thêm Danh Mục"}
         </h1>
       </div>
       {isFetching ? (
@@ -123,8 +123,8 @@ const CategoryForm = (props: Props) => {
           layout="vertical"
           initialValues={data}
         >
-          <Form.Item name="name" label="Tên category">
-            <Input placeholder="Tên category" />
+          <Form.Item name="name" label="Tên Danh Mục">
+            <Input placeholder="Nhập tên danh mục" />
           </Form.Item>
           {error ? <div className=" text-red-600">{error}</div> : ""}
 
@@ -167,7 +167,7 @@ const CategoryForm = (props: Props) => {
             </Upload>
           </Form.Item>
           <Form.Item name="description" label="Mô tả">
-            <Input placeholder="Mô tả category" />
+            <Input placeholder="Nhập mô tả" />
           </Form.Item>
           <Button
             htmlType="submit"

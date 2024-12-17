@@ -934,7 +934,7 @@ const ProductForm = () => {
                             </Form.Item>
                             <Form.Item
                                 name="gallery"
-                                label="Chọn mảng nhiều ảnh"
+                                label="Chọn bộ sưu tập"
                                 className="col-span-1"
                             >
                                 <Upload {...propsGallery}>
@@ -1043,12 +1043,12 @@ setAttribute(0)
                                 )}
                             </Form.Item>
                             {attribute === 0 && <>
-                                <Form.Item name="price_regular" label="Price Regular" className="col-span-1">
+                                <Form.Item name="price_regular" label="Giá gốc" className="col-span-1">
                                     <InputNumber size='large' />
                                     {error?.price_regular && <div className='text-red-600'>{error.price_regular.join(', ')}</div>}
 
                                 </Form.Item>
-                                <Form.Item name="price_sale" label="Price Sale" className="col-span-1">
+                                <Form.Item name="price_sale" label="Giá khuyến mãi" className="col-span-1">
                                     <InputNumber size='large' />
                                     {error?.price_sale && <div className='text-red-600'>{error.price_sale.join(', ')}</div>}
 
@@ -1062,17 +1062,17 @@ setAttribute(0)
                             </>
                             }
 
-                            <Form.Item name="description" label="Description" className="col-span-1">
+                            <Form.Item name="description" label="Mô tả" className="col-span-1">
                                 <TextArea size='large' />
                                 {error?.description && <div className='text-red-600'>{error.description.join(', ')}</div>}
 
                             </Form.Item>
-                            <Form.Item name="description_title" label="Description Title" className="col-span-1">
+                            <Form.Item name="description_title" label=" Tiêu đề mô tả" className="col-span-1">
                                 <Input size='large' />
                                 {error?.description_title && <div className='text-red-600'>{error.description_title.join(', ')}</div>}
 
                             </Form.Item>
-                            <Form.Item name="status" label="Status" className="col-span-1">
+                            <Form.Item name="status" label="Trạng thái" className="col-span-1">
                                 <div className="border border-gray-300 rounded-lg p-4 flex items-center space-x-4">
                                     <Radio.Group onChange={onChangeStatus} value={valueStatus} className="flex space-x-4">
                                         <Radio
@@ -1090,20 +1090,20 @@ setAttribute(0)
                                     </Radio.Group>
                                 </div>
                             </Form.Item>
-                            <Form.Item name="is_show_home" label="Is Show Home" className="col-span-1" >
+                            <Form.Item name="is_show_home" label="Hiển thị ở trang chủ" className="col-span-1" >
                                 <div className="border border-gray-300 rounded-lg p-4 flex items-center space-x-4">
                                     <Radio.Group onChange={onChangeHome} value={valueHome} className="flex space-x-4">
                                         <Radio
                                             value={1}
                                             className="text-lg font-semibold focus:outline-none"
                                         >
-                                            True
+                                            Có
                                         </Radio>
                                         <Radio
                                             value={0}
                                             className="text-lg font-semibold focus:outline-none"
                                         >
-                                            False
+                                            Không
                                         </Radio>
                                     </Radio.Group>
 
@@ -1111,38 +1111,38 @@ setAttribute(0)
                             </Form.Item>
 
 
-                            <Form.Item name="trend" label="Is Trend" className="col-span-1" >
+                            <Form.Item name="trend" label="Xu hướng" className="col-span-1" >
                                 <div className="border border-gray-300 rounded-lg p-4 flex items-center space-x-4">
                                     <Radio.Group onChange={onChangeTrend} value={valueTrend} className="flex space-x-4">
                                         <Radio
                                             value={1}
                                             className="text-lg font-semibold focus:outline-none"
                                         >
-                                            True
+                                            Có
                                         </Radio>
                                         <Radio
                                             value={0}
                                             className="text-lg font-semibold focus:outline-none"
                                         >
-                                            False
+                                            Không
                                         </Radio>
                                     </Radio.Group>
                                 </div>
                             </Form.Item>
-                            <Form.Item name="is_new" label="Is New" className="col-span-1" >
+                            <Form.Item name="is_new" label="Sản phẩm Mới" className="col-span-1" >
                                 <div className="border border-gray-300 rounded-lg p-4 flex items-center space-x-4">
                                     <Radio.Group onChange={onChangeNew} value={valueNew} className="flex space-x-4">
                                         <Radio
                                             value={1}
                                             className="text-lg font-semibold focus:outline-none"
                                         >
-                                            True
+                                            Có 
                                         </Radio>
                                         <Radio
                                             value={0}
                                             className="text-lg font-semibold focus:outline-none"
                                         >
-                                            False
+                                            Không
                                         </Radio>
                                     </Radio.Group>
                                 </div>

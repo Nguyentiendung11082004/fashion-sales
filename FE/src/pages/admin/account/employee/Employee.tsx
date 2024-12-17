@@ -80,16 +80,16 @@ const EmployeePage = () => {
       ),
     },
     {
-      title: "Name",
+      title: "Họ và Tên",
       dataIndex: "name",
     },
     {
-      title: "Avatar",
+      title: "Ảnh Đại Diện",
       dataIndex: "avatar",
       render: (avatar: string, _: IUser) => <Image src={avatar} width={100} />,
     },
     {
-      title: "Phone",
+      title: "Số Điện Thoại",
       dataIndex: "phone_number",
     },
     {
@@ -97,11 +97,11 @@ const EmployeePage = () => {
       dataIndex: "email",
     },
     {
-      title: "Address",
+      title: "Địa chỉ",
       dataIndex: "address",
     },
     {
-      title: "BirthDate",
+      title: "Ngày Sinh",
       dataIndex: "birth_date",
       render: (birth_date: string) => {
         const date = dayjs(birth_date);
@@ -109,7 +109,7 @@ const EmployeePage = () => {
       },
     },
     {
-      title: "Gender",
+      title: "Giới tính",
       dataIndex: "gender",
       render: (gender: number | undefined) => {
         if (typeof gender !== "number") return "";
@@ -124,7 +124,7 @@ const EmployeePage = () => {
       },
     },
     {
-      title: "Action",
+      title: "Thao Tác",
       fixed: "right",
       render: (employee: IUser) => (
         <div>
@@ -187,8 +187,8 @@ const EmployeePage = () => {
     <div className="p-6 min-h-screen">
       <div className="flex items-center justify-between mb-6">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 md:gap-8">
-          <h1 className="text-3xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2">
-            Nhân viên
+          <h1 className="text-3xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2 uppercase">
+            Nhân Viên
           </h1>
           <Input
             value={query}

@@ -61,7 +61,7 @@ const HomePage = () => {
   const [productSeeMore, setProductSeeMore] = useState({});
   const [visiable, setVisible] = useState(false);
   const handleOpenSeeMore = (product: any) => {
-    console.log("product",product)
+    console.log("product", product);
     setVisible(true);
     setProductSeeMore(product);
   };
@@ -205,26 +205,9 @@ const HomePage = () => {
                       </div>
                     </div>
 
-                    {product.price_regular && (
-                      <div>
-                        {product.price_sale > 0 &&
-                        product.price_sale < product.price_regular ? (
-                          <>
-                            <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400">
-                              -
-                              {Math.round(
-                                ((product.price_regular - product.price_sale) /
-                                  product.price_regular) *
-                                  100
-                              )}
-                              %
-                            </div>
-                          </>
-                        ) : (
-                          <div></div>
-                        )}
-                      </div>
-                    )}
+                    <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[45px] lg:w-[45px] h-[40px] w-[40px] lg:text-sm text-[12px] rounded-full bg-red-400">
+                      -{product.discount_percentage}%
+                    </div>
                   </div>
                   <div>
                     <Link
@@ -613,26 +596,9 @@ const HomePage = () => {
                       </div>
                     </div>
 
-                    {product.price_regular && (
-                      <div>
-                        {product.price_sale > 0 &&
-                        product.price_sale < product.price_regular ? (
-                          <>
-                            <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400">
-                              -
-                              {Math.round(
-                                ((product.price_regular - product.price_sale) /
-                                  product.price_regular) *
-                                  100
-                              )}
-                              %
-                            </div>
-                          </>
-                        ) : (
-                          <div></div>
-                        )}
-                      </div>
-                    )}
+                    <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[45px] lg:w-[45px] h-[40px] w-[40px] lg:text-sm text-[12px] rounded-full bg-red-400">
+                      -{product.discount_percentage}%
+                    </div>
                   </div>
                   <div>
                     <Link

@@ -72,16 +72,16 @@ const ClientPage = () => {
       ),
     },
     {
-      title: "Name",
+      title: "Họ Và Tên",
       dataIndex: "name",
     },
     {
-      title: "Avatar",
+      title: "Ảnh Đại Diện",
       dataIndex: "avatar",
       render: (avatar: string, _: IUser) => <Image src={avatar} width={100} />,
     },
     {
-      title: "Phone",
+      title: "Số điện thoại",
       dataIndex: "phone_number",
     },
     {
@@ -89,11 +89,11 @@ const ClientPage = () => {
       dataIndex: "email",
     },
     {
-      title: "Address",
+      title: "Địa chỉ",
       dataIndex: "address",
     },
     {
-      title: "BirthDate",
+      title: "Ngày Sinh",
       dataIndex: "birth_date",
       render: (birth_date: string) => {
         const date = dayjs(birth_date);
@@ -101,7 +101,7 @@ const ClientPage = () => {
       },
     },
     {
-      title: "Gender",
+      title: "Giới tính",
       dataIndex: "gender",
       render: (gender: number | undefined) => {
         if (typeof gender !== "number") return "";
@@ -109,7 +109,7 @@ const ClientPage = () => {
       },
     },
     {
-      title: "Create At",
+      title: "Ngày Tạo",
       dataIndex: "create_at",
       render: (create_at: string) => {
         const date = dayjs(create_at);
@@ -117,7 +117,7 @@ const ClientPage = () => {
       },
     },
     {
-      title: "Action",
+      title: "Thao Tác",
       fixed: "right",
       render: (client: IUser) => (
         <div>
@@ -172,8 +172,8 @@ const ClientPage = () => {
     <div className="p-6 min-h-screen">
       <div className="flex items-center justify-between mb-6">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 md:gap-8">
-          <h1 className="text-3xl font-bold text-gray-800 border-b-4 border-gray-300 pb-2">
-            Khách hàng
+          <h1 className="text-3xl font-bold text-gray-800 border-b-4 border-gray-300 pb-2 uppercase">
+            Khách Hàng
           </h1>
           <Input
             value={query}
@@ -185,7 +185,7 @@ const ClientPage = () => {
             onClick={handleSearch}
             className="bg-indigo-500 hover:bg-indigo-600 text-white font-medium py-2 px-4 rounded-lg shadow"
           >
-            Tìm kiếm
+            Tìm Kiếm
           </Button>
         </div>
         <Link to={`create`}>
@@ -194,7 +194,7 @@ const ClientPage = () => {
             type="primary"
           >
             <PlusOutlined className="mr-2" />
-            Thêm khách hàng
+            Thêm Khách Hàng
           </Button>
         </Link>
       </div>
