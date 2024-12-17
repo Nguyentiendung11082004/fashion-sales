@@ -281,13 +281,13 @@ const ProductDetailAdmin = () => {
                     {key.charAt(0).toUpperCase() + key.slice(1).toLowerCase()}:
                   </h3>
                   <span className="ml-2">
-                    {values
-                      ?.map(
-                        (item: any) =>
-                          item.value.charAt(0).toUpperCase() +
-                            item.value.slice(1).toLowerCase() || "No Value"
+                    {Object.values(values as { [key: string]: string }) // Ép kiểu cho `values`
+                      .map(
+                        (item) =>
+                          item.charAt(0).toUpperCase() +
+                          item.slice(1).toLowerCase()
                       )
-                      .join(", ")}
+                      .join(", ") || "No Value"}
                   </span>
                 </div>
               )
