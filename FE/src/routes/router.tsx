@@ -70,9 +70,9 @@ const Router = () => {
           <Route path="account" element={<Account />} />
           <Route path="wishlist" element={<Wishlist />} />
           <Route path="history-order" element={<HistoryOrder />} />
-          <Route path="checkout" element={<Checkout />} />
         </Route>
-        
+        <Route path="checkout" element={<Checkout />} />
+
         <Route path="contact" element={<Contact />} />
         <Route path="thank" element={<Thanks />} />
         <Route path="requestOrder" element={<RequestOrder />} />
