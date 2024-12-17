@@ -193,7 +193,7 @@ class ProductShopController extends Controller
                 $discountPercentage  = round($discountPercentage, 1); // Làm tròn 1 chữ số thập phân
                 $product->increment('views'); // Tăng số lượt xem
                 $getUniqueAttributes = new GetUniqueAttribute();
-
+                $product->unique_attributes=$getUniqueAttributes->getUniqueAttributes($product["variants"]);
                 // Thêm sản phẩm và biến thể vào mảng
                 $allProducts[] = [
                     'product' => $product,
@@ -201,6 +201,9 @@ class ProductShopController extends Controller
                     'getUniqueAttributes' => $getUniqueAttributes->getUniqueAttributes($product["variants"]),
                 ];
             }
+         
+
+
             
             // Trả về tất cả sản phẩm sau khi vòng lặp kết thúc
             return response()->json([
