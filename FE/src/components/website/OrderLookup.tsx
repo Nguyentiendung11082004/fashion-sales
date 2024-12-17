@@ -1,4 +1,3 @@
-import { colorTranslations } from "@/common/colors/colorUtils";
 import instance from "@/configs/axios";
 import { useMutation } from "@tanstack/react-query";
 import React, { useState } from "react";
@@ -26,11 +25,30 @@ const OrderLookup = () => {
   const [otp, setOtp] = useState("");
   const [showOtpInput, setShowOtpInput] = useState(false);
   const [order, setOrder] = useState<Order | null>(null);
+  const [lookupType, setLookupType] = useState("all");
 
   const [errors, setErrors] = useState({
     orderCode: "",
     contact: "",
     otp: "",
+  });
+
+  const { mutate: fetchOrders } = useMutation({
+    mutationFn: async () => {
+      const response = await instance.post("/search-order", {
+        contact: contact,
+      });
+      return response.data;
+    },
+    onSuccess: (data) => {
+      setOrder(data.orders);
+      setErrors({ orderCode: "", contact: "", otp: "" });
+    },
+    onError: (error: any) => {
+      console.error("Có lỗi xảy ra:", error);
+      setErrors(error.response?.data?.errors || {});
+      toast.error(error.response?.data?.message || "Tra cứu đơn hàng thất bại.");
+    },
   });
 
   const { mutate: sendOtp } = useMutation({
@@ -64,7 +82,6 @@ const OrderLookup = () => {
     },
     onSuccess: (data) => {
       setOrder(data.order); // Lưu thông tin đơn hàng
-      // toast.success("Đã tìm thấy đơn hàng.");
       setErrors({ orderCode: "", contact: "", otp: "" });
     },
     onError: (error: any) => {
@@ -79,39 +96,86 @@ const OrderLookup = () => {
   };
 
   const handleSearch = () => {
-    verifyOtp();
+    if (lookupType === "all") {
+      fetchOrders();
+    } else {
+      verifyOtp();
+    }
   };
-
-  const colorKeys = ["color", "colour", "hue", "màu", "màu sắc"];
 
   return (
     <div className="container bg-white rounded-lg shadow-lg p-8 max-w-2xl w-full my-20 py-10">
-      <div className="flex">
-        <div className="w-1/2">
-          <form className="space-y-4">
-            <h2 className="text-2xl font-bold mb-4">Mã đơn hàng</h2>
-            <p className="text-gray-600 mb-6">(Vui lòng nhập cả chữ và số)</p>
+      <div className="space-y-4">
+        <h2 className="text-2xl font-bold">Tra cứu đơn hàng</h2>
+
+        {/* Radio chọn kiểu tra cứu */}
+        <div className="flex space-x-4">
+          <label className="flex items-center space-x-2">
+            <input
+              type="radio"
+              value="all"
+              checked={lookupType === "all"}
+              onChange={() => setLookupType("all")}
+            />
+            <span>Tất cả đơn hàng</span>
+          </label>
+          <label className="flex items-center space-x-2">
+            <input
+              type="radio"
+              value="specific"
+              checked={lookupType === "specific"}
+              onChange={() => setLookupType("specific")}
+            />
+            <span>Đơn hàng cụ thể</span>
+          </label>
+        </div>
+
+        {/* Form tra cứu */}
+        {lookupType === "all" && (
+          <div>
+            <input
+              type="text"
+              placeholder="Nhập số điện thoại"
+              value={contact}
+              onChange={(e) => setContact(e.target.value)}
+              className={`w-full px-4 py-2 border ${
+                errors.contact ? "border-red-500" : "border-gray-300"
+              } rounded-lg shadow-sm focus:outline-none`}
+            />
+            {errors.contact && (
+              <p className="text-red-500 text-sm mt-1">{errors.contact}</p>
+            )}
+            <button
+              type="button"
+              onClick={handleSearch}
+              className="w-full mt-4 bg-red-500 text-white font-semibold py-2 px-4 rounded-lg shadow hover:bg-red-600 transition"
+            >
+              Tra cứu
+            </button>
+          </div>
+        )}
+
+        {lookupType === "specific" && (
+          <div className="space-y-4">
             <div>
               <input
                 type="text"
-                placeholder="VD: MIXMATCH-674ED2B778397"
+                placeholder="Nhập mã đơn hàng"
                 value={orderCode}
                 onChange={(e) => setOrderCode(e.target.value)}
                 className={`w-full px-4 py-2 border ${
                   errors.orderCode ? "border-red-500" : "border-gray-300"
-                } rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-black`}
+                } rounded-lg shadow-sm focus:outline-none`}
               />
               {errors.orderCode && (
                 <p className="text-red-500 text-sm mt-1">{errors.orderCode}</p>
               )}
             </div>
+
             <div>
-              <h2 className="text-xl font-bold mb-4">
-                Email hoặc Số điện thoại
-              </h2>
               <input
                 type="text"
-                placeholder="VD: example@gmail.com hoặc 0987654321"
+                placeholder="Nhập email"
                 value={contact}
                 onChange={(e) => setContact(e.target.value)}
                 className={`w-full px-4 py-2 border ${
@@ -122,7 +186,7 @@ const OrderLookup = () => {
                 <p className="text-red-500 text-sm mt-1">{errors.contact}</p>
               )}
             </div>
-            {/* OTP */}
+
             {showOtpInput && (
               <div>
                 <input
@@ -143,29 +207,80 @@ const OrderLookup = () => {
             <button
               type="button"
               onClick={() => {
-                const isPhone = /^[0-9]{10,11}$/.test(contact); // Kiểm tra số điện thoại
-                if (isPhone || showOtpInput) {
+                if (showOtpInput) {
                   handleSearch();
                 } else {
                   handleContinue();
                 }
               }}
-              className="w-full my-10 flex items-center justify-center space-x-2 bg-red-500 text-white font-semibold py-2 px-4 rounded-lg shadow hover:bg-red-600 transition"
+              className="w-full mt-4 bg-red-500 text-white font-semibold py-2 px-4 rounded-lg shadow hover:bg-red-600 transition"
             >
-              <p>{(showOtpInput || /^[0-9]{10,11}$/.test(contact)) ? "TRA CỨU" : "TIẾP TỤC"}</p>
-              <p className="mb-[3px]">→</p>
+              {showOtpInput ? "Tra cứu" : "Tiếp tục"}
             </button>
-          </form>
-        </div>
-        <div className="w-1/2 justify-items-center">
-          <img
-            src="https://viettelpost.com.vn/viettelpost-iframe/assets/images/tracking-img.svg"
-            alt=""
-          />
-        </div>
+          </div>
+        )}
       </div>
+
       {/* Bảng hiển thị đơn hàng */}
       {order && order.order_details.length > 0 && (
+        <div className="mt-8">
+          <h3 className="text-lg font-bold mb-4">Kết quả tra cứu</h3>
+          <table className="w-full border-collapse border border-gray-200">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="border border-gray-200 px-4 py-2 text-left">
+                  Tên sản phẩm
+                </th>
+                <th className="border border-gray-200 px-4 py-2 text-left">
+                  Thuộc tính
+                </th>
+                <th className="border border-gray-200 px-4 py-2 text-left">
+                  Số lượng
+                </th>
+                <th className="border border-gray-200 px-4 py-2 text-left">
+                  Giá sản phẩm
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {order.order_details.map((orderDetail, index) => (
+                <tr key={index}>
+                  <td className="border border-gray-200 px-4 py-2">
+                    {orderDetail.product_name}
+                  </td>
+                  <td className="border border-gray-200 px-4 py-2">
+                    {orderDetail.attributes && Object.entries(orderDetail.attributes).length > 0
+                      ? Object.entries(orderDetail.attributes)
+                          .map(([key, value]) => `${key}: ${value}`)
+                          .join(", ")
+                      : ""}
+                  </td>
+                  <td className="border border-gray-200 px-4 py-2">
+                    {orderDetail.quantity}
+                  </td>
+                  <td className="border border-gray-200 px-4 py-2">
+                    {new Intl.NumberFormat("vi-VN").format(orderDetail.price)} VND
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default OrderLookup;
+
+
+{/* <img
+            src="https://viettelpost.com.vn/viettelpost-iframe/assets/images/tracking-img.svg"
+            alt=""
+          /> */}
+
+ {/* Bảng hiển thị đơn hàng */}
+      {/* {order && order.order_details.length > 0 && (
         <div className="mt-8">
           <h3 className="text-lg font-bold mb-4">Kết quả tra cứu</h3>
           <table className="w-full border-collapse border border-gray-200">
@@ -210,13 +325,7 @@ const OrderLookup = () => {
                     {orderDetail.attributes &&
                     Object.entries(orderDetail.attributes).length > 0
                       ? Object.entries(orderDetail.attributes)
-                          .map(([key, value]) => {
-                            if (
-                              colorKeys.includes(key.toLowerCase()) &&
-                              colorTranslations[value]
-                            ) {
-                              return colorTranslations[value];
-                            }
+                          .map(([value]) => {
                             return value;
                           })
                           .join(", ")
@@ -248,9 +357,4 @@ const OrderLookup = () => {
             </tbody>
           </table>
         </div>
-      )}
-    </div>
-  );
-};
-
-export default OrderLookup;
+      )} */}
