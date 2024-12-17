@@ -201,6 +201,7 @@ class ProductShopController extends Controller
                     'getUniqueAttributes' => $getUniqueAttributes->getUniqueAttributes($product["variants"]),
                 ];
             }
+            
             // Trả về tất cả sản phẩm sau khi vòng lặp kết thúc
             return response()->json([
                 'products' => $allProducts,
