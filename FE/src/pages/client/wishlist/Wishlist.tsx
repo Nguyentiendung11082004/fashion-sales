@@ -100,7 +100,12 @@ const Wishlist = () => {
                 ))
             ) : data?.length ? (
               currentProducts?.map(
-                ({ wishlist_id, product, getUniqueAttributes }) => (
+                ({
+                  wishlist_id,
+                  product,
+                  getUniqueAttributes,
+                  discountPercentage,
+                }) => (
                   <div className="product-item" key={wishlist_id}>
                     <div className="lg:mb-[25px] mb-[20px]">
                       <div className="cursor-pointer lg:mb-[15px] mb-[10px] group group/image relative h-[250px] w-full lg:h-[345px] lg:w-[290px] sm:h-[345px] overflow-hidden">
@@ -197,11 +202,13 @@ const Wishlist = () => {
                                     const isSizeValue = (v: any) => {
                                       return (
                                         /^[smlxSMLX]{1,3}$/.test(v) || // Kích thước ký tự s, m, l, x (cả chữ thường và hoa)
-                                        /^[0-9]+(\.\d+)?\s?(cm|inch|mm|kg)?$/i.test(v) || // Số có đơn vị (i: không phân biệt hoa/thường)
+                                        /^[0-9]+(\.\d+)?\s?(cm|inch|mm|kg)?$/i.test(
+                                          v
+                                        ) || // Số có đơn vị (i: không phân biệt hoa/thường)
                                         /^[0-9]+$/.test(v) || // Số nguyên
                                         /^[0-9]+[smlxSMLX]+$/.test(v) // Số trước ký tự size (vd: 2XL, 3X, 4L)
                                       );
-                                    };            
+                                    };
 
                                     if (Array.isArray(value)) {
                                       return value.every(isSizeValue); // Nếu là mảng, kiểm tra từng phần tử
@@ -236,25 +243,9 @@ const Wishlist = () => {
                             </ul>
                           </div>
                         </div>
-                        {product.price_regular && (
-                          <div>
-                            {product.price_sale > 0 &&
-                            product.price_sale < product.price_regular ? (
-                              <>
-                                <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400">
-                                  -
-                                  {Math.round(
-                                    ((product.price_regular -
-                                      product.price_sale) /
-                                      product.price_regular) *
-                                      100
-                                  )}
-                                  %
-                                </div>
-                              </>
-                            ) : (
-                              <div></div>
-                            )}
+                        {discountPercentage > 0 && (
+                          <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[45px] lg:w-[45px] h-[40px] w-[40px] lg:text-sm text-[12px] rounded-full bg-red-400">
+                            -{discountPercentage}%
                           </div>
                         )}
                       </div>
