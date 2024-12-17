@@ -170,12 +170,11 @@ const HomePage = () => {
                                 const isSizeValue = (v: any) => {
                                   return (
                                     /^[smlxSMLX]{1,3}$/.test(v) || // Kích thước ký tự s, m, l, x (cả chữ thường và hoa)
-                                    /^[0-9]+(\.\d+)?\s?(cm|inch|mm|kg)?$/i.test(
-                                      v
-                                    ) || // Số có đơn vị (i: không phân biệt hoa/thường)
-                                    /^[0-9]+$/.test(v) // Số nguyên
+                                    /^[0-9]+(\.\d+)?\s?(cm|inch|mm|kg)?$/i.test(v) || // Số có đơn vị (i: không phân biệt hoa/thường)
+                                    /^[0-9]+$/.test(v) || // Số nguyên
+                                    /^[0-9]+[smlxSMLX]+$/.test(v) // Số trước ký tự size (vd: 2XL, 3X, 4L)
                                   );
-                                };
+                                };            
 
                                 if (Array.isArray(value)) {
                                   return value.every(isSizeValue); // Nếu là mảng, kiểm tra từng phần tử
@@ -566,12 +565,11 @@ const HomePage = () => {
                                 const isSizeValue = (v: any) => {
                                   return (
                                     /^[smlxSMLX]{1,3}$/.test(v) || // Kích thước ký tự s, m, l, x (cả chữ thường và hoa)
-                                    /^[0-9]+(\.\d+)?\s?(cm|inch|mm|kg)?$/i.test(
-                                      v
-                                    ) || // Số có đơn vị (i: không phân biệt hoa/thường)
-                                    /^[0-9]+$/.test(v) // Số nguyên
+                                    /^[0-9]+(\.\d+)?\s?(cm|inch|mm|kg)?$/i.test(v) || // Số có đơn vị (i: không phân biệt hoa/thường)
+                                    /^[0-9]+$/.test(v) || // Số nguyên
+                                    /^[0-9]+[smlxSMLX]+$/.test(v) // Số trước ký tự size (vd: 2XL, 3X, 4L)
                                   );
-                                };
+                                };            
 
                                 if (Array.isArray(value)) {
                                   return value.every(isSizeValue); // Nếu là mảng, kiểm tra từng phần tử
