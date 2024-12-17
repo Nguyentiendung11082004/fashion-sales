@@ -124,7 +124,7 @@ class OrderController extends Controller
                         if ($orderDetail) {
                             // Cập nhật discount
                             $orderDetail->update([
-                                'discount' => $product['voucher_discount'],
+                                'discount' => $product['voucher_discount'] ?? 0,
                             ]);
                         }
                     }
@@ -503,31 +503,40 @@ class OrderController extends Controller
         $is_eligible = true;
         $reasons = [];
 
-        $allowed_category_ids = isset($voucher_metas['_voucher_category_ids']) ? json_decode($voucher_metas['_voucher_category_ids'], true) : [];
-        $excluded_category_ids = isset($voucher_metas['_voucher_exclude_category_ids']) ? json_decode($voucher_metas['_voucher_exclude_category_ids'], true) : [];
-        $allowed_product_ids = isset($voucher_metas['_voucher_product_ids']) ? json_decode($voucher_metas['_voucher_product_ids'], true) : [];
-        $excluded_product_ids = isset($voucher_metas['_voucher_exclude_product_ids']) ? json_decode($voucher_metas['_voucher_exclude_product_ids'], true) : [];
-
-        if (!empty($allowed_category_ids) && !in_array($category_id, $allowed_category_ids)) {
-            $is_eligible = false;
-            $reasons[] = 'Sản phẩm này không nằm trong danh mục được áp dụng voucher.';
+        // 1. Kiểm tra sản phẩm có bị loại trừ không (luôn ưu tiên)
+        if (isset($voucher_metas['_voucher_exclude_product_ids'])) {
+            $excluded_product_ids = json_decode($voucher_metas['_voucher_exclude_product_ids'], true);
+            if (in_array($product_id, $excluded_product_ids)) {
+                $is_eligible = false;
+                $reason[] = 'Sản phẩm ' . $item['product']->name . ' nằm trong danh sách bị loại trừ khỏi voucher.';
+            }
         }
+        // 2. Nếu sản phẩm không được áp dụng rõ ràng, kiểm tra theo danh mục
+        if ($is_eligible) {
+            if (isset($voucher_metas['_voucher_exclude_category_ids'])) {
+                $excluded_category_ids = json_decode($voucher_metas['_voucher_exclude_category_ids'], true);
+                if (in_array($category_id, $excluded_category_ids)) {
+                    $is_eligible = false;
+                    $reason[] = 'Danh mục của sản phẩm ' . $item['product']->name . ' bị loại trừ khỏi voucher.';
+                }
+            }
 
-        if (!empty($excluded_category_ids) && in_array($category_id, $excluded_category_ids)) {
-            $is_eligible = false;
-            $reasons[] = 'Sản phẩm này thuộc danh mục bị loại trừ khỏi voucher.';
+            if ($is_eligible && isset($voucher_metas['_voucher_category_ids'])) {
+                $allowed_category_ids = json_decode($voucher_metas['_voucher_category_ids'], true);
+                if (!in_array($category_id, $allowed_category_ids)) {
+                    $is_eligible = false;
+                    $reason[] = 'Danh mục của sản phẩm ' . $item['product']->name . ' không nằm trong danh mục được áp dụng voucher.';
+                }
+            }
         }
-
-        if (!empty($allowed_product_ids) && !in_array($product_id, $allowed_product_ids)) {
-            $is_eligible = false;
-            $reasons[] = 'Sản phẩm này không nằm trong danh sách sản phẩm được áp dụng voucher.';
+        // 3. Kiểm tra sản phẩm có được áp dụng không (ưu tiên trước danh mục)
+        if (isset($voucher_metas['_voucher_product_ids'])) {
+            $allowed_product_ids = json_decode($voucher_metas['_voucher_product_ids'], true);
+            if (in_array($product_id, $allowed_product_ids)) {
+                $is_eligible = true; // Đảm bảo sản phẩm được ưu tiên áp dụng
+                $reason = []; // Xóa lý do trước đó vì sản phẩm hợp lệ
+            }
         }
-
-        if (!empty($excluded_product_ids) && in_array($product_id, $excluded_product_ids)) {
-            $is_eligible = false;
-            $reasons[] = 'Sản phẩm này nằm trong danh sách sản phẩm bị loại trừ khỏi voucher.';
-        }
-
         return [
             'status' => $is_eligible,
             'reason' => implode(' ', $reasons),

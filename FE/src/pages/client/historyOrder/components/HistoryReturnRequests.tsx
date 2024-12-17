@@ -472,6 +472,13 @@ const HistoryReturnRequests = () => {
                                             Đang gửi yêu cầu hoàn trả hàng
                                           </p>
                                         )}
+                                      {order.items.length > 0 &&
+                                        order.items[0].status ===
+                                          "canceled" && (
+                                          <p className="text-[red]">
+                                            Đã hủy yêu cầu hoàn trả
+                                          </p>
+                                        )}
                                     </span>
                                   </h3>
 
@@ -642,8 +649,21 @@ const HistoryReturnRequests = () => {
                             </button>
                           )}
 
-                          {order?.return_requests[0]?.status ===
-                            "completed" && (
+                          {order?.status === "canceled" && (
+                            <button
+                              className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB] font-medium ${
+                                shipOk
+                                  ? "bg-gray-200 text-gray-400 border cursor-pointer border-gray-300"
+                                  : "text-white"
+                              }`}
+                              disabled={shipOk}
+                              onClick={() => handleGetReturnRequest(order?.id)}
+                            >
+                              Chi tiết hoàn trả
+                            </button>
+                          )}
+
+                          {order?.status === "completed" && (
                             <button
                               className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB] font-medium ${
                                 shipOk

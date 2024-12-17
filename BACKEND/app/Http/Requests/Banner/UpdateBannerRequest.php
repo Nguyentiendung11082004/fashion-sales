@@ -36,12 +36,22 @@ class UpdateBannerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'nullable|string|min:3|max:255',  
-            'image' => 'nullable|string',                
-            'link' => 'nullable|url|max:255',            
-            'start_date' => 'nullable|date|before_or_equal:end_date', 
-            'end_date' => 'nullable|date|after_or_equal:start_date',  
-            // 'status' => 'required|boolean'        
+            'title' => 'nullable|string|min:3|max:255',
+            'image' => 'nullable|string',
+            'link' => 'nullable|url|max:255',
+            'start_date' => 'nullable|date|before_or_equal:end_date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+            // 'status' => 'required|boolean'
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'image.required' => 'Vui lòng tải ảnh',
+            'start_date.required' => 'Vui lòng chọn ngày bắt đầu',
+            'end_date.required' => 'Vui lòng chọn ngày kết thúc',
+            'link.url'=> 'Link không hợp lệ'
         ];
     }
 }

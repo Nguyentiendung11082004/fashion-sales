@@ -33,17 +33,17 @@ class WishlistController extends Controller
                     $product = $wishlistItem->product; // Lấy đối tượng sản phẩm từ wishlistItem
 
                     if ($product) {
-                        $discountPercentage = 0;
+                        $discountPercentage  = 0;
                         if ($product->type == '0') {
                             // Sản phẩm đơn giản (không có biến thể)
-                            $discountPercentage = ($product->price_regular - $product->price_sale) / $product->price_regular * 100;
+                            $discountPercentage  = ($product->price_regular - $product->price_sale) / $product->price_regular * 100;
                         } else if ($product->variants && $product->variants->isNotEmpty()) {
                             // Sản phẩm có biến thể
-                            $discountPercentage = $product->variants->map(function ($variant) {
+                            $discountPercentage  = $product->variants->map(function ($variant) {
                                 return ($variant->price_regular - $variant->price_sale) / $variant->price_regular * 100;
                             })->max(); // Lấy % giảm giá lớn nhất từ các biến thể
                         }
-                        $discountPercentage = round($discountPercentage, 1); // Làm tròn 1 chữ số thập phân
+                        $discountPercentage  = round($discountPercentage, 1); // Làm tròn 1 chữ số thập phân
                         $product->increment('views'); // Tăng số lượt xem cho sản phẩm
 
                         // Khởi tạo đối tượng lấy thuộc tính duy nhất

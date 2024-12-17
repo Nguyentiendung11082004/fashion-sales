@@ -93,17 +93,17 @@ const Brands = () => {
 
   const columns: ColumnType<Ibrands>[] = [
     {
-      title: "Stt",
+      title: "STT",
       render: (_, record: any, index: number) => (
         <div>{index + 1 + pageSize * (currentPage - 1)}</div>
       ),
     },
     {
-      title: "name",
+      title: "Tên Thương Hiệu",
       dataIndex: "name",
     },
     {
-      title: "image",
+      title: "Ảnh Đại Diện",
       dataIndex: "image",
       render: (record: string) => {
         return (
@@ -114,15 +114,15 @@ const Brands = () => {
       },
     },
     {
-      title: "email",
+      title: "Email",
       dataIndex: "email",
     },
     {
-      title: "phone_number",
+      title: "Số Điện Thoại",
       dataIndex: "phone_number",
     },
     {
-      title: "address",
+      title: "Địa Chỉ",
       dataIndex: "address",
     },
     {
@@ -161,8 +161,8 @@ const Brands = () => {
   return (
     <div className="p-6 min-h-screen">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2">
-          Brands
+        <h1 className="text-3xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2 uppercase">
+          Thương Hiệu
         </h1>
         <div className="flex items-center">
           <Input className="w-80" placeholder="Tìm kiếm thương hiệu" value={query}
@@ -183,7 +183,7 @@ const Brands = () => {
               type="primary"
               onClick={() => showModal(null)}
             >
-              <PlusOutlined /> Thêm brands
+              <PlusOutlined /> Thêm thương hiệu
             </Button>
           </Link>
         </div>

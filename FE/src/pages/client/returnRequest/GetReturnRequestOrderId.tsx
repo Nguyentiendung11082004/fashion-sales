@@ -84,7 +84,7 @@ const GetReturnRequestOrderId = () => {
             case "approved":
               return "Chấp nhận";
             case "canceled":
-              return "Từ chối";
+              return "Đã hủy";
             case "pending":
               return "Đang chờ xử lý";
             case "rejected":
@@ -146,23 +146,23 @@ const GetReturnRequestOrderId = () => {
   console.log("huệ : ", dataSource?.data?.data?.status);
 
   useEffect(() => {
-      const pusher = new Pusher("4d3e0d70126f2605977e", {
-        cluster: "ap1",
-      });
-  
-      const channel = pusher.subscribe("orders");
-      pusher.connection.bind("connected", () => {
-        console.log("Connected to Pusher!");
-      });
-      channel.bind("order.updated", (newOrder: any) => {
-        queryClient.invalidateQueries({ queryKey: ["return-item"] });
-      });
-  
-      return () => {
-        channel.unbind_all();
-        channel.unsubscribe();
-      };
-    }, [queryClient]);
+    const pusher = new Pusher("4d3e0d70126f2605977e", {
+      cluster: "ap1",
+    });
+
+    const channel = pusher.subscribe("orders");
+    pusher.connection.bind("connected", () => {
+      console.log("Connected to Pusher!");
+    });
+    channel.bind("order.updated", (newOrder: any) => {
+      queryClient.invalidateQueries({ queryKey: ["return-item"] });
+    });
+
+    return () => {
+      channel.unbind_all();
+      channel.unsubscribe();
+    };
+  }, [queryClient]);
 
   return (
     <>

@@ -30,7 +30,7 @@ class UpdateOrderStatus implements ShouldQueue
         $orders = Order::query()
             ->where('order_status', '=', Order::STATUS_SUCCESS)
             ->where('payment_status', '=', Order::PAYMENT_PAID)
-            ->where('updated_at', '<', now()->subDays(3))
+            ->where('updated_at', '<=', now()->subDays(3))
             ->get();
         foreach ($orders as $order) {
             $order->update([

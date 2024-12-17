@@ -106,7 +106,7 @@ const Register = () => {
                     <Input
                       placeholder="Nhập mật khẩu"
                       className=" text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none"
-                    ></Input>
+                    />
                   </Form.Item>
                   {error &&
                   error.errors &&
@@ -117,10 +117,41 @@ const Register = () => {
                     </div>
                   ) : null}
                 </div>
+                {/* Thêm trường nhập lại mật khẩu */}
+                <div className="col-span-6">
+                  <Form.Item
+                    name="confirm_password"
+                    label="Nhập lại mật khẩu"
+                    dependencies={["password"]} // Lắng nghe thay đổi của password
+                    rules={[
+                      {
+                        required: true,
+                        message: ''
+                      },
+                      ({ getFieldValue }) => ({
+                        validator(_, value) {
+                          if (!value || getFieldValue("password") === value) {
+                            return Promise.resolve();
+                          }
+                          return Promise.reject(
+                            new Error("Mật khẩu nhập lại không khớp.")
+                          );
+                        },
+                      }),
+                    ]}
+                  >
+                    <Input.Password
+                      placeholder="Nhập lại mật khẩu"
+                      className=" text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none"
+                    />
+                  </Form.Item>
+                </div>
+                {/* Kết thúc*/}
+
                 <div className="col-span-6 sm:col-span-3">
-                  <Form.Item name="name" label="Tên">
+                  <Form.Item name="name" label="Họ và tên">
                     <Input
-                      placeholder="Nhập tên "
+                      placeholder="Nhập họ và tên "
                       className=" text-gray-700 focus:outline-none focus:shadow-outline border border-gray-300 rounded py-2 px-4 block w-full appearance-none"
                     ></Input>
                   </Form.Item>

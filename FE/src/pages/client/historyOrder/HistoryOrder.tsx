@@ -296,6 +296,16 @@ const HistoryOrder = () => {
                   Thông tin tài khoản
                 </Link>
                 <Link
+                  to="/password/reset"
+                  className={`${
+                    isActive("/password/reset")
+                      ? "block w-1/4 lg:text-left text-center flex-shrink-0 py-[1.5rem] leading-4 relative border-b-[3px] border-[#00BADB]"
+                      : "hd-account-menu-item "
+                  }`}
+                >
+                  Đổi mật khẩu
+                </Link>
+                <Link
                   to="/wishlist"
                   className={`${
                     isActive("/wishlist")
@@ -315,16 +325,6 @@ const HistoryOrder = () => {
                 >
                   Lịch sử mua hàng
                 </Link>
-                <Link
-                  to="/password/reset"
-                  className={`${
-                    isActive("/password/reset")
-                      ? "block w-1/4 lg:text-left text-center flex-shrink-0 py-[1.5rem] leading-4 relative border-b-[3px] border-[#00BADB]"
-                      : "hd-account-menu-item "
-                  }`}
-                >
-                  Đổi mật khẩu
-                </Link>
               </div>
               <hr className="h-0 border-solid border-b-2" />
             </div>
@@ -332,9 +332,21 @@ const HistoryOrder = () => {
           {/*end hd-account-head*/}
           <div className="hd-account-content pt-[30px] mx-auto">
             <div className="hd-ct-text">
-              <h2 className="lg:mb-[50px] mb-[30px] lg:mt-[25px] text-2xl font-semibold uppercase">
-                Lịch sử mua hàng
-              </h2>
+              <div className="flex flex-wrap items-center justify-between gap-4 lg:gap-8">
+                <h2 className="lg:mb-[50px] mb-[30px] lg:mt-[25px] text-2xl font-semibold uppercase flex-grow">
+                  Lịch sử mua hàng
+                </h2>
+                <Link
+                  to="/historyReturnRequests"
+                  className={`block py-[1rem] px-[1.5rem] text-center rounded-md transition-all ${
+                    isActive("/historyReturnRequests")
+                      ? "border-b-[3px] border-[#00BADB] text-[#00BADB]"
+                      : "text-gray-600 hover:text-[#00BADB]"
+                  }`}
+                >
+                  Lịch sử hoàn hàng
+                </Link>
+              </div>
 
               {data?.length > 0 ? (
                 currentProducts.map((order: any) => {
@@ -681,8 +693,38 @@ const HistoryOrder = () => {
                                   <div>
                                     <div className="flex justify-between">
                                       <div>
-                                        <h3 className="text-lg font-medium line-clamp-1">
-                                          {detail.product_name}
+                                        <h3 className="text-lg font-medium line-clamp-1 flex items-center">
+                                          <span>
+                                            {
+                                              order.order_details[0]
+                                                .product_name
+                                            }
+                                          </span>
+                                          <span className="ml-4 text-sm text-red">
+                                            {order.return_requests.length > 0 &&
+                                              order.return_requests[0]
+                                                .status === "rejected" && (
+                                                <p className="text-[red]">
+                                                  Yêu cầu hoàn trả bị từ chối
+                                                </p>
+                                              )}
+
+                                            {order.return_requests.length > 0 &&
+                                              order.return_requests[0]
+                                                .status === "completed" && (
+                                                <p className="text-[red]">
+                                                  Yêu cầu hoàn trả được chấp
+                                                  nhận
+                                                </p>
+                                              )}
+                                            {order.return_requests.length > 0 &&
+                                              order.return_requests[0]
+                                                .status === "pending" && (
+                                                <p className="text-[red]">
+                                                  Đang gửi yêu cầu hoàn trả hàng
+                                                </p>
+                                              )}
+                                          </span>
                                         </h3>
                                         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                                           {detail.attributes &&
@@ -760,20 +802,39 @@ const HistoryOrder = () => {
                             )}
                             {requestReturn && (
                               <button
-                                className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB]  font-medium ${
+                                className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB] font-medium ${
                                   shipOk
                                     ? "bg-gray-200 text-gray-400 border cursor-pointer border-gray-300"
                                     : "text-white"
                                 }`}
                                 disabled={shipOk}
                                 onClick={() =>
-                                  handleGetReturnRequest(order?.id)
+                                  handleGetReturnRequest(
+                                    order?.return_requests[0]?.id
+                                  )
                                 }
                               >
-                                Xem yêu cầu hoàn trả
+                                Chi tiết hoàn trả
                               </button>
                             )}
-
+                            {order?.return_requests[0]?.status ===
+                              "completed" && (
+                              <button
+                                className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB] font-medium ${
+                                  shipOk
+                                    ? "bg-gray-200 text-gray-400 border cursor-pointer border-gray-300"
+                                    : "text-white"
+                                }`}
+                                disabled={shipOk}
+                                onClick={() =>
+                                  handleGetReturnRequest(
+                                    order?.return_requests[0]?.id
+                                  )
+                                }
+                              >
+                                Chi tiết hoàn trả
+                              </button>
+                            )}
                             {complete && (
                               <>
                                 <button
@@ -802,6 +863,25 @@ const HistoryOrder = () => {
                               </>
                             )}
 
+                            {order?.return_requests[0]?.status ===
+                              "rejected" && (
+                              <button
+                                className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB] font-medium ${
+                                  shipOk
+                                    ? "bg-gray-200 text-gray-400 border cursor-pointer border-gray-300"
+                                    : "text-white"
+                                }`}
+                                disabled={shipOk}
+                                onClick={() =>
+                                  handleGetReturnRequest(
+                                    order?.return_requests[0]?.id
+                                  )
+                                }
+                              >
+                                Chi tiết hoàn trả
+                              </button>
+                            )}
+
                             {isCancelOk && (
                               <button
                                 className={`nc-Button relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 ttnc-ButtonSecondary ${
@@ -822,7 +902,6 @@ const HistoryOrder = () => {
                             )}
 
                             {(canCel || complete || completedReturn) && (
-                              // Nút "Mua Lại" khi đơn hàng đã hủy/ hoàn thành/hoàn trả hàng
                               <button
                                 className="nc-Button relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB] text-white font-medium"
                                 onClick={() => mutateReorder(order.id)}
@@ -830,10 +909,32 @@ const HistoryOrder = () => {
                                 Mua Lại
                               </button>
                             )}
+
+                            {/* {complete && (
+                            <>
+                              <button
+                                className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB] font-medium ${
+                                  shipOk
+                                    ? "bg-gray-200 text-gray-400 border cursor-pointer border-gray-300"
+                                    : "text-white"
+                                }`}
+                                disabled={shipOk}
+                                onClick={() => handleOpenFormReason(order)}
+                              >
+                                Yêu cầu trả hàng
+                              </button>
+
+                              <ReasonReturn
+                                open={visiable}
+                                onClose={handleCloseFormReason}
+                                dataOrderRequest={dataOrderRequest}
+                              />
+                            </>
+                          )} */}
                             {complete && (
                               <>
                                 <button
-                                  className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB]  font-medium ${
+                                  className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB] font-medium ${
                                     shipOk
                                       ? "bg-gray-200 text-gray-400 border cursor-pointer border-gray-300"
                                       : "text-white"
@@ -843,6 +944,7 @@ const HistoryOrder = () => {
                                 >
                                   Yêu cầu trả hàng
                                 </button>
+
                                 <ReasonReturn
                                   open={visiable}
                                   onClose={handleCloseFormReason}
@@ -875,9 +977,8 @@ const HistoryOrder = () => {
                           <p className="mr-2">Thành tiền: </p>
                           <span className="text-[red] font-medium text-xl">
                             {/* {FormatMoney(order.total)}đ */}
-                            {new Intl.NumberFormat("vi-VN").format(
-                              order.total
-                            )}₫
+                            {new Intl.NumberFormat("vi-VN").format(order.total)}
+                            ₫
                           </span>
                         </div>
                       </div>

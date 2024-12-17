@@ -34,10 +34,11 @@ class StoreAttributeItemRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'value.required' => 'Tên là trường bắt buộc.',
-            'value.string' => 'Tên phải là chuỗi ký tự.',
-            'value.max' => 'Tên không được vượt quá 255 ký tự.',
-            'value.unique' => 'Tên này đã tồn tại. Vui lòng chọn tên khác.',
+            'attribute_id.required' => 'Vui lòng chọn thuộc tính',
+            'value.required' => 'Vui lòng nhập giá trị thuộc tính.',
+            'value.string' => 'Giá trị thuộc tính không hợp lệ.',
+            'value.max' => 'Giá trị thuộc tính không hợp lệ.',
+            'value.unique' => 'Giá trị thuộc tính đã tồn tại.',
         ];
     }
 }

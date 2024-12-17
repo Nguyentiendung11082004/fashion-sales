@@ -111,7 +111,7 @@ class StatisticsController extends Controller
     {
         try {
             // Bắt đầu truy vấn với model User
-            $totalUsers = User::query()->count();
+            $totalUsers = User::query()->where('role_id',1)->count();
 
             // Áp dụng bộ lọc ngày
             // $this->applyDateFilter($query, $request, 'created_at');
