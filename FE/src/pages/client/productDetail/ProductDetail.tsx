@@ -19,7 +19,7 @@ import {
   productShow_client,
 } from "@/services/api/client/productClient.api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Button, Modal, Popconfirm } from "antd";
+import { Modal, Popconfirm } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -33,10 +33,8 @@ interface IinitialAttributes {
   [key: string]: string;
 }
 const ProductDetail = () => {
-  // const { id } = useParams<{ id: string }>();
   const { slug } = useParams<{ slug: string }>();
 
-  // const productId = Number(id);
   const [product, setProduct] = useState<any>();
   const [selectedImage, setSelectedImage] = useState<string>();
   const { handleAddToWishlist, isInWishlist } = useWishlist();
@@ -57,6 +55,7 @@ const ProductDetail = () => {
       }
     },
   });
+
   const productId = data?.product?.id;
 
   const getUniqueAttributes = data?.getUniqueAttributes;
@@ -433,7 +432,7 @@ const ProductDetail = () => {
       }
     };
     fetchProductVariant();
-  }, [selectedAttributes]);
+  }, [selectedAttributes,slug]);
 
   const resultGetUniqueAttribute = Object.entries(
     getUniqueAttributes ?? {}
