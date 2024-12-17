@@ -376,7 +376,7 @@ const ProductForm = () => {
             render: (text: any, record: any, index: number) => (
                 <div>
                     <Input
-                        value={variants[index]?.quantity || 0}
+                        value={variants[index]?.quantity}
                         min={0}
                         onChange={(e) => handleInputChange(index, 'quantity', e.target.value)}
                     />
