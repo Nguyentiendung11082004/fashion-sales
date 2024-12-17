@@ -111,7 +111,7 @@ class StatisticsController extends Controller
     {
         try {
             // Bắt đầu truy vấn với model User
-            $totalUsers = User::query()->count();
+            $totalUsers = User::query()->where('role_id',1)->count();
 
             // Áp dụng bộ lọc ngày
             // $this->applyDateFilter($query, $request, 'created_at');
@@ -186,9 +186,9 @@ class StatisticsController extends Controller
                     '=',
                     'return_items.order_detail_id'
                 )
-                // ->join('orders', 'order_details.order_id', '=', 'orders.id') // Join bảng orders
-                // ->whereIn('orders.order_status', ['Hoàn thành', 'Hoàn trả hàng']) // Lọc theo điều kiện order_status từ bảng orders
-                // ->where('orders.payment_status', 'Đã thanh toán')
+                ->join('orders', 'order_details.order_id', '=', 'orders.id') // Join bảng orders
+                ->whereIn('orders.order_status', ['Hoàn thành', 'Hoàn trả hàng']) // Lọc theo điều kiện order_status từ bảng orders
+                ->where('orders.payment_status', 'Đã thanh toán')
                 ->groupBy(
                     'order_details.product_id',
                     'order_details.product_variant_id',

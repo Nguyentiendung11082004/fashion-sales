@@ -19,7 +19,7 @@ const ProductDetailAdmin = () => {
     queryFn: async () => {
       if (!id) return null;
       const response = await instance.get(`/products/${id}`);
-      return response.data.product;
+      return response.data;
     },
     enabled: !!id,
   });
@@ -41,8 +41,8 @@ const ProductDetailAdmin = () => {
         <div className="flex flex-col md:flex-row">
           <div className="w-full md:w-1/2">
             <img
-              src={productShow.img_thumbnail}
-              alt={productShow.name}
+              src={productShow.product.img_thumbnail}
+              alt={productShow.product.name}
               className="rounded-lg w-full h-full object-cover"
             />
           </div>
@@ -51,16 +51,16 @@ const ProductDetailAdmin = () => {
           <div className="w-full md:w-1/2 md:pl-6 mt-4 md:mt-0">
             {/* <div className="flex items-center justify-between"> */}
             <h1 className="text-2xl font-semibold text-gray-800">
-              {productShow.name}
+              {productShow.product.name}
             </h1>
 
             {/* </div> */}
             <p className="text-2xl font-bold mt-3">
-              {(productShow?.price_regular ||
-                productShow?.variants?.length) && (
+              {(productShow?.product?.price_regular ||
+                productShow?.product?.variants?.length) && (
                 <div>
                   {(() => {
-                    const variants = productShow?.variants || [];
+                    const variants = productShow?.product?.variants || [];
                     // Tính toán giá bán và giá gốc từ các biến thể
                     const minPriceSale = Math.min(
                       ...variants
@@ -77,8 +77,9 @@ const ProductDetailAdmin = () => {
                         .map((variant: any) => variant.price_regular)
                         .filter((price: any) => price > 0)
                     );
-                    const productPriceSale = productShow?.price_sale;
-                    const productPriceRegular = productShow?.price_regular;
+                    const productPriceSale = productShow?.product?.price_sale;
+                    const productPriceRegular =
+                      productShow?.product?.price_regular;
 
                     const pricesSaleVar = variants.map(
                       (variant: any) => variant.price_sale
@@ -96,8 +97,9 @@ const ProductDetailAdmin = () => {
                     if (minPriceSale > 0) {
                       // Nếu có giá sale
                       if (
-                        productPriceSale &&
-                        productPriceSale < productPriceRegular
+                        (productPriceSale &&
+                          productPriceSale < productPriceRegular) ||
+                        productPriceSale === 0
                       ) {
                         return (
                           <>
@@ -105,13 +107,13 @@ const ProductDetailAdmin = () => {
                               {new Intl.NumberFormat("vi-VN").format(
                                 productPriceRegular
                               )}
-                              ₫
+                              VNĐ
                             </del>
                             <span className="text-[red]">
                               {new Intl.NumberFormat("vi-VN").format(
                                 productPriceSale
                               )}
-                              ₫
+                              VNĐ
                             </span>
                           </>
                         );
@@ -120,11 +122,11 @@ const ProductDetailAdmin = () => {
                         productPriceSale === productPriceRegular
                       ) {
                         return (
-                          <span className="text-blue-500">
+                          <span>
                             {new Intl.NumberFormat("vi-VN").format(
                               productPriceRegular
                             )}
-                            ₫
+                            VNĐ
                           </span>
                         );
                       } else {
@@ -136,42 +138,42 @@ const ProductDetailAdmin = () => {
                                 {new Intl.NumberFormat("vi-VN").format(
                                   pricesRegularVar[0]
                                 )}{" "}
-                                ₫
+                                VNĐ
                               </del>
                               <span className="text-[red]">
                                 {new Intl.NumberFormat("vi-VN").format(
                                   pricesSaleVar[0]
                                 )}{" "}
-                                ₫
+                                VNĐ
                               </span>
                             </>
                           );
                         } else {
                           return (
-                            <span className="text-blue-500">
+                            <span>
                               {new Intl.NumberFormat("vi-VN").format(
                                 minPriceSale
                               )}
-                              ₫ -{" "}
+                              VNĐ -{" "}
                               {new Intl.NumberFormat("vi-VN").format(
                                 maxPriceRegular
                               )}
-                              ₫
+                              VNĐ
                             </span>
                           );
                         }
                       }
                     } else {
                       return (
-                        <span className="text-blue-500">
+                        <span>
                           {new Intl.NumberFormat("vi-VN").format(
                             minPriceRegular
                           )}
-                          ₫ -{" "}
+                          VNĐ -{" "}
                           {new Intl.NumberFormat("vi-VN").format(
                             maxPriceRegular
                           )}
-                          ₫
+                          VNĐ
                         </span>
                       );
                     }
@@ -180,25 +182,27 @@ const ProductDetailAdmin = () => {
               )}
             </p>
             <p className="bg-gray-100 text-base flex p-4 rounded-lg mt-3">
-              <p className="font-medium mr-1">Lượt xem: {productShow.views}</p>
+              <p className="font-medium mr-1">
+                Lượt xem: {productShow?.product?.views}
+              </p>
             </p>
 
             <p className=" bg-gray-100 text-base flex p-4 rounded-lg mt-3">
               <p className=" font-semibold mr-1">Mã sản phẩm: </p>
-              {productShow.sku}
+              {productShow.product.sku}
             </p>
 
             {/* Quantity */}
             <div className=" mt-4">
               <div className="bg-gray-100 text-base flex p-4 rounded-lg">
                 <p className=" font-semibold mr-1">Số lượng: </p>
-                {productShow?.variants
-                  ? productShow.variants.reduce(
+                {productShow?.product.variants
+                  ? productShow.product.variants.reduce(
                       (total: number, variant: IProductVariant) =>
                         total + variant.quantity,
                       0
                     )
-                  : productShow.quantity}
+                  : productShow.product.quantity}
               </div>
             </div>
 
@@ -207,25 +211,25 @@ const ProductDetailAdmin = () => {
                 <div className="flex items-center">
                   <p className="text-base font-semibold ">Trạng thái:</p>
                   <span
-                    className={`ml-1 ${productShow.status ? "text-green-600" : "text-red-600"}`}
+                    className={`ml-1 ${productShow.product.status ? "text-green-600" : "text-red-600"}`}
                   >
-                    {productShow.status ? "Còn hàng" : "Hết hàng"}
+                    {productShow.product.status ? "Còn hàng" : "Hết hàng"}
                   </span>
                 </div>
                 <div className="flex items-center">
                   <p className="text-base font-semibold">Xu hướng:</p>
                   <span
-                    className={`ml-1 ${productShow.trend ? "text-green-600" : "text-gray-600"}`}
+                    className={`ml-1 ${productShow.product.trend ? "text-green-600" : "text-gray-600"}`}
                   >
-                    {productShow.trend ? "Có" : "Không"}
+                    {productShow.product.trend ? "Có" : "Không"}
                   </span>
                 </div>
                 <div className="flex items-center">
                   <p className="text-base font-semibold ">Mới:</p>
                   <span
-                    className={`ml-1 ${productShow.is_new ? "text-green-600" : "text-gray-600"}`}
+                    className={`ml-1 ${productShow.product.is_new ? "text-green-600" : "text-gray-600"}`}
                   >
-                    {productShow.is_new ? "Có" : "Không"}
+                    {productShow.product.is_new ? "Có" : "Không"}
                   </span>
                 </div>
               </div>
@@ -235,7 +239,7 @@ const ProductDetailAdmin = () => {
               <div className="bg-gray-100 p-4 rounded-lg">
                 <p className="text-base font-semibold ">Thương hiệu:</p>
                 <p className="text-sm text-gray-800">
-                  {productShow.brand?.name}
+                  {productShow.product.brand?.name}
                 </p>
               </div>
             </div>
@@ -243,7 +247,7 @@ const ProductDetailAdmin = () => {
               <div className="bg-gray-100 p-4 rounded-lg">
                 <p className="text-base font-semibold ">Danh mục:</p>
                 <p className="text-sm text-gray-800">
-                  {productShow.category?.name}
+                  {productShow.product.category?.name}
                 </p>
               </div>
             </div>
@@ -258,20 +262,38 @@ const ProductDetailAdmin = () => {
             </h2>
             <div className="mt-4 max-w-full text-base">
               <p className="text-gray-700 font-medium mt-2 break-words">
-                {productShow.description_title}
+                {productShow.product.description_title}
               </p>
               <p className="text-gray-600 mt-1 break-words">
-                {productShow.description}
+                {productShow.product.description}
               </p>
             </div>
           </div>
 
-          <div className="mt-4">
+          <div className="mt-4 text-base">
             <h2 className="text-xl font-semibold text-gray-800">
               Thuộc tính sản phẩm
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-              {/* Màu sắc */}
+            {Object.entries(productShow?.allAttribute || {}).map(
+              ([key, values]) => (
+                <div className="relative flex items-center mt-2 mb-2" key={key}>
+                  <h3 className="font-semibold">
+                    {key.charAt(0).toUpperCase() + key.slice(1).toLowerCase()}:
+                  </h3>
+                  <span className="ml-2">
+                    {Object.values(values as { [key: string]: string }) // Ép kiểu cho `values`
+                      .map(
+                        (item) =>
+                          item.charAt(0).toUpperCase() +
+                          item.slice(1).toLowerCase()
+                      )
+                      .join(", ") || "No Value"}
+                  </span>
+                </div>
+              )
+            )}
+
+            {/* <div key={key} className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
               <div className="bg-gray-100 p-4 rounded-lg">
                 <p className="text-base font-semibold text-black">
                   Màu sắc:
@@ -297,7 +319,6 @@ const ProductDetailAdmin = () => {
                   ))}
                 </div>
               </div>
-              {/* Kích cỡ */}
               <div className="bg-gray-100 p-4 rounded-lg">
                 <p className="text-base font-semibold text-black">
                   Kích cỡ:
@@ -320,7 +341,7 @@ const ProductDetailAdmin = () => {
                   ))}
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
 
@@ -330,9 +351,9 @@ const ProductDetailAdmin = () => {
             Gallery sản phẩm
           </h2>
           <div
-            className={`mt-4 flex ${productShow.galleries?.length >= 4 ? "overflow-x-scroll" : "justify-start gap-3"}`}
+            className={`mt-4 flex ${productShow.product.galleries?.length >= 4 ? "overflow-x-scroll" : "justify-start gap-3"}`}
           >
-            {productShow.galleries?.map((gallery: any) => (
+            {productShow.product.galleries?.map((gallery: any) => (
               <img
                 key={gallery.id}
                 src={gallery.image}

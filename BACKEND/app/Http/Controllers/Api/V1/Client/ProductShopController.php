@@ -29,8 +29,7 @@ class ProductShopController extends Controller
             $allAttribute[$attribute->name] = $attribute->attributeitems->toArray();
         }
         $search = $request->input('search'); // Người dùng nhập từ khóa tìm kiếm
-        $colors = $request->input('colors'); // Người dùng truyền lên một mảng các màu
-        $sizes = $request->input('sizes'); // Người dùng truyền lên một mảng các kích thước
+        $attributes = $request->input('attributes');
         $minPrice = $request->input('min_price'); // Người dùng nhập giá tối thiểu
         $maxPrice = $request->input('max_price'); // Người dùng nhập giá tối đa
         $categories = $request->input('categorys');
@@ -107,28 +106,21 @@ class ProductShopController extends Controller
                         foreach ($keywords as $keyword) {
                             $q->where(function ($subQuery) use ($keyword) {
                                 $subQuery->where('name', 'like', "% {$keyword} %")
-                                         ->orWhere('name', 'like', "{$keyword} %")
-                                         ->orWhere('name', 'like', "% {$keyword}")
-                                         ->orWhere('name', '=', "{$keyword}");
+                                    ->orWhere('name', 'like', "{$keyword} %")
+                                    ->orWhere('name', 'like', "% {$keyword}")
+                                    ->orWhere('name', '=', "{$keyword}");
                             });
                         }
                     });
                 })
 
-
-                ->when($colors, function ($query, $colors) {
-                    // Lọc theo màu sắc
-                    return $query->whereHas('variants.attributes', function ($subQuery) use ($colors) {
-                        $subQuery->where('name', 'color')
-                            ->whereIn('product_variant_has_attributes.value', $colors); // Truy cập giá trị trực tiếp từ bảng trung gian
-                    });
-                })
-                ->when($sizes, function ($query, $sizes) {
-                    // Lọc theo kích thước
-                    return $query->whereHas('variants.attributes', function ($subQuery) use ($sizes) {
-                        $subQuery->where('name', 'size')
-                            ->whereIn('product_variant_has_attributes.value', $sizes); // Truy cập giá trị trực tiếp từ bảng trung gian
-                    });
+                ->when($attributes, function ($query, $attributes) {
+                    foreach ($attributes as $key => $values) {
+                        $query->whereHas('variants.attributes', function ($subQuery) use ($key, $values) {
+                            $subQuery->where('name', $key) // Lọc theo key (tên thuộc tính)
+                                     ->whereIn('product_variant_has_attributes.value', $values); // Lọc theo value (danh sách giá trị)
+                        });
+                    }
                 })
                 // khoảng giá
                 ->when($minPrice || $maxPrice, function ($query) use ($minPrice, $maxPrice) {
@@ -179,15 +171,32 @@ class ProductShopController extends Controller
             $allProducts = []; // Mảng chứa tất cả sản phẩm và biến thể
 
             foreach ($products as $product) {
+                // dd($product);
+                $discountPercentage  = 0;
+                if ($product->type == '0') {
+                    // Sản phẩm đơn giản (không có biến thể)
+                    $discountPercentage  = ($product->price_regular - $product->price_sale) / $product->price_regular * 100;
+                } else if ($product->variants && $product->variants->isNotEmpty()) {
+                    // Sản phẩm có biến thể
+                    $discountPercentage  = $product->variants->map(function ($variant) {
+                        return ($variant->price_regular - $variant->price_sale) / $variant->price_regular * 100;
+                    })->max(); // Lấy % giảm giá lớn nhất từ các biến thể
+                }
+                $discountPercentage  = round($discountPercentage, 1); // Làm tròn 1 chữ số thập phân
                 $product->increment('views'); // Tăng số lượt xem
                 $getUniqueAttributes = new GetUniqueAttribute();
-
+                $product->unique_attributes=$getUniqueAttributes->getUniqueAttributes($product["variants"]);
                 // Thêm sản phẩm và biến thể vào mảng
                 $allProducts[] = [
                     'product' => $product,
+                    'discountPercentage' => $discountPercentage,
                     'getUniqueAttributes' => $getUniqueAttributes->getUniqueAttributes($product["variants"]),
                 ];
             }
+         
+
+
+            
             // Trả về tất cả sản phẩm sau khi vòng lặp kết thúc
             return response()->json([
                 'products' => $allProducts,

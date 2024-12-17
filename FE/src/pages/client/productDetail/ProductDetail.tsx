@@ -547,9 +547,13 @@ const ProductDetail = () => {
     quantity: quantity,
   };
   const handleOpenSeeMore = () => {
-    console.log("_payload",_payload)
+    if (_payload.quantity > data.product.quantity) {
+      toast.error("Số lượng yêu cầu vượt quá số lượng còn lại trong kho");
+      return;
+    }
     navigate("/checkout", { state: { _payload: _payload } });
   }
+
 
   if (isLoading) return <Loading />;
   // if (isError) return <p>{error.message}</p>;
@@ -800,13 +804,12 @@ const ProductDetail = () => {
                   </div>
                 </div>
 
-                <Button
+
+                <button
                   onClick={() => {
                     onHandleAddToCart(productId, product?.id, quantity);
                   }}
-                  className={`h-11 w-full px-2 py-2 rounded-full ...`}
-                  disabled={isLoading}
-                >
+                  className="nc-Button relative right-2 h-14 w-64 inline-flex items-center justify-center rounded-full text-sm sm:text-base font-medium sm:py-3.5 sm:px-2 lg:px-2 shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0  animate-bounce focus:animate-none hover:animate-none text-md  mt-3  border bg-[#56cfe1] text-white">
                   <svg
                     className="hidden lg:hidden xl:block sm:inline-block w-5 h-5 mb-0.5"
                     viewBox="0 0 9 9"
@@ -824,10 +827,10 @@ const ProductDetail = () => {
                       fill="currentColor"
                     ></path>
                   </svg>
-                  <span className="xl:ml-3 ml-1 lg:text-base xl:text-base">
+                  <span className="xl:ml-3 ml-1 lg:text-base xl:text-lg">
                     Thêm vào giỏ hàng
                   </span>
-                </Button>
+                </button>
 
                 <br />
                 <button onClick={() => handleAddToWishlist(data.product)}>

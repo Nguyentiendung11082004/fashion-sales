@@ -2,7 +2,6 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useAuth } from "@/common/context/Auth/AuthContext";
-import { useUser } from "@/common/context/User/UserContext";
 import {
   notifyOrdersChanged,
   useRealtimeOrders,
@@ -10,12 +9,13 @@ import {
 import instance from "@/configs/axios";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Input, Modal, Table } from "antd";
-import Pusher from "pusher-js";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import CommentProduct from "../productDetail/CommentProduct";
 import ReasonReturn from "../requestOrder/components/ReasonReturn";
+import { useUser } from "@/common/context/User/UserContext";
+import Pusher from "pusher-js";
 import { Dayjs } from "dayjs";
 
 const HistoryOrder = () => {
@@ -220,9 +220,9 @@ const HistoryOrder = () => {
 
   console.log("data lịch sử đơn hàng: ", data);
 
-  const [currentPage, setCurrentPage] = useState(1); // Trang hiện tại
-  const productsPerPage = 6; // Mỗi trang có 12 sản phẩm
-  const totalProducts = data?.length || 0; // Tổng số sản phẩm
+  const [currentPage, setCurrentPage] = useState(1);
+  const productsPerPage = 6;
+  const totalProducts = data?.length;
   // Tính toán các sản phẩm hiển thị trên trang hiện tại
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
@@ -266,6 +266,7 @@ const HistoryOrder = () => {
                 <h1 className="text-xl font-medium leading-5 mb-3">
                   Tài khoản
                 </h1>
+                <p className="text-sm">Lịch sử mua hàng</p>
               </div>
             </div>
           </div>
@@ -347,546 +348,569 @@ const HistoryOrder = () => {
                 </Link>
               </div>
 
-              {data?.map((order: any) => {
-                console.log("kiểm tra order  :", order);
-                const date = order?.created_at;
-                const isExpanded = expandedOrders.includes(order.id);
-                const isDelivered =
-                  order.order_status.toLowerCase() === "giao hàng thành công";
-                const isCancelOk =
-                  order.order_status.trim().toLowerCase() ===
-                    "đang chờ xác nhận" ||
-                  order.order_status.trim().toLowerCase() === "đã xác nhận";
-                const canCel =
-                  order.order_status.trim().toLowerCase() === "đã hủy"; //
-                const shipOk =
-                  order.order_status.trim().toLowerCase() === "đang vận chuyển";
-                const complete =
-                  order.order_status.trim().toLowerCase() === "hoàn thành"; //
-                const requestReturn =
-                  order.order_status.trim().toLowerCase() ===
-                  "yêu cầu hoàn trả hàng";
-                const completedReturn =
-                  order.order_status.trim().toLowerCase() === "hoàn trả hàng"; //
+              {data?.length > 0 ? (
+                currentProducts.map((order: any) => {
+                  console.log("data id đang tìm: ", order);
+                  const isExpanded = expandedOrders.includes(order.id);
+                  console.log("isExpanded:", isExpanded);
+                  const isDelivered =
+                    order.order_status.toLowerCase() === "giao hàng thành công";
+                  const isCancelOk =
+                    order.order_status.trim().toLowerCase() ===
+                      "đang chờ xác nhận" ||
+                    order.order_status.trim().toLowerCase() === "đã xác nhận";
+                  const canCel =
+                    order.order_status.trim().toLowerCase() === "đã hủy"; //
+                  const shipOk =
+                    order.order_status.trim().toLowerCase() ===
+                    "đang vận chuyển";
+                  const complete =
+                    order.order_status.trim().toLowerCase() === "hoàn thành"; //
+                  const requestReturn =
+                    order.order_status.trim().toLowerCase() ===
+                    "yêu cầu hoàn trả hàng";
+                  const completedReturn =
+                    order.order_status.trim().toLowerCase() === "hoàn trả hàng"; //
 
-                const handleCancelClick = (id: number, status: string) => {
-                  if (!isCancelOk) {
-                    toast.warning(
-                      "Không thể hủy đơn hàng ở trạng thái hiện tại!"
-                    );
-                    return;
-                  }
+                  const handleCancelClick = (id: number, status: string) => {
+                    if (!isCancelOk) {
+                      toast.warning(
+                        "Không thể hủy đơn hàng ở trạng thái hiện tại!"
+                      );
+                      return;
+                    }
 
-                  setCurrentCancelOrderId(id);
-                  setCancelPopupOpen(true);
-                };
+                    setCurrentCancelOrderId(id);
+                    setCancelPopupOpen(true);
+                  };
 
-                const handleConfirmCancel = () => {
-                  if (!cancelReason.trim()) {
-                    toast.error("Vui lòng nhập lý do hủy đơn hàng.");
-                    return;
-                  }
+                  const handleConfirmCancel = () => {
+                    if (!cancelReason.trim()) {
+                      toast.error("Vui lòng nhập lý do hủy đơn hàng.");
+                      return;
+                    }
 
-                  if (currentCancelOrderId !== null) {
-                    mutate({ id: currentCancelOrderId, reason: cancelReason });
-                    // setCancelReason("");
-                    // Xóa lý do sau khi hủy
-                  }
-                };
+                    if (currentCancelOrderId !== null) {
+                      mutate({
+                        id: currentCancelOrderId,
+                        reason: cancelReason,
+                      });
+                      // setCancelReason("");
+                      // Xóa lý do sau khi hủy
+                    }
+                  };
 
-                const disableCmt: any[] = [];
+                  const disableCmt: any[] = [];
 
-                return (
-                  <div
-                    key={order.id}
-                    className="border border-slate-200 rounded-lg overflow-hidden z-0 mb-[30px]"
-                  >
-                    <button
-                      onClick={() => toggleOrderDetails(order.id)}
-                      className="hd-head-form-order w-full flex sm:flex-row justify-between lg:justify-between sm:justify-between sm:items-center p-4 sm:p-8 bg-slate-50 dark:bg-slate-500/5"
+                  return (
+                    <div
+                      key={order.id}
+                      className="border border-slate-200 rounded-lg overflow-hidden z-0 mb-[30px]"
                     >
-                      <div className="flex items-center">
-                        <button className="text-base">
-                          {isExpanded ? "▼" : "▲"}
-                        </button>
-                        <p className="text-base font-semibold mx-2">
-                          {order.order_code}
-                        </p>
-                        <p className="text-2xl relative mr-2">|</p>
-                        <span className="text-[#00BADB] uppercase font-medium text-base">
-                          {order.order_status}
-                        </span>
-                      </div>
-                      <div className="">
-                        <button
-                          onClick={() => showOrderDetails(order)}
-                          className="nc-Button border relative h-auto inline-flex items-center justify-center rounded-full transition-colors hover:font-medium py-2.5 px-4 sm:px-6 ttnc-ButtonSecondary dark:bg-[#00BADB] dark:text-white bg-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0"
-                        >
-                          Xem chi tiết
-                        </button>
-                        {selectedOrder && (
-                          <Modal
-                            // title={`Chi tiết đơn hàng`}
-                            open={isModalOpen}
-                            onCancel={handleModalClose}
-                            footer={null}
-                            className="-mt-10"
-                            width={1000}
-                            maskStyle={{
-                              backgroundColor: "rgba(0, 0, 0, 0.2)",
-                            }}
+                      <button
+                        onClick={() => toggleOrderDetails(order.id)}
+                        className="hd-head-form-order w-full flex sm:flex-row justify-between lg:justify-between sm:justify-between sm:items-center p-4 sm:p-8 bg-slate-50 dark:bg-slate-500/5"
+                      >
+                        <div className="flex items-center">
+                          <button className="text-base">
+                            {isExpanded ? "▼" : "▲"}{" "}
+                            {/* Hiển thị mũi tên lên hoặc xuống */}
+                          </button>
+                          <p className="text-base font-semibold mx-2">
+                            {order.order_code}
+                          </p>
+                          <p className="text-2xl relative mr-2">|</p>
+                          <span className="text-[#00BADB] uppercase font-medium text-base">
+                            {order.order_status}
+                          </span>
+                        </div>
+                        <div className="">
+                          <button
+                            onClick={() => showOrderDetails(order)}
+                            className="nc-Button border relative h-auto inline-flex items-center justify-center rounded-full transition-colors hover:font-medium py-2.5 px-4 sm:px-6 ttnc-ButtonSecondary dark:bg-[#00BADB] dark:text-white bg-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0"
                           >
-                            <div className="text-lg uppercase font-medium flex">
-                              <p>Mã đơn hàng . {selectedOrder.order_code}</p>
-                              <p className="mx-2">|</p>
-                              <p className="text-[#00BADB]">
-                                {selectedOrder.order_status}
+                            Xem chi tiết
+                          </button>
+                          {selectedOrder && (
+                            <Modal
+                              // title={`Chi tiết đơn hàng`}
+                              open={isModalOpen}
+                              onCancel={handleModalClose}
+                              footer={null}
+                              className="-mt-10"
+                              width={1000}
+                              maskStyle={{
+                                backgroundColor: "rgba(0, 0, 0, 0.2)",
+                              }}
+                            >
+                              <div className="text-lg uppercase font-medium flex">
+                                <p>Mã đơn hàng . {selectedOrder.order_code}</p>
+                                <p className="mx-2">|</p>
+                                <p className="text-[#00BADB]">
+                                  {selectedOrder.order_status}
+                                </p>
+                              </div>
+                              <p className="flex items-center">
+                                <p className="mr-1">Thời gian đặt hàng: </p>
+                                <p className="text-gray-500">
+                                  {selectedOrder.created_at}
+                                </p>
                               </p>
-                            </div>
-                            <p className="flex items-center">
-                              <p className="mr-1">Thời gian đặt hàng: </p>
-                              <p className="text-gray-500">
-                                {selectedOrder.created_at}
-                              </p>
-                            </p>
-                            <div className="py-5">
-                              <p className="font-medium text-base mb-2">
-                                Sản phẩm:
-                              </p>
-                              {selectedOrder.order_details.map((item: any) => (
-                                <div
-                                  className="flex bg-gray-100 p-2 rounded-xl"
-                                  key={item.id}
-                                >
-                                  <div className="relative sm:w-20 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
-                                    <img
-                                      alt={item.product_name}
-                                      loading="lazy"
-                                      decoding="async"
-                                      data-nimg="fill"
-                                      className="block absolute align-middle inset-0 h-full w-full object-cover object-center"
-                                      sizes="100px"
-                                      src={item.product_img}
-                                    />
-                                  </div>
-                                  <div className="ml-4 flex flex-1 flex-col">
-                                    <div>
-                                      <div className="flex ">
-                                        <div className="mr-12">
-                                          <h3 className="text-lg font-medium line-clamp-1">
-                                            {item.product_name}
-                                          </h3>
-                                          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                                            {item.attributes &&
-                                              Object.entries(item.attributes)
-                                                .length > 0 && (
-                                                <>
-                                                  Phân loại hàng:
-                                                  {Object.entries(
+                              <div className="py-5">
+                                <p className="font-medium text-base mb-2">
+                                  Sản phẩm:
+                                </p>
+                                {selectedOrder.order_details.map(
+                                  (item: any) => (
+                                    <div
+                                      className="flex first:pt-0 bg-gray-50 p-3 rounded-xl mb-2"
+                                      key={item.id}
+                                    >
+                                      <div className="relative sm:w-20 h-24 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
+                                        <img
+                                          alt={item.product_name}
+                                          loading="lazy"
+                                          decoding="async"
+                                          data-nimg="fill"
+                                          className="block absolute align-middle inset-0 h-full w-full object-cover object-center"
+                                          sizes="100px"
+                                          src={item.product_img}
+                                        />
+                                      </div>
+                                      <div className="ml-4 flex flex-1 flex-col">
+                                        <div>
+                                          <div className="flex justify-between">
+                                            <div>
+                                              <h3 className="text-lg font-medium line-clamp-1">
+                                                {item.product_name}
+                                              </h3>
+                                              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                                                {item.attributes &&
+                                                  Object.entries(
                                                     item.attributes
-                                                  ).map(([key, value]) => (
-                                                    <li key={key}>
-                                                      {Array.isArray(value)
-                                                        ? value.join(", ") // Nếu là mảng
-                                                        : typeof value ===
-                                                              "object" &&
-                                                            value !== null
-                                                          ? Object.values(
-                                                              value
-                                                            ).join(", ") // Nếu là object
-                                                          : String(value)}
-                                                      {/* Nếu là giá trị đơn lẻ */}
-                                                    </li>
-                                                  ))}
-                                                </>
-                                              )}
-                                          </p>
-                                        </div>
-                                        <div className="mt-[1.7px] ">
-                                          <div className="flex items-center font-medium">
-                                            {/* <del className="mr-1">{detail.price}đ</del> */}
-                                            <span className="text-lg">
-                                              {/* {FormatMoney(detail.price)}₫ */}
-                                              {new Intl.NumberFormat(
-                                                "vi-VN"
-                                              ).format(item.price)}
-                                              ₫
-                                            </span>
+                                                  ).length > 0 && (
+                                                    <>
+                                                      {/* Phân loại hàng: */}
+                                                      {Object.entries(
+                                                        item.attributes
+                                                      ).map(([key, value]) => (
+                                                        <li key={key}>
+                                                          {Array.isArray(value)
+                                                            ? value.join(", ") // Nếu là mảng
+                                                            : typeof value ===
+                                                                  "object" &&
+                                                                value !== null
+                                                              ? Object.values(
+                                                                  value
+                                                                ).join(", ") // Nếu là object
+                                                              : String(value)}
+                                                          {/* Nếu là giá trị đơn lẻ */}
+                                                        </li>
+                                                      ))}
+                                                    </>
+                                                  )}
+                                              </p>
+                                            </div>
+                                            <div className="mt-[1.7px]">
+                                              <div className="flex items-center text-sm font-medium">
+                                                {/* <del className="mr-1">{detail.price}đ</del> */}
+                                                <span className="text-base">
+                                                  {/* {FormatMoney(detail.price)}₫ */}
+                                                  {new Intl.NumberFormat(
+                                                    "vi-VN"
+                                                  ).format(item.price)}
+                                                  ₫
+                                                </span>
+                                              </div>
+                                            </div>
                                           </div>
                                         </div>
+                                        <div className="flex flex-1 items-end justify-between text-sm">
+                                          <p className="text-gray-500 dark:text-slate-400 flex items-center">
+                                            <span className="inline-block">
+                                              x
+                                            </span>
+                                            <span className="ml-2">
+                                              {item.quantity}
+                                            </span>
+                                          </p>
+                                        </div>
                                       </div>
                                     </div>
-                                    <div className="flex flex-1 items-end justify-between text-sm">
-                                      <p className="text-gray-500 dark:text-slate-400 flex items-center">
-                                        <span className="inline-block">x</span>
-                                        <span className="ml-2">
-                                          {item.quantity}
-                                        </span>
-                                      </p>
-                                    </div>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
+                                  )
+                                )}
+                              </div>
+                              {/* </div> */}
 
-                            <Table
-                              dataSource={[
-                                {
-                                  key: "1",
-                                  label: "Thông tin",
-                                  value: `
+                              {/* Dùng Table hiển thị thông tin */}
+                              <Table
+                                dataSource={[
+                                  {
+                                    key: "1",
+                                    label: "Thông tin",
+                                    value: `
                                     ${selectedOrder.ship_user_name} - ${selectedOrder.ship_user_phonenumber}
                                 `,
-                                },
-                                {
-                                  key: "2",
-                                  label: "Địa chỉ nhận hàng",
-                                  value: `
+                                  },
+                                  {
+                                    key: "2",
+                                    label: "Địa chỉ nhận hàng",
+                                    value: `
                                     ${selectedOrder.ship_user_address}
                                 `,
-                                },
-                                {
-                                  key: "3",
-                                  label: "Phí vận chuyển",
-                                  value: `
+                                  },
+                                  {
+                                    key: "3",
+                                    label: "Phí vận chuyển",
+                                    value: `
                                     ${new Intl.NumberFormat("vi-VN").format(selectedOrder.shipping_fee)}
                                   ₫`,
-                                },
-                                {
-                                  key: "4",
-                                  label: "Khuyến mãi",
-                                  value: `${new Intl.NumberFormat("vi-VN").format(selectedOrder.voucher_discount)}₫`,
-                                },
-                                {
-                                  key: "5",
-                                  label: "Thành tiền",
-                                  value: `${new Intl.NumberFormat("vi-VN").format(selectedOrder.total)}₫`,
-                                },
-                                {
-                                  key: "6",
-                                  label: "Phương thức thanh toán",
-                                  value: `${selectedOrder.payment_method.name} - ${selectedOrder.payment_method.description}`,
-                                },
-                              ]}
-                              columns={columns}
-                              pagination={false}
-                              bordered
-                            />
-                          </Modal>
-                        )}
-                      </div>
-                    </button>
-                    <div className="hd-body-form-order border-b border-t border-slate-200 p-2 sm:p-8">
-                      {order.order_details.length > 0 && (
-                        <div
-                          className="flex py-4 sm:py-7 last:pb-0 first:pt-0"
-                          key={order.order_details[0].id}
-                        >
-                          <div className="relative sm:w-20 h-24 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
-                            <img
-                              alt={order.order_details[0].product_name}
-                              loading="lazy"
-                              decoding="async"
-                              data-nimg="fill"
-                              className="block absolute align-middle inset-0 h-full w-full object-cover object-center"
-                              sizes="100px"
-                              src={order.order_details[0].product_img}
-                            />
-                          </div>
-                          <div className="ml-4 flex flex-1 flex-col">
-                            <div>
-                              <div className="flex justify-between">
-                                <div>
-                                  <h3 className="text-lg font-medium line-clamp-1 flex items-center">
-                                    <span>
+                                  },
+                                  {
+                                    key: "4",
+                                    label: "Khuyến mãi",
+                                    value: `${new Intl.NumberFormat("vi-VN").format(selectedOrder.voucher_discount)}₫`,
+                                  },
+                                  {
+                                    key: "5",
+                                    label: "Thành tiền",
+                                    value: `${new Intl.NumberFormat("vi-VN").format(selectedOrder.total)}₫`,
+                                  },
+                                  {
+                                    key: "6",
+                                    label: "Phương thức thanh toán",
+                                    value: `${selectedOrder.payment_method.name} - ${selectedOrder.payment_method.description}`,
+                                  },
+                                  {
+                                    key: "7",
+                                    label: "Trạng thái",
+                                    value: `${selectedOrder.payment_status}`,
+                                  },
+                                ]}
+                                columns={columns}
+                                pagination={false}
+                                bordered
+                              />
+                            </Modal>
+                          )}
+                        </div>
+                      </button>
+                      {/*end hd-head-form-order*/}
+                      <div className="hd-body-form-order border-b border-t border-slate-200 p-2 sm:p-8">
+                        {/* Luôn hiển thị ít nhất 1 sản phẩm */}
+                        {order.order_details.length > 0 && (
+                          <div
+                            className="flex py-4 sm:py-7 last:pb-0 first:pt-0"
+                            key={order.order_details[0].id}
+                          >
+                            <div className="relative sm:w-20 h-24 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
+                              <img
+                                alt={order.order_details[0].product_name}
+                                loading="lazy"
+                                decoding="async"
+                                data-nimg="fill"
+                                className="block absolute align-middle inset-0 h-full w-full object-cover object-center"
+                                sizes="100px"
+                                src={order.order_details[0].product_img}
+                              />
+                            </div>
+                            <div className="ml-4 flex flex-1 flex-col">
+                              <div>
+                                <div className="flex justify-between">
+                                  <div>
+                                    <h3 className="text-lg font-medium line-clamp-1">
                                       {order.order_details[0].product_name}
-                                    </span>
-                                    <span className="ml-4 text-sm text-red">
-                                      {order.return_requests.length > 0 &&
-                                        order.return_requests[0].status ===
-                                          "rejected" && (
-                                          <p className="text-[red]">
-                                            Yêu cầu hoàn trả bị từ chối
-                                          </p>
+                                    </h3>
+                                    <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                                      {order.order_details[0].attributes &&
+                                        Object.entries(
+                                          order.order_details[0].attributes
+                                        ).length > 0 && (
+                                          <>
+                                            {Object.entries(
+                                              order.order_details[0].attributes
+                                            ).map(([key, value]) => (
+                                              <li key={key}>
+                                                {Array.isArray(value)
+                                                  ? value.join(", ") // Nếu là mảng
+                                                  : typeof value === "object" &&
+                                                      value !== null
+                                                    ? Object.values(value).join(
+                                                        ", "
+                                                      ) // Nếu là object
+                                                    : String(value)}
+                                                {/* Nếu là giá trị đơn lẻ */}
+                                              </li>
+                                            ))}
+                                          </>
                                         )}
-
-                                      {order.return_requests.length > 0 &&
-                                        order.return_requests[0].status ===
-                                          "completed" && (
-                                          <p className="text-[red]">
-                                            Yêu cầu hoàn trả được chấp nhận
-                                          </p>
+                                    </p>
+                                  </div>
+                                  <div className="mt-[1.7px]">
+                                    <div className="flex items-center text-sm font-medium">
+                                      {/* <del className="mr-1">{detail.price}đ</del> */}
+                                      <span className="text-base">
+                                        {/* {FormatMoney(detail.price)}₫ */}
+                                        {new Intl.NumberFormat("vi-VN").format(
+                                          order.order_details[0].price
                                         )}
-                                      {order.return_requests.length > 0 &&
-                                        order.return_requests[0].status ===
-                                          "pending" && (
-                                          <p className="text-[red]">
-                                            Đang gửi yêu cầu hoàn trả hàng
-                                          </p>
-                                        )}
-                                    </span>
-                                  </h3>
-
-                                  <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                                    {order.order_details[0].attributes &&
-                                      Object.entries(
-                                        order.order_details[0].attributes
-                                      ).length > 0 && (
-                                        <>
-                                          Phân loại hàng:
-                                          {Object.entries(
-                                            order.order_details[0].attributes
-                                          ).map(([key, value]) => (
-                                            <li key={key}>
-                                              {Array.isArray(value)
-                                                ? value.join(", ") // Nếu là mảng
-                                                : typeof value === "object" &&
-                                                    value !== null
-                                                  ? Object.values(value).join(
-                                                      ", "
-                                                    ) // Nếu là object
-                                                  : String(value)}
-                                              {/* Nếu là giá trị đơn lẻ */}
-                                            </li>
-                                          ))}
-                                        </>
-                                      )}
-                                  </p>
-                                </div>
-                                <div className="mt-[1.7px]">
-                                  <div className="flex items-center text-sm font-medium">
-                                    {/* <del className="mr-1">{detail.price}đ</del> */}
-                                    <span className="text-base">
-                                      {/* {FormatMoney(detail.price)}₫ */}
-                                      {new Intl.NumberFormat("vi-VN").format(
-                                        order.order_details[0].price
-                                      )}
-                                      VNĐ
-                                    </span>
+                                        ₫
+                                      </span>
+                                    </div>
                                   </div>
                                 </div>
                               </div>
-                            </div>
-                            <div className="flex flex-1 items-end justify-between text-sm">
-                              <p className="text-gray-500 dark:text-slate-400 flex items-center">
-                                <span className="inline-block">x</span>
-                                <span className="ml-2">
-                                  {order.order_details[0].quantity}
-                                </span>
-                              </p>
+                              <div className="flex flex-1 items-end justify-between text-sm">
+                                <p className="text-gray-500 dark:text-slate-400 flex items-center">
+                                  <span className="inline-block">x</span>
+                                  <span className="ml-2">
+                                    {order.order_details[0].quantity}
+                                  </span>
+                                </p>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      )}
-                      {isExpanded && order.order_details.length > 1 && (
-                        <div className="divide-y divide-y-slate-20 border-t pt-8">
-                          {order.order_details.slice(1).map((detail: any) => (
-                            <div
-                              className="flex py-4 sm:py-7 last:pb-0 first:pt-0 "
-                              key={detail.id}
-                            >
-                              <div className="relative sm:w-20 h-24 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
-                                <img
-                                  alt={detail.product_name}
-                                  loading="lazy"
-                                  decoding="async"
-                                  data-nimg="fill"
-                                  className="block absolute align-middle inset-0 h-full w-full object-cover object-center"
-                                  sizes="100px"
-                                  src={detail.product_img}
-                                />
-                              </div>
-                              <div className="ml-4 flex flex-1 flex-col">
-                                <div>
-                                  <div className="flex justify-between">
-                                    <div>
-                                      <h3 className="text-lg font-medium line-clamp-1">
-                                        {detail.product_name}
-                                      </h3>
+                        )}
+                        {isExpanded && order.order_details.length > 1 && (
+                          <div className="divide-y divide-y-slate-20 border-t pt-8">
+                            {order.order_details.slice(1).map((detail: any) => (
+                              <div
+                                className="flex py-4 sm:py-7 last:pb-0 first:pt-0 "
+                                key={detail.id}
+                              >
+                                <div className="relative sm:w-20 h-24 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
+                                  <img
+                                    alt={detail.product_name}
+                                    loading="lazy"
+                                    decoding="async"
+                                    data-nimg="fill"
+                                    className="block absolute align-middle inset-0 h-full w-full object-cover object-center"
+                                    sizes="100px"
+                                    src={detail.product_img}
+                                  />
+                                </div>
+                                <div className="ml-4 flex flex-1 flex-col">
+                                  <div>
+                                    <div className="flex justify-between">
+                                      <div>
+                                        <h3 className="text-lg font-medium line-clamp-1 flex items-center">
+                                          <span>
+                                            {
+                                              order.order_details[0]
+                                                .product_name
+                                            }
+                                          </span>
+                                          <span className="ml-4 text-sm text-red">
+                                            {order.return_requests.length > 0 &&
+                                              order.return_requests[0]
+                                                .status === "rejected" && (
+                                                <p className="text-[red]">
+                                                  Yêu cầu hoàn trả bị từ chối
+                                                </p>
+                                              )}
 
-                                      <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                                        {detail.attributes &&
-                                          Object.entries(detail.attributes)
-                                            .length > 0 && (
-                                            <>
-                                              {/* Phân loại hàng: */}
-                                              {Object.entries(
-                                                detail.attributes
-                                              ).map(([key, value]) => (
-                                                <li key={key}>
-                                                  {Array.isArray(value)
-                                                    ? value.join(", ") // Nếu là mảng
-                                                    : typeof value ===
-                                                          "object" &&
-                                                        value !== null
-                                                      ? Object.values(
-                                                          value
-                                                        ).join(", ") // Nếu là object
-                                                      : String(value)}
-                                                  {/* Nếu là giá trị đơn lẻ */}
-                                                </li>
-                                              ))}
-                                            </>
-                                          )}
-                                      </p>
-                                    </div>
-                                    <div className="mt-[1.7px]">
-                                      <div className="flex items-center text-sm font-medium">
-                                        {/* <del className="mr-1">{detail.price}đ</del> */}
-                                        <span className="text-base">
-                                          {/* {FormatMoney(detail.price)}₫ */}
-                                          {new Intl.NumberFormat(
-                                            "vi-VN"
-                                          ).format(detail.price)}
-                                          ₫
-                                        </span>
+                                            {order.return_requests.length > 0 &&
+                                              order.return_requests[0]
+                                                .status === "completed" && (
+                                                <p className="text-[red]">
+                                                  Yêu cầu hoàn trả được chấp
+                                                  nhận
+                                                </p>
+                                              )}
+                                            {order.return_requests.length > 0 &&
+                                              order.return_requests[0]
+                                                .status === "pending" && (
+                                                <p className="text-[red]">
+                                                  Đang gửi yêu cầu hoàn trả hàng
+                                                </p>
+                                              )}
+                                          </span>
+                                        </h3>
+                                        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                                          {detail.attributes &&
+                                            Object.entries(detail.attributes)
+                                              .length > 0 && (
+                                              <>
+                                                {/* Phân loại hàng: */}
+                                                {Object.entries(
+                                                  detail.attributes
+                                                ).map(([key, value]) => (
+                                                  <li key={key}>
+                                                    {Array.isArray(value)
+                                                      ? value.join(", ") // Nếu là mảng
+                                                      : typeof value ===
+                                                            "object" &&
+                                                          value !== null
+                                                        ? Object.values(
+                                                            value
+                                                          ).join(", ") // Nếu là object
+                                                        : String(value)}
+                                                    {/* Nếu là giá trị đơn lẻ */}
+                                                  </li>
+                                                ))}
+                                              </>
+                                            )}
+                                        </p>
+                                      </div>
+                                      <div className="mt-[1.7px]">
+                                        <div className="flex items-center text-sm font-medium">
+                                          {/* <del className="mr-1">{detail.price}đ</del> */}
+                                          <span className="text-base">
+                                            {/* {FormatMoney(detail.price)}₫ */}
+                                            {new Intl.NumberFormat(
+                                              "vi-VN"
+                                            ).format(detail.price)}
+                                            ₫
+                                          </span>
+                                        </div>
                                       </div>
                                     </div>
                                   </div>
-                                </div>
-                                <div className="flex flex-1 items-end justify-between text-sm">
-                                  <p className="text-gray-500 dark:text-slate-400 flex items-center">
-                                    <span className="inline-block">x</span>
-                                    <span className="ml-2">
-                                      {detail.quantity}
-                                    </span>
-                                  </p>
+                                  <div className="flex flex-1 items-end justify-between text-sm">
+                                    <p className="text-gray-500 dark:text-slate-400 flex items-center">
+                                      <span className="inline-block">x</span>
+                                      <span className="ml-2">
+                                        {detail.quantity}
+                                      </span>
+                                    </p>
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
 
-                    {/*end hd-body-form-order*/}
-                    <div className="hd-head-form-order flex sm:flex-row justify-between lg:justify-between sm:justify-between sm:items-center p-4 sm:p-8">
-                      <div className="mt-3 sm:mt-0">
-                        <div className="flex items-center space-x-2">
-                          {(isDelivered || requestReturn || shipOk) && (
-                            <>
-                              <button
-                                className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB]  font-medium ${
-                                  shipOk
-                                    ? "bg-gray-200 text-gray-400 border cursor-pointer border-gray-300"
-                                    : "text-white"
-                                }`}
-                                onClick={() => mutateOk(order.id)}
-                                disabled={shipOk}
-                              >
-                                Đã Nhận Hàng
-                              </button>
-
-                              {requestReturn && (
+                      {/*end hd-body-form-order*/}
+                      <div className="hd-head-form-order flex sm:flex-row justify-between lg:justify-between sm:justify-between sm:items-center p-4 sm:p-8">
+                        <div className="mt-3 sm:mt-0">
+                          <div className="flex items-center space-x-2">
+                            {(isDelivered || shipOk) && (
+                              <>
                                 <button
-                                  className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB] font-medium ${
+                                  className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB]  font-medium ${
                                     shipOk
                                       ? "bg-gray-200 text-gray-400 border cursor-pointer border-gray-300"
                                       : "text-white"
                                   }`}
+                                  onClick={() => mutateOk(order.id)}
                                   disabled={shipOk}
-                                  onClick={() =>
-                                    handleGetReturnRequest(
-                                      order?.return_requests[0]?.id
-                                    )
-                                  }
                                 >
-                                  Chi tiết hoàn trả
+                                  Đã Nhận Hàng
                                 </button>
-                              )}
-                            </>
-                          )}
-
-                          {order?.return_requests[0]?.status ===
-                            "completed" && (
-                            <button
-                              className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB] font-medium ${
-                                shipOk
-                                  ? "bg-gray-200 text-gray-400 border cursor-pointer border-gray-300"
-                                  : "text-white"
-                              }`}
-                              disabled={shipOk}
-                              onClick={() =>
-                                handleGetReturnRequest(
-                                  order?.return_requests[0]?.id
-                                )
-                              }
-                            >
-                              Chi tiết hoàn trả
-                            </button>
-                          )}
-                          {complete && (
-                            <>
+                              </>
+                            )}
+                            {requestReturn && (
                               <button
-                                className="nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB] text-white font-medium"
-                                onClick={() => {
-                                  showFormCmt(order);
-                                }}
+                                className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB] font-medium ${
+                                  shipOk
+                                    ? "bg-gray-200 text-gray-400 border cursor-pointer border-gray-300"
+                                    : "text-white"
+                                }`}
+                                disabled={shipOk}
+                                onClick={() =>
+                                  handleGetReturnRequest(
+                                    order?.return_requests[0]?.id
+                                  )
+                                }
                               >
-                                Đánh Giá
+                                Chi tiết hoàn trả
                               </button>
-                              <Modal
-                                visible={isShowFormCmtOpen}
-                                onCancel={closeFormCmt}
-                                footer={null}
-                                centered
+                            )}
+                            {order?.return_requests[0]?.status ===
+                              "completed" && (
+                              <button
+                                className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB] font-medium ${
+                                  shipOk
+                                    ? "bg-gray-200 text-gray-400 border cursor-pointer border-gray-300"
+                                    : "text-white"
+                                }`}
+                                disabled={shipOk}
+                                onClick={() =>
+                                  handleGetReturnRequest(
+                                    order?.return_requests[0]?.id
+                                  )
+                                }
                               >
-                                <CommentProduct
-                                  selectedOrder={selectedOrder}
-                                  listIdProduct={listIdProduct}
-                                  InForCommentId={InForCommentId}
-                                  isShowFormCmtOpen={isShowFormCmtOpen}
-                                  listInForProducts={listInForProducts}
-                                  setShowFormCmtOpen={setShowFormCmtOpen}
-                                />
-                              </Modal>
-                            </>
-                          )}
+                                Chi tiết hoàn trả
+                              </button>
+                            )}
+                            {complete && (
+                              <>
+                                <button
+                                  className="nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB] text-white font-medium"
+                                  onClick={() => {
+                                    showFormCmt(order);
+                                  }}
+                                >
+                                  Đánh Giá
+                                </button>
+                                <Modal
+                                  visible={isShowFormCmtOpen}
+                                  onCancel={closeFormCmt}
+                                  footer={null}
+                                  centered
+                                >
+                                  <CommentProduct
+                                    selectedOrder={selectedOrder}
+                                    listIdProduct={listIdProduct}
+                                    InForCommentId={InForCommentId}
+                                    isShowFormCmtOpen={isShowFormCmtOpen}
+                                    listInForProducts={listInForProducts}
+                                    setShowFormCmtOpen={setShowFormCmtOpen}
+                                  />
+                                </Modal>
+                              </>
+                            )}
 
-                          {order?.return_requests[0]?.status === "rejected" && (
-                            <button
-                              className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB] font-medium ${
-                                shipOk
-                                  ? "bg-gray-200 text-gray-400 border cursor-pointer border-gray-300"
-                                  : "text-white"
-                              }`}
-                              disabled={shipOk}
-                              onClick={() =>
-                                handleGetReturnRequest(
-                                  order?.return_requests[0]?.id
-                                )
-                              }
-                            >
-                              Chi tiết hoàn trả
-                            </button>
-                          )}
+                            {order?.return_requests[0]?.status ===
+                              "rejected" && (
+                              <button
+                                className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB] font-medium ${
+                                  shipOk
+                                    ? "bg-gray-200 text-gray-400 border cursor-pointer border-gray-300"
+                                    : "text-white"
+                                }`}
+                                disabled={shipOk}
+                                onClick={() =>
+                                  handleGetReturnRequest(
+                                    order?.return_requests[0]?.id
+                                  )
+                                }
+                              >
+                                Chi tiết hoàn trả
+                              </button>
+                            )}
 
-                          {isCancelOk && (
-                            <button
-                              className={`nc-Button relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 ttnc-ButtonSecondary ${
-                                isCancelOk
-                                  ? "bg-[#00BADB] text-white font-medium"
-                                  : "bg-gray-200 text-slate-400 border cursor-pointer border-gray-300"
-                              }`}
-                              onClick={() =>
-                                handleCancelClick(order.id, order.order_status)
-                              }
-                              disabled={canCel}
-                            >
-                              Xác Nhận Hủy
-                            </button>
-                          )}
+                            {isCancelOk && (
+                              <button
+                                className={`nc-Button relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 ttnc-ButtonSecondary ${
+                                  isCancelOk
+                                    ? "bg-[#00BADB] text-white font-medium"
+                                    : "bg-gray-200 text-slate-400 border cursor-pointer border-gray-300"
+                                }`}
+                                onClick={() =>
+                                  handleCancelClick(
+                                    order.id,
+                                    order.order_status
+                                  )
+                                }
+                                disabled={canCel}
+                              >
+                                Xác Nhận Hủy
+                              </button>
+                            )}
 
-                          {(canCel || complete || completedReturn) && (
-                            <button
-                              className="nc-Button relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB] text-white font-medium"
-                              onClick={() => mutateReorder(order.id)}
-                            >
-                              Mua Lại
-                            </button>
-                          )}
+                            {(canCel || complete || completedReturn) && (
+                              <button
+                                className="nc-Button relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB] text-white font-medium"
+                                onClick={() => mutateReorder(order.id)}
+                              >
+                                Mua Lại
+                              </button>
+                            )}
 
-                          {/* {complete && (
+                            {/* {complete && (
                             <>
                               <button
                                 className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB] font-medium ${
@@ -907,61 +931,63 @@ const HistoryOrder = () => {
                               />
                             </>
                           )} */}
-                          {complete && (
-                            <>
-                              <button
-                                className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB] font-medium ${
-                                  shipOk
-                                    ? "bg-gray-200 text-gray-400 border cursor-pointer border-gray-300"
-                                    : "text-white"
-                                }`}
-                                disabled={shipOk}
-                                onClick={() => handleOpenFormReason(order)}
-                              >
-                                Yêu cầu trả hàng
-                              </button>
+                            {complete && (
+                              <>
+                                <button
+                                  className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB] font-medium ${
+                                    shipOk
+                                      ? "bg-gray-200 text-gray-400 border cursor-pointer border-gray-300"
+                                      : "text-white"
+                                  }`}
+                                  disabled={shipOk}
+                                  onClick={() => handleOpenFormReason(order)}
+                                >
+                                  Yêu cầu trả hàng
+                                </button>
 
-                              <ReasonReturn
-                                open={visiable}
-                                onClose={handleCloseFormReason}
-                                dataOrderRequest={dataOrderRequest}
-                              />
-                            </>
-                          )}
+                                <ReasonReturn
+                                  open={visiable}
+                                  onClose={handleCloseFormReason}
+                                  dataOrderRequest={dataOrderRequest}
+                                />
+                              </>
+                            )}
+                          </div>
+
+                          <Modal
+                            title="Lý do hủy đơn hàng"
+                            open={isCancelPopupOpen}
+                            onOk={handleConfirmCancel}
+                            onCancel={() => setCancelPopupOpen(false)}
+                            okText="Gửi"
+                            cancelText="Hủy"
+                            maskStyle={{
+                              backgroundColor: "rgba(0, 0, 0, 0.2)",
+                            }}
+                          >
+                            <Input.TextArea
+                              value={cancelReason}
+                              onChange={(e) => setCancelReason(e.target.value)}
+                              placeholder="Nhập lý do hủy..."
+                              rows={4}
+                            />
+                          </Modal>
                         </div>
-
-                        <Modal
-                          title="Lý do hủy đơn hàng"
-                          open={isCancelPopupOpen}
-                          onOk={handleConfirmCancel}
-                          onCancel={() => setCancelPopupOpen(false)}
-                          okText="Gửi"
-                          cancelText="Hủy"
-                          maskStyle={{
-                            backgroundColor: "rgba(0, 0, 0, 0.2)",
-                          }}
-                        >
-                          <Input.TextArea
-                            value={cancelReason}
-                            onChange={(e) => setCancelReason(e.target.value)}
-                            placeholder="Nhập lý do hủy..."
-                            rows={4}
-                          />
-                        </Modal>
-                      </div>
-                      <div className="flex items-center">
-                        <p className="mr-2">Thành tiền: </p>
-                        <span className="text-[red] font-medium text-xl">
-                          {/* {FormatMoney(order.total)}đ */}
-                          {new Intl.NumberFormat("vi-VN").format(
-                            order.total
-                          )}₫
-                        </span>
+                        <div className="flex items-center">
+                          <p className="mr-2">Thành tiền: </p>
+                          <span className="text-[red] font-medium text-xl">
+                            {/* {FormatMoney(order.total)}đ */}
+                            {new Intl.NumberFormat("vi-VN").format(order.total)}
+                            ₫
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })
+              ) : (
+                <div></div>
+              )}
 
               {/* phân trang  */}
               {totalProducts > productsPerPage && (

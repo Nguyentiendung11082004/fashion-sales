@@ -367,7 +367,7 @@ const FormVoucher = () => {
     <div className="p-6 min-h-screen">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2">
-          {id ? "Sửa voucher" : "Thêm voucher"}
+          {id ? "Sửa mã giảm giá" : "Thêm mã giảm giá"}
         </h1>
       </div>
 
@@ -375,8 +375,8 @@ const FormVoucher = () => {
         <Loading />
       ) : (
         <Form form={form} layout="vertical" onFinish={onFinish}>
-          <Form.Item name="title" label="Tên voucher">
-            <Input placeholder="Tên voucher" />
+          <Form.Item name="title" label="Tên mã giảm giá">
+            <Input placeholder="Tên mã giảm giá" />
           </Form.Item>
           {errors ? <div className=" text-red-600">{errors.title}</div> : ""}
 
@@ -420,7 +420,7 @@ const FormVoucher = () => {
             <div className="text-red-600">{errors.min_order_value}</div>
           )}
 
-          <Form.Item label="Số lượng voucher" name="usage_limit">
+          <Form.Item label="Số lượng mã giảm giá" name="usage_limit">
             <Input />
           </Form.Item>
           {errors.usage_limit && (
@@ -432,7 +432,7 @@ const FormVoucher = () => {
               onChange={handleRadioChange}
               value={voucher_applies_to_total}
             >
-              <Radio value="true">Áp dụng cho tất cả đơn hàng</Radio>
+              <Radio value="true">Áp dụng cho đơn hàng</Radio>
               <Radio value="false">Áp dụng cho từng mục...</Radio>
             </Radio.Group>
           </Form.Item>

@@ -186,7 +186,7 @@ const Dashboard = () => {
               <h3 className="text-xs text-gray-500 font-semibold uppercase tracking-wider">
                 Doanh thu
               </h3>
-              <p className="text-sm text-gray-400">Tháng này</p>
+              {/* <p className="text-sm text-gray-400">Tháng này</p> */}
             </div>
             <p className="text-2xl font-bold text-gray-800 mt-4">{tongDoanhThu}</p>
             <div className="flex justify-between items-center mt-4">

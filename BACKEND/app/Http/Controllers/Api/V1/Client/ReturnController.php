@@ -11,6 +11,7 @@ use App\Models\OrderDetail;
 use App\Models\ReturnItem;
 use App\Models\ReturnLog;
 use App\Models\ReturnRequest;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -157,6 +158,10 @@ class ReturnController extends Controller
                     'items.*.quantity' => 'required|integer|min:1',
                     'reason' => 'required|string',
                 ]);
+                $order=Order::query()->findOrFail($request->input('order_id'));
+                if (Carbon::parse($order->created_at)->addDays(3)->isPast()) {
+                    return response()->json(['message' => 'Bạn chỉ có thể hoàn trả hàng sau 3 ngày kể từ ngày nhận hàng.'], 400);
+                }
 
                 // Tạo yêu cầu hoàn trả
                 $returnRequest = ReturnRequest::create([
@@ -165,6 +170,7 @@ class ReturnController extends Controller
                     'reason' => $validated['reason'],
                     'total_refund_amount' => 0, // Sẽ được tính sau
                 ]);
+
 
                 $totalRefundAmount = 0;
 
@@ -197,9 +203,11 @@ class ReturnController extends Controller
                 ]);
 
                 // Cập nhật trạng thái đơn hàng
-                Order::query()->findOrFail($validated['order_id'])->update([
+                $order=Order::query()->findOrFail($validated['order_id'])->update([
                     'order_status' => 'Yêu cầu hoàn trả hàng',
                 ]);
+                broadcast(new OrderStatusUpdated($order))->toOthers();
+
 
                 return [
                     'message' => 'Return request created successfully.',
@@ -271,7 +279,7 @@ class ReturnController extends Controller
                     'return_request_id' => $returnRequest->id,
                     'user_id' => $user->id,
                     'action' => 'canceled',
-                    'comment' => "Canceled item ID: {$item->id}",
+                    'comment' => "Khách hàng tên: {$user->name} hủy item ID: {$item->id}",
                 ]);
             }
 
@@ -287,7 +295,7 @@ class ReturnController extends Controller
                     'return_request_id' => $returnRequest->id,
                     'user_id' => $user->id,
                     'action' => 'canceled',
-                    'comment' => 'Canceled the entire return request.',
+                    'comment' => "Khách hàng tên: {$user->name} đã hủy toàn bộ yêu cầu.",
                 ]);
                 $order=Order::query()->findOrFail($returnRequest->order_id)->update([
                     'order_status' => "Hoàn thành"

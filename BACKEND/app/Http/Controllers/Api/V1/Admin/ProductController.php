@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Helper\Product\GetUniqueAttribute;
 use App\Http\Requests\Product\StoreProduct;
 use App\Http\Requests\Product\UpdateProduct;
 use App\Models\Attribute;
@@ -159,22 +160,28 @@ class ProductController extends Controller
         try {
 
             $product = Product::query()->latest('id')->findOrFail($id)->load(["brand", "category", "attributes", "variants.attributes", "galleries", "tags"]);
+            // dd($product->variants->toArray());
+            $getUniqueAttributes = new GetUniqueAttribute();
 
+            $unique_attributes=$getUniqueAttributes->getUniqueAttributes($product->variants->toArray());
+            // dd($unique_attributes);
             foreach ($product->attributes as  $item) {
                 $item->pivot->attribute_item_ids = json_decode($item->pivot->attribute_item_ids);
+
             }
             $category = Category::query()->latest('id')->get();
             // dd($category->toArray());
             $tag = Tag::query()->latest('id')->pluck('name', 'id');
             $attribute = Attribute::with(["attributeitems"])->get();
             $brand = Brand::query()->pluck('name', 'id');
+            
             return response()->json([
                 "product" => $product,
                 "category" => $category,
                 "tag" => $tag,
                 "attribute" => $attribute,
                 "brand" => $brand,
-
+                "allAttribute"=> $unique_attributes 
             ], Response::HTTP_OK);
         } catch (\Exception $ex) {
             Log::error('API/V1/Admin/ProductController@show: ', [$ex->getMessage()]);

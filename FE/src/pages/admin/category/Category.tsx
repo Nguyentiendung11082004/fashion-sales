@@ -61,17 +61,17 @@ const CategoryPage = () => {
 
   const columns = [
     {
-      title: "Stt",
+      title: "STT",
       render: (text: any, record: any, index: number) => (
         <div>{index + 1 + pageSize * (currentCategoryPage - 1)}</div>
       ),
     },
     {
-      title: "Name",
+      title: "Tên Danh Mục",
       dataIndex: "name",
     },
     {
-      title: "Img",
+      title: "Ảnh",
       dataIndex: "img_thumbnail",
       render: (text: any, record: Icategories, index: number) => (
         <img
@@ -82,11 +82,11 @@ const CategoryPage = () => {
       ),
     },
     {
-      title: "Description",
+      title: "Mô tả",
       dataIndex: "description",
     },
     {
-      title: "Action",
+      title: "Thao tác",
       render: (text: any, record: Icategories) => (
         <div>
           <Button
@@ -118,13 +118,13 @@ const CategoryPage = () => {
     <>
       <div className="p-6 min-h-screen">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2">
+          <h1 className="text-3xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2 uppercase">
             Danh mục sản phẩm
           </h1>
           <div>
             <Link to={`create`}>
               <Button className="my-2" type="primary">
-                <PlusOutlined /> Thêm category
+                <PlusOutlined /> Thêm danh mục
               </Button>
             </Link>
           </div>

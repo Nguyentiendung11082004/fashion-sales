@@ -33,7 +33,6 @@ return new class extends Migration
             $table->boolean('is_show_home')->default(true);
             $table->boolean('trend')->default(true);
             $table->boolean('is_new')->default(true);
-            
             $table->timestamps();
         });
     }

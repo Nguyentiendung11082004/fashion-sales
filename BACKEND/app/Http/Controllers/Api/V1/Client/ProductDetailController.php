@@ -41,7 +41,7 @@ class ProductDetailController extends Controller
             ])->get()->toArray();
             foreach ($productRelated as $key => $item) {
 
-                $productRelated[$key]["product_related_attributes"] = $this->getUniqueAttributes->getUniqueAttributes($item["variants"]);
+                $productRelated[$key]["unique_attributes"] = $this->getUniqueAttributes->getUniqueAttributes($item["variants"]);
             }
             return response()->json(
                 [
