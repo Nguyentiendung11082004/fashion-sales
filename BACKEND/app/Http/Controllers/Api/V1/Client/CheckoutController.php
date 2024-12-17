@@ -260,44 +260,48 @@ class CheckoutController extends Controller
 
         foreach ($order_items as $item) {
             $product_id = $item['product']->id;
+            $category_id = $item['product']->category_id;
             $is_eligible = true;
             $reason = [];
 
-            // Kiểm tra điều kiện danh mục và sản phẩm
-            if (isset($voucher_metas['_voucher_category_ids'])) {
-                $allowed_category_ids = json_decode($voucher_metas['_voucher_category_ids'], true);
-                if (!in_array($item['product']->category_id, $allowed_category_ids)) {
-                    $is_eligible = false;
-                    $reason[] = 'Sản phẩm này không nằm trong danh mục được áp dụng voucher.';
-                }
-            }
-
-            if (isset($voucher_metas['_voucher_exclude_category_ids'])) {
-                $excluded_category_ids = json_decode($voucher_metas['_voucher_exclude_category_ids'], true);
-                if (in_array($item['product']->category_id, $excluded_category_ids)) {
-                    $is_eligible = false;
-                    $reason[] = 'Sản phẩm này thuộc danh mục bị loại trừ khỏi voucher.';
-                }
-            }
-
-            if (isset($voucher_metas['_voucher_product_ids'])) {
-                $allowed_product_ids = json_decode($voucher_metas['_voucher_product_ids'], true);
-                if (!in_array($product_id, $allowed_product_ids)) {
-                    $is_eligible = false;
-                    $reason[] = 'Sản phẩm này không nằm trong danh sách sản phẩm được áp dụng voucher.';
-                }
-            }
-
+            // 1. Kiểm tra sản phẩm có bị loại trừ không (luôn ưu tiên)
             if (isset($voucher_metas['_voucher_exclude_product_ids'])) {
                 $excluded_product_ids = json_decode($voucher_metas['_voucher_exclude_product_ids'], true);
                 if (in_array($product_id, $excluded_product_ids)) {
                     $is_eligible = false;
-                    $reason[] = 'Sản phẩm này nằm trong danh sách sản phẩm bị loại trừ khỏi voucher.';
+                    $reason[] = 'Sản phẩm ' . $item['product']->name . ' nằm trong danh sách bị loại trừ khỏi voucher.';
                 }
             }
-
-            // Thêm vào danh sách và cộng dồn giá trị
+            // 2. Nếu sản phẩm không được áp dụng rõ ràng, kiểm tra theo danh mục
             if ($is_eligible) {
+                if (isset($voucher_metas['_voucher_exclude_category_ids'])) {
+                    $excluded_category_ids = json_decode($voucher_metas['_voucher_exclude_category_ids'], true);
+                    if (in_array($category_id, $excluded_category_ids)) {
+                        $is_eligible = false;
+                        $reason[] = 'Danh mục của sản phẩm ' . $item['product']->name . ' bị loại trừ khỏi voucher.';
+                    }
+                }
+
+                if ($is_eligible && isset($voucher_metas['_voucher_category_ids'])) {
+                    $allowed_category_ids = json_decode($voucher_metas['_voucher_category_ids'], true);
+                    if (!in_array($category_id, $allowed_category_ids)) {
+                        $is_eligible = false;
+                        $reason[] = 'Danh mục của sản phẩm ' . $item['product']->name . ' không nằm trong danh mục được áp dụng voucher.';
+                    }
+                }
+            }
+            // 3. Kiểm tra sản phẩm có được áp dụng không (ưu tiên trước danh mục)
+            if (isset($voucher_metas['_voucher_product_ids'])) {
+                $allowed_product_ids = json_decode($voucher_metas['_voucher_product_ids'], true);
+                if (in_array($product_id, $allowed_product_ids)) {
+                    $is_eligible = true; // Đảm bảo sản phẩm được ưu tiên áp dụng
+                    $reason = []; // Xóa lý do trước đó vì sản phẩm hợp lệ
+                }
+            }
+            // 4. Thêm vào danh sách và cộng dồn giá trị
+            if ($is_eligible) {
+                $reason[] = 'Sản phẩm ' . $item['product']->name . ' đã được áp mã giảm giá';
+                $item['reason'] = implode(' ', $reason);
                 $eligible_products[] = $item;
                 $sub_total += $item['total_price'];
             } else {
@@ -305,7 +309,6 @@ class CheckoutController extends Controller
                 $ineligible_products[] = $item;
             }
         }
-
         // Kiểm tra giá trị tối thiểu của đơn hàng
         if (isset($voucher_metas['_voucher_min_order_value']) && $sub_total < $voucher_metas['_voucher_min_order_value']) {
             return [
