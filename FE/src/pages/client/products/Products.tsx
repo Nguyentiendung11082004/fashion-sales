@@ -1321,10 +1321,8 @@ const Products = () => {
                                       if (minPriceSale > 0) {
                                         // Nếu có giá sale
                                         if (
-                                          (productPriceSale &&
-                                            productPriceSale <
-                                              productPriceRegular) ||
-                                          productPriceSale === 0
+                                          productPriceSale &&
+                                          productPriceSale < productPriceRegular
                                         ) {
                                           return (
                                             <>
@@ -1346,6 +1344,19 @@ const Products = () => {
                                           productPriceSale &&
                                           productPriceSale ===
                                             productPriceRegular
+                                        ) {
+                                          return (
+                                            <span>
+                                              {new Intl.NumberFormat(
+                                                "vi-VN"
+                                              ).format(productPriceRegular)}
+                                              VNĐ
+                                            </span>
+                                          );
+                                        } else if (
+                                          productPriceSale &&
+                                          productPriceSale === 0 &&
+                                          productPriceRegular === 0
                                         ) {
                                           return (
                                             <span>
@@ -1379,6 +1390,21 @@ const Products = () => {
                                               </>
                                             );
                                           } else {
+                                            if (
+                                              pricesSaleVar ===
+                                                pricesRegularVar ||
+                                              (pricesSaleVar === 0 &&
+                                                pricesRegularVar === 0)
+                                            ) {
+                                              return (
+                                                <span>
+                                                  {new Intl.NumberFormat(
+                                                    "vi-VN"
+                                                  ).format(pricesRegularVar)}
+                                                  VNĐ
+                                                </span>
+                                              );
+                                            }
                                             return (
                                               <span>
                                                 {new Intl.NumberFormat(
@@ -1510,44 +1536,41 @@ const Products = () => {
                   <div></div>
                 )}
               </div>
-              {/* phân trang  */}
-              {totalProducts > productsPerPage && (
-                <div className="pagination flex justify-center mt-6">
-                  <button
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    className="px-4 py-2 mx-1 bg-gray-100 rounded"
-                  >
-                    Quay lại
-                  </button>
-                  {Array.from(
-                    { length: totalPages },
-                    (_, index) => index + 1
-                  ).map((pageNumber) => (
-                    <button
-                      key={pageNumber}
-                      onClick={() => handlePageChange(pageNumber)}
-                      className={`px-4 py-2 mx-1 ${
-                        currentPage === pageNumber
-                          ? "text-black"
-                          : "text-gray-300"
-                      } rounded`}
-                    >
-                      {pageNumber}
-                    </button>
-                  ))}
-                  <button
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                    className="px-4 py-2 mx-1 bg-gray-100 rounded"
-                  >
-                    Chuyển tiếp
-                  </button>
-                </div>
-              )}
             </div>
           </div>
         </div>
+        {/* phân trang  */}
+        {totalProducts > productsPerPage && (
+          <div className="pagination flex absolute left-[800px] -mt-10">
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="px-4 py-2 mx-1 bg-gray-100 rounded"
+            >
+              Quay lại
+            </button>
+            {Array.from({ length: totalPages }, (_, index) => index + 1).map(
+              (pageNumber) => (
+                <button
+                  key={pageNumber}
+                  onClick={() => handlePageChange(pageNumber)}
+                  className={`px-4 py-2 mx-1 ${
+                    currentPage === pageNumber ? "text-black" : "text-gray-300"
+                  } rounded`}
+                >
+                  {pageNumber}
+                </button>
+              )
+            )}
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="px-4 py-2 mx-1 bg-gray-100 rounded"
+            >
+              Chuyển tiếp
+            </button>
+          </div>
+        )}
       </div>
     </>
   );
