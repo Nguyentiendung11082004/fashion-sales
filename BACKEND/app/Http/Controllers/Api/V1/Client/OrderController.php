@@ -297,7 +297,7 @@ class OrderController extends Controller
             // Nếu không có biến thể
             if ($product->quantity == 0) {
                 $errors['out_of_stock'][] = [
-                    'message' => "Sản phẩm $product->name hiện đã hết hàng và hệ thống đã tự động loại bỏ khỏi giỏ hàng của bạn. Vui lòng kiểm tra và xác nhận lại đơn hàng.",
+                    'message' => "Sản phẩm $product->name hiện đã hết hàng. Vui lòng kiểm tra và xác nhận lại đơn hàng.",
                     'product_id' => $product->id,
                 ];
                 // return ['errors' => $errors];
@@ -441,13 +441,65 @@ class OrderController extends Controller
         $sub_total = 0;
 
         foreach ($order_items as $item) {
-            $is_eligible = $this->checkEligibility($item, $voucher_metas);
+            $product_id = $item['product']->id;
+            $category_id = $item['product']->category_id;
+            $is_eligible = true;
+            $reasons = [];
 
-            if ($is_eligible['status']) {
+            // 1. Kiểm tra sản phẩm có bị loại trừ không (luôn ưu tiên)
+            if (isset($voucher_metas['_voucher_exclude_product_ids'])) {
+                $excluded_product_ids = json_decode($voucher_metas['_voucher_exclude_product_ids'], true);
+                if (in_array($product_id, $excluded_product_ids)) {
+                    $is_eligible = false;
+                    $reason[] = 'Sản phẩm ' . $item['product']->name . ' nằm trong danh sách bị loại trừ khỏi voucher.';
+                }
+            }
+            // 2. Kiểm tra sản phẩm có được áp dụng không (ưu tiên thứ 2)
+            if ($is_eligible && isset($voucher_metas['_voucher_product_ids']) && !isset($voucher_metas['_voucher_category_ids'])) {
+                $allowed_product_ids = json_decode($voucher_metas['_voucher_product_ids'], true);
+                if (in_array($product_id, $allowed_product_ids)) {
+                    $reason[] = 'Sản phẩm ' . $item['product']->name . ' đã được áp mã giảm giá';
+                    $item['reason'] = implode(' ', $reason);
+                    $eligible_products[] = $item;
+                    $sub_total += $item['total_price'];
+                    continue;
+                } else {
+                    $is_eligible = false;
+                    $reason[] = 'Sản phẩm ' . $item['product']->name . 'không nằm trong danh sách áp dụng voucher.';
+                }
+            }
+            if ($is_eligible && isset($voucher_metas['_voucher_product_ids']) && isset($voucher_metas['_voucher_category_ids'])) {
+                $allowed_product_ids = json_decode($voucher_metas['_voucher_product_ids'], true);
+                if (in_array($product_id, $allowed_product_ids)) {
+                    $reason[] = 'Sản phẩm ' . $item['product']->name . ' đã được áp mã giảm giá';
+                    $item['reason'] = implode(' ', $reason);
+                    $eligible_products[] = $item;
+                    $sub_total += $item['total_price'];
+                    continue;
+                }
+            }
+            // 3. Nếu sản phẩm không được áp dụng rõ ràng, kiểm tra theo danh mục
+            if ($is_eligible && isset($voucher_metas['_voucher_exclude_category_ids'])) {
+                $excluded_category_ids = json_decode($voucher_metas['_voucher_exclude_category_ids'], true);
+                if (in_array($category_id, $excluded_category_ids)) {
+                    $is_eligible = false;
+                    $reason[] = 'Danh mục của sản phẩm ' . $item['product']->name . ' bị loại trừ khỏi voucher.';
+                }
+            }
+
+            if ($is_eligible && isset($voucher_metas['_voucher_category_ids'])) {
+                $allowed_category_ids = json_decode($voucher_metas['_voucher_category_ids'], true);
+                if (!in_array($category_id, $allowed_category_ids)) {
+                    $is_eligible = false;
+                    $reason[] = 'Danh mục của sản phẩm ' . $item['product']->name . ' không nằm trong danh mục được áp dụng voucher.';
+                }
+            }
+            // Phân loại sản phẩm dựa trên tính hợp lệ
+            if ($is_eligible) {
                 $eligible_products[] = $item;
                 $sub_total += $item['total_price'];
             } else {
-                $item['reason'] = $is_eligible['reason'];
+                $item['reason'] = implode(' ', $reasons);
                 $ineligible_products[] = $item;
             }
         }
@@ -483,7 +535,6 @@ class OrderController extends Controller
                 'usage_count' => 1,
             ]);
         }
-
         return [
             'voucher' => $voucher,
             'voucher_discount' => $voucher_discount['total_discount'],
@@ -494,54 +545,53 @@ class OrderController extends Controller
             'sub_total_after_discount' => $sub_total - $voucher_discount['total_discount'],
         ];
     }
-
     // Hàm kiểm tra điều kiện sản phẩm để áp dụng voucher
-    protected function checkEligibility($item, $voucher_metas)
-    {
-        $product_id = $item['product']->id;
-        $category_id = $item['product']->category_id;
-        $is_eligible = true;
-        $reasons = [];
+    // protected function checkEligibility($item, $voucher_metas)
+    // {
+    //     $product_id = $item['product']->id;
+    //     $category_id = $item['product']->category_id;
+    //     $is_eligible = true;
+    //     $reasons = [];
 
-        // 1. Kiểm tra sản phẩm có bị loại trừ không (luôn ưu tiên)
-        if (isset($voucher_metas['_voucher_exclude_product_ids'])) {
-            $excluded_product_ids = json_decode($voucher_metas['_voucher_exclude_product_ids'], true);
-            if (in_array($product_id, $excluded_product_ids)) {
-                $is_eligible = false;
-                $reason[] = 'Sản phẩm ' . $item['product']->name . ' nằm trong danh sách bị loại trừ khỏi voucher.';
-            }
-        }
-        // 2. Nếu sản phẩm không được áp dụng rõ ràng, kiểm tra theo danh mục
-        if ($is_eligible) {
-            if (isset($voucher_metas['_voucher_exclude_category_ids'])) {
-                $excluded_category_ids = json_decode($voucher_metas['_voucher_exclude_category_ids'], true);
-                if (in_array($category_id, $excluded_category_ids)) {
-                    $is_eligible = false;
-                    $reason[] = 'Danh mục của sản phẩm ' . $item['product']->name . ' bị loại trừ khỏi voucher.';
-                }
-            }
+    //     // 1. Kiểm tra sản phẩm có bị loại trừ không (luôn ưu tiên)
+    //     if (isset($voucher_metas['_voucher_exclude_product_ids'])) {
+    //         $excluded_product_ids = json_decode($voucher_metas['_voucher_exclude_product_ids'], true);
+    //         if (in_array($product_id, $excluded_product_ids)) {
+    //             $is_eligible = false;
+    //             $reason[] = 'Sản phẩm ' . $item['product']->name . ' nằm trong danh sách bị loại trừ khỏi voucher.';
+    //         }
+    //     }
+    //     // 2. Nếu sản phẩm không được áp dụng rõ ràng, kiểm tra theo danh mục
+    //     if ($is_eligible) {
+    //         if (isset($voucher_metas['_voucher_exclude_category_ids'])) {
+    //             $excluded_category_ids = json_decode($voucher_metas['_voucher_exclude_category_ids'], true);
+    //             if (in_array($category_id, $excluded_category_ids)) {
+    //                 $is_eligible = false;
+    //                 $reason[] = 'Danh mục của sản phẩm ' . $item['product']->name . ' bị loại trừ khỏi voucher.';
+    //             }
+    //         }
 
-            if ($is_eligible && isset($voucher_metas['_voucher_category_ids'])) {
-                $allowed_category_ids = json_decode($voucher_metas['_voucher_category_ids'], true);
-                if (!in_array($category_id, $allowed_category_ids)) {
-                    $is_eligible = false;
-                    $reason[] = 'Danh mục của sản phẩm ' . $item['product']->name . ' không nằm trong danh mục được áp dụng voucher.';
-                }
-            }
-        }
-        // 3. Kiểm tra sản phẩm có được áp dụng không (ưu tiên trước danh mục)
-        if (isset($voucher_metas['_voucher_product_ids'])) {
-            $allowed_product_ids = json_decode($voucher_metas['_voucher_product_ids'], true);
-            if (in_array($product_id, $allowed_product_ids)) {
-                $is_eligible = true; // Đảm bảo sản phẩm được ưu tiên áp dụng
-                $reason = []; // Xóa lý do trước đó vì sản phẩm hợp lệ
-            }
-        }
-        return [
-            'status' => $is_eligible,
-            'reason' => implode(' ', $reasons),
-        ];
-    }
+    //         if ($is_eligible && isset($voucher_metas['_voucher_category_ids'])) {
+    //             $allowed_category_ids = json_decode($voucher_metas['_voucher_category_ids'], true);
+    //             if (!in_array($category_id, $allowed_category_ids)) {
+    //                 $is_eligible = false;
+    //                 $reason[] = 'Danh mục của sản phẩm ' . $item['product']->name . ' không nằm trong danh mục được áp dụng voucher.';
+    //             }
+    //         }
+    //     }
+    //     // 3. Kiểm tra sản phẩm có được áp dụng không (ưu tiên trước danh mục)
+    //     if (isset($voucher_metas['_voucher_product_ids'])) {
+    //         $allowed_product_ids = json_decode($voucher_metas['_voucher_product_ids'], true);
+    //         if (in_array($product_id, $allowed_product_ids)) {
+    //             $is_eligible = true; // Đảm bảo sản phẩm được ưu tiên áp dụng
+    //             $reason = []; // Xóa lý do trước đó vì sản phẩm hợp lệ
+    //         }
+    //     }
+    //     return [
+    //         'status' => $is_eligible,
+    //         'reason' => implode(' ', $reasons),
+    //     ];
+    // }
 
     // Hàm tính toán giảm giá
     protected function calculateDiscount($voucher, $sub_total, $voucher_metas, $eligible_products)
