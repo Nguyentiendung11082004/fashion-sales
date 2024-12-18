@@ -55,7 +55,7 @@ class WishlistController extends Controller
                             }
                         }
                         $discountPercentage  = round($discountPercentage, 1); // Làm tròn 1 chữ số thập phân
-                        $product->increment('views'); // Tăng số lượt xem cho sản phẩm
+                        // $product->increment('views'); // Tăng số lượt xem cho sản phẩm
 
                         // Khởi tạo đối tượng lấy thuộc tính duy nhất
                         $getUniqueAttributes = new GetUniqueAttribute();
