@@ -343,7 +343,7 @@ const ProductForm = () => {
             render: (text: any, record: any, index: number) => (
                 <div>
                     <Input
-                        value={variants[index]?.price_regular || ''}
+                        value={variants[index]?.price_regular || 0}
                         onChange={(e) => handleInputChange(index, 'price_regular', e.target.value)} />
                     {variantErrors[index]?.price_regular && (
                         <div style={{ color: 'red', fontSize: '12px' }}>
@@ -360,7 +360,7 @@ const ProductForm = () => {
             render: (text: any, record: any, index: number) => (
                 <div>
                     <Input
-                        value={variants[index]?.price_sale || ''}
+                        value={variants[index]?.price_sale || 0}
                         onChange={(e) => handleInputChange(index, 'price_sale', e.target.value)} />
                     {variantErrors[index]?.price_sale && (
                         <div style={{ color: 'red', fontSize: '12px' }}>
@@ -376,7 +376,7 @@ const ProductForm = () => {
             render: (text: any, record: any, index: number) => (
                 <div>
                     <Input
-                        value={variants[index]?.quantity}
+                        value={variants[index]?.quantity || 0}
                         min={0}
                         onChange={(e) => handleInputChange(index, 'quantity', e.target.value)}
                     />
@@ -1136,7 +1136,7 @@ setAttribute(0)
                                             value={1}
                                             className="text-lg font-semibold focus:outline-none"
                                         >
-                                            Có 
+                                            Có
                                         </Radio>
                                         <Radio
                                             value={0}
