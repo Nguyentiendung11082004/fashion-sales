@@ -44,8 +44,8 @@ class OrderController extends Controller
                     ->with([
                         'orderDetails',
                         'paymentMethod',
-                        'returnRequests' 
-                        // => function ($query) {
+                        'returnRequests'
+                        //  => function ($query) {
                         //     $query->where('status', '!=', 'canceled')->latest('id'); // Điều kiện loại bỏ "canceled" và sắp xếp theo id mới nhất
                         // }
                     ])

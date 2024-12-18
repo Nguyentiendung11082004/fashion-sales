@@ -16,7 +16,7 @@ import CommentProduct from "../productDetail/CommentProduct";
 import ReasonReturn from "../requestOrder/components/ReasonReturn";
 import { useUser } from "@/common/context/User/UserContext";
 import Pusher from "pusher-js";
-import { Dayjs } from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 
 const HistoryOrder = () => {
   const [expandedOrders, setExpandedOrders] = useState<number[]>([]);
@@ -252,6 +252,7 @@ const HistoryOrder = () => {
       channel.unsubscribe();
     };
   }, [queryClient]);
+  // sau 3 ngày ẩn nút hoàn hàng, đánh giá
 
   return (
     <>
@@ -383,6 +384,8 @@ const HistoryOrder = () => {
                     setCurrentCancelOrderId(id);
                     setCancelPopupOpen(true);
                   };
+                  const canRequestReturn =
+                    dayjs().diff(dayjs(order?.created_at), "day") <= 3;
 
                   const handleConfirmCancel = () => {
                     if (!cancelReason.trim()) {
@@ -416,21 +419,63 @@ const HistoryOrder = () => {
                             {isExpanded ? "▼" : "▲"}{" "}
                             {/* Hiển thị mũi tên lên hoặc xuống */}
                           </button>
-                          <p className="text-base font-semibold mx-2">
-                            {order.order_code}
-                          </p>
+                          <div className="flex">
+                            <p className="text-base font-semibold mx-2">
+                              {order.order_code}
+                            </p>
+                          </div>
+
                           <p className="text-2xl relative mr-2">|</p>
                           <span className="text-[#00BADB] uppercase font-medium text-base">
                             {order.order_status}
                           </span>
                         </div>
                         <div className="">
-                          <button
-                            onClick={() => showOrderDetails(order)}
-                            className="nc-Button border relative h-auto inline-flex items-center justify-center rounded-full transition-colors hover:font-medium py-2.5 px-4 sm:px-6 ttnc-ButtonSecondary dark:bg-[#00BADB] dark:text-white bg-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0"
-                          >
-                            Xem chi tiết
-                          </button>
+                          <div className="">
+                            <button
+                              onClick={() => showOrderDetails(order)}
+                              className="nc-Button border relative h-auto inline-flex items-center justify-center rounded-full transition-colors hover:font-medium py-2.5 px-4 sm:px-6 ttnc-ButtonSecondary dark:bg-[#00BADB] dark:text-white bg-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0"
+                            >
+                              Xem chi tiết
+                            </button>
+                            <span className="ml-4 text-sm text-red mt-[20px]">
+                              {order.return_requests.length > 0 &&
+                                order.return_requests[
+                                  order.return_requests.length - 1
+                                ]?.status === "rejected" && (
+                                  <p className="text-[red]">
+                                    Yêu cầu hoàn trả bị từ chối
+                                  </p>
+                                )}
+                              {(order.return_requests.length > 0 &&
+                                order.return_requests[
+                                  order.return_requests.length - 1
+                                ]?.status === "completed") ||
+                                (order.return_requests[
+                                  order.return_requests.length - 1
+                                ]?.status === "approved" && (
+                                  <p className="text-[red]">
+                                    Yêu cầu hoàn trả được chấp nhận
+                                  </p>
+                                ))}
+                              {order.return_requests.length > 0 &&
+                                order.return_requests[
+                                  order.return_requests.length - 1
+                                ]?.status === "pending" && (
+                                  <p className="text-[red]">
+                                    Đang gửi yêu cầu hoàn trả hàng
+                                  </p>
+                                )}
+                              {order.return_requests.length > 0 &&
+                                order.return_requests[
+                                  order.return_requests.length - 1
+                                ]?.status === "canceled" && (
+                                  <p className="text-[red]">
+                                    Đã hủy yêu cầu hoàn trả
+                                  </p>
+                                )}
+                            </span>
+                          </div>
                           {selectedOrder && (
                             <Modal
                               // title={`Chi tiết đơn hàng`}
@@ -618,9 +663,12 @@ const HistoryOrder = () => {
                               <div>
                                 <div className="flex justify-between">
                                   <div>
-                                    <h3 className="text-lg font-medium line-clamp-1">
-                                      {order.order_details[0].product_name}
+                                    <h3 className="text-lg font-medium line-clamp-1 flex items-center">
+                                      <span>
+                                        {order.order_details[0].product_name}
+                                      </span>
                                     </h3>
+
                                     <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                                       {order.order_details[0].attributes &&
                                         Object.entries(
@@ -694,37 +742,7 @@ const HistoryOrder = () => {
                                     <div className="flex justify-between">
                                       <div>
                                         <h3 className="text-lg font-medium line-clamp-1 flex items-center">
-                                          <span>
-                                            {
-                                              order.order_details[0]
-                                                .product_name
-                                            }
-                                          </span>
-                                          <span className="ml-4 text-sm text-red">
-                                            {order.return_requests.length > 0 &&
-                                              order.return_requests[0]
-                                                .status === "rejected" && (
-                                                <p className="text-[red]">
-                                                  Yêu cầu hoàn trả bị từ chối
-                                                </p>
-                                              )}
-
-                                            {order.return_requests.length > 0 &&
-                                              order.return_requests[0]
-                                                .status === "completed" && (
-                                                <p className="text-[red]">
-                                                  Yêu cầu hoàn trả được chấp
-                                                  nhận
-                                                </p>
-                                              )}
-                                            {order.return_requests.length > 0 &&
-                                              order.return_requests[0]
-                                                .status === "pending" && (
-                                                <p className="text-[red]">
-                                                  Đang gửi yêu cầu hoàn trả hàng
-                                                </p>
-                                              )}
-                                          </span>
+                                          {order.order_details[0].product_name}
                                         </h3>
                                         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                                           {detail.attributes &&
@@ -817,6 +835,7 @@ const HistoryOrder = () => {
                                 Chi tiết hoàn trả
                               </button>
                             )}
+
                             {order?.return_requests[0]?.status ===
                               "completed" && (
                               <button
@@ -835,7 +854,7 @@ const HistoryOrder = () => {
                                 Chi tiết hoàn trả
                               </button>
                             )}
-                            {complete && (
+                            {complete && canRequestReturn && (
                               <>
                                 <button
                                   className="nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB] text-white font-medium"
@@ -910,28 +929,7 @@ const HistoryOrder = () => {
                               </button>
                             )}
 
-                            {/* {complete && (
-                            <>
-                              <button
-                                className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB] font-medium ${
-                                  shipOk
-                                    ? "bg-gray-200 text-gray-400 border cursor-pointer border-gray-300"
-                                    : "text-white"
-                                }`}
-                                disabled={shipOk}
-                                onClick={() => handleOpenFormReason(order)}
-                              >
-                                Yêu cầu trả hàng
-                              </button>
-
-                              <ReasonReturn
-                                open={visiable}
-                                onClose={handleCloseFormReason}
-                                dataOrderRequest={dataOrderRequest}
-                              />
-                            </>
-                          )} */}
-                            {complete && (
+                            {complete && canRequestReturn && (
                               <>
                                 <button
                                   className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB] font-medium ${

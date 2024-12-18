@@ -34,7 +34,6 @@ const Vouchers = () => {
       }
     },
   });
-  console.log("voucher : ", data);
 
   const navigate = useNavigate();
 

@@ -19,7 +19,7 @@ import {
   productShow_client,
 } from "@/services/api/client/productClient.api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Button, Modal, Popconfirm } from "antd";
+import { Modal, Popconfirm } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -33,10 +33,8 @@ interface IinitialAttributes {
   [key: string]: string;
 }
 const ProductDetail = () => {
-  // const { id } = useParams<{ id: string }>();
   const { slug } = useParams<{ slug: string }>();
 
-  // const productId = Number(id);
   const [product, setProduct] = useState<any>();
   const [selectedImage, setSelectedImage] = useState<string>();
   const { handleAddToWishlist, isInWishlist } = useWishlist();
@@ -57,6 +55,7 @@ const ProductDetail = () => {
       }
     },
   });
+
   const productId = data?.product?.id;
 
   const getUniqueAttributes = data?.getUniqueAttributes;
@@ -387,7 +386,7 @@ const ProductDetail = () => {
           return (
             x[key] &&
             x[key].toString() ===
-            selectedAttributes?.product_variant[key].toString()
+              selectedAttributes?.product_variant[key].toString()
           );
         }
         return true;
@@ -433,7 +432,7 @@ const ProductDetail = () => {
       }
     };
     fetchProductVariant();
-  }, [selectedAttributes]);
+  }, [selectedAttributes, slug]);
 
   const resultGetUniqueAttribute = Object.entries(
     getUniqueAttributes ?? {}
@@ -447,10 +446,8 @@ const ProductDetail = () => {
   const [isShowFormCmtOpen, setShowFormCmtOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-
   const [editIdComment, setEditIdComment] = useState<string | null>(null);
   const [InForCommentId, setInForCommentId] = useState<string | null>(null);
-
 
   const onHandleEdit = (id: any, value: any) => {
     if (value.parent_id) {
@@ -556,15 +553,13 @@ const ProductDetail = () => {
       }
     }
     navigate("/checkout", { state: { _payload: _payload } });
-  }
-
+  };
 
   if (isLoading) return <Loading />;
   // if (isError) return <p>{error.message}</p>;
 
   return (
     <>
-
       <div>
         <div className="hd-detail-head bg-[#f6f6f6]">
           <div className="container h-[55px] flex items-center">
@@ -592,7 +587,7 @@ const ProductDetail = () => {
                     data-nimg="fill"
                     className="w-full lg:h-[100%] h-full lg:w-[500px] object-cover transition-transform ease-in-out duration-300 group-hover:scale-150"
                     src={mainImage || selectedImage}
-                  // src={selectedImage}
+                    // src={selectedImage}
                   />
                 </div>
               </div>
@@ -678,18 +673,18 @@ const ProductDetail = () => {
                           <span className="font-medium">{key.attribute}:</span>
                           {selectedAttributes.product_variant[key.attribute] !==
                             undefined && (
-                              <span className="ml-2">
-                                {key.attributeValue
-                                  .find(
-                                    (item) =>
-                                      item.id ===
-                                      selectedAttributes.product_variant[
+                            <span className="ml-2">
+                              {key.attributeValue
+                                .find(
+                                  (item) =>
+                                    item.id ===
+                                    selectedAttributes.product_variant[
                                       key.attribute
-                                      ]
-                                  )
-                                  ?.name.toLowerCase()}
-                              </span>
-                            )}
+                                    ]
+                                )
+                                ?.name.toLowerCase()}
+                            </span>
+                          )}
                         </label>
                         <div className="flex mt-3 gap-2">
                           {key.attributeValue.map((item) => {
@@ -699,19 +694,20 @@ const ProductDetail = () => {
                             );
                             const isSelected =
                               selectedAttributes.product_variant[
-                              key.attribute
+                                key.attribute
                               ] === item.id;
 
                             return (
                               <div
                                 key={item.id}
                                 className={`relative flex-1 max-w-[70px] h-6 sm:h-9 rounded-full cursor-pointer flex items-center justify-center
-                                   ${isSelected
-                                    ? "border-gray-800 border-2"
-                                    : isDisabled
-                                      ? "border-gray-200 border-2 opacity-50 cursor-not-allowed"
-                                      : ""
-                                  }`}
+                                   ${
+                                     isSelected
+                                       ? "border-gray-800 border-2"
+                                       : isDisabled
+                                         ? "border-gray-200 border-2 opacity-50 cursor-not-allowed"
+                                         : ""
+                                   }`}
                                 style={{
                                   backgroundColor:
                                     key.attribute === "color"
@@ -731,7 +727,7 @@ const ProductDetail = () => {
                                         [key.attribute]: item.id,
                                       },
                                     }));
-                                    getAttribute(key.attribute, item.id)
+                                    getAttribute(key.attribute, item.id);
                                   }
                                 }}
                               >
@@ -808,12 +804,12 @@ const ProductDetail = () => {
                   </div>
                 </div>
 
-
                 <button
                   onClick={() => {
                     onHandleAddToCart(productId, product?.id, quantity);
                   }}
-                  className="nc-Button relative right-2 h-14 w-64 inline-flex items-center justify-center rounded-full text-sm sm:text-base font-medium sm:py-3.5 sm:px-2 lg:px-2 shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0  animate-bounce focus:animate-none hover:animate-none text-md  mt-3  border bg-[#56cfe1] text-white">
+                  className="nc-Button relative right-2 h-14 w-64 inline-flex items-center justify-center rounded-full text-sm sm:text-base font-medium sm:py-3.5 sm:px-2 lg:px-2 shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0  animate-bounce focus:animate-none hover:animate-none text-md  mt-3  border bg-[#56cfe1] text-white"
+                >
                   <svg
                     className="hidden lg:hidden xl:block sm:inline-block w-5 h-5 mb-0.5"
                     viewBox="0 0 9 9"
@@ -848,7 +844,8 @@ const ProductDetail = () => {
               {/* mua ngay */}
               <button
                 onClick={() => handleOpenSeeMore()}
-                className=" nc-Button relative right-2 h-11 w-full inline-flex items-center justify-center rounded-full text-sm sm:text-base font-medium sm:py-3.5 sm:px-2 lg:px-2 shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0 text-md mt-3 border bg-[#222222] text-white">
+                className=" nc-Button relative right-2 h-11 w-full inline-flex items-center justify-center rounded-full text-sm sm:text-base font-medium sm:py-3.5 sm:px-2 lg:px-2 shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0 text-md mt-3 border bg-[#222222] text-white"
+              >
                 <span className="xl:ml-3 ml-1 lg:text-base xl:text-base">
                   Mua ngay
                 </span>
@@ -870,10 +867,11 @@ const ProductDetail = () => {
                   setReplyToCommentId(null);
                   setInForCommentId("");
                 }}
-                className={`${activeButton === "details"
-                  ? "border-black text-black border-2"
-                  : " text-[#8e8e8e]"
-                  } font-medium cursor-pointer lg:text-base text-[10px] lg:py-2 lg:px-6 px-2 py-2 rounded-full`}
+                className={`${
+                  activeButton === "details"
+                    ? "border-black text-black border-2"
+                    : " text-[#8e8e8e]"
+                } font-medium cursor-pointer lg:text-base text-[10px] lg:py-2 lg:px-6 px-2 py-2 rounded-full`}
               >
                 Chi tiết sản phẩm
               </button>
@@ -885,10 +883,11 @@ const ProductDetail = () => {
                   setReplyToCommentId(null);
                   setInForCommentId("");
                 }}
-                className={`${activeButton === "reviews"
-                  ? "border-black text-black border-2"
-                  : "border-black text-[#8e8e8e]"
-                  } btn_cmt text-[10px] lg:text-base font-medium cursor-pointer lg:py-2 lg:px-6 px-2 py-2 rounded-full`}
+                className={`${
+                  activeButton === "reviews"
+                    ? "border-black text-black border-2"
+                    : "border-black text-[#8e8e8e]"
+                } btn_cmt text-[10px] lg:text-base font-medium cursor-pointer lg:py-2 lg:px-6 px-2 py-2 rounded-full`}
               >
                 Xem đánh giá sản phẩm
               </button>

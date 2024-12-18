@@ -98,7 +98,6 @@ const FormVoucher = () => {
 
   console.log("kiểm tra voucherDetail?.meta_data: ", voucherDetail?.meta_data);
 
-  
   useEffect(() => {
     if (voucherDetail) {
       let metaDataValues = {};
@@ -148,6 +147,7 @@ const FormVoucher = () => {
         min_order_value: parseFloat(voucherDetail?.voucher?.min_order_value),
         ...(initialVoucherAppliesToTotal === "false" ? metaDataValues : {}),
       };
+      console.log("kiểm tra initialValues : ", initialValues);
 
       form.setFieldsValue(initialValues);
     }
@@ -351,7 +351,6 @@ const FormVoucher = () => {
           .filter(Boolean)
           .join(", ");
 
-        // Return the error message
         return Promise.reject(
           `Sản phẩm ${duplicateProductNames} đã được chọn ở ô input khác`
         );
