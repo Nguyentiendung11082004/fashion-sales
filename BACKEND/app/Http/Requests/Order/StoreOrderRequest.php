@@ -72,6 +72,65 @@ class StoreOrderRequest extends FormRequest
             'voucher_code' => 'nullable|string|exists:vouchers,code',
         ];
     }
+    public function messages(): array
+{
+    return [
+        'payment_method_id.required' => 'Vui lòng chọn phương thức thanh toán.',
+        'payment_method_id.integer' => 'Phương thức thanh toán không hợp lệ.',
+        'payment_method_id.exists' => 'Phương thức thanh toán không tồn tại.',
+
+        'user_note.string' => 'Ghi chú phải là văn bản.',
+        'user_note.max' => 'Ghi chú không được vượt quá 255 ký tự.',
+
+        'ship_user_name.required' => 'Vui lòng nhập tên người nhận.',
+        'ship_user_name.string' => 'Tên người nhận phải là văn bản.',
+        'ship_user_name.max' => 'Tên người nhận không được vượt quá 255 ký tự.',
+
+        'ship_user_phonenumber.required' => 'Vui lòng nhập số điện thoại người nhận.',
+        'ship_user_phonenumber.regex' => 'Số điện thoại không đúng định dạng.',
+
+        'ship_user_email.required' => 'Vui lòng nhập email người nhận.',
+        'ship_user_email.email' => 'Email không đúng định dạng.',
+        'ship_user_email.max' => 'Email không được vượt quá 255 ký tự.',
+
+        'xa.required' => 'Vui lòng nhập xã/phường.',
+        'huyen.required' => 'Vui lòng nhập quận/huyện.',
+        'tinh.required' => 'Vui lòng nhập tỉnh/thành phố.',
+
+        'ship_user_address.required' => 'Vui lòng nhập địa chỉ người nhận.',
+        'ship_user_address.string' => 'Địa chỉ phải là văn bản.',
+        'ship_user_address.max' => 'Địa chỉ không được vượt quá 255 ký tự.',
+
+        'shipping_method.required' => 'Vui lòng chọn phương thức vận chuyển.',
+        'shipping_method.max' => 'Phương thức vận chuyển không được vượt quá 50 ký tự.',
+
+        'shipping_fee.required' => 'Vui lòng nhập phí vận chuyển.',
+        'shipping_fee.numeric' => 'Phí vận chuyển phải là số.',
+        'shipping_fee.min' => 'Phí vận chuyển không được nhỏ hơn 0.',
+        'shipping_fee.regex' => 'Phí vận chuyển không hợp lệ.',
+
+        'product_id.required_without' => 'Vui lòng chọn sản phẩm hoặc giỏ hàng.',
+        'product_id.integer' => 'Mã sản phẩm không hợp lệ.',
+        'product_id.exists' => 'Sản phẩm không tồn tại.',
+
+        'product_variant_id.required_if' => 'Vui lòng chọn biến thể sản phẩm khi cần.',
+        'product_variant_id.integer' => 'Mã biến thể không hợp lệ.',
+        'product_variant_id.exists' => 'Biến thể sản phẩm không tồn tại.',
+
+        'quantity.required_without' => 'Vui lòng nhập số lượng sản phẩm.',
+        'quantity.integer' => 'Số lượng phải là số nguyên.',
+        'quantity.min' => 'Số lượng tối thiểu là 1.',
+
+        'cart_item_ids.required_without' => 'Vui lòng chọn sản phẩm trong giỏ hàng.',
+        'cart_item_ids.array' => 'Giỏ hàng không hợp lệ.',
+        'cart_item_ids.*.integer' => 'Mã sản phẩm trong giỏ hàng không hợp lệ.',
+        'cart_item_ids.*.exists' => 'Sản phẩm trong giỏ hàng không tồn tại.',
+
+        'voucher_code.string' => 'Mã giảm giá phải là văn bản.',
+        'voucher_code.exists' => 'Mã giảm giá không hợp lệ.',
+    ];
+}
+
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {

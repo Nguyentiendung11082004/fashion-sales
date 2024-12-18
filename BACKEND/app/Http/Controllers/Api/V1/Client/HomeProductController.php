@@ -41,7 +41,7 @@ class HomeProductController extends Controller
                 $trendProducts[$key]['discount_percentage'] = $discountPercentage;
 
                 // Tăng lượt xem khi sản phẩm được nhấn
-                $product->increment('views');
+                // $product->increment('views');
             }
 
             // Thêm các thuộc tính độc nhất và phần trăm giảm giá cho sản phẩm hiển thị trên trang chủ
@@ -53,7 +53,7 @@ class HomeProductController extends Controller
                 $homeShowProducts[$key]['discount_percentage'] = $discountPercentage;
 
                 // Tăng lượt xem khi sản phẩm được nhấn
-                $product->increment('views');
+              
             }
 
             // Lấy danh mục (categories) từ database

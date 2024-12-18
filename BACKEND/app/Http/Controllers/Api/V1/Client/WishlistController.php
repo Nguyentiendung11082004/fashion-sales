@@ -36,15 +36,26 @@ class WishlistController extends Controller
                         $discountPercentage  = 0;
                         if ($product->type == '0') {
                             // Sản phẩm đơn giản (không có biến thể)
-                            $discountPercentage  = ($product->price_regular - $product->price_sale) / $product->price_regular * 100;
+                            if ($product->price_regular > 0) {
+                                // Nếu giá bán = 0, phần trăm giảm giá là 100%
+                                $discountPercentage = ($product->price_regular - $product->price_sale) / $product->price_regular * 100;
+                            }
                         } else if ($product->variants && $product->variants->isNotEmpty()) {
                             // Sản phẩm có biến thể
-                            $discountPercentage  = $product->variants->map(function ($variant) {
-                                return ($variant->price_regular - $variant->price_sale) / $variant->price_regular * 100;
-                            })->max(); // Lấy % giảm giá lớn nhất từ các biến thể
+                            $validVariants = $product->variants->filter(function ($variant) {
+                                // Lọc chỉ lấy những biến thể có giá gốc > 0
+                                return $variant->price_regular > 0;
+                            });
+        
+                            if ($validVariants->isNotEmpty()) {
+                                // Tính % giảm giá lớn nhất từ những biến thể hợp lệ
+                                $discountPercentage = $validVariants->map(function ($variant) {
+                                    return ($variant->price_regular - $variant->price_sale) / $variant->price_regular * 100;
+                                })->max();
+                            }
                         }
                         $discountPercentage  = round($discountPercentage, 1); // Làm tròn 1 chữ số thập phân
-                        $product->increment('views'); // Tăng số lượt xem cho sản phẩm
+                        // $product->increment('views'); // Tăng số lượt xem cho sản phẩm
 
                         // Khởi tạo đối tượng lấy thuộc tính duy nhất
                         $getUniqueAttributes = new GetUniqueAttribute();

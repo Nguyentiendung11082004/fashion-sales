@@ -520,6 +520,7 @@ const ProductDetail = () => {
       [attribute]: id,
     }));
   };
+  console.log("selectedVariantId", selectedVariantId)
 
   const getSelectedVariantId = () => {
     const matchingVariant = data?.product?.variants?.find((variant: any) => {
@@ -541,15 +542,18 @@ const ProductDetail = () => {
   useEffect(() => {
     getSelectedVariantId();
   }, [dataAttribute]);
+
   const _payload = {
     product_id: productId || product?.id,
     product_variant_id: selectedVariantId,
     quantity: quantity,
   };
   const handleOpenSeeMore = () => {
-    if (_payload.quantity > data.product.quantity) {
-      toast.error("Số lượng yêu cầu vượt quá số lượng còn lại trong kho");
-      return;
+    if (data.product.quantity) {
+      if (_payload.quantity > data.product.quantity) {
+        toast.error("Số lượng yêu cầu vượt quá số lượng còn lại trong kho");
+        return;
+      }
     }
     navigate("/checkout", { state: { _payload: _payload } });
   }
