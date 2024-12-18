@@ -1363,70 +1363,34 @@ const Products = () => {
                                                 <del className="mr-1">
                                                   {new Intl.NumberFormat(
                                                     "vi-VN"
-                                                  ).format(productPriceRegular)}
+                                                  ).format(
+                                                    pricesRegularVar[0]
+                                                  )}{" "}
                                                   VNĐ
                                                 </del>
                                                 <span className="text-[red]">
                                                   {new Intl.NumberFormat(
                                                     "vi-VN"
-                                                  ).format(productPriceSale)}
+                                                  ).format(
+                                                    pricesSaleVar[0]
+                                                  )}{" "}
                                                   VNĐ
                                                 </span>
                                               </>
                                             );
-                                          } else if (
-                                            productPriceSale &&
-                                            productPriceSale ===
-                                              productPriceRegular
-                                          ) {
+                                          } else {
                                             return (
                                               <span>
                                                 {new Intl.NumberFormat(
                                                   "vi-VN"
-                                                ).format(productPriceRegular)}
+                                                ).format(minPriceSale)}
+                                                VNĐ -{" "}
+                                                {new Intl.NumberFormat(
+                                                  "vi-VN"
+                                                ).format(maxPriceRegular)}
                                                 VNĐ
                                               </span>
                                             );
-                                          } else {
-                                            if (
-                                              allSaleEqual &&
-                                              allRegularEqual
-                                            ) {
-                                              // Nếu tất cả giá sale và giá regular giống nhau
-                                              return (
-                                                <>
-                                                  <del className="mr-1">
-                                                    {new Intl.NumberFormat(
-                                                      "vi-VN"
-                                                    ).format(
-                                                      pricesRegularVar[0]
-                                                    )}{" "}
-                                                    VNĐ
-                                                  </del>
-                                                  <span className="text-[red]">
-                                                    {new Intl.NumberFormat(
-                                                      "vi-VN"
-                                                    ).format(
-                                                      pricesSaleVar[0]
-                                                    )}{" "}
-                                                    VNĐ
-                                                  </span>
-                                                </>
-                                              );
-                                            } else {
-                                              return (
-                                                <span>
-                                                  {new Intl.NumberFormat(
-                                                    "vi-VN"
-                                                  ).format(minPriceSale)}
-                                                  VNĐ -{" "}
-                                                  {new Intl.NumberFormat(
-                                                    "vi-VN"
-                                                  ).format(maxPriceRegular)}
-                                                  VNĐ
-                                                </span>
-                                              );
-                                            }
                                           }
                                         }
                                       } else {
