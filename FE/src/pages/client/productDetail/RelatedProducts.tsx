@@ -99,7 +99,7 @@ const RelatedProducts = () => {
                     </button> */}
                   </div>
                   <div className="mb-[15px] absolute top-[50%] flex flex-col justify-between left-[50%] -translate-x-1/2 -translate-y-1/2 h-[40px] transform transition-all duration-500 ease-in-out group-hover:-translate-y-1/2 opacity-0 group-hover:opacity-100">
-                    <Link to="" className="group/btn relative m-auto">
+                    {/* <Link to="" className="group/btn relative m-auto">
                       <button
                         className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]"
                         // onClick={() => handleOpenSeeMore(product)}
@@ -109,7 +109,7 @@ const RelatedProducts = () => {
                         </p>
                         <Eye />
                       </button>
-                    </Link>
+                    </Link> */}
                     <Link to="" className="group/btn relative">
                       <button
                         className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]"
