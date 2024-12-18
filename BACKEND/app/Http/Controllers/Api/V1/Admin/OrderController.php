@@ -8,6 +8,8 @@ use App\Models\Order;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use App\Models\Product;
+use App\Models\ProductVariant;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -141,7 +143,15 @@ class OrderController extends Controller
             if ($currentStatus === 'Đang chờ xác nhận' && !in_array($newStatus, ['Đã xác nhận', 'Đã hủy'])) {
                 return response()->json(['message' => 'Trạng thái tiếp theo chỉ có thể là "Đã xác nhận" hoặc "Đã hủy".'], Response::HTTP_BAD_REQUEST);
             }
-
+            if ($currentStatus === 'Đang chờ xác nhận' && $newStatus === 'Đã xác nhận') {
+                // Kiểm tra nếu phương thức thanh toán là 2 và payment_status là 'Chưa thanh toán'
+                if ($order->payment_method_id == 2 && $order->payment_status == 'Chưa Thanh Toán') {
+                    // Cập nhật payment_method_id thành 1
+                    $order->payment_method_id = 1;
+                
+                }
+            }
+            
             if ($currentStatus === 'Đã xác nhận' && !in_array($newStatus, ['Đang vận chuyển', 'Đã hủy'])) {
 
                 return response()->json(['message' => 'Trạng thái tiếp theo chỉ có thể là "Đang vận chuyển" hoặc "Đã hủy".'], Response::HTTP_BAD_REQUEST);
@@ -168,6 +178,10 @@ class OrderController extends Controller
             // Nếu có trạng thái mới từ request, thực hiện thay đổi trạng thái
             if ($newStatus && $newStatus !== $order->order_status) {
                 $order->order_status = $newStatus;
+            }
+            if ($newStatus === 'Đã hủy') {
+                // Gọi logic hoàn lại sản phẩm về kho
+                $this->handleOrderCancellation($order, null); // Không cần lý do hủy
             }
             if ($newStatus === 'Giao hàng thành công') {
                 $order->payment_status = 'Đã thanh toán';
@@ -196,7 +210,32 @@ class OrderController extends Controller
     {
         //
     }
-
+    protected function handleOrderCancellation(Order $order, ?string $user_note = null)
+    {
+        // Lưu lý do hủy vào ghi chú, nếu không có thì đặt giá trị mặc định
+        $order->return_notes = $user_note ?? 'Không có lý do được cung cấp';
+        
+        // Trả lại số lượng sản phẩm về kho
+        foreach ($order->orderDetails as $detail) {
+            // Kiểm tra nếu là sản phẩm có biến thể
+            if ($detail->product_variant_id) {
+                $variant = ProductVariant::find($detail->product_variant_id);
+                if ($variant) {
+                    $variant->increment('quantity', $detail->quantity);
+                }
+            } else {
+                // Nếu là sản phẩm đơn
+                $product = Product::find($detail->product_id);
+                if ($product) {
+                    $product->increment('quantity', $detail->quantity);
+                }
+            }
+        }
+    
+        // Lưu lại trạng thái mới của đơn hàng
+        $order->save();
+    }
+    
     public function searchOrders(Request $request)
     {
         // Danh sách trạng thái hợp lệ

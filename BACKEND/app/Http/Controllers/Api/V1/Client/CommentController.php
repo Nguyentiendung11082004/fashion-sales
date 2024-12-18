@@ -34,90 +34,25 @@ class CommentController extends Controller
   
     
     
-    // public function store(Request $request)
-    // {
-    //     // Kiểm tra xem người dùng đã đăng nhập chưa
-    //     if (!Auth::check()) {
-    //         return response()->json(['message' => 'Bạn cần đăng nhập để có thể bình luận.'], Response::HTTP_UNAUTHORIZED);
-    //     }
-    
-    //     // Validate dữ liệu
-    //     $validated = $request->validate([
-    //         'product_id' => 'required|exists:products,id',
-    //         'content' => 'nullable|string|max:1000',
-    //         'rating' => 'nullable|integer|min:1|max:5',
-    //         'image' => 'nullable|string',
-    //         'parent_id' => 'nullable|exists:comments,id' // Kiểm tra nếu có parent_id
-    //     ]);
-    
-    //     // Nếu không có parent_id trong dữ liệu, đặt giá trị mặc định là null
-    //     $parentId = $validated['parent_id'] ?? null;
-    
-    //     // Kiểm tra xem người dùng đã mua sản phẩm này chưa
-    //     $userHasPurchased = Order::where('user_id', Auth::id())
-    //         ->where('order_status', 'Hoàn thành')
-    //         ->whereHas('orderDetails', function($query) use ($validated) {
-    //             $query->where('product_id', $validated['product_id']);
-    //         })
-    //         ->exists();
-    
-    //     if (!$userHasPurchased) {
-    //         return response()->json(['message' => 'Bạn cần phải mua sản phẩm này trước khi bình luận.'], Response::HTTP_FORBIDDEN);
-    //     }
-    
-    //     // Nếu không có parent_id (bình luận cha), kiểm tra người dùng đã bình luận hay chưa
-    //     if (is_null($parentId)) {
-    //         $userHasCommented = Comments::where('user_id', Auth::id())
-    //             ->where('product_id', $validated['product_id'])
-    //             ->whereNull('parent_id') // Kiểm tra bình luận cha
-    //             ->exists();
-    
-    //         if ($userHasCommented) {
-    //             return response()->json([
-    //                 'user_has_commented' => true,
-    //                 'message' => 'Bạn đã đánh giá về sản phẩm này.',
-    //             ], Response::HTTP_FORBIDDEN);
-    //         }
-    //     }
-    
-    //     // Tạo bình luận mới (cha hoặc con)
-    //     $comment = Comments::create([
-    //         'user_id' => Auth::id(),
-    //         'product_id' => $validated['product_id'],
-    //         'content' => $validated['content'],
-    //         'rating' => $validated['rating'],
-    //         'image' => $validated['image'],
-    //         'status' => true,
-    //         'parent_id' => $parentId // Nếu có parent_id thì đây là bình luận con
-    //     ]);
-    
-    //     // Trả về kết quả sau khi bình luận được tạo thành công
-    //     return response()->json([
-    //         'user_has_commented' => false,
-    //         'message' => 'Thêm bình luận thành công!',
-    //         'comment' => $comment
-    //     ], Response::HTTP_CREATED);
-    // }
+   
     public function store(Request $request)
-    {
-        // Kiểm tra xem người dùng đã đăng nhập chưa
-        if (!Auth::check()) {
-            return response()->json(['message' => 'Bạn cần đăng nhập để có thể bình luận.'], Response::HTTP_UNAUTHORIZED);
-        }
-    
-        // Validate dữ liệu
-        $validated = $request->validate([
-            'product_id' => 'required|exists:products,id',
-            'order_id' => 'required|exists:orders,id', // Yêu cầu FE truyền order_id
-            'content' => 'nullable|string|max:1000',
-            'rating' => 'nullable|integer|min:1|max:5',
-            'image' => 'nullable|string',
-            'parent_id' => 'nullable|exists:comments,id',
-        ]);
-    
-        $parentId = $validated['parent_id'] ?? null;
-    
-        // Kiểm tra tính hợp lệ của order_id
+{
+    if (!Auth::check()) {
+        return response()->json(['message' => 'Bạn cần đăng nhập để có thể bình luận.'], Response::HTTP_UNAUTHORIZED);
+    }
+    $validated = $request->validate([
+        'product_id' => 'required|exists:products,id',
+        'content' => 'nullable|string|max:1000',
+        'rating' => 'nullable|integer|min:1|max:5',
+        'image' => 'nullable|string',
+        'parent_id' => 'nullable|exists:comments,id',
+        'order_id' => 'required_if:parent_id,null|exists:orders,id', // Chỉ bắt buộc khi là bình luận cha
+    ]);
+
+    $parentId = $validated['parent_id'] ?? null;
+
+    // Nếu là bình luận cha, kiểm tra tính hợp lệ của order_id
+    if (is_null($parentId)) {
         $order = Order::where('id', $validated['order_id'])
             ->where('user_id', Auth::id())
             ->where('order_status', 'Hoàn thành')
@@ -125,41 +60,54 @@ class CommentController extends Controller
                 $query->where('product_id', $validated['product_id']);
             })
             ->first();
-    
+
         if (!$order) {
             return response()->json(['message' => 'Đơn hàng không hợp lệ hoặc không chứa sản phẩm này.'], Response::HTTP_FORBIDDEN);
         }
-    
+
         // Kiểm tra bình luận cha
-        if (is_null($parentId)) {
-            $existingComment = Comments::where('user_id', Auth::id())
-                ->where('product_id', $validated['product_id'])
-                ->where('order_id', $order->id) // Bình luận cha cho đơn hàng cụ thể
-                ->whereNull('parent_id') // Chỉ kiểm tra bình luận cha
-                ->exists();
-    
-            if ($existingComment) {
-                return response()->json([
-                    'user_has_commented' => true,
-                    'message' => 'Bạn đã bình luận về sản phẩm này trong đơn hàng này.',
-                ], Response::HTTP_FORBIDDEN);
-            }
+        $existingComment = Comments::where('user_id', Auth::id())
+            ->where('product_id', $validated['product_id'])
+            ->where('order_id', $order->id) // Bình luận cha cho đơn hàng cụ thể
+            ->whereNull('parent_id') // Chỉ kiểm tra bình luận cha
+            ->exists();
+
+        if ($existingComment) {
+            return response()->json([
+                'user_has_commented' => true,
+                'message' => 'Bạn đã bình luận về sản phẩm này trong đơn hàng này.',
+            ], Response::HTTP_FORBIDDEN);
         }
-    
-        // Tạo bình luận mới
-        $comment = Comments::create([
-            'user_id' => Auth::id(),
-            'product_id' => $validated['product_id'],
-            'content' => $validated['content'],
-            'rating' => $validated['rating'],
-            'image' => $validated['image'],
-            'parent_id' => $parentId,
-            'status' => is_null($parentId), // Chỉ đặt status = true nếu là bình luận cha
-            'order_id' => $order->id, // Lưu order_id do FE truyền vào
-        ]);
-    
-        return response()->json(['message' => 'Bình luận của bạn đã được gửi thành công.', 'comment' => $comment], Response::HTTP_CREATED);
     }
+
+    // Nếu là bình luận con, lấy thông tin từ bình luận cha
+    if (!is_null($parentId)) {
+        $parentComment = Comments::find($parentId);
+
+        if (!$parentComment) {
+            return response()->json(['message' => 'Bình luận cha không tồn tại.'], Response::HTTP_NOT_FOUND);
+        }
+
+        // Gán thông tin sản phẩm và đơn hàng từ bình luận cha
+        $validated['product_id'] = $parentComment->product_id;
+        $validated['order_id'] = $parentComment->order_id;
+    }
+
+    // Tạo bình luận mới
+    $comment = Comments::create([
+        'user_id' => Auth::id(),
+        'product_id' => $validated['product_id'],
+        'content' => $validated['content'],
+        'rating' => $validated['rating'],
+        'image' => $validated['image'],
+        'parent_id' => $parentId,
+        'status' => is_null($parentId), // Chỉ đặt status = true nếu là bình luận cha
+        'order_id' => $validated['order_id'] ?? null, // Lưu order_id nếu có
+    ]);
+
+    return response()->json(['message' => 'Bình luận của bạn đã được gửi thành công.', 'comment' => $comment], Response::HTTP_CREATED);
+}
+
     /**
      * Hiển thị một bình luận cụ thể.
      */
@@ -172,35 +120,35 @@ class CommentController extends Controller
     /**
      * Cập nhật bình luận.
      */
+ 
     public function update(Request $request, string $id)
-    {
-        $comment = Comments::findOrFail($id);
-    
-        
-        if ($comment->user_id !== Auth::id()) {
-            return response()->json(['message' => 'Không có quyền chỉnh sửa'], Response::HTTP_FORBIDDEN);
-        }
-        $validated = $request->validate([
-            'content' => 'nullable|string|max:1000',
-            'rating' => 'nullable|integer|min:1|max:5',
-            'image' => 'nullable|string', 
-            'parent_id' => 'nullable|exists:comments,id'
-        ]);
-    
-        if ($request->has('content')) {
-            $comment->content = $validated['content'];
-        }
-        $comment->rating = $validated['rating'] ?? $comment->rating;
-        if ($request->has('image')) {
-            $comment->image = $validated['image'];
-        }
-        if ($comment->parent_id !== null) {
-            $comment->parent_id = $validated['parent_id'] ?? $comment->parent_id;
-        }
-        $comment->save();
-    
-        return response()->json(['message' => 'Cập nhật bình luận thành công!', 'comment' => $comment], Response::HTTP_OK);
+{
+    $comment = Comments::findOrFail($id);
+
+    if ($comment->user_id !== Auth::id()) {
+        return response()->json(['message' => 'Không có quyền chỉnh sửa'], Response::HTTP_FORBIDDEN);
     }
+    $validated = $request->validate([
+        'content' => 'nullable|string|max:1000',
+        'rating' => 'nullable|integer|min:1|max:5',
+        'image' => 'nullable|string',
+    ]);
+    if ($request->has('content')) {
+        $comment->content = $validated['content'];
+    }
+    $comment->rating = $validated['rating'] ?? $comment->rating;
+
+    if ($request->has('image')) {
+        $comment->image = $validated['image'];
+    }
+
+    // Không cho phép thay đổi parent_id, order_id, hoặc product_id
+    // Chỉ lưu các thay đổi hợp lệ
+    $comment->save();
+
+    return response()->json(['message' => 'Cập nhật bình luận thành công!', 'comment' => $comment], Response::HTTP_OK);
+}
+
     
 
     /**
