@@ -701,8 +701,9 @@ const HistoryOrder = () => {
                                             }
                                           </span>
                                           <span className="ml-4 text-sm text-red">
-                                            {order?.return_requests?.length > 0 &&
-                                              order?.return_requests[0]?.status === "rejected" && (
+                                            {order.return_requests.length > 0 &&
+                                              order.return_requests[0]
+                                                .status === "rejected" && (
                                                 <p className="text-[red]">
                                                   Yêu cầu hoàn trả bị từ chối
                                                 </p>
