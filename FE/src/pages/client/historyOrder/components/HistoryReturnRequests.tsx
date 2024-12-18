@@ -414,14 +414,6 @@ const HistoryReturnRequests = () => {
                           {order?.order?.order_status}
                         </span>
                       </div>
-                      {/* <div className="">
-                        <button
-                          onClick={() => showOrderDetails(order)}
-                          className="nc-Button border relative h-auto inline-flex items-center justify-center rounded-full transition-colors hover:font-medium py-2.5 px-4 sm:px-6 ttnc-ButtonSecondary dark:bg-[#00BADB] dark:text-white bg-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0"
-                        >
-                          Xem chi tiết
-                        </button>
-                      </div> */}
                     </button>
                     <div className="hd-body-form-order border-b border-t border-slate-200 p-2 sm:p-8">
                       {order.items.length > 0 && (
@@ -459,13 +451,15 @@ const HistoryReturnRequests = () => {
                                             Yêu cầu hoàn trả bị từ chối
                                           </p>
                                         )}
-                                      {order.items.length > 0 &&
+                                      {(order.items.length > 0 &&
                                         order.items[0].status ===
-                                          "completed" && (
+                                          "completed") ||
+                                        (order.items[0].status ===
+                                          "approved" && (
                                           <p className="text-[red]">
                                             Yêu cầu hoàn trả được chấp nhận
                                           </p>
-                                        )}
+                                        ))}
                                       {order.items.length > 0 &&
                                         order.items[0].status === "pending" && (
                                           <p className="text-[red]">

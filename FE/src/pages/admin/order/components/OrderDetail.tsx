@@ -71,7 +71,7 @@ const OrderDetail = () => {
       {/* User Information */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-8">
         <h2 className="text-2xl font-bold text-gray-800 mb-4 border-b pb-2 border-gray-200">
-          Thông tin người dùng
+          Thông tin người nhận hàng
         </h2>
         <div className="grid grid-cols-2 gap-6">
           <div className="text-gray-700">
@@ -135,7 +135,7 @@ const OrderDetail = () => {
                   <div className="text-gray-800 font-semibold text-lg">
                     {product?.product_name}
                   </div>
-                  
+
                   <div className="text-gray-800 text-base font-semibold">
                     <span>Phân loại sản phẩm:</span>
                     {product?.attributes &&

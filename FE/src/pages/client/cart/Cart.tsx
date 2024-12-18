@@ -363,7 +363,7 @@ const Cart = () => {
       >
         <div className="hd-page-head">
           <div className="hd-header-banner bg-[url('./src/assets/images/shopping-cart-head.webp')] bg-no-repeat bg-cover bg-center">
-            <div className="hd-bg-banner overflow-hidden relative !text-center bg-black bg-opacity-55 lg:py-[50px] mb-0 py-[30px]">
+            <div className="hd-bg-banner overflow-hidden relative !text-center bg-pink bg-opacity-55 lg:py-[50px] mb-0 py-[30px]">
               <div className="z-[100] relative hd-container">
                 <h1 className="text-white text-xl font-medium leading-5">
                   Giỏ hàng

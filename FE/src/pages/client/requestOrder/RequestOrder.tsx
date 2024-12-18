@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { MinusOutlined } from "@ant-design/icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
@@ -11,6 +11,13 @@ const RequestOrder = () => {
   const [selectedItems, setSelectedItems] = useState<boolean[]>(
     new Array(dataOrder?.order_details?.length).fill(false)
   );
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!dataOrder || !reasonFromState) {
+      navigate("/notfound");
+    }
+  }, [reasonFromState, dataOrder, navigate]);
   console.log("dataOrder?.order_details?: ", dataOrder?.order_details);
   const [selectAll, setSelectAll] = useState(false);
   // const [quantities, setQuantities] = useState<number[]>(
@@ -56,7 +63,6 @@ const RequestOrder = () => {
       setQuantities(newQuantities);
     }
   };
-  const navigate = useNavigate();
 
   const isContinueDisabled = !selectedItems.includes(true);
 
