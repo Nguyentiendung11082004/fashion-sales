@@ -440,31 +440,36 @@ const HistoryOrder = () => {
                             </button>
                             <span className="ml-4 text-sm text-red mt-[20px]">
                               {order.return_requests.length > 0 &&
-                                order.return_requests[0]?.status ===
-                                  "rejected" && (
+                                order.return_requests[
+                                  order.return_requests.length - 1
+                                ]?.status === "rejected" && (
                                   <p className="text-[red]">
                                     Yêu cầu hoàn trả bị từ chối
                                   </p>
                                 )}
                               {(order.return_requests.length > 0 &&
-                                order.return_requests[0]?.status ===
-                                  "completed") ||
-                                (order.return_requests[0]?.status ===
-                                  "approved" && (
+                                order.return_requests[
+                                  order.return_requests.length - 1
+                                ]?.status === "completed") ||
+                                (order.return_requests[
+                                  order.return_requests.length - 1
+                                ]?.status === "approved" && (
                                   <p className="text-[red]">
                                     Yêu cầu hoàn trả được chấp nhận
                                   </p>
                                 ))}
                               {order.return_requests.length > 0 &&
-                                order.return_requests[0]?.status ===
-                                  "pending" && (
+                                order.return_requests[
+                                  order.return_requests.length - 1
+                                ]?.status === "pending" && (
                                   <p className="text-[red]">
                                     Đang gửi yêu cầu hoàn trả hàng
                                   </p>
                                 )}
                               {order.return_requests.length > 0 &&
-                                order.return_requests[0]?.status ===
-                                  "canceled" && (
+                                order.return_requests[
+                                  order.return_requests.length - 1
+                                ]?.status === "canceled" && (
                                   <p className="text-[red]">
                                     Đã hủy yêu cầu hoàn trả
                                   </p>
@@ -970,9 +975,8 @@ const HistoryOrder = () => {
                           <p className="mr-2">Thành tiền: </p>
                           <span className="text-[red] font-medium text-xl">
                             {/* {FormatMoney(order.total)}đ */}
-                            {new Intl.NumberFormat("vi-VN").format(
-                              order.total
-                            )}₫
+                            {new Intl.NumberFormat("vi-VN").format(order.total)}
+                            ₫
                           </span>
                         </div>
                       </div>
