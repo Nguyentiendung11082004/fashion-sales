@@ -73,7 +73,7 @@ const Post = () => {
                   {value.post_name}
                 </h3>
                 {/* <p className="mt-2 mb-4">Thêm vào ngày 11 tháng 5 năm 2022</p> */}
-                <span className="text-[#909090] ">
+                <span className="text-[#909090]">
                   {value.post_content.length > 200
                     ? `${value.post_content.slice(0, 200)}...`
                     : value.post_content}

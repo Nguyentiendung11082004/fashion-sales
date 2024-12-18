@@ -37,7 +37,7 @@ class StoreCategoryRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => 'Trường tên danh mục là bắt buộc.',
+            'name.required' => 'Vui lòng nhập tên danh mục.',
             'name.string' => 'Tên danh mục phải là chuỗi ký tự.',
             'name.max' => 'Tên danh mục không được vượt quá 255 ký tự.',
             'name.unique' => 'Tên danh mục này đã tồn tại.',

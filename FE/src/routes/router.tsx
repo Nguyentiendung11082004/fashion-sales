@@ -69,16 +69,17 @@ const Router = () => {
           <Route path="cart" element={<Cart />} />
           <Route path="account" element={<Account />} />
           <Route path="wishlist" element={<Wishlist />} />
+          <Route path="history-order" element={<HistoryOrder />} />
         </Route>
         <Route path="checkout" element={<Checkout />} />
+
         <Route path="contact" element={<Contact />} />
         <Route path="thank" element={<Thanks />} />
-        <Route path="history-order" element={<HistoryOrder />} />
+        <Route path="requestOrder" element={<RequestOrder />} />
         <Route
           path="historyReturnRequests"
           element={<HistoryReturnRequests />}
         />
-        <Route path="requestOrder" element={<RequestOrder />} />
         <Route path="return/request_order" element={<ReturnRequest />} />
         <Route
           path="/history-order/return_requests"

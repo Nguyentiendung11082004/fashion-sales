@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1\Admin;
 
 use App\Events\OrderStatusUpdated;
 use App\Events\ReturnItemStatusUpdated;
+use App\Events\ReturnRequestStatusUpdate;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderDetail;
@@ -306,10 +307,10 @@ class ReturnAdminController extends Controller
                 }
 
                 // Lưu lịch sử vào return_log
-                $logComment = "Updated status to {$validated['status']}";
+                $logComment = "Quản trị viên tên :{$user->name} đã cập nhật trạng thái thành {$validated['status']}";
                 if ($validated['status'] === 'rejected' && $validated['reason']) {
                     // Chỉ ghi lý do từ chối khi trạng thái là "rejected" và khi admin thao tác
-                    $logComment .= ". Reason: {$validated['reason']}";
+                    $logComment .= ". Lí do: {$validated['reason']}";
                 }
 
                 ReturnLog::create([
@@ -392,6 +393,7 @@ class ReturnAdminController extends Controller
                     'refund_amount' => $returnItem->refund_amount,
                     // 'message' => "Return item status updated to {$validated['status']}."
                 ]));
+                // broadcast(new ReturnRequestStatusUpdate($returnRequest))->toOthers();
             });
 
             return response()->json([

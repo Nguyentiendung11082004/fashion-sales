@@ -264,23 +264,7 @@ const Account = () => {
               </div>
               {/*end item-start*/}
               <form onSubmit={handleSubmit} className="lg:w-3/4 max-w-full">
-                <div>
-                  <label
-                    className="nc-Label text-base font-medium"
-                    data-nc-id="Label"
-                  >
-                    Họ tên
-                  </label>
-
-                  <input
-                    className="block w-full outline-0 border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50 focus:border-neutral-200 rounded-2xl font-normal h-11 px-4 py-3 mt-1.5"
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div className="mt-5">
+              <div className="mt-5">
                   <label
                     className="nc-Label text-base font-medium"
                     data-nc-id="Label"
@@ -294,6 +278,7 @@ const Account = () => {
                       </i>
                     </span>
                     <input
+                      disabled
                       className="block w-full outline-0 border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50 rounded-2xl font-normal h-11 px-4 py-3 !rounded-l-none"
                       value={formData.email}
                       onChange={handleChange}
@@ -308,6 +293,23 @@ const Account = () => {
                   )}
                 </div>
 
+                <div className="mt-5">
+                  <label
+                    className="nc-Label text-base font-medium"
+                    data-nc-id="Label"
+                  >
+                    Họ tên
+                  </label>
+
+                  <input
+                  
+                    className="block w-full outline-0 border border-neutral-200 focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 bg-white dark:focus:ring-primary-6000 dark:focus:ring-opacity-25 dark:bg-neutral-50 disabled:bg-neutral-200 dark:disabled:bg-neutral-50 focus:border-neutral-200 rounded-2xl font-normal h-11 px-4 py-3 mt-1.5"
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                  />
+                </div>
                 <div className="max-w-lg mt-5">
                   <label
                     className="nc-Label text-base font-medium"

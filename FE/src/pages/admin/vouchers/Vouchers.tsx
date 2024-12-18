@@ -81,13 +81,13 @@ const Vouchers = () => {
 
   const columns: ColumnType<IVouchers>[] = [
     {
-      title: "Stt",
+      title: "STT",
       render: (_, __: any, index: number) => (
         <div>{index + 1 + pageSize * (currentPage - 1)}</div>
       ),
     },
     {
-      title: "Tên voucher",
+      title: "Tên mã giảm giá",
       dataIndex: "title",
     },
     {
@@ -184,8 +184,8 @@ const Vouchers = () => {
           Danh sách voucher
         </h1> */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 md:gap-8">
-          <h1 className="text-3xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2">
-            Danh sách voucher
+          <h1 className="text-3xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2 uppercase">
+            Danh sách mã giảm giá
           </h1>
           <Input
             value={query}
@@ -203,7 +203,7 @@ const Vouchers = () => {
         <Link to={`create`}>
           <Button className="bg-blue-500 text-white rounded-lg h-10 px-4 flex items-center hover:bg-blue-600 transition duration-200">
             <PlusOutlined className="mr-2" />
-            Thêm voucher
+            Thêm mã giảm giá
           </Button>
         </Link>
       </div>

@@ -85,4 +85,20 @@ class UserRequest extends FormRequest
         ], Response::HTTP_BAD_REQUEST);
         throw new HttpResponseException($response);
     }
+    public function messages()
+    {
+        return [
+            'name.required' => 'Vui lòng nhập họ tên.',
+            'email.required' => 'Vui lòng nhập Email.',
+            'email.email' => 'Email không đúng định dạng.',
+            'email.unique' => 'Email này đã được đăng ký.',
+            'password.required' => 'Vui lòng nhập mật khẩu.',
+            'password.min' => 'Mật khẩu phải có ít nhất :min ký tự.',
+            'password.confirmed' => 'Mật khẩu xác nhận không khớp.',
+            'phone_number.required' => 'Vui lòng nhập số điện thoại.',
+            'phone_number.regex' => 'Số điện thoại không đúng định dạng.',
+            'phone_number.unique' => 'Số điện thoại này đã được đăng ký.',
+            'address.required' => 'Vui lòng nhập địa chỉ.',
+        ];
+    }
 }

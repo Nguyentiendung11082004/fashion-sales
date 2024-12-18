@@ -33,15 +33,27 @@ class WishlistController extends Controller
                     $product = $wishlistItem->product; // Lấy đối tượng sản phẩm từ wishlistItem
 
                     if ($product) {
+                        $discountPercentage  = 0;
+                        if ($product->type == '0') {
+                            // Sản phẩm đơn giản (không có biến thể)
+                            $discountPercentage  = ($product->price_regular - $product->price_sale) / $product->price_regular * 100;
+                        } else if ($product->variants && $product->variants->isNotEmpty()) {
+                            // Sản phẩm có biến thể
+                            $discountPercentage  = $product->variants->map(function ($variant) {
+                                return ($variant->price_regular - $variant->price_sale) / $variant->price_regular * 100;
+                            })->max(); // Lấy % giảm giá lớn nhất từ các biến thể
+                        }
+                        $discountPercentage  = round($discountPercentage, 1); // Làm tròn 1 chữ số thập phân
                         $product->increment('views'); // Tăng số lượt xem cho sản phẩm
 
                         // Khởi tạo đối tượng lấy thuộc tính duy nhất
                         $getUniqueAttributes = new GetUniqueAttribute();
-
+                        $product->unique_attributes=$getUniqueAttributes->getUniqueAttributes($product["variants"]);
                         // Thêm sản phẩm và biến thể vào mảng
                         $allProducts[] = [
                             'wishlist_id' => $wishlistItem->id,
                             'product' => $product,
+                            'discountPercentage' => $discountPercentage,
                             'getUniqueAttributes' => $getUniqueAttributes->getUniqueAttributes($product->variants->toArray()),
                         ];
                     }
@@ -106,14 +118,13 @@ class WishlistController extends Controller
                 return response()->json(['message' => 'Sản phẩm đã có trong danh sách yêu thích'], 200);
             } else {
                 return response()->json(['message' => 'User not authenticated'], 401);
-            } 
-        }
-         catch (\Exception $e) {
+            }
+        } catch (\Exception $e) {
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
-    
+
 
     /**
      * Remove the specified resource from storage.

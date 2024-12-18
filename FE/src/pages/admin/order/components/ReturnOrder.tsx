@@ -6,7 +6,8 @@ import instance from "@/configs/axios";
 import { EyeOutlined } from "@ant-design/icons";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button, Pagination, Select, Table } from "antd";
-import { useState } from "react";
+import Pusher from "pusher-js";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 const ReturnOrder = () => {
@@ -89,17 +90,36 @@ const ReturnOrder = () => {
     },
   ];
 
+  useEffect(() => {
+        const pusher = new Pusher("4d3e0d70126f2605977e", {
+          cluster: "ap1",
+        });
+    
+        const channel = pusher.subscribe("orders");
+        pusher.connection.bind("connected", () => {
+          console.log("Connected to Pusher!");
+        });
+        channel.bind("order.updated", (newOrder: any) => {
+          queryClient.invalidateQueries({ queryKey: ["return-requests"] });
+        });
+    
+        return () => {
+          channel.unbind_all();
+          channel.unsubscribe();
+        };
+      }, [queryClient]);
+
   return (
     <div className="p-6 min-h-screen">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2">
+        <h1 className="text-3xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2 uppercase">
           Danh sách yêu cầu hoàn trả hàng
         </h1>
       </div>
 
-      {isFetching ? (
+      {/* {isFetching ? (
         <Loading />
-      ) : (
+      ) : ( */}
         <div className="">
           <Table
             className="custom-table"
@@ -121,7 +141,7 @@ const ReturnOrder = () => {
           </div>
         </div>
         
-      )}
+      {/* )} */}
     </div>
   );
 };

@@ -8,9 +8,10 @@ import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { notifyOrdersChanged, useRealtimeOrders } from "@/common/hooks/useRealtimeOrders";
+import Pusher from "pusher-js";
 const ReturnOrderId = () => {
   const { id } = useParams();
 
@@ -150,6 +151,25 @@ const ReturnOrderId = () => {
   }, 0);
 
   console.log("Tổng số tiền:", totalAmount);
+
+  useEffect(() => {
+      const pusher = new Pusher("4d3e0d70126f2605977e", {
+        cluster: "ap1",
+      });
+  
+      const channel = pusher.subscribe("orders");
+      pusher.connection.bind("connected", () => {
+        console.log("Connected to Pusher!");
+      });
+      channel.bind("order.updated", (newOrder: any) => {
+        queryClient.invalidateQueries({ queryKey: ["return-requests"] });
+      });
+  
+      return () => {
+        channel.unbind_all();
+        channel.unsubscribe();
+      };
+    }, [queryClient]);
 
   return (
     <div className="p-6 min-h-screen">
