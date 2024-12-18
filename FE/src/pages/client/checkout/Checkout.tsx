@@ -26,6 +26,11 @@ const Checkout = () => {
   const [cartIds, setCartIds] = useState<number[]>(location.state?.cartIds || []);
   const [validCartIds, setValidCartIds] = useState<any[]>([])
   const [_payload, _setPayLoad] = useState(location.state?._payload);
+  useEffect(() => {
+    if (!_payload && (!cartIds || cartIds.length === 0)) {
+      navigate('/', { replace: true });
+    }
+  }, [_payload, cartIds, navigate]);
   const [paymentMethhod, setPaymentMethod] = useState('1');
   const [shiping, setShipPing] = useState<string>('');
   const [voucher, setVoucher] = useState<any>();
@@ -34,13 +39,13 @@ const Checkout = () => {
   const [dataCheckout, setDataCheckout] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true); // Trạng thái loading
   const [visible, setVisible] = useState(false)
-  const [idTinh, setIdTinh] = useState<number | null>(0)
+  const [idTinh, setIdTinh] = useState<number | null>()
   const [idQuanHuyen, setIdQuanHuyen] = useState<number | null>(0)
   const [idXa, setIdXa] = useState<number | null>(0);
   const [payloadDiaChi, setPayLoadDiaChi] = useState<any>(null);
 
   // lỗi
-  const [error, setError] = useState<any>()
+  const [error, setError] = useState<any>({})
   const [errorOrder, setErrorOrder] = useState<any>()
   const [errorCheckout, setErrorCheckout] = useState<any>()
 
@@ -52,7 +57,7 @@ const Checkout = () => {
       payment_method_id: newPaymentMethod,
     }));
   };
-
+  // console.log("error", error)
   const qty = dataCheckout?.order_items?.map((e: any) => e?.quantity);
   const cartItemIds = dataCheckout?.order_items?.map((e: any) => e);
   const quantityOfCart = cartItemIds?.reduce((acc: any, id: any, index: number) => {
@@ -112,23 +117,30 @@ const Checkout = () => {
           navigate('/thank', { replace: true });
         }, 2000);
       } else {
-        // queryClient.invalidateQueries({
-        //   queryKey: ['cart']
-        // });
+        queryClient.invalidateQueries({
+          queryKey: ['cart']
+        });
         localStorage.removeItem('checkedItems');
         navigate('/thank', { replace: true });
       }
       localStorage.removeItem('checkedItems');
     },
     onError: (error: any) => {
-      setErrorOrder(error?.response?.data?.errors)
-      setError(error?.response?.data?.errors)
+      const errors = error?.response?.data?.errors;
+      if (errors?.out_of_stock || errors?.insufficient_stock) {
+        // Lỗi liên quan đến số lượng
+        setErrorOrder(errors);
+        setError({})
+      } else {
+        // Lỗi liên quan đến validate thông tin
+        setError(errors);
+      }
       toast.error(error?.response?.data?.errors);
     }
   });
   useEffect(() => {
     if (errorOrder) {
-      const allErrors = [...errorOrder.out_of_stock, ...errorOrder.insufficient_stock];
+      const allErrors = [...errorOrder?.out_of_stock, ...errorOrder?.insufficient_stock];
       allErrors.forEach(error => toast.error(error.message));
       const outOfStockCartIds = errorOrder.out_of_stock.map((error: any) => error.cart_id);
       const filteredCartIds = cartIds.filter((id: number) => !outOfStockCartIds.includes(id));
@@ -299,7 +311,6 @@ const Checkout = () => {
         setIsLoading(false);
       }
     }
-
   }
 
   const handleBuyNow = async () => {
@@ -320,7 +331,7 @@ const Checkout = () => {
           throw new Error('Network response was not ok');
         }
         const data = await response.json();
-        console.log("data",data )
+        // console.log("data", data)
         // setErrorCheckout(data?.errors)
         setDataCheckout(data);
         setIsLoading(false);
@@ -347,7 +358,7 @@ const Checkout = () => {
   };
   useEffect(() => {
     handleBuyNow()
-  }, [_payload, payloadDiaChi,errorOrder])
+  }, [_payload, payloadDiaChi, errorOrder])
   useEffect(() => {
     handleBuyCart()
   }, [payloadDiaChi, errorOrder]);
@@ -370,7 +381,6 @@ const Checkout = () => {
       getShipp();
     }
   }, [idXa, idQuanHuyen]);
-
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -529,7 +539,6 @@ const Checkout = () => {
                           </div>
                         </div>
                       </div>
-
                     }
                     {
                       !token && (
@@ -551,7 +560,7 @@ const Checkout = () => {
                                     onChange={(e) => setForm("ship_user_name", e.target.value)}
                                   />
                                   {error?.ship_user_name && (
-                                    <p className="text-sm text-red-500 mt-1">{error?.ship_user_name[0]}</p>
+                                    <p className="text-sm text-red-500 mt-1">{error.ship_user_name[0]}</p>
                                   )}
                                 </div>
 
@@ -677,8 +686,8 @@ const Checkout = () => {
                         <div className="flex items-center space-x-3 text-sm sm:text-base">
                           <div
                             className={`flex items-center border-2 rounded-lg p-3 transition-all duration-300 
-          ${paymentMethhod == '1' ? 'border-[#0099B5] bg-[#A0E3F8]' : 'bg-transparent'}
-          hover:border-[#0099B5] focus-within:bg-[#e3f0f1]`}
+             ${paymentMethhod == '1' ? 'border-[#0099B5] bg-[#A0E3F8]' : 'bg-transparent'}
+             hover:border-[#0099B5] focus-within:bg-[#e3f0f1]`}
                           >
                             <Radio
                               value={'1'}

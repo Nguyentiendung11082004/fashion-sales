@@ -57,15 +57,15 @@ const AttributeItem: React.FC = () => {
 
     const columns = [
         {
-            title: 'Stt',
+            title: 'STT',
             render: (text: any, record: Iattribute, index: number) => (index + 1) + (currentPage - 1) * pageSize,
         },
         {
-            title: 'Tên thuộc tính',
+            title: 'Tên Thuộc Tính',
             dataIndex: 'name',
         },
         {
-            title: 'Thao tác',
+            title: 'Thao Tác',
             render: (record: Iattribute) => (
                 <div>
                     <Button className="mx-2 btn-warning" onClick={() => handleEdit(record.id)}>
@@ -88,7 +88,7 @@ const AttributeItem: React.FC = () => {
     return (
         <div className="p-6 min-h-screen bg-gray-100">
             <div className="flex items-center justify-between mb-6">
-                <h1 className="text-3xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2">
+                <h1 className="text-3xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2 uppercase">
                     Thuộc tính
                 </h1>
                 <Button className="my-2" type="primary" onClick={openModal}>

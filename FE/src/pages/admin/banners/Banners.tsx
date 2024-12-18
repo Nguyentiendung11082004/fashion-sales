@@ -119,7 +119,7 @@ const Banner = () => {
     },
 
     {
-      title: "Action",
+      title: "Thao tác",
       fixed: "right",
       width: 150,
       render: (banner: IBanner) => (
@@ -166,8 +166,8 @@ const Banner = () => {
     <div className="p-6 min-h-screen">
       <div className="flex items-center justify-between mb-6">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 md:gap-8">
-          <h1 className="text-3xl font-bold text-gray-800 border-b-4 border-gray-300 pb-2">
-            Banner
+          <h1 className="text-3xl font-bold text-gray-800 border-b-4 border-gray-300 pb-2 uppercase">
+            Quản lý banner
           </h1>
           {/* <form className="flex items-center gap-2">
             <Input

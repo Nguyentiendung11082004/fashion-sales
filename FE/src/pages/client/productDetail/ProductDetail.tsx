@@ -547,9 +547,13 @@ const ProductDetail = () => {
     quantity: quantity,
   };
   const handleOpenSeeMore = () => {
-    console.log("_payload", _payload)
+    if (_payload.quantity > data.product.quantity) {
+      toast.error("Số lượng yêu cầu vượt quá số lượng còn lại trong kho");
+      return;
+    }
     navigate("/checkout", { state: { _payload: _payload } });
   }
+
 
   if (isLoading) return <Loading />;
   // if (isError) return <p>{error.message}</p>;

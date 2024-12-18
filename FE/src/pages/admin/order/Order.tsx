@@ -181,7 +181,7 @@ const OrderPage = () => {
 
   const columns: ColumnType<IOrder>[] = [
     {
-      title: "Stt",
+      title: "STT",
       render: (_, __: any, index: number) => (
         <div>{index + 1 + pageSize * (currentPage - 1)}</div>
       ),
@@ -318,31 +318,7 @@ const OrderPage = () => {
     });
   
     channel.bind("order.updated", (newOrder: any) => {
-      console.log("Data received from Pusher:", newOrder);
-  
-      const updatedOrder = newOrder.order; 
-      console.log("Extracted updated order:", updatedOrder);
-
       queryClient.invalidateQueries({ queryKey: ["order-status"] });
-  
-      // queryClient.setQueryData(["order-status"], (oldData: any) => {
-      //   const orders = Array.isArray(oldData?.data) ? [...oldData.data] : [];
-      //   const index = orders.findIndex((order) => order.id === updatedOrder.id);
-      
-      //   if (index >= 0) {
-      //     orders[index] = { ...orders[index], ...updatedOrder };
-      //   } else {
-      //     orders.push(updatedOrder);
-      //   }
-      
-      //   console.log("Updated orders:", orders);
-      
-      //   return {
-      //     ...oldData,
-      //     data: orders,
-      //   };
-      // });
-      
     });
   
     return () => {
@@ -358,7 +334,7 @@ const OrderPage = () => {
   return (
     <div className="p-6 min-h-screen">
       <div className="flex items-center justify-between mb-2">
-        <h1 className="text-3xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2">
+        <h1 className="text-3xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2 uppercase">
           Quản lí đơn hàng
         </h1>
         <div>

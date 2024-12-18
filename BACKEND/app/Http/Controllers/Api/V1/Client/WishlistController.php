@@ -48,7 +48,7 @@ class WishlistController extends Controller
 
                         // Khởi tạo đối tượng lấy thuộc tính duy nhất
                         $getUniqueAttributes = new GetUniqueAttribute();
-
+                        $product->unique_attributes=$getUniqueAttributes->getUniqueAttributes($product["variants"]);
                         // Thêm sản phẩm và biến thể vào mảng
                         $allProducts[] = [
                             'wishlist_id' => $wishlistItem->id,

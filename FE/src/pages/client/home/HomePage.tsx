@@ -61,7 +61,7 @@ const HomePage = () => {
   const [productSeeMore, setProductSeeMore] = useState({});
   const [visiable, setVisible] = useState(false);
   const handleOpenSeeMore = (product: any) => {
-    console.log("product",product)
+    console.log("product", product);
     setVisible(true);
     setProductSeeMore(product);
   };
@@ -169,13 +169,12 @@ const HomePage = () => {
                                 // Hàm kiểm tra xem giá trị có phải là kích thước hay không
                                 const isSizeValue = (v: any) => {
                                   return (
-                                    /^[SMLX]{1,3}$/.test(v) ||
-                                    /^[0-9]+(\.\d+)?\s?(cm|inch|mm|kg)?$/.test(
-                                      v
-                                    ) ||
-                                    /^[0-9]+$/.test(v)
+                                    /^[smlxSMLX]{1,3}$/.test(v) || // Kích thước ký tự s, m, l, x (cả chữ thường và hoa)
+                                    /^[0-9]+(\.\d+)?\s?(cm|inch|mm|kg)?$/i.test(v) || // Số có đơn vị (i: không phân biệt hoa/thường)
+                                    /^[0-9]+$/.test(v) || // Số nguyên
+                                    /^[0-9]+[smlxSMLX]+$/.test(v) // Số trước ký tự size (vd: 2XL, 3X, 4L)
                                   );
-                                };
+                                };            
 
                                 if (Array.isArray(value)) {
                                   return value.every(isSizeValue); // Nếu là mảng, kiểm tra từng phần tử
@@ -193,36 +192,24 @@ const HomePage = () => {
                               .map(([key, value]) => (
                                 <li key={key}>
                                   {Array.isArray(value)
-                                    ? value.join(", ") // Nếu là mảng
+                                    ? value
+                                        .map((v) => String(v).toUpperCase())
+                                        .join(", ") // Nếu là mảng
                                     : typeof value === "object" &&
                                         value !== null
-                                      ? Object.values(value).join(", ") // Nếu là object
-                                      : String(value)}{" "}
-                                  {/* Nếu là giá trị đơn lẻ*/}
+                                      ? Object.values(value)
+                                          .map((v) => String(v).toUpperCase())
+                                          .join(", ") // Nếu là object
+                                      : String(value).toUpperCase()}{" "}
+                                  {/* Nếu là giá trị đơn lẻ */}
                                 </li>
                               ))}
                         </ul>
                       </div>
                     </div>
-
-                    {product.price_regular && (
-                      <div>
-                        {product.price_sale > 0 &&
-                        product.price_sale < product.price_regular ? (
-                          <>
-                            <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400">
-                              -
-                              {Math.round(
-                                ((product.price_regular - product.price_sale) /
-                                  product.price_regular) *
-                                  100
-                              )}
-                              %
-                            </div>
-                          </>
-                        ) : (
-                          <div></div>
-                        )}
+                    {product.discount_percentage > 0 && (
+                      <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[45px] lg:w-[45px] h-[40px] w-[40px] lg:text-sm text-[12px] rounded-full bg-red-400">
+                        -{product.discount_percentage}%
                       </div>
                     )}
                   </div>
@@ -577,13 +564,12 @@ const HomePage = () => {
                                 // Hàm kiểm tra xem giá trị có phải là kích thước hay không
                                 const isSizeValue = (v: any) => {
                                   return (
-                                    /^[SMLX]{1,3}$/.test(v) ||
-                                    /^[0-9]+(\.\d+)?\s?(cm|inch|mm|kg)?$/.test(
-                                      v
-                                    ) ||
-                                    /^[0-9]+$/.test(v)
+                                    /^[smlxSMLX]{1,3}$/.test(v) || // Kích thước ký tự s, m, l, x (cả chữ thường và hoa)
+                                    /^[0-9]+(\.\d+)?\s?(cm|inch|mm|kg)?$/i.test(v) || // Số có đơn vị (i: không phân biệt hoa/thường)
+                                    /^[0-9]+$/.test(v) || // Số nguyên
+                                    /^[0-9]+[smlxSMLX]+$/.test(v) // Số trước ký tự size (vd: 2XL, 3X, 4L)
                                   );
-                                };
+                                };            
 
                                 if (Array.isArray(value)) {
                                   return value.every(isSizeValue); // Nếu là mảng, kiểm tra từng phần tử
@@ -601,36 +587,25 @@ const HomePage = () => {
                               .map(([key, value]) => (
                                 <li key={key}>
                                   {Array.isArray(value)
-                                    ? value.join(", ") // Nếu là mảng
+                                    ? value
+                                        .map((v) => String(v).toUpperCase())
+                                        .join(", ") // Nếu là mảng
                                     : typeof value === "object" &&
                                         value !== null
-                                      ? Object.values(value).join(", ") // Nếu là object
-                                      : String(value)}{" "}
-                                  {/* Nếu là giá trị đơn lẻ*/}
+                                      ? Object.values(value)
+                                          .map((v) => String(v).toUpperCase())
+                                          .join(", ") // Nếu là object
+                                      : String(value).toUpperCase()}{" "}
+                                  {/* Nếu là giá trị đơn lẻ */}
                                 </li>
                               ))}
                         </ul>
                       </div>
                     </div>
 
-                    {product.price_regular && (
-                      <div>
-                        {product.price_sale > 0 &&
-                        product.price_sale < product.price_regular ? (
-                          <>
-                            <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400">
-                              -
-                              {Math.round(
-                                ((product.price_regular - product.price_sale) /
-                                  product.price_regular) *
-                                  100
-                              )}
-                              %
-                            </div>
-                          </>
-                        ) : (
-                          <div></div>
-                        )}
+                    {product.discount_percentage > 0 && (
+                      <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[45px] lg:w-[45px] h-[40px] w-[40px] lg:text-sm text-[12px] rounded-full bg-red-400">
+                        -{product.discount_percentage}%
                       </div>
                     )}
                   </div>
