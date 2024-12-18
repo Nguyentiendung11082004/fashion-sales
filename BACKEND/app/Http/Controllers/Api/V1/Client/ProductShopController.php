@@ -198,7 +198,7 @@ class ProductShopController extends Controller
                 $discountPercentage = round($discountPercentage, 1);
 
                 // Tăng số lượt xem của sản phẩm
-                $product->increment('views');
+                // $product->increment('views');
 
                 // Lấy thuộc tính duy nhất từ các biến thể
                 $getUniqueAttributes = new GetUniqueAttribute();
