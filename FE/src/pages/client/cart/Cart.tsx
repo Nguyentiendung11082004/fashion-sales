@@ -75,6 +75,7 @@ const Cart = () => {
       });
     },
     onError: (message: any) => {
+      console.log("message", message)
       toast.error(message?.response?.data?.message, {
         autoClose: 5000,
       });
@@ -141,6 +142,7 @@ const Cart = () => {
           }
         },
         onError: (message: any) => {
+          console.log("message", message)
           toast.error(message?.response?.data?.message, {
             autoClose: 5000,
           });
@@ -442,50 +444,50 @@ const Cart = () => {
                                   </Link>
                                   {/*end hd-price-item*/}
                                   {updatedAttributes.dataAttributes &&
-                                  Object.entries(
-                                    updatedAttributes.dataAttributes
-                                  ).length > 0
+                                    Object.entries(
+                                      updatedAttributes.dataAttributes
+                                    ).length > 0
                                     ? Object.entries(
-                                        updatedAttributes.dataAttributes
-                                      ).map(
-                                        ([attributeName, attributeValue]) => {
-                                          const attributeItem =
-                                            updatedAttributes.find(
-                                              (item: any) =>
-                                                item.name === attributeName
-                                            );
-                                          return (
-                                            <div
-                                              className="hd-infor-text-meta text-[13px] text-[#878787]"
-                                              key={attributeName}
-                                            >
-                                              <p>
-                                                {attributeName}:{" "}
-                                                <strong>
-                                                  {attributeItem
-                                                    ? attributeItem.pivot.value
-                                                    : attributeValue}
-                                                </strong>
-                                              </p>
-                                            </div>
+                                      updatedAttributes.dataAttributes
+                                    ).map(
+                                      ([attributeName, attributeValue]) => {
+                                        const attributeItem =
+                                          updatedAttributes.find(
+                                            (item: any) =>
+                                              item.name === attributeName
                                           );
-                                        }
-                                      )
-                                    : e?.productvariant?.attributes?.map(
-                                        (item: any) => (
+                                        return (
                                           <div
                                             className="hd-infor-text-meta text-[13px] text-[#878787]"
-                                            key={item.id}
+                                            key={attributeName}
                                           >
                                             <p>
-                                              {item?.name}:{" "}
+                                              {attributeName}:{" "}
                                               <strong>
-                                                {item?.pivot?.value}
+                                                {attributeItem
+                                                  ? attributeItem.pivot.value
+                                                  : attributeValue}
                                               </strong>
                                             </p>
                                           </div>
-                                        )
-                                      )}
+                                        );
+                                      }
+                                    )
+                                    : e?.productvariant?.attributes?.map(
+                                      (item: any) => (
+                                        <div
+                                          className="hd-infor-text-meta text-[13px] text-[#878787]"
+                                          key={item.id}
+                                        >
+                                          <p>
+                                            {item?.name}:{" "}
+                                            <strong>
+                                              {item?.pivot?.value}
+                                            </strong>
+                                          </p>
+                                        </div>
+                                      )
+                                    )}
 
                                   <div className="hd-infor-text-tools mt-[10px]">
                                     {e.productvariant && (
@@ -572,13 +574,13 @@ const Cart = () => {
                                   <del className="text-[#696969]">
                                     {FormatMoney(
                                       e?.productvariant?.price_regular ||
-                                        e?.product?.price_regular
+                                      e?.product?.price_regular
                                     )}
                                   </del>
                                   <ins className="ms-[6px] no-underline text-[#ec0101]">
                                     {FormatMoney(
                                       e?.productvariant?.price_sale ||
-                                        e?.product?.price_sale
+                                      e?.product?.price_sale
                                     )}
                                   </ins>
                                 </div>
@@ -641,12 +643,12 @@ const Cart = () => {
               <div className="hd-pagecart-footer lg:my-[60px]">
                 <div className="hd-footer lg:flex lg:flex-wrap mt-[30px]">
                   <div className="hd-note-text text-start lg:w-[50%] !order-2 hd-col-item mt-8 lg:max-w-full">
-                   
+
                   </div>
                   {/*end hd-note-text*/}
                   <div className="hd-sub-total text-end !order-4 lg:w-[50%] hd-col-item my-[30px] hd-all-textgrey">
                     <div className="border-b-0 shadow-none pt-[10px] pb-[4px] pl-[20px] text-[13px] leading-normal">
-                     
+
                     </div>
                     <div className="hd-cart-total uppercase mb-[10px] text-black lg:text-[20px] text-[18px]">
                       <div className="flex-wrap !items-center !justify-between !inline-flex gap-[30px]">

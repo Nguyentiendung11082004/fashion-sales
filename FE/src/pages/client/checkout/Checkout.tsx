@@ -81,6 +81,7 @@ const Checkout = () => {
     quantity: _payload?.quantity || null,
 
   });
+
   const mutationVoucher = useMutation({
     mutationFn: async () => {
       const res = await instance.post(`/checkout`, {
@@ -98,6 +99,23 @@ const Checkout = () => {
       setSubTotal(res?.data?.sub_total)
       return res.data;
     },
+    onSuccess: (data) => {
+      console.log("data", data)
+      // queryClient.invalidateQueries({
+      //   queryKey: ['cart']
+      // });
+      // const insufficientStockMessages = data?.errors?.insufficient_stock?.map(
+      //   (item: any) => item.message
+      // );
+      // insufficientStockMessages.forEach((message: string) => toast.error(message));
+      const reasons = data?.order_items
+        ?.map((item: any) => item.reason)
+        .filter((reason: string | null) => reason);
+      reasons.forEach((reason: string) => toast.success(reason));
+    },
+    onError: (error) => {
+      console.log("error", error)
+    }
   });
 
   const orderMutation = useMutation({
@@ -128,11 +146,9 @@ const Checkout = () => {
     onError: (error: any) => {
       const errors = error?.response?.data?.errors;
       if (errors?.out_of_stock || errors?.insufficient_stock) {
-        // Lỗi liên quan đến số lượng
         setErrorOrder(errors);
         setError({})
       } else {
-        // Lỗi liên quan đến validate thông tin
         setError(errors);
       }
       toast.error(error?.response?.data?.errors);
@@ -296,8 +312,8 @@ const Checkout = () => {
           body: JSON.stringify(payload),
         });
         if (!response.ok) {
-          navigate('/cart', { replace: true });
-          toast.error("Sản phẩm đã hết hàng")
+          // navigate('/cart');
+          // toast.error("Tất cả sản phẩm trong giỏ hàng đã hết hàng")
           throw new Error('Network response was not ok');
         }
         const data = await response.json();

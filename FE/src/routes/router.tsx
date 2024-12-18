@@ -72,7 +72,6 @@ const Router = () => {
           <Route path="history-order" element={<HistoryOrder />} />
         </Route>
         <Route path="checkout" element={<Checkout />} />
-
         <Route path="contact" element={<Contact />} />
         <Route path="thank" element={<Thanks />} />
         <Route path="requestOrder" element={<RequestOrder />} />
