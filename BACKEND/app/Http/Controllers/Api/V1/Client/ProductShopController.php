@@ -118,7 +118,7 @@ class ProductShopController extends Controller
                     foreach ($attributes as $key => $values) {
                         $query->whereHas('variants.attributes', function ($subQuery) use ($key, $values) {
                             $subQuery->where('name', $key) // Lọc theo key (tên thuộc tính)
-                                     ->whereIn('product_variant_has_attributes.value', $values); // Lọc theo value (danh sách giá trị)
+                                ->whereIn('product_variant_has_attributes.value', $values); // Lọc theo value (danh sách giá trị)
                         });
                     }
                 })
@@ -171,32 +171,46 @@ class ProductShopController extends Controller
             $allProducts = []; // Mảng chứa tất cả sản phẩm và biến thể
 
             foreach ($products as $product) {
-                // dd($product);
-                $discountPercentage  = 0;
+                $discountPercentage = 0;
+
                 if ($product->type == '0') {
                     // Sản phẩm đơn giản (không có biến thể)
-                    $discountPercentage  = ($product->price_regular - $product->price_sale) / $product->price_regular * 100;
+                    if ($product->price_regular > 0) {
+                        // Nếu giá bán = 0, phần trăm giảm giá là 100%
+                        $discountPercentage = ($product->price_regular - $product->price_sale) / $product->price_regular * 100;
+                    }
                 } else if ($product->variants && $product->variants->isNotEmpty()) {
                     // Sản phẩm có biến thể
-                    $discountPercentage  = $product->variants->map(function ($variant) {
-                        return ($variant->price_regular - $variant->price_sale) / $variant->price_regular * 100;
-                    })->max(); // Lấy % giảm giá lớn nhất từ các biến thể
+                    $validVariants = $product->variants->filter(function ($variant) {
+                        // Lọc chỉ lấy những biến thể có giá gốc > 0
+                        return $variant->price_regular > 0;
+                    });
+
+                    if ($validVariants->isNotEmpty()) {
+                        // Tính % giảm giá lớn nhất từ những biến thể hợp lệ
+                        $discountPercentage = $validVariants->map(function ($variant) {
+                            return ($variant->price_regular - $variant->price_sale) / $variant->price_regular * 100;
+                        })->max();
+                    }
                 }
-                $discountPercentage  = round($discountPercentage, 1); // Làm tròn 1 chữ số thập phân
-                $product->increment('views'); // Tăng số lượt xem
+
+                // Làm tròn phần trăm giảm giá
+                $discountPercentage = round($discountPercentage, 1);
+
+                // Tăng số lượt xem của sản phẩm
+                $product->increment('views');
+
+                // Lấy thuộc tính duy nhất từ các biến thể
                 $getUniqueAttributes = new GetUniqueAttribute();
-                $product->unique_attributes=$getUniqueAttributes->getUniqueAttributes($product["variants"]);
-                // Thêm sản phẩm và biến thể vào mảng
+                $product->unique_attributes = $getUniqueAttributes->getUniqueAttributes($product["variants"]);
+
+                // Thêm sản phẩm và biến thể vào mảng kết quả
                 $allProducts[] = [
                     'product' => $product,
                     'discountPercentage' => $discountPercentage,
                     'getUniqueAttributes' => $getUniqueAttributes->getUniqueAttributes($product["variants"]),
                 ];
             }
-         
-
-
-            
             // Trả về tất cả sản phẩm sau khi vòng lặp kết thúc
             return response()->json([
                 'products' => $allProducts,
