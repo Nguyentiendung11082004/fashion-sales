@@ -7,6 +7,7 @@ import instance from "@/configs/axios";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Modal as AntModal, Button } from "antd";
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 type Props = {
   open: boolean;
   onClose: () => void;
@@ -97,8 +98,14 @@ const ModalCart = ({
         }
       );
     },
+    onSuccess: (data: any) => {
+      toast.success("Cập nhật thành công")
+    },
+    onError: (error: any) => {
+      toast.error(error.response.data.message)
+    },
   });
-  console.log("cartAttribute",cartAttribute)
+  console.log("cartAttribute", cartAttribute)
 
   const formattedAttributes = cartAttribute ? cartAttribute.cart_item?.product?.variants
     ?.filter((item: any) =>
@@ -116,7 +123,7 @@ const ModalCart = ({
     })
     : [];
 
-    
+
   const dataAttribute = cartAttribute?.getuniqueattributes;
 
   const checkDisable = (attribute: string, value: any) => {

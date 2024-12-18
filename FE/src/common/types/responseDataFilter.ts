@@ -14,4 +14,5 @@ export interface ResponseWishlist {
     wishlist_id: number;
     product: Iproduct;
     getUniqueAttributes: any;
+    discountPercentage: number;
 }

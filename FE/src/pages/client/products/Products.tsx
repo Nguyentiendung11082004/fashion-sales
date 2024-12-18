@@ -41,7 +41,7 @@ const Products = () => {
   const [selectedBrand, setSelectedBrand] = useState<string[]>([]);
   const [appliedBrands, setAppliedBrands] = useState<string[]>([]);
   const [selectedAttributes, setSelectedAttributes] = useState<
-    Record<string, any[]>
+    Record<string, any[] | undefined>
   >({});
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
@@ -92,20 +92,27 @@ const Products = () => {
   });
   const applyFilters = useCallback(() => {
     const filters = {
-      search: searchTerm,
-      categorys: selectedCategories,
-      brands: selectedBrand,
-      sizes: selectedAttributes,
-      colors: selectedAttributes,
-      min_price: minPrice,
-      max_price: maxPrice,
-      sale: isSale,
-      trend: selectedSort.trend,
-      sortDirection: selectedSort.sortDirection,
-      sortPrice: selectedSort.sortPrice,
-      sortAlphaOrder: selectedSort.sortAlphaOrder,
+      search: searchTerm || null,
+      categorys: selectedCategories.length ? selectedCategories : null,
+      brands: selectedBrand.length ? selectedBrand : null,
+      attributes: Object.keys(selectedAttributes).length
+        ? selectedAttributes
+        : null,
+      min_price: minPrice || null,
+      max_price: maxPrice || null,
+      sale: isSale || null,
+      trend: selectedSort.trend || null,
+      sortDirection: selectedSort.sortDirection || null,
+      sortPrice: selectedSort.sortPrice || null,
+      sortAlphaOrder: selectedSort.sortAlphaOrder || null,
     };
-    mutate(filters);
+
+    // Xóa các key có giá trị null
+    const cleanedFilters = Object.fromEntries(
+      Object.entries(filters).filter(([_, value]) => value !== null)
+    );
+
+    mutate(cleanedFilters);
     setAppliedBrands(selectedBrand);
     setSelectedSortName(temporarySortName);
     setGrowboxDropdownOpen(false);
@@ -114,7 +121,6 @@ const Products = () => {
     searchTerm,
     selectedCategories,
     selectedBrand,
-    selectedAttributes,
     selectedAttributes,
     minPrice,
     maxPrice,
@@ -172,7 +178,7 @@ const Products = () => {
 
         return {
           ...prev,
-          [name]: newValues, // Cập nhật giá trị cho key tương ứng
+          [name]: newValues.length ? newValues : undefined, // Xóa key nếu giá trị rỗng
         };
       });
 
@@ -200,24 +206,6 @@ const Products = () => {
           return newBrands;
         });
         break;
-      // case "sizes":
-      //   setSelectedSizes((prev) => {
-      //     const newSizes = prev.includes(value)
-      //       ? prev.filter((size) => size !== value)
-      //       : [...prev, value];
-      //     applyFilters();
-      //     return newSizes;
-      //   });
-      //   break;
-      // case "colors":
-      //   setSelectedColors((prev) => {
-      //     const newColors = prev.includes(value)
-      //       ? prev.filter((color) => color !== value)
-      //       : [...prev, value];
-      //     applyFilters();
-      //     return newColors;
-      //   });
-      //   break;
       case "sale":
         setIsSale((prev) => {
           const newSale = !prev;
@@ -1221,11 +1209,12 @@ const Products = () => {
                                             // Hàm kiểm tra xem giá trị có phải là kích thước hay không
                                             const isSizeValue = (v: any) => {
                                               return (
-                                                /^[SMLX]{1,3}$/.test(v) ||
-                                                /^[0-9]+(\.\d+)?\s?(cm|inch|mm|kg)?$/.test(
+                                                /^[smlxSMLX]{1,3}$/.test(v) || // Kích thước ký tự s, m, l, x (cả chữ thường và hoa)
+                                                /^[0-9]+(\.\d+)?\s?(cm|inch|mm|kg)?$/i.test(
                                                   v
-                                                ) ||
-                                                /^[0-9]+$/.test(v)
+                                                ) || // Số có đơn vị (i: không phân biệt hoa/thường)
+                                                /^[0-9]+$/.test(v) || // Số nguyên
+                                                /^[0-9]+[smlxSMLX]+$/.test(v) // Số trước ký tự size (vd: 2XL, 3X, 4L)
                                               );
                                             };
 
@@ -1245,22 +1234,31 @@ const Products = () => {
                                           .map(([key, value]) => (
                                             <li key={key}>
                                               {Array.isArray(value)
-                                                ? value.join(", ") // Nếu là mảng
+                                                ? value
+                                                    .map((v) =>
+                                                      String(v).toUpperCase()
+                                                    )
+                                                    .join(", ") // Nếu là mảng
                                                 : typeof value === "object" &&
                                                     value !== null
-                                                  ? Object.values(value).join(
-                                                      ", "
-                                                    ) // Nếu là object
-                                                  : String(value)}{" "}
-                                              {/* Nếu là giá trị đơn lẻ*/}
+                                                  ? Object.values(value)
+                                                      .map((v) =>
+                                                        String(v).toUpperCase()
+                                                      )
+                                                      .join(", ") // Nếu là object
+                                                  : String(
+                                                      value
+                                                    ).toUpperCase()}{" "}
+                                              {/* Nếu là giá trị đơn lẻ */}
                                             </li>
                                           ))}
                                     </ul>
                                   </div>
-
-                                  <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[45px] lg:w-[45px] h-[40px] w-[40px] lg:text-sm text-[12px] rounded-full bg-red-400">
-                                    -{discountPercentage}%
-                                  </div>
+                                  {discountPercentage > 0 && (
+                                    <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[45px] lg:w-[45px] h-[40px] w-[40px] lg:text-sm text-[12px] rounded-full bg-red-400">
+                                      -{discountPercentage}%
+                                    </div>
+                                  )}
                                 </div>
                               </div>
                               <div>
