@@ -80,6 +80,7 @@ class OrderController extends Controller
             $response = DB::transaction(function () use ($data, $user, $isImmediatePurchase, $isCartPurchase) {
                 // Tạo đơn hàng
                 $order = $this->createOrder($data, $user);
+                broadcast(new OrderStatusUpdated($order))->toOthers();
                 $totalQuantity = 0;
                 $totalPrice = 0.00;
                 $errors = [];
@@ -183,12 +184,14 @@ class OrderController extends Controller
                         return response()->json(['errors' => $errors], Response::HTTP_BAD_REQUEST);
                     }
                 }
+
                 if (!auth('sanctum')->check()) {
                     // Gửi notification cho người dùng với email nhận thông báo
                     Notification::route('mail', $order->user_email)
                         ->notify(new OrderConfirmationNotification($order, $order->user_email, $order->orderDetails));
                     // Gửi email xác nhận đơn hàng cho khách hàng
                 }
+
                 // Thực hiện thanh toán nếu chọn phương thức online (VNPay)
                 if ($data['payment_method_id'] == 2) {
                     $payment = new PaymentController();
