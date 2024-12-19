@@ -4,7 +4,13 @@ import { useAuth } from "@/common/context/Auth/AuthContext";
 import Loading from "@/common/Loading/Loading";
 import { IPost } from "@/common/types/post";
 import instance from "@/configs/axios";
-import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  DeleteOutlined,
+  EditOutlined,
+  PlusOutlined,
+  SearchOutlined,
+  SyncOutlined,
+} from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button, Image, Input, Modal, Pagination, Table } from "antd";
 import { useState, useEffect } from "react";
@@ -20,7 +26,7 @@ const Posts = () => {
   const [pageSize] = useState(5);
   const navigate = useNavigate();
   const { token } = useAuth();
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isFetching } = useQuery({
     queryKey: ["posts"],
     queryFn: async () => {
       const res = await instance.get("/posts", {});
@@ -165,7 +171,7 @@ const Posts = () => {
       setDataSearch(res?.data?.data || []);
       setCurrentPage(1);
     } catch (error) {
-      toast.error("Lỗi khi tìm kiếm");
+      toast.error("Kết quả tìm kiếm trống");
     }
   };
 
@@ -178,16 +184,20 @@ const Posts = () => {
             ...post,
           }))
         : [];
-  console.log("tìm kiếm: ", dataSource);
+  const handleCancelSearch = () => {
+    setQuery("");
+    setDataSearch([]);
+    setCurrentPage(1);
+  };
 
   return (
     <div className="p-6 min-h-screen">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 md:gap-8">
           <h1 className="text-3xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2 uppercase">
             Bài viết
           </h1>
-          <Input
+          {/* <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Tìm kiếm"
@@ -198,7 +208,7 @@ const Posts = () => {
             className="bg-indigo-500 hover:bg-indigo-600 text-white font-medium py-2 px-4 rounded-lg shadow"
           >
             Tìm kiếm
-          </Button>
+          </Button> */}
         </div>
         <Link to={`create`}>
           <Button
@@ -216,6 +226,19 @@ const Posts = () => {
           <Loading />
         ) : (
           <>
+            <div className="w-[36%] flex mb-4 float-right">
+              <Input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Tìm kiếm"
+              />
+              <Button onClick={handleSearch} className="ml-2">
+                <SearchOutlined />
+              </Button>
+              <Button onClick={handleCancelSearch} className="ml-2">
+                <SyncOutlined />
+              </Button>
+            </div>
             <Table
               className="custom-table"
               dataSource={dataSource.slice(

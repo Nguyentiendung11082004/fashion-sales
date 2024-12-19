@@ -246,6 +246,11 @@ const FormVoucher = () => {
             value._voucher_category_ids.map((item: any) => item.id || item)
           ),
         });
+      } else {
+        meta.push({
+          meta_key: "_voucher_category_ids",
+          meta_value: "[]",
+        });
       }
 
       if (
@@ -260,6 +265,11 @@ const FormVoucher = () => {
             )
           ),
         });
+      } else {
+        meta.push({
+          meta_key: "_voucher_exclude_category_ids",
+          meta_value: "[]",
+        });
       }
 
       if (value._voucher_product_ids && value._voucher_product_ids.length > 0) {
@@ -268,6 +278,11 @@ const FormVoucher = () => {
           meta_value: JSON.stringify(
             value._voucher_product_ids.map((item: any) => item.id || item)
           ),
+        });
+      } else {
+        meta.push({
+          meta_key: "_voucher_product_ids",
+          meta_value: "[]",
         });
       }
 
@@ -283,12 +298,22 @@ const FormVoucher = () => {
             )
           ),
         });
+      } else {
+        meta.push({
+          meta_key: "_voucher_exclude_product_ids",
+          meta_value: "[]",
+        });
       }
 
       if (value._voucher_max_discount_amount) {
         meta.push({
           meta_key: "_voucher_max_discount_amount",
-          meta_value: value._voucher_max_discount_amount || 0,
+          meta_value: value._voucher_max_discount_amount,
+        });
+      } else {
+        meta.push({
+          meta_key: "_voucher_max_discount_amount",
+          meta_value: "0",
         });
       }
     }
