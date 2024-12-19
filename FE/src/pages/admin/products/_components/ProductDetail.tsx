@@ -196,13 +196,14 @@ const ProductDetailAdmin = () => {
             <div className=" mt-4">
               <div className="bg-gray-100 text-base flex p-4 rounded-lg">
                 <p className=" font-semibold mr-1">Số lượng: </p>
-                {productShow?.product.variants
+                {productShow?.product.variants &&
+                productShow?.product.variants.length > 0
                   ? productShow.product.variants.reduce(
                       (total: number, variant: IProductVariant) =>
                         total + variant.quantity,
                       0
                     )
-                  : productShow.product.quantity}
+                  : productShow?.product.quantity}
               </div>
             </div>
 
@@ -270,79 +271,35 @@ const ProductDetailAdmin = () => {
             </div>
           </div>
 
-          <div className="mt-4 text-base">
-            <h2 className="text-xl font-semibold text-gray-800">
-              Thuộc tính sản phẩm
-            </h2>
-            {Object.entries(productShow?.allAttribute || {}).map(
-              ([key, values]) => (
-                <div className="relative flex items-center mt-2 mb-2" key={key}>
-                  <h3 className="font-semibold">
-                    {key.charAt(0).toUpperCase() + key.slice(1).toLowerCase()}:
-                  </h3>
-                  <span className="ml-2">
-                    {Object.values(values as { [key: string]: string }) // Ép kiểu cho `values`
-                      .map(
-                        (item) =>
-                          item.charAt(0).toUpperCase() +
-                          item.slice(1).toLowerCase()
-                      )
-                      .join(", ") || "No Value"}
-                  </span>
-                </div>
-              )
-            )}
-
-            {/* <div key={key} className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-              <div className="bg-gray-100 p-4 rounded-lg">
-                <p className="text-base font-semibold text-black">
-                  Màu sắc:
-                </p>
-                <div className="text-base">
-                  {Array.from(
-                    new Set<string>(
-                      productShow.variants.flatMap((variant: any) =>
-                        variant.attributes
-                          .filter((attr: any) => attr.name === "color")
-                          .map((attr: any) => attr.pivot.value)
-                      )
-                    )
-                  ).map((uniqueColor: string, index: number) => (
-                    <p key={index}>
-                      <span className="font-medium text-gray-500">
-                        {colorTranslations[
-                            uniqueColor.charAt(0).toUpperCase() +
-                            uniqueColor.slice(1).toLowerCase()
-                          ] || ""}
-                      </span>
-                    </p>
-                  ))}
-                </div>
-              </div>
-              <div className="bg-gray-100 p-4 rounded-lg">
-                <p className="text-base font-semibold text-black">
-                  Kích cỡ:
-                </p>
-                <div className="text-base">
-                  {Array.from(
-                    new Set<string>(
-                      productShow.variants.flatMap((variant: any) =>
-                        variant.attributes
-                          .filter((attr: any) => attr.name === "size")
-                          .map((attr: any) => attr.pivot.value)
-                      )
-                    )
-                  ).map((uniqueSize: string, index: number) => (
-                    <p key={index} >
-                      <span className="font-medium text-gray-500">
-                        {uniqueSize}
-                      </span>
-                    </p>
-                  ))}
-                </div>
-              </div>
-            </div> */}
-          </div>
+          {productShow?.allAttribute?.length > 0 && (
+            <div className="mt-4 text-base">
+              <h2 className="text-xl font-semibold text-gray-800">
+                Thuộc tính sản phẩm
+              </h2>
+              {Object.entries(productShow?.allAttribute || {}).map(
+                ([key, values]) => (
+                  <div
+                    className="relative flex items-center mt-2 mb-2"
+                    key={key}
+                  >
+                    <h3 className="font-semibold">
+                      {key.charAt(0).toUpperCase() + key.slice(1).toLowerCase()}
+                      :
+                    </h3>
+                    <span className="ml-2">
+                      {Object.values(values as { [key: string]: string }) 
+                        .map(
+                          (item) =>
+                            item.charAt(0).toUpperCase() +
+                            item.slice(1).toLowerCase()
+                        )
+                        .join(", ") || "No Value"}
+                    </span>
+                  </div>
+                )
+              )}
+            </div>
+          )}
         </div>
 
         {/* <!-- Product Gallery Section --> */}
