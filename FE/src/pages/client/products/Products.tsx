@@ -1267,11 +1267,14 @@ const Products = () => {
                                     {product.name.charAt(0).toUpperCase() +
                                       product.name.slice(1).toLowerCase()}
                                   </p>
+                                  
                                 </Link>
                                 {(product?.price_regular ||
                                   product?.variants?.length) && (
                                   <div>
                                     {(() => {
+                                      console.log("sp", product);
+                                      
                                       const variants = product?.variants || [];
                                       const hasVariants = variants.length > 0;
 
@@ -1298,16 +1301,15 @@ const Products = () => {
                                           )
                                           .filter((price: any) => price >= 0)
                                       );
-                                      const productPriceSale =
-                                        product?.price_sale ?? 0; // Sử dụng 0 nếu không có giá trị
-                                      const productPriceRegular =
-                                        product?.price_regular ?? 0; // Sử dụng 0 nếu không có giá trị
-
-                                      console.log(product.name);
-                                      console.log(
-                                        productPriceSale,
-                                        productPriceRegular
+                                      const productPriceSale = Number(
+                                        product?.price_sale
+                                      ) ;
+                                      const productPriceRegular = Number(
+                                        product?.price_regular
                                       );
+                                      // console.log(product?.name);
+                                      // console.log(typeof productPriceSale, typeof productPriceRegular);
+                                      // console.log(productPriceSale, productPriceRegular);
 
                                       const pricesSaleVar = variants.map(
                                         (variant: any) => variant.price_sale
@@ -1364,8 +1366,12 @@ const Products = () => {
                                               </span>
                                             );
                                           }
-                                        } else if (productPriceSale === 0) {
-                                          if (productPriceRegular === 0) {
+                                        } else if(productPriceSale == 0){
+                                          // console.log("sale", productPriceSale);
+                                          
+                                          if (productPriceRegular == 0) {
+                                            // console.log("gốc", productPriceRegular);
+
                                             return (
                                               <span>
                                                 {new Intl.NumberFormat(
@@ -1377,6 +1383,7 @@ const Products = () => {
                                               </span>
                                             );
                                           } else {
+                                            // console.log("gốc 1", productPriceRegular);
                                             return (
                                               <>
                                                 <del className="mr-1">
@@ -1436,7 +1443,7 @@ const Products = () => {
                                               </span>
                                             );
                                           }
-                                        } else if (minPriceSale === 0) {
+                                        } else if(minPriceSale === 0) {
                                           if (maxPriceRegular === 0) {
                                             return (
                                               <span>
@@ -1462,6 +1469,7 @@ const Products = () => {
                                           }
                                         }
                                       }
+
                                     })()}
                                   </div>
                                 )}
