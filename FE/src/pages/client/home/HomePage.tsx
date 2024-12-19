@@ -236,6 +236,11 @@ const HomePage = () => {
                               .map((variant: any) => variant.price_sale)
                               .filter((price: any) => price >= 0)
                           );
+                          const maxPriceSale = Math.max(
+                            ...variants
+                              .map((variant: any) => variant.price_sale)
+                              .filter((price: any) => price >= 0)
+                          );
                           const minPriceRegular = Math.min(
                             ...variants
                               .map((variant: any) => variant.price_regular)
@@ -358,7 +363,7 @@ const HomePage = () => {
                                     )}{" "}
                                     VNĐ -{" "}
                                     {new Intl.NumberFormat("vi-VN").format(
-                                      maxPriceRegular
+                                      maxPriceSale
                                     )}{" "}
                                     VNĐ
                                   </span>
@@ -378,11 +383,11 @@ const HomePage = () => {
                                 return (
                                   <span>
                                     {new Intl.NumberFormat("vi-VN").format(
-                                      minPriceRegular
+                                      minPriceSale
                                     )}{" "}
                                     VNĐ -{" "}
                                     {new Intl.NumberFormat("vi-VN").format(
-                                      maxPriceRegular
+                                      maxPriceSale
                                     )}{" "}
                                     VNĐ
                                   </span>
@@ -682,6 +687,11 @@ const HomePage = () => {
                               .map((variant: any) => variant.price_sale)
                               .filter((price: any) => price >= 0)
                           );
+                          const maxPriceSale = Math.max(
+                            ...variants
+                              .map((variant: any) => variant.price_sale)
+                              .filter((price: any) => price >= 0)
+                          );
                           const minPriceRegular = Math.min(
                             ...variants
                               .map((variant: any) => variant.price_regular)
@@ -804,7 +814,7 @@ const HomePage = () => {
                                     )}{" "}
                                     VNĐ -{" "}
                                     {new Intl.NumberFormat("vi-VN").format(
-                                      maxPriceRegular
+                                      maxPriceSale
                                     )}{" "}
                                     VNĐ
                                   </span>
@@ -824,11 +834,11 @@ const HomePage = () => {
                                 return (
                                   <span>
                                     {new Intl.NumberFormat("vi-VN").format(
-                                      minPriceRegular
+                                      minPriceSale
                                     )}{" "}
                                     VNĐ -{" "}
                                     {new Intl.NumberFormat("vi-VN").format(
-                                      maxPriceRegular
+                                      maxPriceSale
                                     )}{" "}
                                     VNĐ
                                   </span>

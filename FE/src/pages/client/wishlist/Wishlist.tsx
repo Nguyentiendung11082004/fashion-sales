@@ -298,6 +298,11 @@ const Wishlist = () => {
                                   .map((variant: any) => variant.price_sale)
                                   .filter((price: any) => price >= 0)
                               );
+                              const maxPriceSale = Math.max(
+                                ...variants
+                                  .map((variant: any) => variant.price_sale)
+                                  .filter((price: any) => price >= 0)
+                              );
                               const minPriceRegular = Math.min(
                                 ...variants
                                   .map((variant: any) => variant.price_regular)
@@ -422,7 +427,7 @@ const Wishlist = () => {
                                         )}{" "}
                                         VNĐ -{" "}
                                         {new Intl.NumberFormat("vi-VN").format(
-                                          maxPriceRegular
+                                          maxPriceSale
                                         )}{" "}
                                         VNĐ
                                       </span>
@@ -442,11 +447,11 @@ const Wishlist = () => {
                                     return (
                                       <span>
                                         {new Intl.NumberFormat("vi-VN").format(
-                                          minPriceRegular
+                                          minPriceSale
                                         )}{" "}
                                         VNĐ -{" "}
                                         {new Intl.NumberFormat("vi-VN").format(
-                                          maxPriceRegular
+                                          maxPriceSale
                                         )}{" "}
                                         VNĐ
                                       </span>
