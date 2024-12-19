@@ -556,17 +556,17 @@ const ProductForm = () => {
         enabled: !!id
     });
     const getProduct = (productShow: any) => {
-        const productTags = productShow.tags.map((tag: any) => tag.id);
-        const productType = productShow.type ? 1 : 0;
-        const productAttribute = productShow.attributes.map((attribute: any) => attribute.id);
+        const productTags = productShow?.tags.map((tag: any) => tag.id);
+        const productType = productShow?.type ? 1 : 0;
+        const productAttribute = productShow?.attributes.map((attribute: any) => attribute.id);
 
         // Chuyển các attribute_item_ids thành một object để dễ dàng lấy giá trị của từng attribute
-        const productAttributeValue = productShow.attributes.reduce((acc: any, attribute: any) => {
+        const productAttributeValue = productShow?.attributes.reduce((acc: any, attribute: any) => {
             acc[attribute.id] = attribute.pivot.attribute_item_ids;
             return acc;
         }, {});
 
-        const initialGalleryFiles = (productShow.gallery || []).map((galleryItem: any, index: number) => ({
+        const initialGalleryFiles = (productShow?.gallery || []).map((galleryItem: any, index: number) => ({
             uid: String(galleryItem.id || index),
             name: galleryItem.image.substring(galleryItem.image.lastIndexOf('/') + 1),
             status: 'done',
@@ -580,7 +580,7 @@ const ProductForm = () => {
         setSelectedValues(productAttributeValue);
 
         // Xử lý variants và cập nhật theo id_guid
-        const initialItems = productShow.variants.map((item: any) => {
+        const initialItems = productShow?.variants.map((item: any) => {
             const itemAttributes = productAttribute.reduce((acc: any, attrId: any) => {
                 acc[attrId] = item[attrId] || [];
                 return acc;
@@ -600,10 +600,10 @@ const ProductForm = () => {
 
 
         // Xử lý variants và so sánh attributes với selectedItems
-        const initialVariants = productShow.variants.map((variant: any) => {
+        const initialVariants = productShow?.variants?.map((variant: any) => {
 
             // Chuyển đổi attributes thành đối tượng key-value với id làm key và value từ pivot
-            const variantAttributes = variant.attributes.reduce((acc: any, attribute: any) => {
+            const variantAttributes = variant?.attributes?.reduce((acc: any, attribute: any) => {
                 const { id, pivot } = attribute;
                 const value = pivot ? pivot.value : null;
 

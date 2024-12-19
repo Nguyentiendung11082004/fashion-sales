@@ -111,7 +111,9 @@ const Checkout = () => {
       const reasons = data?.order_items
         ?.map((item: any) => item.reason)
         .filter((reason: string | null) => reason);
-      reasons.forEach((reason: string) => toast.success(reason));
+      reasons.forEach((reason: string) => toast.success(reason, {
+        autoClose: 6000,
+      }));
     },
     onError: (error) => {
       console.log("error", error)
@@ -144,6 +146,7 @@ const Checkout = () => {
       localStorage.removeItem('checkedItems');
     },
     onError: (error: any) => {
+      console.log("error", error)
       const errors = error?.response?.data?.errors;
       if (errors?.out_of_stock || errors?.insufficient_stock) {
         setErrorOrder(errors);
@@ -152,12 +155,18 @@ const Checkout = () => {
         setError(errors);
       }
       toast.error(error?.response?.data?.errors);
+      toast.error(
+        error?.response?.data?.errors?.product_id?.join(", ") || "Đã xảy ra lỗi."
+      );
+      
     }
   });
   useEffect(() => {
     if (errorOrder) {
       const allErrors = [...errorOrder?.out_of_stock, ...errorOrder?.insufficient_stock];
-      allErrors.forEach(error => toast.error(error.message));
+      allErrors.forEach(error => toast.error(error.message, {
+        autoClose: 8000,
+      }));
       const outOfStockCartIds = errorOrder.out_of_stock.map((error: any) => error.cart_id);
       const filteredCartIds = cartIds.filter((id: number) => !outOfStockCartIds.includes(id));
       setCartIds(filteredCartIds);
@@ -167,7 +176,9 @@ const Checkout = () => {
       }))
     } else if (errorCheckout) {
       const allErrors = [...errorCheckout?.out_of_stock, ...errorCheckout?.insufficient_stock,];
-      allErrors.forEach(error => toast.error(error.message));
+      allErrors.forEach(error => toast.error(error.message, {
+        autoClose: 8000,
+      }));
       const outOfStockCartIds = errorCheckout.out_of_stock.map((error: any) => error.cart_id);
       const filteredCartIds = cartIds.filter((id: number) => !outOfStockCartIds.includes(id));
       setCartIds(filteredCartIds);
@@ -311,11 +322,16 @@ const Checkout = () => {
           },
           body: JSON.stringify(payload),
         });
-        if (!response.ok) {
-          // navigate('/cart');
-          // toast.error("Tất cả sản phẩm trong giỏ hàng đã hết hàng")
+        console.log("response", response)
+        if (!response.ok && response.status == 400) {
+          navigate('/cart');
+          toast.error("Tất cả sản phẩm trong giỏ hàng đã hết hàng");
           throw new Error('Network response was not ok');
-        }
+        } else if (!response.ok) {
+          navigate('/cart');
+          throw new Error('Network response was not ok');
+        };
+
         const data = await response.json();
         setErrorCheckout(data.errors)
         setDataCheckout(data);
