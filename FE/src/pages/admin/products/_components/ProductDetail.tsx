@@ -180,6 +180,184 @@ const ProductDetailAdmin = () => {
                   })()}
                 </div>
               )}
+              {(productShow?.product?.price_regular ||
+                          productShow?.product?.variants?.length) && (
+                          <div>
+                            {(() => {
+                              console.log("sp", product);
+
+                              const variants = productShow?.product?.variants || [];
+                              const hasVariants = variants.length > 0;
+
+                              const minPriceSale = Math.min(
+                                ...variants
+                                  .map((variant: any) => variant.price_sale)
+                                  .filter((price: any) => price >= 0)
+                              );
+                              const maxPriceSale = Math.max(
+                                ...variants
+                                  .map((variant: any) => variant.price_sale)
+                                  .filter((price: any) => price >= 0)
+                              );
+                              const minPriceRegular = Math.min(
+                                ...variants
+                                  .map((variant: any) => variant.price_regular)
+                                  .filter((price: any) => price >= 0)
+                              );
+                              const maxPriceRegular = Math.max(
+                                ...variants
+                                  .map((variant: any) => variant.price_regular)
+                                  .filter((price: any) => price >= 0)
+                              );
+                              const productPriceSale = Number(
+                                productShow?.product?.price_sale
+                              );
+                              const productPriceRegular = Number(
+                                productShow?.product?.price_regular
+                              );
+                              // console.log(product?.name);
+                              // console.log(typeof productPriceSale, typeof productPriceRegular);
+                              // console.log(productPriceSale, productPriceRegular);
+
+                              const pricesSaleVar = variants.map(
+                                (variant: any) => variant.price_sale
+                              );
+                              const pricesRegularVar = variants.map(
+                                (variant: any) => variant.price_regular
+                              );
+                              const allSaleEqual = pricesSaleVar.every(
+                                (price: any) => price === pricesSaleVar[0]
+                              );
+                              const allRegularEqual = pricesRegularVar.every(
+                                (price: any) => price === pricesRegularVar[0]
+                              );
+
+                              // Hiển thị giá sản phẩm đơn (nếu không có biến thể)
+                              if (!hasVariants) {
+                                if (productPriceSale > 0) {
+                                  if (productPriceSale < productPriceRegular) {
+                                    return (
+                                      <>
+                                        <del className="mr-1">
+                                          {new Intl.NumberFormat(
+                                            "vi-VN"
+                                          ).format(productPriceRegular)}{" "}
+                                          VNĐ
+                                        </del>
+                                        <span className="text-[red]">
+                                          {new Intl.NumberFormat(
+                                            "vi-VN"
+                                          ).format(productPriceSale)}{" "}
+                                          VNĐ
+                                        </span>
+                                      </>
+                                    );
+                                  } else {
+                                    return (
+                                      <span>
+                                        {new Intl.NumberFormat("vi-VN").format(
+                                          productPriceRegular
+                                        )}{" "}
+                                        VNĐ
+                                      </span>
+                                    );
+                                  }
+                                } else if (productPriceSale == 0) {
+                                  // console.log("sale", productPriceSale);
+
+                                  if (productPriceRegular == 0) {
+                                    // console.log("gốc", productPriceRegular);
+
+                                    return (
+                                      <span>
+                                        {new Intl.NumberFormat("vi-VN").format(
+                                          productPriceRegular
+                                        )}{" "}
+                                        VNĐ
+                                      </span>
+                                    );
+                                  } else {
+                                    // console.log("gốc 1", productPriceRegular);
+                                    return (
+                                      <>
+                                        <del className="mr-1">
+                                          {new Intl.NumberFormat(
+                                            "vi-VN"
+                                          ).format(productPriceRegular)}{" "}
+                                          VNĐ
+                                        </del>
+                                        <span className="text-[red]">
+                                          {new Intl.NumberFormat(
+                                            "vi-VN"
+                                          ).format(productPriceSale)}{" "}
+                                          VNĐ
+                                        </span>
+                                      </>
+                                    );
+                                  }
+                                }
+                              } else {
+                                if (minPriceSale > 0) {
+                                  if (allSaleEqual && allRegularEqual) {
+                                    return (
+                                      <>
+                                        <del className="mr-1">
+                                          {new Intl.NumberFormat(
+                                            "vi-VN"
+                                          ).format(pricesRegularVar[0])}{" "}
+                                          VNĐ
+                                        </del>
+                                        <span className="text-[red]">
+                                          {new Intl.NumberFormat(
+                                            "vi-VN"
+                                          ).format(pricesSaleVar[0])}{" "}
+                                          VNĐ
+                                        </span>
+                                      </>
+                                    );
+                                  } else {
+                                    return (
+                                      <span>
+                                        {new Intl.NumberFormat("vi-VN").format(
+                                          minPriceSale
+                                        )}{" "}
+                                        VNĐ -{" "}
+                                        {new Intl.NumberFormat("vi-VN").format(
+                                          maxPriceSale
+                                        )}{" "}
+                                        VNĐ
+                                      </span>
+                                    );
+                                  }
+                                } else if (minPriceSale === 0) {
+                                  if (maxPriceRegular === 0) {
+                                    return (
+                                      <span>
+                                        {new Intl.NumberFormat("vi-VN").format(
+                                          maxPriceRegular
+                                        )}{" "}
+                                        VNĐ
+                                      </span>
+                                    );
+                                  } else {
+                                    return (
+                                      <span>
+                                        {new Intl.NumberFormat("vi-VN").format(
+                                          minPriceSale
+                                        )}{" "}
+                                        VNĐ -{" "}
+                                        {new Intl.NumberFormat("vi-VN").format(
+                                          maxPriceSale
+                                        )}{" "}
+                                        VNĐ
+                                      </span>
+                                    );
+                                  }
+                                }
+                              }
+                            })()}
+                          </div>
+                        )}
             </p>
             <p className="bg-gray-100 text-base flex p-4 rounded-lg mt-3">
               <p className="font-medium mr-1">
@@ -271,7 +449,7 @@ const ProductDetailAdmin = () => {
             </div>
           </div>
 
-          {productShow?.allAttribute?.length > 0 && (
+          {/* {productShow?.allAttribute?.length > 0 && ( */}
             <div className="mt-4 text-base">
               <h2 className="text-xl font-semibold text-gray-800">
                 Thuộc tính sản phẩm
@@ -299,7 +477,7 @@ const ProductDetailAdmin = () => {
                 )
               )}
             </div>
-          )}
+          {/* )} */}
         </div>
 
         {/* <!-- Product Gallery Section --> */}
