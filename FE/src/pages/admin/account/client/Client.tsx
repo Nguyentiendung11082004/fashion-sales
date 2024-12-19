@@ -4,7 +4,12 @@ import Loading from "@/common/Loading/Loading";
 import { IUser } from "@/common/types/users";
 import instance from "@/configs/axios";
 import { deleteClient, getClients } from "@/services/api/admin/clients";
-import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  DeleteOutlined,
+  PlusOutlined,
+  SearchOutlined,
+  SyncOutlined,
+} from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button, Image, Input, Modal, Pagination } from "antd";
 import Table, { ColumnType } from "antd/es/table";
@@ -154,7 +159,7 @@ const ClientPage = () => {
       setDataSearch(res?.data?.data || []);
       setCurrentPage(1);
     } catch (error) {
-      toast.error("Lỗi khi tìm kiếm");
+      toast.error("Kết quả tìm kiếm trống");
     }
   };
 
@@ -167,26 +172,20 @@ const ClientPage = () => {
             ...client,
           }))
         : [];
+  // Cancel search and reset to all products
+  const handleCancelSearch = () => {
+    setQuery("");
+    setDataSearch([]);
+    setCurrentPage(1);
+  };
 
   return (
     <div className="p-6 min-h-screen">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 md:gap-8">
           <h1 className="text-3xl font-bold text-gray-800 border-b-4 border-gray-300 pb-2 uppercase">
             Khách Hàng
           </h1>
-          <Input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Tìm kiếm"
-            className="w-full md:w-64 px-4 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
-          />
-          <Button
-            onClick={handleSearch}
-            className="bg-indigo-500 hover:bg-indigo-600 text-white font-medium py-2 px-4 rounded-lg shadow"
-          >
-            Tìm Kiếm
-          </Button>
         </div>
         <Link to={`create`}>
           <Button
@@ -199,11 +198,24 @@ const ClientPage = () => {
         </Link>
       </div>
       <div className="">
-        <div className="flex space-x-4 py-4"></div>
+        <div className="flex space-x-4 py-2"></div>
         {isLoading ? (
           <Loading />
         ) : (
           <>
+            <div className="w-[36%] flex mb-4 float-right">
+              <Input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Tìm kiếm tài khoản"
+              />
+              <Button onClick={handleSearch} className="ml-2">
+                <SearchOutlined />
+              </Button>
+              <Button onClick={handleCancelSearch} className="ml-2">
+                <SyncOutlined />
+              </Button>
+            </div>
             <Table
               className="custom-table"
               dataSource={dataSource.slice(

@@ -4,7 +4,13 @@ import Loading from "@/common/Loading/Loading";
 import { IUser } from "@/common/types/users";
 import instance from "@/configs/axios";
 import { deleteEmployee, getEmployees } from "@/services/api/admin/employee";
-import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  DeleteOutlined,
+  EditOutlined,
+  PlusOutlined,
+  SearchOutlined,
+  SyncOutlined,
+} from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button, Image, Input, Modal, Pagination } from "antd";
 import Table, { ColumnType } from "antd/es/table";
@@ -167,7 +173,7 @@ const EmployeePage = () => {
       setDataSearch(res?.data?.data || []);
       setCurrentPage(1);
     } catch (error) {
-      toast.error("Lỗi khi tìm kiếm");
+      toast.error("Kết quả tìm kiếm trống!!!");
     }
   };
 
@@ -182,7 +188,11 @@ const EmployeePage = () => {
         : [];
 
   console.log("dataSource: ", dataSource);
-
+  const handleCancelSearch = () => {
+    setQuery("");
+    setDataSearch([]);
+    setCurrentPage(1);
+  };
   return (
     <div className="p-6 min-h-screen">
       <div className="flex items-center justify-between mb-6">
@@ -190,18 +200,6 @@ const EmployeePage = () => {
           <h1 className="text-3xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2 uppercase">
             Nhân Viên
           </h1>
-          <Input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Tìm kiếm"
-            className="w-full md:w-64 px-4 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
-          />
-          <Button
-            onClick={handleSearch}
-            className="bg-indigo-500 hover:bg-indigo-600 text-white font-medium py-2 px-4 rounded-lg shadow"
-          >
-            Tìm kiếm
-          </Button>
         </div>
         <Link to={`create`}>
           <Button
@@ -218,6 +216,19 @@ const EmployeePage = () => {
           <Loading />
         ) : (
           <>
+            <div className="w-[36%] flex mb-4 float-right">
+              <Input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Tìm kiếm"
+              />
+              <Button onClick={handleSearch} className="ml-2">
+                <SearchOutlined />
+              </Button>
+              <Button onClick={handleCancelSearch} className="ml-2">
+                <SyncOutlined />
+              </Button>
+            </div>
             <Table
               className="custom-table"
               dataSource={dataSource.slice(
