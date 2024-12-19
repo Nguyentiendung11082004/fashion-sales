@@ -648,17 +648,15 @@ const Cart = () => {
                   {/*end hd-note-text*/}
                   <div className="hd-sub-total text-end !order-4 lg:w-[50%] hd-col-item my-[30px] hd-all-textgrey">
                     <div className="border-b-0 shadow-none pt-[10px] pb-[4px] pl-[20px] text-[13px] leading-normal">
-
                     </div>
                     <div className="hd-cart-total uppercase mb-[10px] text-black lg:text-[20px] text-[18px]">
                       <div className="flex-wrap !items-center !justify-between !inline-flex gap-[30px]">
-                        <div className="hd-col-item w-auto">
+                        <div className="hd-col-item w-auto ">
                           <strong className="font-semibold">Tổng:</strong>
                         </div>
                         <div className="hd-col-item w-auto">
                           <div className="text-right font-semibold">
                             {
-                              // isFetching ? <Skeleton /> :
                               FormatMoney(data?.sub_total)
                             }
                           </div>
@@ -666,15 +664,15 @@ const Cart = () => {
                       </div>
                     </div>
                     <p className="mb-[10px]">
-                      Thuế và phí vận chuyển được tính khi thanh toán
+                      Phí vận chuyển được tính khi thanh toán
                     </p>
-                    <div className="relative inline-block mb-[20px]">
+                    {/* <div className="relative inline-block mb-[20px]">
                       <input
                         type="checkbox"
                         className="size-3.5 absolute rounded-md shadow-sm top-1 -left-6"
                       />
                       <label>Tôi đồng ý với các điều khoản và điều kiện.</label>
-                    </div>
+                    </div> */}
                     <div className=" ">
                       <Button
                         onClick={handleCheckout}

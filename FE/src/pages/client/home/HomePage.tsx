@@ -174,7 +174,7 @@ const HomePage = () => {
                                     /^[0-9]+$/.test(v) || // Số nguyên
                                     /^[0-9]+[smlxSMLX]+$/.test(v) // Số trước ký tự size (vd: 2XL, 3X, 4L)
                                   );
-                                };            
+                                };
 
                                 if (Array.isArray(value)) {
                                   return value.every(isSizeValue); // Nếu là mảng, kiểm tra từng phần tử
@@ -193,13 +193,13 @@ const HomePage = () => {
                                 <li key={key}>
                                   {Array.isArray(value)
                                     ? value
-                                        .map((v) => String(v).toUpperCase())
-                                        .join(", ") // Nếu là mảng
+                                      .map((v) => String(v).toUpperCase())
+                                      .join(", ") // Nếu là mảng
                                     : typeof value === "object" &&
-                                        value !== null
+                                      value !== null
                                       ? Object.values(value)
-                                          .map((v) => String(v).toUpperCase())
-                                          .join(", ") // Nếu là object
+                                        .map((v) => String(v).toUpperCase())
+                                        .join(", ") // Nếu là object
                                       : String(value).toUpperCase()}{" "}
                                   {/* Nếu là giá trị đơn lẻ */}
                                 </li>
@@ -525,7 +525,8 @@ const HomePage = () => {
                           className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]"
                           onClick={() => handleOpenSeeMore(product)}
                         >
-                          <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
+                          <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out 
+                          group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
                             Mua ngay
                           </p>
                           <Eye />
@@ -569,7 +570,7 @@ const HomePage = () => {
                                     /^[0-9]+$/.test(v) || // Số nguyên
                                     /^[0-9]+[smlxSMLX]+$/.test(v) // Số trước ký tự size (vd: 2XL, 3X, 4L)
                                   );
-                                };            
+                                };
 
                                 if (Array.isArray(value)) {
                                   return value.every(isSizeValue); // Nếu là mảng, kiểm tra từng phần tử
@@ -588,13 +589,13 @@ const HomePage = () => {
                                 <li key={key}>
                                   {Array.isArray(value)
                                     ? value
-                                        .map((v) => String(v).toUpperCase())
-                                        .join(", ") // Nếu là mảng
+                                      .map((v) => String(v).toUpperCase())
+                                      .join(", ") // Nếu là mảng
                                     : typeof value === "object" &&
-                                        value !== null
+                                      value !== null
                                       ? Object.values(value)
-                                          .map((v) => String(v).toUpperCase())
-                                          .join(", ") // Nếu là object
+                                        .map((v) => String(v).toUpperCase())
+                                        .join(", ") // Nếu là object
                                       : String(value).toUpperCase()}{" "}
                                   {/* Nếu là giá trị đơn lẻ */}
                                 </li>
