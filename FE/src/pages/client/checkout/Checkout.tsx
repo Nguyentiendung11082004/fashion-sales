@@ -146,6 +146,7 @@ const Checkout = () => {
       localStorage.removeItem('checkedItems');
     },
     onError: (error: any) => {
+      console.log("error", error)
       const errors = error?.response?.data?.errors;
       if (errors?.out_of_stock || errors?.insufficient_stock) {
         setErrorOrder(errors);
@@ -154,6 +155,10 @@ const Checkout = () => {
         setError(errors);
       }
       toast.error(error?.response?.data?.errors);
+      toast.error(
+        error?.response?.data?.errors?.product_id?.join(", ") || "Đã xảy ra lỗi."
+      );
+      
     }
   });
   useEffect(() => {
