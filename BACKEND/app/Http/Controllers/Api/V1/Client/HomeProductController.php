@@ -20,14 +20,14 @@ class HomeProductController extends Controller
             ])->where([
                 ['trend', true],
                 ['status', true]
-            ])->get();
+            ])->latest('id')->get();
 
             $homeShowProducts = Product::query()->with([
                 "variants.attributes"
             ])->where([
                 ['is_show_home', true],
                 ['status', true]
-            ])->get();
+            ])->latest('id')->get();
 
             // Khởi tạo đối tượng để lấy các thuộc tính độc nhất
             $getUniqueAttributes = new GetUniqueAttribute();

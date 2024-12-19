@@ -62,7 +62,7 @@ class StoreProduct extends FormRequest
             'product_variant.*.attribute_item_id.*.value' => 'required|string|max:255',
 
             'product_variant.*.sku' => 'required_if:type,1|string|max:255|distinct',
-            'product_variant.*.quantity' => 'integer|min:1|required_if:type,1',
+            'product_variant.*.quantity' => 'integer|min:0|required_if:type,1',
             'product_variant.*.price_regular' => 'numeric|min:0|required_if:type,1',
             'product_variant.*.price_sale' => 'numeric|min:0|lte:product_variant.*.price_regular|required_if:type,1',
             'product_variant.*.image' => 'nullable|string',
