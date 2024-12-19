@@ -287,7 +287,7 @@ const ProductDetailAdmin = () => {
                       :
                     </h3>
                     <span className="ml-2">
-                      {Object.values(values as { [key: string]: string }) 
+                      {Object.values(values as { [key: string]: string })
                         .map(
                           (item) =>
                             item.charAt(0).toUpperCase() +

@@ -1267,18 +1267,24 @@ const Products = () => {
                                     {product.name.charAt(0).toUpperCase() +
                                       product.name.slice(1).toLowerCase()}
                                   </p>
-                                  
                                 </Link>
                                 {(product?.price_regular ||
                                   product?.variants?.length) && (
                                   <div>
                                     {(() => {
                                       console.log("sp", product);
-                                      
+
                                       const variants = product?.variants || [];
                                       const hasVariants = variants.length > 0;
 
                                       const minPriceSale = Math.min(
+                                        ...variants
+                                          .map(
+                                            (variant: any) => variant.price_sale
+                                          )
+                                          .filter((price: any) => price >= 0)
+                                      );
+                                      const maxPriceSale = Math.max(
                                         ...variants
                                           .map(
                                             (variant: any) => variant.price_sale
@@ -1303,7 +1309,7 @@ const Products = () => {
                                       );
                                       const productPriceSale = Number(
                                         product?.price_sale
-                                      ) ;
+                                      );
                                       const productPriceRegular = Number(
                                         product?.price_regular
                                       );
@@ -1366,9 +1372,9 @@ const Products = () => {
                                               </span>
                                             );
                                           }
-                                        } else if(productPriceSale == 0){
+                                        } else if (productPriceSale == 0) {
                                           // console.log("sale", productPriceSale);
-                                          
+
                                           if (productPriceRegular == 0) {
                                             // console.log("gốc", productPriceRegular);
 
@@ -1438,12 +1444,12 @@ const Products = () => {
                                                 VNĐ -{" "}
                                                 {new Intl.NumberFormat(
                                                   "vi-VN"
-                                                ).format(maxPriceRegular)}{" "}
+                                                ).format(maxPriceSale)}{" "}
                                                 VNĐ
                                               </span>
                                             );
                                           }
-                                        } else if(minPriceSale === 0) {
+                                        } else if (minPriceSale === 0) {
                                           if (maxPriceRegular === 0) {
                                             return (
                                               <span>
@@ -1458,18 +1464,17 @@ const Products = () => {
                                               <span>
                                                 {new Intl.NumberFormat(
                                                   "vi-VN"
-                                                ).format(minPriceRegular)}{" "}
+                                                ).format(minPriceSale)}{" "}
                                                 VNĐ -{" "}
                                                 {new Intl.NumberFormat(
                                                   "vi-VN"
-                                                ).format(maxPriceRegular)}{" "}
+                                                ).format(maxPriceSale)}{" "}
                                                 VNĐ
                                               </span>
                                             );
                                           }
                                         }
                                       }
-
                                     })()}
                                   </div>
                                 )}
