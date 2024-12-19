@@ -742,7 +742,7 @@ const HistoryOrder = () => {
                                     <div className="flex justify-between">
                                       <div>
                                         <h3 className="text-lg font-medium line-clamp-1 flex items-center">
-                                          {order.order_details[0].product_name}
+                                          {detail.product_name}
                                         </h3>
                                         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                                           {detail.attributes &&

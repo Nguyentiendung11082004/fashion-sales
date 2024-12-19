@@ -326,7 +326,7 @@ const ProductDetailAdmin = () => {
             </div>
           </div>
 
-          {/* {productShow?.allAttribute?.length > 0 && ( */}
+          {productShow?.allAttribute?.length > 0 && (
           <div className="mt-4 text-base">
             <h2 className="text-xl font-semibold text-gray-800">
               Thuộc tính sản phẩm
@@ -350,7 +350,7 @@ const ProductDetailAdmin = () => {
               )
             )}
           </div>
-          {/* )} */}
+           )} 
         </div>
 
         {/* <!-- Product Gallery Section --> */}
