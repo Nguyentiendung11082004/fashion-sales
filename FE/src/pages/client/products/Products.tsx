@@ -1273,7 +1273,8 @@ const Products = () => {
                                   <div>
                                     {(() => {
                                       const variants = product?.variants || [];
-                                      // Tính toán giá bán và giá gốc từ các biến thể
+                                      const hasVariants = variants.length > 0;
+
                                       const minPriceSale = Math.min(
                                         ...variants
                                           .map(
@@ -1295,12 +1296,18 @@ const Products = () => {
                                             (variant: any) =>
                                               variant.price_regular
                                           )
-                                          .filter((price: any) => price > 0)
+                                          .filter((price: any) => price >= 0)
                                       );
                                       const productPriceSale =
-                                        product?.price_sale;
+                                        product?.price_sale ?? 0; // Sử dụng 0 nếu không có giá trị
                                       const productPriceRegular =
-                                        product?.price_regular;
+                                        product?.price_regular ?? 0; // Sử dụng 0 nếu không có giá trị
+
+                                      console.log(product.name);
+                                      console.log(
+                                        productPriceSale,
+                                        productPriceRegular
+                                      );
 
                                       const pricesSaleVar = variants.map(
                                         (variant: any) => variant.price_sale
@@ -1318,57 +1325,83 @@ const Products = () => {
                                             price === pricesRegularVar[0]
                                         );
 
-                                      if (minPriceSale > 0) {
-                                        // Nếu có giá sale
-                                        if (
-                                          productPriceSale &&
-                                          productPriceSale < productPriceRegular
-                                        ) {
-                                          return (
-                                            <>
-                                              <del className="mr-1">
+                                      // Hiển thị giá sản phẩm đơn (nếu không có biến thể)
+                                      if (!hasVariants) {
+                                        if (productPriceSale > 0) {
+                                          if (
+                                            productPriceSale <
+                                            productPriceRegular
+                                          ) {
+                                            return (
+                                              <>
+                                                <del className="mr-1">
+                                                  {new Intl.NumberFormat(
+                                                    "vi-VN"
+                                                  ).format(
+                                                    productPriceRegular
+                                                  )}{" "}
+                                                  VNĐ
+                                                </del>
+                                                <span className="text-[red]">
+                                                  {new Intl.NumberFormat(
+                                                    "vi-VN"
+                                                  ).format(
+                                                    productPriceSale
+                                                  )}{" "}
+                                                  VNĐ
+                                                </span>
+                                              </>
+                                            );
+                                          } else {
+                                            return (
+                                              <span>
                                                 {new Intl.NumberFormat(
                                                   "vi-VN"
-                                                ).format(productPriceRegular)}
-                                                VNĐ
-                                              </del>
-                                              <span className="text-[red]">
-                                                {new Intl.NumberFormat(
-                                                  "vi-VN"
-                                                ).format(productPriceSale)}
+                                                ).format(
+                                                  productPriceRegular
+                                                )}{" "}
                                                 VNĐ
                                               </span>
-                                            </>
-                                          );
-                                        } else if (
-                                          productPriceSale &&
-                                          productPriceSale ===
-                                            productPriceRegular
-                                        ) {
-                                          return (
-                                            <span>
-                                              {new Intl.NumberFormat(
-                                                "vi-VN"
-                                              ).format(productPriceRegular)}
-                                              VNĐ
-                                            </span>
-                                          );
-                                        } else if (
-                                          productPriceSale &&
-                                          productPriceSale === 0 &&
-                                          productPriceRegular === 0
-                                        ) {
-                                          return (
-                                            <span>
-                                              {new Intl.NumberFormat(
-                                                "vi-VN"
-                                              ).format(productPriceRegular)}
-                                              VNĐ
-                                            </span>
-                                          );
-                                        } else {
+                                            );
+                                          }
+                                        } else if (productPriceSale === 0) {
+                                          if (productPriceRegular === 0) {
+                                            return (
+                                              <span>
+                                                {new Intl.NumberFormat(
+                                                  "vi-VN"
+                                                ).format(
+                                                  productPriceRegular
+                                                )}{" "}
+                                                VNĐ
+                                              </span>
+                                            );
+                                          } else {
+                                            return (
+                                              <>
+                                                <del className="mr-1">
+                                                  {new Intl.NumberFormat(
+                                                    "vi-VN"
+                                                  ).format(
+                                                    productPriceRegular
+                                                  )}{" "}
+                                                  VNĐ
+                                                </del>
+                                                <span className="text-[red]">
+                                                  {new Intl.NumberFormat(
+                                                    "vi-VN"
+                                                  ).format(
+                                                    productPriceSale
+                                                  )}{" "}
+                                                  VNĐ
+                                                </span>
+                                              </>
+                                            );
+                                          }
+                                        }
+                                      } else {
+                                        if (minPriceSale > 0) {
                                           if (allSaleEqual && allRegularEqual) {
-                                            // Nếu tất cả giá sale và giá regular giống nhau
                                             return (
                                               <>
                                                 <del className="mr-1">
@@ -1390,48 +1423,44 @@ const Products = () => {
                                               </>
                                             );
                                           } else {
-                                            if (
-                                              pricesSaleVar ===
-                                                pricesRegularVar ||
-                                              (pricesSaleVar === 0 &&
-                                                pricesRegularVar === 0)
-                                            ) {
-                                              return (
-                                                <span>
-                                                  {new Intl.NumberFormat(
-                                                    "vi-VN"
-                                                  ).format(pricesRegularVar)}
-                                                  VNĐ
-                                                </span>
-                                              );
-                                            }
                                             return (
                                               <span>
                                                 {new Intl.NumberFormat(
                                                   "vi-VN"
-                                                ).format(minPriceSale)}
+                                                ).format(minPriceSale)}{" "}
                                                 VNĐ -{" "}
                                                 {new Intl.NumberFormat(
                                                   "vi-VN"
-                                                ).format(maxPriceRegular)}
+                                                ).format(maxPriceRegular)}{" "}
+                                                VNĐ
+                                              </span>
+                                            );
+                                          }
+                                        } else if (minPriceSale === 0) {
+                                          if (maxPriceRegular === 0) {
+                                            return (
+                                              <span>
+                                                {new Intl.NumberFormat(
+                                                  "vi-VN"
+                                                ).format(maxPriceRegular)}{" "}
+                                                VNĐ
+                                              </span>
+                                            );
+                                          } else {
+                                            return (
+                                              <span>
+                                                {new Intl.NumberFormat(
+                                                  "vi-VN"
+                                                ).format(minPriceRegular)}{" "}
+                                                VNĐ -{" "}
+                                                {new Intl.NumberFormat(
+                                                  "vi-VN"
+                                                ).format(maxPriceRegular)}{" "}
                                                 VNĐ
                                               </span>
                                             );
                                           }
                                         }
-                                      } else {
-                                        return (
-                                          <span>
-                                            {new Intl.NumberFormat(
-                                              "vi-VN"
-                                            ).format(minPriceRegular)}
-                                            VNĐ -{" "}
-                                            {new Intl.NumberFormat(
-                                              "vi-VN"
-                                            ).format(maxPriceRegular)}
-                                            VNĐ
-                                          </span>
-                                        );
                                       }
                                     })()}
                                   </div>
