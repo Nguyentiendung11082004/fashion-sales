@@ -167,7 +167,7 @@ class ProductShopController extends Controller
                     "tags",
                     "comments",
                     "variants.attributes"
-                ])->get();
+                ])->latest('id')->get();
             $allProducts = []; // Mảng chứa tất cả sản phẩm và biến thể
 
             foreach ($products as $product) {

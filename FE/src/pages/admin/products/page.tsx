@@ -42,7 +42,7 @@ const ProductPageManager = () => {
       setDataSearch(res?.data?.data || []);
       setCurrentPage(1); // Quay lại trang đầu khi tìm kiếm
     } catch (error) {
-      toast.error("Có lỗi xảy ra khi tìm kiếm sản phẩm.");
+      toast.error("Không tìm thấy sản phẩm nào.");
     }
   };
 

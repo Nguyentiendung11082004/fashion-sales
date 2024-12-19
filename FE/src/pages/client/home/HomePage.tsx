@@ -195,13 +195,13 @@ const HomePage = () => {
                                 <li key={key}>
                                   {Array.isArray(value)
                                     ? value
-                                        .map((v) => String(v).toUpperCase())
-                                        .join(", ") // Nếu là mảng
+                                      .map((v) => String(v).toUpperCase())
+                                      .join(", ") // Nếu là mảng
                                     : typeof value === "object" &&
-                                        value !== null
+                                      value !== null
                                       ? Object.values(value)
-                                          .map((v) => String(v).toUpperCase())
-                                          .join(", ") // Nếu là object
+                                        .map((v) => String(v).toUpperCase())
+                                        .join(", ") // Nếu là object
                                       : String(value).toUpperCase()}{" "}
                                   {/* Nếu là giá trị đơn lẻ */}
                                 </li>
@@ -580,7 +580,8 @@ const HomePage = () => {
                           className="lg:h-[40px] lg:w-[136px] lg:rounded-full bg-[#fff] text-base text-[#000] lg:hover:bg-[#000]"
                           onClick={() => handleOpenSeeMore(product)}
                         >
-                          <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
+                          <p className="text-sm lg:block hidden translate-y-2 transform transition-all duration-300 ease-in-out 
+                          group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
                             Mua ngay
                           </p>
                           <Eye />
@@ -645,13 +646,13 @@ const HomePage = () => {
                                 <li key={key}>
                                   {Array.isArray(value)
                                     ? value
-                                        .map((v) => String(v).toUpperCase())
-                                        .join(", ") // Nếu là mảng
+                                      .map((v) => String(v).toUpperCase())
+                                      .join(", ") // Nếu là mảng
                                     : typeof value === "object" &&
-                                        value !== null
+                                      value !== null
                                       ? Object.values(value)
-                                          .map((v) => String(v).toUpperCase())
-                                          .join(", ") // Nếu là object
+                                        .map((v) => String(v).toUpperCase())
+                                        .join(", ") // Nếu là object
                                       : String(value).toUpperCase()}{" "}
                                   {/* Nếu là giá trị đơn lẻ */}
                                 </li>
