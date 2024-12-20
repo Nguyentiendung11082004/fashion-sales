@@ -288,12 +288,36 @@ const OrderPage = () => {
   ];
   const trangThai = [
     {
+      name: "Đang chờ xác nhận",
+      id: "Đang chờ xác nhận",
+    },
+    {
+      name: "Đã xác nhận",
+      id: "Đã xác nhận",
+    },
+    {
+      name: "Đã hủy",
+      id: "Đã hủy",
+    },
+    {
+      name: "Đang vận chuyển",
+      id: "Đang vận chuyển",
+    },
+    {
       name: "Giao hàng thành công",
       id: "Giao hàng thành công",
     },
     {
-      name: "Đang chờ xác nhận",
-      id: "Đang chờ xác nhận",
+      name: "Hoàn trả hàng",
+      id: "Hoàn trả hàng",
+    },
+    {
+      name: "Hoàn thành",
+      id: "Hoàn thành",
+    },
+    {
+      name: "Yêu cầu hoàn trả hàng",
+      id: "Yêu cầu hoàn trả hàng",
     },
   ];
 

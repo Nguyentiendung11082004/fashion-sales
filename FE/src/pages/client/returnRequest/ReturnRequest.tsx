@@ -43,10 +43,18 @@ const ReturnRequest = () => {
       navigate(`/history-order`, { state: { checkRequest } });
     },
     onError: (error: any) => {
-      const errorMessage =
-        error.response?.data?.message || "Yêu cầu hoàn hàng thất bại";
-      console.log("Lỗi khi hoàn hàng:", errorMessage);
-      toast.error(errorMessage);
+      const errorMessage = error.response?.data?.message;
+      const missingProducts = error.response?.data?.missing_products;
+
+      if (missingProducts && missingProducts.length > 0) {
+        toast.error(
+          `Sản phẩm ${missingProducts.join(", ")} không tồn tại trong hệ thống, không thể hoàn trả`
+        );
+      } else {
+        if (errorMessage) {
+          toast.error(errorMessage);
+        }
+      }
     },
   });
 
