@@ -8,8 +8,9 @@ import CartDetail from "@/components/icons/detail/CartDetail";
 import Eye from "@/components/icons/detail/Eye";
 import HeartWhite from "@/components/icons/detail/HeartWhite";
 import { ProductNext } from "@/components/icons";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Loading from "@/common/Loading/Loading";
+import CartPopup from "@/components/ModalPopup/CartPopup";
 
 const RelatedProducts = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -27,6 +28,8 @@ const RelatedProducts = () => {
       }
     },
   });
+  const [slugProduct, setSlugProduct] = useState();
+  const [idProduct, setIdProduct] = useState();
 
   const { product, productRelated } = data || {};
   console.log("data sp liên quan: ", data);
@@ -61,6 +64,7 @@ const RelatedProducts = () => {
       setCurrentPage(currentPage - 1);
     }
   };
+  const modalRef = useRef<HTMLDialogElement>(null);
 
   return (
     <>
@@ -110,7 +114,7 @@ const RelatedProducts = () => {
                         <Eye />
                       </button>
                     </Link> */}
-                    <Link to="" className="group/btn relative">
+                    {/* <Link to="" className="group/btn relative">
                       <button
                         className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]"
                         // onClick={() => {
@@ -124,7 +128,29 @@ const RelatedProducts = () => {
                         </p>
                         <CartDetail />
                       </button>
+                    </Link> */}
+                    <Link to="" className="group/btn relative">
+                      <button
+                        className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]"
+                        onClick={() => {
+                          modalRef.current?.showModal(),
+                            setSlugProduct(product?.slug);
+                          setIdProduct(product?.id);
+                        }}
+                      >
+                        <p className="text-sm block translate-y-2 transform transition-all duration-300 ease-in-out group-hover/btn:-translate-y-2 group-hover/btn:opacity-0">
+                          Thêm vào giỏ hàng
+                        </p>
+                        <CartDetail />
+                      </button>
                     </Link>
+                    <CartPopup
+                      slugProduct={slugProduct}
+                      idProduct={idProduct}
+                      setIdProduct={setIdProduct}
+                      ref={modalRef}
+                      setSlugProduct={setSlugProduct}
+                    />
                   </div>
                   <div className="flex justify-center">
                     <div
@@ -178,13 +204,15 @@ const RelatedProducts = () => {
                   {relatedProduct.price_regular && (
                     <div>
                       {relatedProduct.price_sale > 0 &&
-                      relatedProduct.price_sale < relatedProduct.price_regular ? (
+                      relatedProduct.price_sale <
+                        relatedProduct.price_regular ? (
                         <>
                           <div className="flex justify-center items-center text-white absolute right-2 top-2 lg:h-[40px] lg:w-[40px] h-[30px] w-[30px] lg:text-sm text-[12px] rounded-full bg-red-400">
                             -
                             {Math.round(
-                              ((relatedProduct.price_regular - relatedProduct.price_sale) /
-                              relatedProduct.price_regular) *
+                              ((relatedProduct.price_regular -
+                                relatedProduct.price_sale) /
+                                relatedProduct.price_regular) *
                                 100
                             )}
                             %
@@ -204,7 +232,8 @@ const RelatedProducts = () => {
                     {relatedProduct.name.charAt(0).toUpperCase() +
                       relatedProduct.name.slice(1).toLowerCase()}
                   </Link>
-                  {(relatedProduct?.price_regular || relatedProduct?.variants?.length) && (
+                  {(relatedProduct?.price_regular ||
+                    relatedProduct?.variants?.length) && (
                     <div>
                       {(() => {
                         const variants = relatedProduct?.variants || [];
@@ -225,7 +254,8 @@ const RelatedProducts = () => {
                             .filter((price: any) => price > 0)
                         );
                         const productPriceSale = relatedProduct?.price_sale;
-                        const productPriceRegular = relatedProduct?.price_regular;
+                        const productPriceRegular =
+                          relatedProduct?.price_regular;
 
                         const pricesSaleVar = variants.map(
                           (variant: any) => variant.price_sale

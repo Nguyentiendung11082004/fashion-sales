@@ -7,6 +7,8 @@ import {
   EditOutlined,
   EyeOutlined,
   PlusOutlined,
+  SearchOutlined,
+  SyncOutlined,
 } from "@ant-design/icons";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button, Input, Modal, Pagination, Table } from "antd";
@@ -24,7 +26,7 @@ const Vouchers = () => {
   const initialPage = queryClient.getQueryData(["currentPage"]) || 1;
 
   const [currentPage, setCurrentPage] = useState(Number(initialPage));
-  const { data, isLoading, isError, error } = useQuery({
+  const { data, isLoading, isError, isFetching, error } = useQuery({
     queryKey: ["vouchers"],
     queryFn: async () => {
       try {
@@ -161,7 +163,7 @@ const Vouchers = () => {
       setDataSearch(res?.data?.data || []);
       setCurrentPage(1);
     } catch (error) {
-      toast.error("Lỗi khi tìm kiếm");
+      toast.error("Kết quả tìm kiếm trống!!!");
     }
   };
 
@@ -172,6 +174,24 @@ const Vouchers = () => {
           key: item?.id,
           ...item,
         })) || [];
+
+  // // Search handler
+  // const handleSearch = async () => {
+  //   try {
+  //     const res = await instance.post("/product/search", { query });
+  //     setDataSearch(res?.data?.data || []);
+  //     setCurrentPage(1); // Quay lại trang đầu khi tìm kiếm
+  //   } catch (error) {
+  //     toast.error("Có lỗi xảy ra khi tìm kiếm sản phẩm.");
+  //   }
+  // };
+
+  // Cancel search and reset to all products
+  const handleCancelSearch = () => {
+    setQuery("");
+    setDataSearch([]);
+    setCurrentPage(1);
+  };
 
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>{error.message}</div>;
@@ -186,7 +206,7 @@ const Vouchers = () => {
           <h1 className="text-3xl font-bold text-gray-800 border-b-2 border-gray-300 pb-2 uppercase">
             Danh sách mã giảm giá
           </h1>
-          <Input
+          {/* <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Tìm kiếm"
@@ -197,7 +217,7 @@ const Vouchers = () => {
             className="bg-indigo-500 hover:bg-indigo-600 text-white font-medium py-2 px-4 rounded-lg shadow"
           >
             Tìm kiếm
-          </Button>
+          </Button> */}
         </div>
         <Link to={`create`}>
           <Button className="bg-blue-500 text-white rounded-lg h-10 px-4 flex items-center hover:bg-blue-600 transition duration-200">
@@ -207,10 +227,23 @@ const Vouchers = () => {
         </Link>
       </div>
       <div className="">
-        {isLoading ? (
+        {isFetching ? (
           <Loading />
         ) : (
           <>
+            <div className="w-[36%] flex mb-4 float-right">
+              <Input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Tìm kiếm sản phẩm"
+              />
+              <Button onClick={handleSearch} className="ml-2">
+                <SearchOutlined />
+              </Button>
+              <Button onClick={handleCancelSearch} className="ml-2">
+                <SyncOutlined />
+              </Button>
+            </div>
             <Table
               className="custom-table"
               dataSource={dataSource.slice(

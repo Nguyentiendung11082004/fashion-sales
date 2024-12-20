@@ -742,7 +742,7 @@ const HistoryOrder = () => {
                                     <div className="flex justify-between">
                                       <div>
                                         <h3 className="text-lg font-medium line-clamp-1 flex items-center">
-                                          {order.order_details[0].product_name}
+                                          {detail.product_name}
                                         </h3>
                                         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                                           {detail.attributes &&
@@ -826,18 +826,25 @@ const HistoryOrder = () => {
                                     : "text-white"
                                 }`}
                                 disabled={shipOk}
-                                onClick={() =>
+                                onClick={() => {
                                   handleGetReturnRequest(
-                                    order?.return_requests[0]?.id
-                                  )
-                                }
+                                    order?.return_requests[
+                                      order?.return_requests.length - 1
+                                    ]?.id
+                                  );
+                                  console.log(
+                                    "kiểm tra id: ",
+                                    order?.return_requests.length
+                                  );
+                                }}
                               >
                                 Chi tiết hoàn trả
                               </button>
                             )}
 
-                            {order?.return_requests[0]?.status ===
-                              "completed" && (
+                            {order?.return_requests[
+                              order?.return_requests.length - 1
+                            ]?.status === "completed" && (
                               <button
                                 className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB] font-medium ${
                                   shipOk
@@ -845,11 +852,17 @@ const HistoryOrder = () => {
                                     : "text-white"
                                 }`}
                                 disabled={shipOk}
-                                onClick={() =>
+                                onClick={() => {
                                   handleGetReturnRequest(
-                                    order?.return_requests[0]?.id
-                                  )
-                                }
+                                    order?.return_requests[
+                                      order?.return_requests.length - 1
+                                    ]?.id
+                                  );
+                                  console.log(
+                                    "kiểm tra id: ",
+                                    order?.return_requests.length
+                                  );
+                                }}
                               >
                                 Chi tiết hoàn trả
                               </button>
@@ -882,8 +895,9 @@ const HistoryOrder = () => {
                               </>
                             )}
 
-                            {order?.return_requests[0]?.status ===
-                              "rejected" && (
+                            {order?.return_requests[
+                              order?.return_requests.length - 1
+                            ]?.status === "rejected" && (
                               <button
                                 className={`nc-Button mr-3 relative h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm py-2.5 px-4 sm:px-6 bg-[#00BADB] font-medium ${
                                   shipOk
@@ -891,11 +905,17 @@ const HistoryOrder = () => {
                                     : "text-white"
                                 }`}
                                 disabled={shipOk}
-                                onClick={() =>
+                                onClick={() => {
                                   handleGetReturnRequest(
-                                    order?.return_requests[0]?.id
-                                  )
-                                }
+                                    order?.return_requests[
+                                      order?.return_requests.length - 1
+                                    ]?.id
+                                  );
+                                  console.log(
+                                    "kiểm tra id: ",
+                                    order?.return_requests.length
+                                  );
+                                }}
                               >
                                 Chi tiết hoàn trả
                               </button>

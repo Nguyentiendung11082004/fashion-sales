@@ -71,18 +71,18 @@ const Login = () => {
           <div className="w-full m-9 p-[50px] lg:w-[450px] shadow-2xl border">
             <h2 className="text-2xl font-semibold text-gray-700 text-center">ĐĂNG NHẬP</h2>
             <p className="text-xl text-gray-600 text-center">Chào mừng trở lại</p>
-            <Button 
+            {/* <Button 
              className="flex items-center justify-center w-full h-11 mt-4 bg-white rounded-lg shadow-md hover:bg-gray-100">
               <div className="px-1 py-3">
                 <LoginIcon1 />
               </div>
               <h1 className="px-4 py-3 w-5/6 text-center text-gray-600 font-bold">Đăng nhập với Google</h1>
-            </Button>
-            <div className="mt-4 flex items-center justify-between">
+            </Button> */}
+            {/* <div className="mt-4 flex items-center justify-between">
               <span className="border-b w-1/5 lg:w-1/4" />
               <Link to="" className="text-xs text-center text-gray-500 uppercase">hoặc với Email</Link>
               <span className="border-b w-1/5 lg:w-1/4" />
-            </div>
+            </div> */}
 
             <Form layout="vertical" onFinish={onFinish} form={form}>
               <div className="mt-4">

@@ -78,9 +78,9 @@ const AttributeItemValues: React.FC = () => {
                     <Button className="mx-2 btn-warning" onClick={() => handleEdit(record.id)}>
                         <EditOutlined />
                     </Button>
-                    <Button className="btn-danger" onClick={() => handleRemove(record.id)}>
+                    {/* <Button className="btn-danger" onClick={() => handleRemove(record.id)}>
                         <DeleteOutlined />
-                    </Button>
+                    </Button> */}
                 </div>
             ),
         },
