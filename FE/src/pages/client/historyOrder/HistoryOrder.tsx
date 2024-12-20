@@ -178,6 +178,7 @@ const HistoryOrder = () => {
   const [isShowFormCmtOpen, setShowFormCmtOpen] = useState(false);
   const showFormCmt = (order: any) => {
     console.log("data order nè : ", order);
+    console.log("selectedOrder: ", selectedOrder);
     setShowFormCmtOpen(true);
     setSelectedOrder(order);
 
@@ -995,8 +996,9 @@ const HistoryOrder = () => {
                           <p className="mr-2">Thành tiền: </p>
                           <span className="text-[red] font-medium text-xl">
                             {/* {FormatMoney(order.total)}đ */}
-                            {new Intl.NumberFormat("vi-VN").format(order.total)}
-                            ₫
+                            {new Intl.NumberFormat("vi-VN").format(
+                              order.total
+                            )}₫
                           </span>
                         </div>
                       </div>

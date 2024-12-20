@@ -587,7 +587,7 @@ const HomePage = () => {
                           <Eye />
                         </button>
                       </Link>
-                      <Link to="" className="group/btn relative">
+                      {/* <Link to="" className="group/btn relative">
                         <button
                           className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]"
                           onClick={() => {
@@ -601,7 +601,7 @@ const HomePage = () => {
                           </p>
                           <CartDetail />
                         </button>
-                      </Link>
+                      </Link> */}
                     </div>
                     <div className="flex justify-center">
                       <div
