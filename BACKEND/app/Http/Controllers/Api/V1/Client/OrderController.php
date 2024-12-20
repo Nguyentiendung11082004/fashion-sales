@@ -52,8 +52,6 @@ class OrderController extends Controller
                     ->latest('id')
                     ->get();
 
-
-
                 return response()->json($orders, 200);
             } else {
                 return response()->json(['message' => 'User not authenticated'], 401);
@@ -133,6 +131,9 @@ class OrderController extends Controller
                     $voucher->increment('used_count', 1);
                 }
                 // Cập nhật tổng số lượng và tổng tiền cho đơn hàng
+                if ($totalPrice < $order->shipping_fee) {
+                    $totalPrice = $order->shipping_fee;
+                }
                 $order->update([
                     'total_quantity' => $totalQuantity,
                     'total' => $totalPrice,
