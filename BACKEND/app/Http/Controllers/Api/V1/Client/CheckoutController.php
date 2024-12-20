@@ -342,7 +342,7 @@ class CheckoutController extends Controller
         // // Kiểm tra giá trị tối thiểu của đơn hàng
         if ($voucher->min_order_value && $sub_total < $voucher->min_order_value) {
             return [
-                'error' => "Tổng giá trị đơn hàng phải lớn hơn " . $voucher->min_order_value . " để áp dụng voucher này.",
+                'error' => "Tổng giá trị đơn hàng phải lớn hơn hoặc bằng " . $voucher->min_order_value . " để áp dụng voucher này.",
                 'ineligible_products' => $ineligible_products,
             ];
         }
