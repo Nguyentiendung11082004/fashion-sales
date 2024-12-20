@@ -62,8 +62,8 @@ const ProductPageManager = () => {
       });
       toast.success("Xoá sản phẩm thành công");
     },
-    onError: () => {
-      toast.error("Xoá sản phẩm thất bại");
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message);
     },
   });
 

@@ -157,7 +157,7 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
   };
   console.log("_payload", _payload)
   console.log("productSeeMore", productSeeMore)
-  
+
   const handleCheckout = () => {
     if (_payload.product_variant_id) {
       const selectedVariant = productSeeMore?.variants.find(
@@ -252,8 +252,10 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
           <div className="flex items-center justify-between">
             <span className="text-xl text-[#696969]">
               {minPrice !== null && maxPrice !== null
-                ? `${FormatMoney(minPrice)} - ${FormatMoney(maxPrice)}`
-                : FormatMoney(productSeeMore?.price_sale || 0)}
+                ? minPrice === maxPrice
+                  ? `${new Intl.NumberFormat("vi-VN").format(minPrice)} VNĐ`
+                  : `${new Intl.NumberFormat("vi-VN").format(minPrice)} - ${new Intl.NumberFormat("vi-VN").format(maxPrice)} VNĐ`
+                : `${new Intl.NumberFormat("vi-VN").format(productSeeMore?.price_sale || 0)} VNĐ`}
             </span>
             <div className="flex items-center">
               <Link
