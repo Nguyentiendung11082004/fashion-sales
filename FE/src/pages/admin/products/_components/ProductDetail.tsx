@@ -1,4 +1,3 @@
-
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { colorTranslations } from "@/common/colors/colorUtils";
 import Loading from "@/common/Loading/Loading";
@@ -80,7 +79,7 @@ const ProductDetailAdmin = () => {
                       ...variants
                         .map((variant: any) => variant.price_regular)
                         .filter((price: any) => price >= 0)
-);
+                    );
                     const maxPriceRegular = Math.max(
                       ...variants
                         .map((variant: any) => variant.price_regular)
@@ -119,13 +118,13 @@ const ProductDetailAdmin = () => {
                                 {new Intl.NumberFormat("vi-VN").format(
                                   productPriceRegular
                                 )}{" "}
-                                VNĐ
+                                ₫
                               </del>
                               <span className="text-[red]">
                                 {new Intl.NumberFormat("vi-VN").format(
                                   productPriceSale
                                 )}{" "}
-                                VNĐ
+                                ₫
                               </span>
                             </>
                           );
@@ -135,7 +134,7 @@ const ProductDetailAdmin = () => {
                               {new Intl.NumberFormat("vi-VN").format(
                                 productPriceRegular
                               )}{" "}
-                              VNĐ
+                              ₫
                             </span>
                           );
                         }
@@ -147,10 +146,10 @@ const ProductDetailAdmin = () => {
 
                           return (
                             <span>
-{new Intl.NumberFormat("vi-VN").format(
+                              {new Intl.NumberFormat("vi-VN").format(
                                 productPriceRegular
                               )}{" "}
-                              VNĐ
+                              ₫
                             </span>
                           );
                         } else {
@@ -161,13 +160,13 @@ const ProductDetailAdmin = () => {
                                 {new Intl.NumberFormat("vi-VN").format(
                                   productPriceRegular
                                 )}{" "}
-                                VNĐ
+                                ₫
                               </del>
                               <span className="text-[red]">
                                 {new Intl.NumberFormat("vi-VN").format(
                                   productPriceSale
                                 )}{" "}
-                                VNĐ
+                                ₫
                               </span>
                             </>
                           );
@@ -182,13 +181,13 @@ const ProductDetailAdmin = () => {
                                 {new Intl.NumberFormat("vi-VN").format(
                                   pricesRegularVar[0]
                                 )}{" "}
-                                VNĐ
+                                ₫
                               </del>
                               <span className="text-[red]">
                                 {new Intl.NumberFormat("vi-VN").format(
                                   pricesSaleVar[0]
                                 )}{" "}
-                                VNĐ
+                                ₫
                               </span>
                             </>
                           );
@@ -198,11 +197,11 @@ const ProductDetailAdmin = () => {
                               {new Intl.NumberFormat("vi-VN").format(
                                 minPriceSale
                               )}{" "}
-                              VNĐ -{" "}
+                              ₫ -{" "}
                               {new Intl.NumberFormat("vi-VN").format(
                                 maxPriceSale
                               )}{" "}
-                              VNĐ
+                              ₫
                             </span>
                           );
                         }
@@ -213,20 +212,20 @@ const ProductDetailAdmin = () => {
                               {new Intl.NumberFormat("vi-VN").format(
                                 maxPriceRegular
                               )}{" "}
-                              VNĐ
+                              ₫
                             </span>
                           );
-} else {
+                        } else {
                           return (
                             <span>
                               {new Intl.NumberFormat("vi-VN").format(
                                 minPriceSale
                               )}{" "}
-                              VNĐ -{" "}
+                              ₫ -{" "}
                               {new Intl.NumberFormat("vi-VN").format(
                                 maxPriceSale
                               )}{" "}
-                              VNĐ
+                              ₫
                             </span>
                           );
                         }
@@ -287,7 +286,7 @@ const ProductDetailAdmin = () => {
                   >
                     {productShow.product.is_new ? "Có" : "Không"}
                   </span>
-</div>
+                </div>
               </div>
             </div>
 
@@ -366,7 +365,7 @@ const ProductDetailAdmin = () => {
                 key={gallery.id}
                 src={gallery.image}
                 alt={`Gallery ${gallery.id}`}
-className="w-64 flex-shrink-0 object-cover rounded-md shadow-md mr-3"
+                className="w-64 flex-shrink-0 object-cover rounded-md shadow-md mr-3"
               />
             ))}
           </div>

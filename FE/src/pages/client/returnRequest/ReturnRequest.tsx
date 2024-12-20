@@ -43,10 +43,18 @@ const ReturnRequest = () => {
       navigate(`/history-order`, { state: { checkRequest } });
     },
     onError: (error: any) => {
-      const errorMessage =
-        error.response?.data?.message || "Yêu cầu hoàn hàng thất bại";
-      console.log("Lỗi khi hoàn hàng:", errorMessage);
-      toast.error(errorMessage);
+      const errorMessage = error.response?.data?.message;
+      const missingProducts = error.response?.data?.missing_products;
+
+      if (missingProducts && missingProducts.length > 0) {
+        toast.error(
+          `Sản phẩm ${missingProducts.join(", ")} không tồn tại trong hệ thống, không thể hoàn trả`
+        );
+      } else {
+        if (errorMessage) {
+          toast.error(errorMessage);
+        }
+      }
     },
   });
 
@@ -154,7 +162,7 @@ const ReturnRequest = () => {
                         Số lượng: <span>{value?.quantity}</span>
                       </span>
                       <span className="block mt-2 text-base">
-                        Giá: {Number(value.price).toLocaleString("vi-VN")} VNĐ
+                        Giá: {Number(value.price).toLocaleString("vi-VN")} ₫
                       </span>
                     </div>
                   </div>
@@ -166,7 +174,7 @@ const ReturnRequest = () => {
                   Thông tin hoàn tiền
                 </h2>
                 <span className="text-base mb-4 ml-4">
-                  Số tiền hoàn lại: {refund.toLocaleString("vi-VN")} VNĐ
+                  Số tiền hoàn lại: {refund.toLocaleString("vi-VN")} ₫
                 </span>
                 <br />
               </div>
@@ -175,7 +183,7 @@ const ReturnRequest = () => {
                 <div className="flex items-center space-x-2">
                   <p className="ml-4 text-sm font-medium text-gray-800">
                     Số tiền hoàn lại:
-                    {refund.toLocaleString("vi-VN")} VNĐ
+                    {refund.toLocaleString("vi-VN")} ₫
                   </p>
                 </div>
                 <button

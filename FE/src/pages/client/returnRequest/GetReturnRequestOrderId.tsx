@@ -51,7 +51,7 @@ const GetReturnRequestOrderId = () => {
       title: "Ảnh sản phẩm",
       render: (record: any) => (
         <img
-          className="w-[100px] h-[100px] m-auto object-fit"
+          className="w-[100px] h-[100px] m-auto object-fit object-cover"
           src={record?.order?.order_detail?.product_img}
           alt="Ảnh sản phẩm"
         />
@@ -219,12 +219,12 @@ const GetReturnRequestOrderId = () => {
                     {dataReturnRequest?.data?.data?.total_refund_amount ? (
                       <>
                         {dataReturnRequest.data.data.total_refund_amount &&
-                          `${new Intl.NumberFormat("vi-VN").format(dataReturnRequest.data.data.total_refund_amount)} VNĐ`}
+                          `${new Intl.NumberFormat("vi-VN").format(dataReturnRequest.data.data.total_refund_amount)} ₫`}
                       </>
                     ) : (
                       <>
                         {totalAmount.toLocaleString("vi-VN")}
-                        <span> VNĐ</span>
+                        <span> ₫</span>
                       </>
                     )}
                   </p>

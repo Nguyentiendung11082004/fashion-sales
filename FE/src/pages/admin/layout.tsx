@@ -63,15 +63,6 @@ const SidebarMenu = memo(({ selectedKey }: { selectedKey: string }) => (
         ),
       },
       {
-        key: "16",
-        icon: <ShoppingCartOutlined />,
-        label: (
-          <NavLink className="text-white" to="/admin/returnRequests">
-            Hoàn Hàng
-          </NavLink>
-        ),
-      },
-      {
         key: "17",
         icon: <ShoppingCartOutlined />,
         label: (
@@ -80,6 +71,16 @@ const SidebarMenu = memo(({ selectedKey }: { selectedKey: string }) => (
           </NavLink>
         ),
       },
+      {
+        key: "16",
+        icon: <ShoppingCartOutlined />,
+        label: (
+          <NavLink className="text-white" to="/admin/returnRequests">
+            Hoàn Hàng
+          </NavLink>
+        ),
+      },
+     
       {
         key: "3",
         icon: <UploadOutlined />,

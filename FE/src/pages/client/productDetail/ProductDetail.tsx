@@ -607,7 +607,7 @@ const ProductDetail = () => {
                     <img
                       key={value.id}
                       // alt={`Gallery image ${value.id}`}
-                      className="mb-2 w-24 h-[150px] lg:w-auto flex-shrink-0 cursor-pointer"
+                      className="mb-2 w-24 h-[150px] lg:w-auto flex-shrink-0 cursor-pointer object-cover"
                       src={value.image}
                       onClick={() => handleGalleryClick(value.image)}
                     />

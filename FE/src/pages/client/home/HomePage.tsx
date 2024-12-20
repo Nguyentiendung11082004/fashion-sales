@@ -282,13 +282,13 @@ const HomePage = () => {
                                       {new Intl.NumberFormat("vi-VN").format(
                                         productPriceRegular
                                       )}{" "}
-                                      VNĐ
+                                      ₫
                                     </del>
                                     <span className="text-[red]">
                                       {new Intl.NumberFormat("vi-VN").format(
                                         productPriceSale
                                       )}{" "}
-                                      VNĐ
+                                      ₫
                                     </span>
                                   </>
                                 );
@@ -298,7 +298,7 @@ const HomePage = () => {
                                     {new Intl.NumberFormat("vi-VN").format(
                                       productPriceRegular
                                     )}{" "}
-                                    VNĐ
+                                    ₫
                                   </span>
                                 );
                               }
@@ -313,7 +313,7 @@ const HomePage = () => {
                                     {new Intl.NumberFormat("vi-VN").format(
                                       productPriceRegular
                                     )}{" "}
-                                    VNĐ
+                                    ₫
                                   </span>
                                 );
                               } else {
@@ -324,13 +324,13 @@ const HomePage = () => {
                                       {new Intl.NumberFormat("vi-VN").format(
                                         productPriceRegular
                                       )}{" "}
-                                      VNĐ
+                                      ₫
                                     </del>
                                     <span className="text-[red]">
                                       {new Intl.NumberFormat("vi-VN").format(
                                         productPriceSale
                                       )}{" "}
-                                      VNĐ
+                                     ₫
                                     </span>
                                   </>
                                 );
@@ -345,13 +345,13 @@ const HomePage = () => {
                                       {new Intl.NumberFormat("vi-VN").format(
                                         pricesRegularVar[0]
                                       )}{" "}
-                                      VNĐ
+                                      ₫
                                     </del>
                                     <span className="text-[red]">
                                       {new Intl.NumberFormat("vi-VN").format(
                                         pricesSaleVar[0]
                                       )}{" "}
-                                      VNĐ
+                                      ₫
                                     </span>
                                   </>
                                 );
@@ -361,11 +361,11 @@ const HomePage = () => {
                                     {new Intl.NumberFormat("vi-VN").format(
                                       minPriceSale
                                     )}{" "}
-                                    VNĐ -{" "}
+                                    ₫ -{" "}
                                     {new Intl.NumberFormat("vi-VN").format(
                                       maxPriceSale
                                     )}{" "}
-                                    VNĐ
+                                    ₫
                                   </span>
                                 );
                               }
@@ -376,7 +376,7 @@ const HomePage = () => {
                                     {new Intl.NumberFormat("vi-VN").format(
                                       maxPriceRegular
                                     )}{" "}
-                                    VNĐ
+                                    ₫
                                   </span>
                                 );
                               } else {
@@ -385,11 +385,11 @@ const HomePage = () => {
                                     {new Intl.NumberFormat("vi-VN").format(
                                       minPriceSale
                                     )}{" "}
-                                    VNĐ -{" "}
+                                    ₫ -{" "}
                                     {new Intl.NumberFormat("vi-VN").format(
                                       maxPriceSale
                                     )}{" "}
-                                    VNĐ
+                                    ₫
                                   </span>
                                 );
                               }
@@ -587,7 +587,7 @@ const HomePage = () => {
                           <Eye />
                         </button>
                       </Link>
-                      <Link to="" className="group/btn relative">
+                      {/* <Link to="" className="group/btn relative">
                         <button
                           className="mt-2 h-[40px] w-[136px] rounded-full bg-[#fff] text-base text-[#000] hover:bg-[#000]"
                           onClick={() => {
@@ -601,7 +601,7 @@ const HomePage = () => {
                           </p>
                           <CartDetail />
                         </button>
-                      </Link>
+                      </Link> */}
                     </div>
                     <div className="flex justify-center">
                       <div
@@ -734,13 +734,13 @@ const HomePage = () => {
                                       {new Intl.NumberFormat("vi-VN").format(
                                         productPriceRegular
                                       )}{" "}
-                                      VNĐ
+                                      ₫
                                     </del>
                                     <span className="text-[red]">
                                       {new Intl.NumberFormat("vi-VN").format(
                                         productPriceSale
                                       )}{" "}
-                                      VNĐ
+                                      ₫
                                     </span>
                                   </>
                                 );
@@ -750,7 +750,7 @@ const HomePage = () => {
                                     {new Intl.NumberFormat("vi-VN").format(
                                       productPriceRegular
                                     )}{" "}
-                                    VNĐ
+                                    ₫
                                   </span>
                                 );
                               }
@@ -765,7 +765,7 @@ const HomePage = () => {
                                     {new Intl.NumberFormat("vi-VN").format(
                                       productPriceRegular
                                     )}{" "}
-                                    VNĐ
+                                    ₫
                                   </span>
                                 );
                               } else {
@@ -776,13 +776,13 @@ const HomePage = () => {
                                       {new Intl.NumberFormat("vi-VN").format(
                                         productPriceRegular
                                       )}{" "}
-                                      VNĐ
+                                      ₫
                                     </del>
                                     <span className="text-[red]">
                                       {new Intl.NumberFormat("vi-VN").format(
                                         productPriceSale
                                       )}{" "}
-                                      VNĐ
+                                      ₫
                                     </span>
                                   </>
                                 );
@@ -797,13 +797,13 @@ const HomePage = () => {
                                       {new Intl.NumberFormat("vi-VN").format(
                                         pricesRegularVar[0]
                                       )}{" "}
-                                      VNĐ
+                                      ₫
                                     </del>
                                     <span className="text-[red]">
                                       {new Intl.NumberFormat("vi-VN").format(
                                         pricesSaleVar[0]
                                       )}{" "}
-                                      VNĐ
+                                      ₫
                                     </span>
                                   </>
                                 );
@@ -813,11 +813,11 @@ const HomePage = () => {
                                     {new Intl.NumberFormat("vi-VN").format(
                                       minPriceSale
                                     )}{" "}
-                                    VNĐ -{" "}
+                                    ₫ -{" "}
                                     {new Intl.NumberFormat("vi-VN").format(
                                       maxPriceSale
                                     )}{" "}
-                                    VNĐ
+                                    ₫
                                   </span>
                                 );
                               }
@@ -828,7 +828,7 @@ const HomePage = () => {
                                     {new Intl.NumberFormat("vi-VN").format(
                                       maxPriceRegular
                                     )}{" "}
-                                    VNĐ
+                                    ₫
                                   </span>
                                 );
                               } else {
@@ -837,11 +837,11 @@ const HomePage = () => {
                                     {new Intl.NumberFormat("vi-VN").format(
                                       minPriceSale
                                     )}{" "}
-                                    VNĐ -{" "}
+                                    ₫ -{" "}
                                     {new Intl.NumberFormat("vi-VN").format(
                                       maxPriceSale
                                     )}{" "}
-                                    VNĐ
+                                    ₫
                                   </span>
                                 );
                               }

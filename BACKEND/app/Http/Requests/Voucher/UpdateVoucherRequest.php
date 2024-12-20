@@ -37,7 +37,7 @@ class UpdateVoucherRequest extends FormRequest
                 'min:0',  // không được nhỏ hơn 0
                 function ($attribute, $value, $fail) {
                     if ($this->discount_type == 'percent' && $value > 100) {
-                        $fail('The ' . $attribute . ' must not be greater than 100 when discount type is percentage.');
+                        $fail('Phần trăm giảm giá không được lớn hơn 100%.');
                     }
                 }
             ],
@@ -90,5 +90,16 @@ class UpdateVoucherRequest extends FormRequest
             'meta.*.meta_value.required_with' => 'Trường meta value là bắt buộc khi meta có mặt.',
             'meta.*.meta_value.string' => 'Trường meta value phải là một chuỗi.',
         ];
+    }
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            if ($this->discount_type === 'fixed' && $this->min_order_value < $this->discount_value) {
+                $validator->errors()->add(
+                    'min_order_value',
+                    'Giá trị đơn hàng tối thiểu phải lớn hơn hoặc bằng giá trị giảm giá khi loại giảm giá là cố định.'
+                );
+            }
+        });
     }
 }

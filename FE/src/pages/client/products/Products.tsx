@@ -1348,7 +1348,7 @@ const Products = () => {
                                                   ).format(
                                                     productPriceRegular
                                                   )}{" "}
-                                                  VNĐ
+                                                  ₫
                                                 </del>
                                                 <span className="text-[red]">
                                                   {new Intl.NumberFormat(
@@ -1356,7 +1356,7 @@ const Products = () => {
                                                   ).format(
                                                     productPriceSale
                                                   )}{" "}
-                                                  VNĐ
+                                                  ₫
                                                 </span>
                                               </>
                                             );
@@ -1368,7 +1368,7 @@ const Products = () => {
                                                 ).format(
                                                   productPriceRegular
                                                 )}{" "}
-                                                VNĐ
+                                                ₫
                                               </span>
                                             );
                                           }
@@ -1385,7 +1385,7 @@ const Products = () => {
                                                 ).format(
                                                   productPriceRegular
                                                 )}{" "}
-                                                VNĐ
+                                                ₫
                                               </span>
                                             );
                                           } else {
@@ -1398,7 +1398,7 @@ const Products = () => {
                                                   ).format(
                                                     productPriceRegular
                                                   )}{" "}
-                                                  VNĐ
+                                                  ₫
                                                 </del>
                                                 <span className="text-[red]">
                                                   {new Intl.NumberFormat(
@@ -1406,7 +1406,7 @@ const Products = () => {
                                                   ).format(
                                                     productPriceSale
                                                   )}{" "}
-                                                  VNĐ
+                                                  ₫
                                                 </span>
                                               </>
                                             );
@@ -1423,7 +1423,7 @@ const Products = () => {
                                                   ).format(
                                                     pricesRegularVar[0]
                                                   )}{" "}
-                                                  VNĐ
+                                                  ₫
                                                 </del>
                                                 <span className="text-[red]">
                                                   {new Intl.NumberFormat(
@@ -1431,7 +1431,7 @@ const Products = () => {
                                                   ).format(
                                                     pricesSaleVar[0]
                                                   )}{" "}
-                                                  VNĐ
+                                                  ₫
                                                 </span>
                                               </>
                                             );
@@ -1441,11 +1441,11 @@ const Products = () => {
                                                 {new Intl.NumberFormat(
                                                   "vi-VN"
                                                 ).format(minPriceSale)}{" "}
-                                                VNĐ -{" "}
+                                                ₫ -{" "}
                                                 {new Intl.NumberFormat(
                                                   "vi-VN"
                                                 ).format(maxPriceSale)}{" "}
-                                                VNĐ
+                                                ₫
                                               </span>
                                             );
                                           }
@@ -1456,7 +1456,7 @@ const Products = () => {
                                                 {new Intl.NumberFormat(
                                                   "vi-VN"
                                                 ).format(maxPriceRegular)}{" "}
-                                                VNĐ
+                                                ₫
                                               </span>
                                             );
                                           } else {
@@ -1465,11 +1465,11 @@ const Products = () => {
                                                 {new Intl.NumberFormat(
                                                   "vi-VN"
                                                 ).format(minPriceSale)}{" "}
-                                                VNĐ -{" "}
+                                                ₫ -{" "}
                                                 {new Intl.NumberFormat(
                                                   "vi-VN"
                                                 ).format(maxPriceSale)}{" "}
-                                                VNĐ
+                                                ₫
                                               </span>
                                             );
                                           }
