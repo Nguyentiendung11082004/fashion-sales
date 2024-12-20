@@ -326,34 +326,30 @@ const ProductDetailAdmin = () => {
           </div>
 
           {productShow?.allAttribute?.length > 0 && (
-            <div className="mt-4 text-base">
-              <h2 className="text-xl font-semibold text-gray-800">
-                Thuộc tính sản phẩm
-              </h2>
-              {Object.entries(productShow?.allAttribute || {}).map(
-                ([key, values]) => (
-                  <div
-                    className="relative flex items-center mt-2 mb-2"
-                    key={key}
-                  >
-                    <h3 className="font-semibold">
-                      {key.charAt(0).toUpperCase() + key.slice(1).toLowerCase()}
-                      :
-                    </h3>
-                    <span className="ml-2">
-                      {Object.values(values as { [key: string]: string })
-                        .map(
-                          (item) =>
-                            item.charAt(0).toUpperCase() +
-                            item.slice(1).toLowerCase()
-                        )
-                        .join(", ") || "No Value"}
-                    </span>
-                  </div>
-                )
-              )}
-            </div>
-          )}
+          <div className="mt-4 text-base">
+            <h2 className="text-xl font-semibold text-gray-800">
+              Thuộc tính sản phẩm
+            </h2>
+            {Object.entries(productShow?.allAttribute || {}).map(
+              ([key, values]) => (
+                <div className="relative flex items-center mt-2 mb-2" key={key}>
+                  <h3 className="font-semibold">
+                    {key.charAt(0).toUpperCase() + key.slice(1).toLowerCase()}:
+                  </h3>
+                  <span className="ml-2">
+                    {Object.values(values as { [key: string]: string })
+                      .map(
+                        (item) =>
+                          item.charAt(0).toUpperCase() +
+                          item.slice(1).toLowerCase()
+                      )
+                      .join(", ") || "No Value"}
+                  </span>
+                </div>
+              )
+            )}
+          </div>
+           )} 
         </div>
 
         {/* <!-- Product Gallery Section --> */}
