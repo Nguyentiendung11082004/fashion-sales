@@ -33,7 +33,7 @@ class ReturnController extends Controller
                 ->map(function ($returnRequest) {
                     // Tách thông tin order
                     $order = $returnRequest->order;
-        
+
                     return [
                         'id' => $returnRequest->id,
                         'order_id' => $returnRequest->order_id,
@@ -43,7 +43,7 @@ class ReturnController extends Controller
                         'status' => $returnRequest->status,
                         'created_at' => $returnRequest->created_at->format('Y-m-d H:i:s'),
                         'updated_at' => $returnRequest->updated_at->format('Y-m-d H:i:s'),
-        
+
                         // Map items mà không lặp lại order
                         'items' => $returnRequest->items->map(function ($item) {
                             return [
@@ -56,7 +56,7 @@ class ReturnController extends Controller
                                 'status' => $item->status,
                             ];
                         }),
-        
+
                         // Gán order và orderDetails ngoài vòng lặp
                         'order' => [
                             'id' => $order->id,
@@ -86,16 +86,16 @@ class ReturnController extends Controller
                     ];
                 });
 
-        return response()->json([
-            'message' => 'User return requests retrieved successfully.',
-            'data' => $returnRequests,
-        ]);
-    } catch (\Exception $ex) {
-        return response()->json([
-            'message' => 'Error retrieving return requests: ' . $ex->getMessage(),
-        ], 500);
+            return response()->json([
+                'message' => 'User return requests retrieved successfully.',
+                'data' => $returnRequests,
+            ]);
+        } catch (\Exception $ex) {
+            return response()->json([
+                'message' => 'Error retrieving return requests: ' . $ex->getMessage(),
+            ], 500);
+        }
     }
-}
 
     //
     public function createReturnRequest(Request $request)
@@ -149,7 +149,7 @@ class ReturnController extends Controller
 
 
         try {
-            $response = DB::transaction(function () use ($request) {
+            return DB::transaction(function () use ($request) {
                 // Validate dữ liệu từ client
                 $validated = $request->validate([
                     'order_id' => 'required|exists:orders,id',
@@ -158,7 +158,54 @@ class ReturnController extends Controller
                     'items.*.quantity' => 'required|integer|min:1',
                     'reason' => 'required|string',
                 ]);
-                $order=Order::query()->findOrFail($request->input('order_id'));
+                $order = Order::query()->findOrFail($request->input('order_id'));
+                $items = $request->input('items', []);
+
+                // Nếu không có sản phẩm nào được gửi lên
+                if (empty($items)) {
+                    return response()->json([
+                        'message' => 'Không có sản phẩm nào được gửi lên để xử lý hoàn trả.',
+                    ], 400);
+                }
+
+                // Lấy danh sách `order_detail_id` từ items
+                $orderDetailIds = collect($items)->pluck('order_detail_id')->toArray();
+
+                // Lấy thông tin chi tiết đơn hàng từ cơ sở dữ liệu
+                $existingOrderDetails = OrderDetail::query()
+                    ->whereIn('id', $orderDetailIds)
+                    ->get();
+
+                // Tìm các `order_detail_id` không tồn tại
+                $missingOrderDetailIds = collect($orderDetailIds)->diff($existingOrderDetails->pluck('id'));
+
+                // Tìm các chi tiết đơn hàng có `product_id` là null (sản phẩm đã bị xóa)
+                $invalidOrderDetails = $existingOrderDetails->filter(function ($orderDetail) {
+                    return is_null($orderDetail->product_id); // Nếu `product_id` là NULL thì sản phẩm đã bị xóa
+                });
+
+                // Nếu có `order_detail_id` không tồn tại hoặc sản phẩm bị xóa
+                if ($missingOrderDetailIds->isNotEmpty() || $invalidOrderDetails->isNotEmpty()) {
+                    // Lấy tên các sản phẩm không hợp lệ (dữ liệu từ request)
+                    $missingProductNames = collect($items)
+                        ->whereIn('order_detail_id', $missingOrderDetailIds)
+                        ->pluck('product_name') // Giả sử `product_name` có trong dữ liệu gửi lên
+                        ->toArray();
+
+                    // Lấy tên các sản phẩm bị xóa
+                    $deletedProductNames = $invalidOrderDetails->map(function ($orderDetail) {
+                        return $orderDetail->product_name ?? 'Không rõ tên'; // Nếu `product_name` không có, trả về giá trị mặc định
+                    })->toArray();
+
+                    // Gộp cả hai danh sách sản phẩm không hợp lệ
+                    $invalidProductNames = array_merge($missingProductNames, $deletedProductNames);
+
+                    return response()->json([
+                        'message' => 'Một hoặc nhiều sản phẩm không còn tồn tại trong hệ thống.',
+                        'missing_products' => $invalidProductNames, // Danh sách tên sản phẩm không hợp lệ
+                    ], 400);
+                }
+
                 if (Carbon::parse($order->created_at)->addDays(3)->isPast()) {
                     return response()->json(['message' => 'Bạn chỉ có thể hoàn trả hàng sau 3 ngày kể từ ngày nhận hàng.'], 400);
                 }
@@ -203,19 +250,19 @@ class ReturnController extends Controller
                 ]);
 
                 // Cập nhật trạng thái đơn hàng
-                $order=Order::query()->findOrFail($validated['order_id'])->update([
+                $order = Order::query()->findOrFail($validated['order_id'])->update([
                     'order_status' => 'Yêu cầu hoàn trả hàng',
                 ]);
                 broadcast(new OrderStatusUpdated($order))->toOthers();
 
 
-                return [
-                    'message' => 'Return request created successfully.',
+                return response()->json([
+                    'message' => 'Tạo hoàn trả hàng thành công',
                     'return_request' => $returnRequest,
-                ];
+                ],201);
             });
 
-            return response()->json($response, 201);
+            // return response()->json($response, 201);
         } catch (\Exception $ex) {
             return response()->json([
                 'message' => $ex->getMessage(),
@@ -297,16 +344,14 @@ class ReturnController extends Controller
                     'action' => 'canceled',
                     'comment' => "Khách hàng tên: {$user->name} đã hủy toàn bộ yêu cầu.",
                 ]);
-                $order=Order::query()->findOrFail($returnRequest->order_id)->update([
+                $order = Order::query()->findOrFail($returnRequest->order_id)->update([
                     'order_status' => "Hoàn thành"
                 ]);
                 broadcast(new OrderStatusUpdated($order))->toOthers();
 
                 broadcast(new ReturnRequestStatusUpdate($returnRequest))->toOthers();
-                
-
             }
-           
+
 
             return response()->json([
                 'message' => 'Cancellation successful.',
@@ -314,7 +359,6 @@ class ReturnController extends Controller
                 'remaining_items' => $remainingItems,
                 'request_status' => $remainingItems === 0 ? 'canceled' : 'partially_canceled',
             ], 200);
-            
         } catch (\Exception $ex) {
             return response()->json([
                 "message" => "Error: " . $ex->getMessage()

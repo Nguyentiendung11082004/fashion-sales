@@ -163,25 +163,24 @@ class ProductController extends Controller
             // dd($product->variants->toArray());
             $getUniqueAttributes = new GetUniqueAttribute();
 
-            $unique_attributes=$getUniqueAttributes->getUniqueAttributes($product->variants->toArray());
+            $unique_attributes = $getUniqueAttributes->getUniqueAttributes($product->variants->toArray());
             // dd($unique_attributes);
             foreach ($product->attributes as  $item) {
                 $item->pivot->attribute_item_ids = json_decode($item->pivot->attribute_item_ids);
-
             }
             $category = Category::query()->latest('id')->get();
             // dd($category->toArray());
             $tag = Tag::query()->latest('id')->pluck('name', 'id');
             $attribute = Attribute::with(["attributeitems"])->get();
             $brand = Brand::query()->pluck('name', 'id');
-            
+
             return response()->json([
                 "product" => $product,
                 "category" => $category,
                 "tag" => $tag,
                 "attribute" => $attribute,
                 "brand" => $brand,
-                "allAttribute"=> $unique_attributes 
+                "allAttribute" => $unique_attributes
             ], Response::HTTP_OK);
         } catch (\Exception $ex) {
             Log::error('API/V1/Admin/ProductController@show: ', [$ex->getMessage()]);
@@ -411,8 +410,20 @@ class ProductController extends Controller
         //
         try {
             $product = Product::query()->findOrFail($id);
-            $respone = DB::transaction(function () use ($product) {
+            return DB::transaction(function () use ($product) {
+                $hasPendingReturn = DB::table('return_requests')
+                    ->join('orders', 'return_requests.order_id', '=', 'orders.id')
+                    ->join('order_details', 'orders.id', '=', 'order_details.order_id')
+                    ->where('order_details.product_id', $product->id)
+                    ->where('return_requests.status', 'pending')
+                    ->exists();
+                // dd($hasPendingReturn);
 
+                if ($hasPendingReturn) {
+                    return response()->json([
+                        'message' => "Không thể xóa sản phẩm vì có yêu cầu hoàn trả đang ở trạng thái 'pending'."
+                    ], 400);
+                }
                 ProductGallery::query()->where('product_id', $product->id)->delete();
                 $product->tags()->sync([]);
                 if ($product->type == 1) {
@@ -429,11 +440,11 @@ class ProductController extends Controller
                 }
                 $product->delete();
 
-                return [
+                return  response()->json([
                     "message" => "xóa dữ liệu thành công"
-                ];
+                ]);
             });
-            return response()->json($respone);
+            // return response()->json($respone);
         } catch (\Exception $ex) {
             return response()->json(
                 [
