@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { formatDateString } from "@/common/utils/utils";
 import instance from "@/configs/axios";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
@@ -46,6 +47,11 @@ const OrderDetail = () => {
               parseInt(dataOrderDetail?.order?.voucher_discount)
             )}
             <span> ₫</span>
+          </div>
+          <div className="text-gray-700">
+            <span className="font-semibold">Ngày đặt hàng: </span>
+         
+            <span>   {formatDateString(dataOrderDetail?.order?.created_at)}</span>
           </div>
           <div className="text-gray-700">
             <span className="font-semibold">Tổng số lượng: </span>

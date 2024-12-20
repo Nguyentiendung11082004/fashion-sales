@@ -13,7 +13,8 @@ export const FormatMoney = (price: number) => {
 };
 
 export function formatDateString(datestring: any) {
-  const day = new Date(new Date(datestring).getTime() + (7 * 60 * 60 * 1000));
+  const day = new Date(new Date(datestring).getTime() );
+  // + (7 * 60 * 60 * 1000)
   const yyyy = day.getFullYear();
   let mm = day.getMonth() + 1;
   let dd = day.getDate();
