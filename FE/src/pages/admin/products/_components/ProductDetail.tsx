@@ -1,3 +1,4 @@
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { colorTranslations } from "@/common/colors/colorUtils";
 import Loading from "@/common/Loading/Loading";
@@ -60,9 +61,17 @@ const ProductDetailAdmin = () => {
                 productShow?.product?.variants?.length) && (
                 <div>
                   {(() => {
+                    // console.log("sp", product);
+
                     const variants = productShow?.product?.variants || [];
-                    // Tính toán giá bán và giá gốc từ các biến thể
+                    const hasVariants = variants.length > 0;
+
                     const minPriceSale = Math.min(
+                      ...variants
+                        .map((variant: any) => variant.price_sale)
+                        .filter((price: any) => price >= 0)
+                    );
+                    const maxPriceSale = Math.max(
                       ...variants
                         .map((variant: any) => variant.price_sale)
                         .filter((price: any) => price >= 0)
@@ -71,15 +80,21 @@ const ProductDetailAdmin = () => {
                       ...variants
                         .map((variant: any) => variant.price_regular)
                         .filter((price: any) => price >= 0)
-                    );
+);
                     const maxPriceRegular = Math.max(
                       ...variants
                         .map((variant: any) => variant.price_regular)
-                        .filter((price: any) => price > 0)
+                        .filter((price: any) => price >= 0)
                     );
-                    const productPriceSale = productShow?.product?.price_sale;
-                    const productPriceRegular =
-                      productShow?.product?.price_regular;
+                    const productPriceSale = Number(
+                      productShow?.product?.price_sale
+                    );
+                    const productPriceRegular = Number(
+                      productShow?.product?.price_regular
+                    );
+                    // console.log(product?.name);
+                    // console.log(typeof productPriceSale, typeof productPriceRegular);
+                    // console.log(productPriceSale, productPriceRegular);
 
                     const pricesSaleVar = variants.map(
                       (variant: any) => variant.price_sale
@@ -94,44 +109,73 @@ const ProductDetailAdmin = () => {
                       (price: any) => price === pricesRegularVar[0]
                     );
 
-                    if (minPriceSale > 0) {
-                      // Nếu có giá sale
-                      if (
-                        (productPriceSale &&
-                          productPriceSale < productPriceRegular) ||
-                        productPriceSale === 0
-                      ) {
-                        return (
-                          <>
-                            <del className="mr-1">
+                    // Hiển thị giá sản phẩm đơn (nếu không có biến thể)
+                    if (!hasVariants) {
+                      if (productPriceSale > 0) {
+                        if (productPriceSale < productPriceRegular) {
+                          return (
+                            <>
+                              <del className="mr-1">
+                                {new Intl.NumberFormat("vi-VN").format(
+                                  productPriceRegular
+                                )}{" "}
+                                VNĐ
+                              </del>
+                              <span className="text-[red]">
+                                {new Intl.NumberFormat("vi-VN").format(
+                                  productPriceSale
+                                )}{" "}
+                                VNĐ
+                              </span>
+                            </>
+                          );
+                        } else {
+                          return (
+                            <span>
                               {new Intl.NumberFormat("vi-VN").format(
                                 productPriceRegular
-                              )}
-                              VNĐ
-                            </del>
-                            <span className="text-[red]">
-                              {new Intl.NumberFormat("vi-VN").format(
-                                productPriceSale
-                              )}
+                              )}{" "}
                               VNĐ
                             </span>
-                          </>
-                        );
-                      } else if (
-                        productPriceSale &&
-                        productPriceSale === productPriceRegular
-                      ) {
-                        return (
-                          <span>
-                            {new Intl.NumberFormat("vi-VN").format(
-                              productPriceRegular
-                            )}
-                            VNĐ
-                          </span>
-                        );
-                      } else {
+                          );
+                        }
+                      } else if (productPriceSale == 0) {
+                        // console.log("sale", productPriceSale);
+
+                        if (productPriceRegular == 0) {
+                          // console.log("gốc", productPriceRegular);
+
+                          return (
+                            <span>
+{new Intl.NumberFormat("vi-VN").format(
+                                productPriceRegular
+                              )}{" "}
+                              VNĐ
+                            </span>
+                          );
+                        } else {
+                          // console.log("gốc 1", productPriceRegular);
+                          return (
+                            <>
+                              <del className="mr-1">
+                                {new Intl.NumberFormat("vi-VN").format(
+                                  productPriceRegular
+                                )}{" "}
+                                VNĐ
+                              </del>
+                              <span className="text-[red]">
+                                {new Intl.NumberFormat("vi-VN").format(
+                                  productPriceSale
+                                )}{" "}
+                                VNĐ
+                              </span>
+                            </>
+                          );
+                        }
+                      }
+                    } else {
+                      if (minPriceSale > 0) {
                         if (allSaleEqual && allRegularEqual) {
-                          // Nếu tất cả giá sale và giá regular giống nhau
                           return (
                             <>
                               <del className="mr-1">
@@ -153,29 +197,40 @@ const ProductDetailAdmin = () => {
                             <span>
                               {new Intl.NumberFormat("vi-VN").format(
                                 minPriceSale
-                              )}
+                              )}{" "}
                               VNĐ -{" "}
                               {new Intl.NumberFormat("vi-VN").format(
+                                maxPriceSale
+                              )}{" "}
+                              VNĐ
+                            </span>
+                          );
+                        }
+                      } else if (minPriceSale === 0) {
+                        if (maxPriceRegular === 0) {
+                          return (
+                            <span>
+                              {new Intl.NumberFormat("vi-VN").format(
                                 maxPriceRegular
-                              )}
+                              )}{" "}
+                              VNĐ
+                            </span>
+                          );
+} else {
+                          return (
+                            <span>
+                              {new Intl.NumberFormat("vi-VN").format(
+                                minPriceSale
+                              )}{" "}
+                              VNĐ -{" "}
+                              {new Intl.NumberFormat("vi-VN").format(
+                                maxPriceSale
+                              )}{" "}
                               VNĐ
                             </span>
                           );
                         }
                       }
-                    } else {
-                      return (
-                        <span>
-                          {new Intl.NumberFormat("vi-VN").format(
-                            minPriceRegular
-                          )}
-                          VNĐ -{" "}
-                          {new Intl.NumberFormat("vi-VN").format(
-                            maxPriceRegular
-                          )}
-                          VNĐ
-                        </span>
-                      );
                     }
                   })()}
                 </div>
@@ -232,7 +287,7 @@ const ProductDetailAdmin = () => {
                   >
                     {productShow.product.is_new ? "Có" : "Không"}
                   </span>
-                </div>
+</div>
               </div>
             </div>
 
@@ -272,34 +327,30 @@ const ProductDetailAdmin = () => {
           </div>
 
           {productShow?.allAttribute?.length > 0 && (
-            <div className="mt-4 text-base">
-              <h2 className="text-xl font-semibold text-gray-800">
-                Thuộc tính sản phẩm
-              </h2>
-              {Object.entries(productShow?.allAttribute || {}).map(
-                ([key, values]) => (
-                  <div
-                    className="relative flex items-center mt-2 mb-2"
-                    key={key}
-                  >
-                    <h3 className="font-semibold">
-                      {key.charAt(0).toUpperCase() + key.slice(1).toLowerCase()}
-                      :
-                    </h3>
-                    <span className="ml-2">
-                      {Object.values(values as { [key: string]: string }) 
-                        .map(
-                          (item) =>
-                            item.charAt(0).toUpperCase() +
-                            item.slice(1).toLowerCase()
-                        )
-                        .join(", ") || "No Value"}
-                    </span>
-                  </div>
-                )
-              )}
-            </div>
-          )}
+          <div className="mt-4 text-base">
+            <h2 className="text-xl font-semibold text-gray-800">
+              Thuộc tính sản phẩm
+            </h2>
+            {Object.entries(productShow?.allAttribute || {}).map(
+              ([key, values]) => (
+                <div className="relative flex items-center mt-2 mb-2" key={key}>
+                  <h3 className="font-semibold">
+                    {key.charAt(0).toUpperCase() + key.slice(1).toLowerCase()}:
+                  </h3>
+                  <span className="ml-2">
+                    {Object.values(values as { [key: string]: string })
+                      .map(
+                        (item) =>
+                          item.charAt(0).toUpperCase() +
+                          item.slice(1).toLowerCase()
+                      )
+                      .join(", ") || "No Value"}
+                  </span>
+                </div>
+              )
+            )}
+          </div>
+           )} 
         </div>
 
         {/* <!-- Product Gallery Section --> */}
@@ -315,7 +366,7 @@ const ProductDetailAdmin = () => {
                 key={gallery.id}
                 src={gallery.image}
                 alt={`Gallery ${gallery.id}`}
-                className="w-64 flex-shrink-0 object-cover rounded-md shadow-md mr-3"
+className="w-64 flex-shrink-0 object-cover rounded-md shadow-md mr-3"
               />
             ))}
           </div>

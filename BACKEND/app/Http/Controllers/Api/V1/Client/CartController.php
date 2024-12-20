@@ -85,7 +85,7 @@ class CartController extends Controller
             }
             $user = Auth::user();
             if (!$user) {
-                return response()->json(['message' => 'Unauthorized'], Response::HTTP_UNAUTHORIZED);
+                return response()->json(['message' => 'Bạn cần phải đăng nhập để thực hiện chức năng này'], Response::HTTP_BAD_REQUEST);
             }
 
             return DB::transaction(function () use ($data, $user) {
