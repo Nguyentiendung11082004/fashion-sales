@@ -14,5 +14,10 @@ class Authenticate extends Middleware
     {
         return $request->expectsJson() ? null : route('login');
     }
-    
+    protected function unauthenticated($request, array $guards)
+    {
+        throw new \Illuminate\Auth\AuthenticationException(
+            __('Bạn chưa đăng nhập.') 
+        );
+    }
 }

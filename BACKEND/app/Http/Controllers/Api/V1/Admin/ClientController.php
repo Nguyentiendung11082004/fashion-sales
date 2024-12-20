@@ -147,7 +147,8 @@ class ClientController extends Controller
             ], 404);
         }
 
-        // Xóa bản ghi nhân viên
+        // Xóa tất cả token của user (dành cho Sanctum)
+        $client->tokens()->delete();
         $client->delete();
 
         return response()->json([
