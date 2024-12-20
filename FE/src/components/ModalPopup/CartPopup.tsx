@@ -41,8 +41,9 @@ const CartPopup = forwardRef((props: any, ref) => {
     },
     enabled: !!slugProduct,
   });
-  console.log("kiểm tra slug nè : ", slugProduct);
-  console.log("kiểm tra id nè : ", idProduct);
+  console.log("kiểm tra slugProduct nè : ", slugProduct);
+  console.log("kiểm tra idProduct nè : ", idProduct);
+  console.log("kiểm tra product nè : ", product);
   const getUniqueAttributes = data?.getUniqueAttributes;
 
   console.log("data", data);
