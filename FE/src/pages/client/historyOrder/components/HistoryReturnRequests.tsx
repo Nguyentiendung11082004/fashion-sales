@@ -508,7 +508,7 @@ const HistoryReturnRequests = () => {
                                       {new Intl.NumberFormat("vi-VN").format(
                                         order?.order?.order_detail[0]?.price
                                       )}
-                                      VNĐ
+                                      ₫
                                     </span>
                                   </div>
                                 </div>
@@ -584,7 +584,7 @@ const HistoryReturnRequests = () => {
                                             {new Intl.NumberFormat(
                                               "vi-VN"
                                             ).format(detail.price)}
-                                            VNĐ
+                                            ₫
                                           </span>
                                         </div>
                                       </div>
@@ -797,7 +797,7 @@ const HistoryReturnRequests = () => {
                           {new Intl.NumberFormat("vi-VN").format(
                             order?.order?.total
                           )}
-                          VNĐ
+                          ₫
                         </span>
                       </div>
                     </div>

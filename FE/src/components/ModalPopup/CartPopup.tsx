@@ -347,7 +347,7 @@ const CartPopup = forwardRef((props: any, ref) => {
 
             {/* Giá sản phẩm */}
             <div className="text-2xl text-[#ff4d4f] font-semibold mb-6">
-              {Number(product?.price_sale).toLocaleString("vi-VN")} VNĐ
+              {Number(product?.price_sale).toLocaleString("vi-VN")} ₫
             </div>
 
             {/* Thuộc tính sản phẩm */}

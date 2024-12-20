@@ -170,7 +170,7 @@ const RequestOrder = () => {
                       Số lượng: <span>{value?.quantity}</span>
                     </span>
                     <span className="block mt-2 text-base">
-                      Giá: {Number(value.price).toLocaleString("vi-VN")} VNĐ
+                      Giá: {Number(value.price).toLocaleString("vi-VN")} ₫
                     </span>
                   </div>
                 </div>

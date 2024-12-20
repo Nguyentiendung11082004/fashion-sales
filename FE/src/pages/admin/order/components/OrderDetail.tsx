@@ -45,7 +45,7 @@ const OrderDetail = () => {
             {new Intl.NumberFormat("vi-VN").format(
               parseInt(dataOrderDetail?.order?.voucher_discount)
             )}
-            <span> VNĐ</span>
+            <span> ₫</span>
           </div>
           <div className="text-gray-700">
             <span className="font-semibold">Tổng số lượng: </span>
@@ -56,7 +56,7 @@ const OrderDetail = () => {
             {new Intl.NumberFormat("vi-VN").format(
               parseInt(dataOrderDetail?.order?.total)
             )}
-            <span> VNĐ</span>
+            <span> ₫</span>
           </div>
           <div className="text-gray-700">
             <span className="font-semibold">Phương thức thanh toán: </span>
@@ -168,14 +168,14 @@ const OrderDetail = () => {
                     {new Intl.NumberFormat("vi-VN").format(
                       parseInt(product?.price)
                     )}{" "}
-                    VNĐ
+                    ₫
                   </div>
                   <div className="text-gray-600">
                     <strong>Tổng tiền: </strong>
                     {new Intl.NumberFormat("vi-VN").format(
                       parseInt(product?.total_price)
                     )}{" "}
-                    VNĐ
+                    ₫
                   </div>
                 </div>
               </div>

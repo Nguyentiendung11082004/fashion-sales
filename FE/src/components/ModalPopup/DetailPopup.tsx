@@ -253,9 +253,9 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
             <span className="text-xl text-[#696969]">
               {minPrice !== null && maxPrice !== null
                 ? minPrice === maxPrice
-                  ? `${new Intl.NumberFormat("vi-VN").format(minPrice)} VNĐ`
-                  : `${new Intl.NumberFormat("vi-VN").format(minPrice)} - ${new Intl.NumberFormat("vi-VN").format(maxPrice)} VNĐ`
-                : `${new Intl.NumberFormat("vi-VN").format(productSeeMore?.price_sale || 0)} VNĐ`}
+                  ? `${new Intl.NumberFormat("vi-VN").format(minPrice)} ₫`
+                  : `${new Intl.NumberFormat("vi-VN").format(minPrice)} - ${new Intl.NumberFormat("vi-VN").format(maxPrice)} ₫`
+                : `${new Intl.NumberFormat("vi-VN").format(productSeeMore?.price_sale || 0)} ₫`}
             </span>
             <div className="flex items-center">
               <Link
