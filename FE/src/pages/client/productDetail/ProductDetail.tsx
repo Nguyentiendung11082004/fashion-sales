@@ -629,7 +629,7 @@ const ProductDetail = () => {
                 <div className="flex items-center mt-5 lg:mx-[15%] sm:mx-[42%] xl:mx-0 sm:mt-2 space-x-4">
                   <div className="">
                     <span className="lg:text-[18px] sm:text-[16px] text-lg text-[#747474] my-2">
-                      {product?.price_sale?.toLocaleString("vi-VN")} VNĐ
+                      {product?.price_sale?.toLocaleString("vi-VN")} ₫
                     </span>
                   </div>
 
