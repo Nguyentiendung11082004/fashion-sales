@@ -32,6 +32,7 @@ class CheckoutController extends Controller
     {
         try {
             $data = $request->validated(); // Lấy dữ liệu đã xác thực
+            $usedVoucherIds = [];
             if (auth('sanctum')->check()) {
                 $user_id = auth('sanctum')->id();
 
@@ -338,10 +339,10 @@ class CheckoutController extends Controller
                 $ineligible_products[] = $item;
             }
         }
-        // Kiểm tra giá trị tối thiểu của đơn hàng
-        if (isset($voucher_metas['_voucher_min_order_value']) && $sub_total < $voucher_metas['_voucher_min_order_value']) {
+        // // Kiểm tra giá trị tối thiểu của đơn hàng
+        if ($voucher->min_order_value && $sub_total < $voucher->min_order_value) {
             return [
-                'error' => "Tổng giá trị đơn hàng phải lớn hơn " . $voucher_metas['_voucher_min_order_value'] . " để áp dụng voucher này.",
+                'error' => "Tổng giá trị đơn hàng phải lớn hơn " . $voucher->min_order_value . " để áp dụng voucher này.",
                 'ineligible_products' => $ineligible_products,
             ];
         }
