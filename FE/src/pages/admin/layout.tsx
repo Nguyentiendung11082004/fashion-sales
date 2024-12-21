@@ -120,7 +120,7 @@ const SidebarMenu = memo(({ selectedKey }: { selectedKey: string }) => (
         icon: <OrderedListOutlined />,
         label: (
           <NavLink className="text-white" to="/admin">
-            Biến Thể Sản Phẩm
+            Quản lý thuộc tính
           </NavLink>
         ),
         children: [

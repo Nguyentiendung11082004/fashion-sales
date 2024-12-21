@@ -27,6 +27,8 @@ class CheckoutController extends Controller
     {
         $this->api_key = env('API_KEY');
         $this->shop_id = env('SHOP_ID');
+        // dd( $this->api_key,
+        // $this->shop_id);
     }
     public function store(StoreCheckoutRequest $request)
     {
@@ -532,7 +534,7 @@ class CheckoutController extends Controller
             $response = curl_exec($ch);
             curl_close($ch);
             $services = json_decode($response, true)['data'][0];
-
+            // dd($services);
             return  $services;
         } catch (\Exception $ex) {
             return response()->json([
@@ -588,7 +590,7 @@ class CheckoutController extends Controller
             curl_close($ch);
 
             $fee = json_decode($response, true)['data'];
-
+            // dd($fee);
             return response()->json([
                 "fee" => $fee
             ], Response::HTTP_OK);
