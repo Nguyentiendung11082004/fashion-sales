@@ -115,8 +115,8 @@ const Checkout = () => {
         autoClose: 6000,
       }));
     },
-    onError: (error) => {
-      console.log("error", error)
+    onError: (error:any) => {
+      toast.error(error?.response?.data?.error)
     }
   });
 
