@@ -84,7 +84,7 @@ const OrderPage = () => {
 
   const prinfOrderAll = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/v1/pdf-order", {
+      const response = await fetch("https://backend.muskskyland.com.vn/api/v1/pdf-order", {
         method: "POST",
       });
       if (!response.ok) {
@@ -103,7 +103,7 @@ const OrderPage = () => {
 
   const prinfOrderId = async (order_id: any) => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/v1/pdf-order", {
+      const response = await fetch("https://backend.muskskyland.com.vn/api/v1/pdf-order", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

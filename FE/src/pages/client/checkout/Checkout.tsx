@@ -313,7 +313,7 @@ const Checkout = () => {
     if (cartIds.length > 0) {
       try {
         setIsLoading(true);
-        const response = await fetch('http://127.0.0.1:8000/api/v1/checkout', {
+        const response = await fetch('https://backend.muskskyland.com.vn/api/v1/checkout', {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -349,7 +349,7 @@ const Checkout = () => {
     try {
       if (_payload || payloadDiaChi) {
         setIsLoading(true);
-        const response = await fetch('http://127.0.0.1:8000/api/v1/checkout', {
+        const response = await fetch('https://backend.muskskyland.com.vn/api/v1/checkout', {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,
