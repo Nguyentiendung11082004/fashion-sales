@@ -23,7 +23,7 @@ class PaymentController extends Controller
             $vnp_HashSecret = $this->vnp_HashSecret;
             $vnp_Url = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
             // trả về url mà bạn muốn hiển thị khi thanh toán thành công
-            $vnp_Returnurl = "https://fashion-sales.muskskyland.com.vn/api/v1/payment/vnpay-return";
+            $vnp_Returnurl = "https://backend.muskskyland.com.vn/api/v1/payment/vnpay-return";
 
             $vnp_TxnRef = $request->id;
             $vnp_Amount = $request->total * 100;
