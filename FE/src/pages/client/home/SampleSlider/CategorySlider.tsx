@@ -39,8 +39,8 @@ const CategoryCarousel = () => {
   }, []);
 
   const handleCategoryClick = () => {
-    setSelectedCategories([categoryId]);
-    applyFilters([categoryId]);
+    // setSelectedCategories([categoryId]);
+    // applyFilters([categoryId]);
     navigate("/products");
   };
 

@@ -28,8 +28,8 @@ const Wishlist = () => {
     },
   });
   // console.log(data);
-  const [slugProduct, setSlugProduct] = useState();
-  const [idProduct, setIdProduct] = useState();
+  const [slugProduct, setSlugProduct] = useState<any>();
+  const [idProduct, setIdProduct] = useState<any>();
 
   const [currentPage, setCurrentPage] = useState(1); // Trang hiện tại
   const productsPerPage = 12; // Mỗi trang có 12 sản phẩm

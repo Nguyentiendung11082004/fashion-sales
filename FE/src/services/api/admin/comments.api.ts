@@ -5,7 +5,7 @@ import instance from "@/configs/axios";
 const handleRequest = async (
   method: "get" | "delete",
   url: string,
-  value?: Icomments
+  value?: any
 ) => {
   try {
     const { data } = await instance[method](url, value);
