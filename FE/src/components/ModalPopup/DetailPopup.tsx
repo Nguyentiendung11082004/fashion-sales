@@ -155,9 +155,6 @@ const DetailPopup = ({ open, onClose, productSeeMore }: Props) => {
     setSelectedVariantId(null);
     onClose();
   };
-  console.log("_payload", _payload)
-  console.log("productSeeMore", productSeeMore)
-
   const handleCheckout = () => {
     if (_payload.product_variant_id) {
       const selectedVariant = productSeeMore?.variants.find(

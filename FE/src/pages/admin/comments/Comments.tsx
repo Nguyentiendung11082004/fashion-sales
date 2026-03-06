@@ -18,14 +18,12 @@ const CommentPage = () => {
   const [currentTagId, setCurrentTagId] = useState<number | null>(null);
   const [visiable, setVisiable] = useState(false);
   const [query, setQuery] = useState("");
-  const [searchResults, setSearchResults] = useState([]); 
+  const [searchResults, setSearchResults] = useState([]);
 
   const { data, isFetching, isError } = useQuery({
     queryKey: ["comments"],
     queryFn: getComments,
   });
-  console.log("comments  nè:", data);
-
   const handleSearch = async () => {
     if (!query.trim()) {
       setSearchResults(data || []);
@@ -55,9 +53,9 @@ const CommentPage = () => {
     },
   });
 
-  const handleOpen = (id: number) => {
-    setCurrentTagId(id);
-    setVisiable(true);
+  const handleOpen = (id: any) => {
+      setCurrentTagId(id);
+      setVisiable(true);
   };
 
   const handleRemove = () => {
@@ -148,11 +146,11 @@ const CommentPage = () => {
             onChange={(e) => {
               const value = e.target.value;
               setQuery(value);
-    
+
               if (!value.trim()) {
                 setSearchResults(data || []);
               }
-            }}/>
+            }} />
           <Button className="ml-1" onClick={handleSearch}>Tìm kiếm</Button>
         </div>
       </div>

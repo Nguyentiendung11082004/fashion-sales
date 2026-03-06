@@ -177,7 +177,6 @@ const HistoryOrder = () => {
 
   const [isShowFormCmtOpen, setShowFormCmtOpen] = useState(false);
   const showFormCmt = (order: any) => {
-    console.log("data order nè : ", order);
     setShowFormCmtOpen(true);
     setSelectedOrder(order);
 

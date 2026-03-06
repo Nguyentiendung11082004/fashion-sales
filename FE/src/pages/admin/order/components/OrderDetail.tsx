@@ -16,17 +16,14 @@ const OrderDetail = () => {
     },
   });
   const dataOrderDetail = data?.data;
-  console.log("data order nè : ", dataOrderDetail);
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>{error.message}</div>;
   console.log("order-detail: ", data);
   return (
     <div className="bg-gray-50 min-h-screen p-8">
-      {/* Title */}
       <div className="text-4xl font-extrabold  mb-8 text-center">
         Chi tiết Đơn hàng
       </div>
-
       {/* Order Information */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-8">
         <h2 className="text-2xl font-bold text-gray-800 mb-4 border-b pb-2 border-gray-200">

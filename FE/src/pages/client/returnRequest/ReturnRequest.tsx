@@ -1,9 +1,7 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useAuth } from "@/common/context/Auth/AuthContext";
 import instance from "@/configs/axios";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import Pusher from "pusher-js";
+import { useMutation } from "@tanstack/react-query";
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -14,6 +12,7 @@ const ReturnRequest = () => {
   const reasonReturn = location.state?.reasonFromState;
   const dataOrder = location.state?.dataOrder;
   const filteredProduct = dataOrder.order_details?.filter((product: any) =>
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     items.some((item: any) => item.order_detail_id === product.id)
   );
   const navigate = useNavigate();
@@ -27,7 +26,6 @@ const ReturnRequest = () => {
     }
     return product;
   });
-  console.log("updatedProducts 12345: ", updatedProducts);
   const { token } = useAuth();
   const { mutate } = useMutation({
     mutationFn: async (request: any) => {

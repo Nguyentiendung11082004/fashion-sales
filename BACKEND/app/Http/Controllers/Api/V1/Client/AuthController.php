@@ -94,7 +94,7 @@ class AuthController extends Controller
             event(new Registered($user));
 
             return response()->json([
-                'message' => 'Đăng ký tài khoản thành công, Vui lòng check mail đẻ xác nhận',
+                'message' => 'Đăng ký tài khoản thành công, Vui lòng check mail để xác nhận',
                 'email'   => $user->email
                 // 'token' => $token
             ]);

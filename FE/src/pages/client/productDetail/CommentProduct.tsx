@@ -235,11 +235,10 @@ const CommentProduct = ({
                 editIdComment,
               });
             } else {
-              console.log("payload nè : ", payload);
               postCommentProduct.mutate(payload as Icomments);
             }
           });
-        }}
+        }}z
         className="m-auto w-full max-w-lg p-6 bg-white shadow-lg rounded-lg"
       >
         <h1 className="font-semibold lg:text-2xl text-base mb-4 text-center">

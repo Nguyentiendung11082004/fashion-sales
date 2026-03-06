@@ -41,12 +41,7 @@ const CartPopup = forwardRef((props: any, ref) => {
     },
     enabled: !!slugProduct,
   });
-  console.log("kiểm tra slugProduct nè : ", slugProduct);
-  console.log("kiểm tra idProduct nè : ", idProduct);
-  console.log("kiểm tra product nè : ", product);
   const getUniqueAttributes = data?.getUniqueAttributes;
-
-  console.log("data", data);
   useEffect(() => {
     if (data && data.product) {
       setProduct(data.product);

@@ -33,7 +33,6 @@ const ProductForm = () => {
 
     const [isTableVisible, setIsTableVisible] = useState(false); // State điều khiển hiển thị bảng
     const [selectedValues, setSelectedValues] = useState<any>([]); // State lưu trữ giá trị đã chọn cho từng thuộc tính
-    console.log("selectedValues", selectedValues)
     const [isColumnsVisible, setIsColumnsVisible] = useState(false); // state cột
     const [error, setError] = useState<any>()
     const [valueHome, setValueHome] = useState(1);
