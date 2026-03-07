@@ -1,0 +1,40 @@
+# --- BACKEND (Laravel/PHP) ---
+/BACKEND/vendor/
+/BACKEND/node_modules/
+/BACKEND/.env
+/BACKEND/.env.backup
+/BACKEND/.env.production
+/BACKEND/.phpunit.cache
+/BACKEND/.phpunit.result.cache
+/BACKEND/public/build
+/BACKEND/public/hot
+/BACKEND/public/storage
+/BACKEND/storage/*.key
+/BACKEND/Homestead.json
+/BACKEND/Homestead.yaml
+/BACKEND/auth.json
+/BACKEND/npm-debug.log
+/BACKEND/yarn-error.log
+
+# --- FRONTEND (Node/Vue/React) ---
+/FE/node_modules/
+/FE/dist/
+/FE/dist-ssr/
+/FE/*.local
+/FE/*.log
+/FE/npm-debug.log*
+/FE/yarn-debug.log*
+/FE/yarn-error.log*
+/FE/pnpm-debug.log*
+/FE/lerna-debug.log*
+
+# --- Tổng hợp & Editor ---
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+.fleet
