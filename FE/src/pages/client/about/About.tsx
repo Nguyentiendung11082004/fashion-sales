@@ -130,7 +130,7 @@ const About = () => {
                       data-nimg="fill"
                       className="absolute inset-0 object-cover hidden lg:block"
                       sizes="300px"
-                      src="./src/assets/images/z6080913682718_0437356e59304fbfb80754b6b07df34c.jpg"
+                      src="./images/z6080913682718_0437356e59304fbfb80754b6b07df34c.jpg"
                       style={{
                         position: "absolute",
                         height: "100%",
@@ -158,7 +158,7 @@ const About = () => {
                       sizes="300px"
                       srcSet="
               "
-                      src="./src/assets/images/z5513883787421_7d1f10db8a5171d1da722feb02185edd.jpg"
+                      src="./images/z5513883787421_7d1f10db8a5171d1da722feb02185edd.jpg"
                       style={{
                         position: "absolute",
                         height: "100%",
@@ -184,7 +184,7 @@ const About = () => {
                       sizes="300px"
                       srcSet="
               "
-                      src="./src/assets/images/z6080902480848_00dba82ce951d41b5cbd2cdf379607a8.jpg"
+                      src="./images/z6080902480848_00dba82ce951d41b5cbd2cdf379607a8.jpg"
                       style={{
                         position: "absolute",
                         height: "100%",
@@ -212,7 +212,7 @@ const About = () => {
                       sizes="300px"
                       srcSet="
               "
-                      src="./src/assets/images/iamgeKimHue.jpg"
+                      src="./images/iamgeKimHue.jpg"
                       style={{
                         position: "absolute",
                         height: "100%",
@@ -238,7 +238,7 @@ const About = () => {
                       sizes="300px"
                       srcSet="
               "
-                      src="./src/assets/images/z6080904489132_be65fadd49e6806784032537c238ad3f.jpg"
+                      src="./images/z6080904489132_be65fadd49e6806784032537c238ad3f.jpg"
                       style={{
                         position: "absolute",
                         height: "100%",
@@ -266,7 +266,7 @@ const About = () => {
                       sizes="300px"
                       srcSet="
               "
-                      src="./src/assets/images/z6080907305180_9095ebc9d001ef6aae02f629b373af48.jpg"
+                      src="./images/z6080907305180_9095ebc9d001ef6aae02f629b373af48.jpg"
                       style={{
                         position: "absolute",
                         height: "100%",
