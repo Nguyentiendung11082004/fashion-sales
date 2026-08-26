@@ -427,7 +427,7 @@ const Checkout = () => {
                 <div className="flex-1">
                   <div className="space-y-8">
                     {
-                      token &&
+                      // token &&
                       <div className="scroll-mt-24 mt-2">
                         <div className="border border-slate-200 rounded-xl shadow-md overflow-hidden z-0">
                           <div className="flex flex-col sm:flex-row items-start p-6 bg-white dark:bg-neutral-900">
@@ -455,7 +455,7 @@ const Checkout = () => {
                           </div>
                         </div>
 
-                        <div className="border border-slate-200 rounded-xl overflow-hidden z-0 mt-4 p-6 shadow-lg bg-white dark:bg-neutral-800">
+                        <div className="border border-slate-200 rounded-xl overflow-hidden z-0 mt-4 p-6 shadow-lg bg-white  ">
                           <div>
                             <div className="sm:ml-4">
                               <h3 className="text-black flex items-center space-x-2">
@@ -559,7 +559,7 @@ const Checkout = () => {
                     {
                       !token && (
                         <div id="hd-ShippingAddress" className="scroll-mt-24">
-                          <div className="border border-slate-200 dark:border-neutral-600 rounded-xl bg-white dark:bg-neutral-800 shadow-lg">
+                          <div className="border border-slate-200 dark:border-neutral-600 rounded-xl bg-white   shadow-lg">
                             <div className="hd-body-ShippingAddress border-t border-slate-200 dark:border-neutral-600 px-6 py-7 space-y-6 sm:space-y-8">
                               <h3 className="text-2xl font-bold text-center text-gray-900 dark:text-white border-b-2 border-gray-300 pb-2 mb-6">
                                 Thông tin người nhận hàng
@@ -751,12 +751,12 @@ const Checkout = () => {
                 </div>
                 {/*end-left*/}
                 <div className="flex-shrink-0 border-t lg:border-t-0 lg:border-l border-slate-200 my-10 lg:my-0 lg:mx-10 xl:lg:mx-14 2xl:mx-8" />
-                <div className="w-full lg:w-[42%] bg-white dark:bg-neutral-800 px-6 pb-5 rounded-xl shadow-lg">
+                <div className="w-full lg:w-[42%] bg-white   px-6 pb-5 rounded-xl shadow-lg">
                   <h3 className="text-lg font-semibold mb-4">Đặt hàng</h3>
                   {
                     isLoading ? <Loading /> :
                       dataCheckout?.order_items.map((e: any) => (
-                        <div className="relative flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-6 my-4 p-4 bg-white dark:bg-neutral-800 rounded-lg shadow-lg">
+                        <div className="relative flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-6 my-4 p-4 bg-white   rounded-lg shadow-lg">
                           {/* Product Image Section */}
                           <div className="relative h-32 w-24 sm:w-28 flex-shrink-0 overflow-hidden rounded-lg border border-slate-200 dark:border-neutral-600">
                             <img
